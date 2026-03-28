@@ -112,6 +112,101 @@
     }
 
     /* Override products-grid for catalogue: ensure 5 cols on desktop (already in style.css) */
+
+    /* Subcategory bar */
+    .subcategory-bar {
+      padding: 12px 0;
+      border-bottom: 1px solid #EBEBEB;
+      margin-bottom: 16px;
+    }
+    .gender-filter {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .gender-filter .gender-btn {
+      padding: 8px 20px;
+      border: 2px solid #EBEBEB;
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      color: #333;
+    }
+    .gender-filter .gender-btn:hover { border-color: #09B1BA; color: #09B1BA; }
+    .gender-filter .gender-btn.active {
+      border-color: #09B1BA;
+      background: #E6F7F8;
+      color: #09B1BA;
+      font-weight: 600;
+    }
+    .subcategory-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .subcategory-chips .sub-chip {
+      padding: 6px 14px;
+      border: 1px solid #EBEBEB;
+      border-radius: 16px;
+      background: white;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+      color: #555;
+    }
+    .subcategory-chips .sub-chip:hover { border-color: #09B1BA; color: #09B1BA; }
+    .subcategory-chips .sub-chip.active {
+      border-color: #09B1BA;
+      background: #09B1BA;
+      color: white;
+    }
+    .zone-filter {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .zone-filter .zone-btn {
+      padding: 8px 20px;
+      border: 2px solid #EBEBEB;
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .zone-filter .zone-btn:hover { border-color: #09B1BA; }
+    .zone-filter .zone-btn.active {
+      border-color: #09B1BA;
+      background: #E6F7F8;
+      color: #09B1BA;
+      font-weight: 600;
+    }
+    .age-filter {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .age-filter .age-chip {
+      padding: 5px 12px;
+      border: 1px solid #EBEBEB;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+    .age-filter .age-chip:hover { border-color: #09B1BA; }
+    .age-filter .age-chip.active {
+      border-color: #09B1BA;
+      background: #09B1BA;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -193,6 +288,22 @@
       </select>
 
       <button class="clear-filters" id="clear-filters-btn"><i class="fas fa-times"></i> Clear</button>
+    </div>
+
+    <!-- Dynamic Subcategory Filters (shown for clothing, kids, bags_accessories) -->
+    <div class="subcategory-bar" id="subcategory-bar" style="display:none;">
+      <div class="gender-filter" id="gender-filter" style="display:none;">
+        <!-- Gender buttons populated dynamically -->
+      </div>
+      <div class="subcategory-chips" id="subcategory-chips" style="display:none;">
+        <!-- Subcategory chips populated dynamically -->
+      </div>
+      <div class="zone-filter" id="zone-filter" style="display:none;">
+        <!-- Zone buttons for Bags & Accessories -->
+      </div>
+      <div class="age-filter" id="age-filter" style="display:none;">
+        <!-- Age range chips for Kids -->
+      </div>
     </div>
   </div>
 
@@ -317,12 +428,35 @@
       }
 
       function renderCatalogue() {
-        const { items } = DemoItems.browse({
+        const result = DemoItems.browse({
           category: currentFilters.category || undefined,
           condition: currentFilters.condition || undefined,
           search: currentFilters.search || undefined,
           sortBy: currentFilters.sortBy
         });
+
+        // Apply subcategory filters
+        let items = result.items;
+        if (currentSubFilters.gender) {
+          items = items.filter(function(item) {
+            return item.clothing_gender === currentSubFilters.gender;
+          });
+        }
+        if (currentSubFilters.subcategory) {
+          items = items.filter(function(item) {
+            return item.subcategory === currentSubFilters.subcategory;
+          });
+        }
+        if (currentSubFilters.zone) {
+          items = items.filter(function(item) {
+            return item.zone === currentSubFilters.zone;
+          });
+        }
+        if (currentSubFilters.ageRange) {
+          items = items.filter(function(item) {
+            return item.age_range === currentSubFilters.ageRange;
+          });
+        }
 
         const grid = document.getElementById('catalogue-grid');
         const count = document.getElementById('item-count');
@@ -353,6 +487,7 @@
           currentFilters.category = catSelect.value;
           visibleCount = PAGE_SIZE;
           renderCatalogue();
+          updateSubcategoryBar();
         });
       }
 
@@ -409,6 +544,7 @@
           if (navSearch) navSearch.value = '';
           visibleCount = PAGE_SIZE;
           renderCatalogue();
+          updateSubcategoryBar();
         });
       }
 
@@ -437,11 +573,174 @@
           if (catSelect) catSelect.value = currentFilters.category;
           visibleCount = PAGE_SIZE;
           renderCatalogue();
+          updateSubcategoryBar();
         });
       });
 
+      // ──── SUBCATEGORY FILTER SYSTEM ────
+      var currentSubFilters = { gender: null, subcategory: null, zone: null, ageRange: null };
+
+      function updateSubcategoryBar() {
+        var cat = currentFilters.category;
+        var bar = document.getElementById('subcategory-bar');
+        var genderFilter = document.getElementById('gender-filter');
+        var subChips = document.getElementById('subcategory-chips');
+        var zoneFilter = document.getElementById('zone-filter');
+        var ageFilter = document.getElementById('age-filter');
+
+        // Reset
+        bar.style.display = 'none';
+        genderFilter.style.display = 'none';
+        subChips.style.display = 'none';
+        zoneFilter.style.display = 'none';
+        ageFilter.style.display = 'none';
+        currentSubFilters = { gender: null, subcategory: null, zone: null, ageRange: null };
+
+        if (cat === 'clothing' && window.CLOTHING_SUBCATEGORIES) {
+          bar.style.display = 'block';
+          genderFilter.style.display = 'flex';
+          genderFilter.innerHTML = ['male', 'female', 'kids', 'unisex'].map(function(g) {
+            var labels = { male: 'Men', female: 'Women', kids: 'Children', unisex: 'Unisex' };
+            return '<button class="gender-btn" data-gender="' + g + '">' + labels[g] + '</button>';
+          }).join('');
+          genderFilter.querySelectorAll('.gender-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              genderFilter.querySelectorAll('.gender-btn').forEach(function(b) { b.classList.remove('active'); });
+              btn.classList.add('active');
+              currentSubFilters.gender = btn.dataset.gender;
+              showClothingSubcategories(btn.dataset.gender);
+              renderCatalogue();
+            });
+          });
+        } else if (cat === 'kids' && window.KIDS_SUBCATEGORIES) {
+          bar.style.display = 'block';
+          genderFilter.style.display = 'flex';
+          genderFilter.innerHTML = ['girl', 'boy', 'unisex'].map(function(g) {
+            var labels = { girl: 'Girl', boy: 'Boy', unisex: 'Unisex' };
+            return '<button class="gender-btn" data-gender="' + g + '">' + labels[g] + '</button>';
+          }).join('');
+          genderFilter.querySelectorAll('.gender-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              genderFilter.querySelectorAll('.gender-btn').forEach(function(b) { b.classList.remove('active'); });
+              btn.classList.add('active');
+              currentSubFilters.gender = btn.dataset.gender;
+              showKidsSubcategories(btn.dataset.gender);
+              renderCatalogue();
+            });
+          });
+          // Age range filter
+          ageFilter.style.display = 'flex';
+          ageFilter.innerHTML = (window.KIDS_AGE_RANGES || []).map(function(a) {
+            return '<button class="age-chip" data-age="' + a + '">' + a + '</button>';
+          }).join('');
+          ageFilter.querySelectorAll('.age-chip').forEach(function(chip) {
+            chip.addEventListener('click', function() {
+              if (chip.classList.contains('active')) {
+                chip.classList.remove('active');
+                currentSubFilters.ageRange = null;
+              } else {
+                ageFilter.querySelectorAll('.age-chip').forEach(function(c) { c.classList.remove('active'); });
+                chip.classList.add('active');
+                currentSubFilters.ageRange = chip.dataset.age;
+              }
+              renderCatalogue();
+            });
+          });
+        } else if (cat === 'bags_accessories' && window.BAGS_ACCESSORIES_SUBCATEGORIES) {
+          bar.style.display = 'block';
+          zoneFilter.style.display = 'flex';
+          zoneFilter.innerHTML = '<button class="zone-btn" data-zone="bags">Bags</button>' +
+            '<button class="zone-btn" data-zone="accessories">Accessories</button>';
+          zoneFilter.querySelectorAll('.zone-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              if (btn.classList.contains('active')) {
+                btn.classList.remove('active');
+                currentSubFilters.zone = null;
+                subChips.style.display = 'none';
+              } else {
+                zoneFilter.querySelectorAll('.zone-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentSubFilters.zone = btn.dataset.zone;
+                showBagsSubcategories(btn.dataset.zone);
+              }
+              renderCatalogue();
+            });
+          });
+        }
+      }
+
+      function showClothingSubcategories(gender) {
+        var subChips = document.getElementById('subcategory-chips');
+        var subs = (window.CLOTHING_SUBCATEGORIES || {})[gender] || [];
+        if (subs.length === 0) { subChips.style.display = 'none'; return; }
+        subChips.style.display = 'flex';
+        subChips.innerHTML = subs.map(function(s) {
+          return '<button class="sub-chip" data-sub="' + s + '">' + s + '</button>';
+        }).join('');
+        subChips.querySelectorAll('.sub-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            if (chip.classList.contains('active')) {
+              chip.classList.remove('active');
+              currentSubFilters.subcategory = null;
+            } else {
+              subChips.querySelectorAll('.sub-chip').forEach(function(c) { c.classList.remove('active'); });
+              chip.classList.add('active');
+              currentSubFilters.subcategory = chip.dataset.sub;
+            }
+            renderCatalogue();
+          });
+        });
+      }
+
+      function showKidsSubcategories(gender) {
+        var subChips = document.getElementById('subcategory-chips');
+        var subs = (window.KIDS_SUBCATEGORIES || {})[gender] || [];
+        if (subs.length === 0) { subChips.style.display = 'none'; return; }
+        subChips.style.display = 'flex';
+        subChips.innerHTML = subs.map(function(s) {
+          return '<button class="sub-chip" data-sub="' + s + '">' + s + '</button>';
+        }).join('');
+        subChips.querySelectorAll('.sub-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            if (chip.classList.contains('active')) {
+              chip.classList.remove('active');
+              currentSubFilters.subcategory = null;
+            } else {
+              subChips.querySelectorAll('.sub-chip').forEach(function(c) { c.classList.remove('active'); });
+              chip.classList.add('active');
+              currentSubFilters.subcategory = chip.dataset.sub;
+            }
+            renderCatalogue();
+          });
+        });
+      }
+
+      function showBagsSubcategories(zone) {
+        var subChips = document.getElementById('subcategory-chips');
+        var subs = (window.BAGS_ACCESSORIES_SUBCATEGORIES || {})[zone] || [];
+        if (subs.length === 0) { subChips.style.display = 'none'; return; }
+        subChips.style.display = 'flex';
+        subChips.innerHTML = subs.map(function(s) {
+          return '<button class="sub-chip" data-sub="' + s + '">' + s + '</button>';
+        }).join('');
+        subChips.querySelectorAll('.sub-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            if (chip.classList.contains('active')) {
+              chip.classList.remove('active');
+              currentSubFilters.subcategory = null;
+            } else {
+              subChips.querySelectorAll('.sub-chip').forEach(function(c) { c.classList.remove('active'); });
+              chip.classList.add('active');
+              currentSubFilters.subcategory = chip.dataset.sub;
+            }
+            renderCatalogue();
+          });
+        });
+      }
+
       // Initial render
       renderCatalogue();
+      updateSubcategoryBar();
     });
   </script>
 

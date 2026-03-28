@@ -613,6 +613,10 @@
                 <div class="category-btn-icon">&#x1F476;</div>
                 <div class="category-btn-label">Kids & Baby</div>
               </button>
+              <button type="button" class="category-btn" data-category="plants" onclick="selectCategory(this, 'plants')">
+                <div class="category-btn-icon"><i class="fas fa-leaf"></i></div>
+                <div class="category-btn-label" data-i18n="plants">Plants</div>
+              </button>
               <button type="button" class="category-btn" data-category="sports" onclick="selectCategory(this, 'sports')">
                 <div class="category-btn-icon">&#x26BD;</div>
                 <div class="category-btn-label">Sports & Leisure</div>
@@ -628,6 +632,10 @@
               <button type="button" class="category-btn" data-category="vehicles" onclick="selectCategory(this, 'vehicles')">
                 <div class="category-btn-icon">&#x1F697;</div>
                 <div class="category-btn-label">Vehicles</div>
+              </button>
+              <button type="button" class="category-btn" data-category="bags_accessories" onclick="selectCategory(this, 'bags_accessories')">
+                <div class="category-btn-icon"><i class="fas fa-shopping-bag"></i></div>
+                <div class="category-btn-label" data-i18n="bags_accessories">Bags & Accessories</div>
               </button>
               <button type="button" class="category-btn" data-category="other" onclick="selectCategory(this, 'other')">
                 <div class="category-btn-icon">&#x1F4E6;</div>
@@ -842,10 +850,13 @@
     // ========================
     const categoryFields = {
       clothing: {
-        types: ['T-shirt', 'Jacket', 'Pants', 'Dress', 'Shoes', 'Bag', 'Watch', 'Scarf', 'Other'],
-        brands: ['Nike', 'Adidas', 'Zara', 'H&M', 'Gucci', 'Prada', 'Uniqlo', 'Other'],
-        showSize: true,
-        sizeOptions: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One size']
+        gender: { label: 'Gender', type: 'select', options: ['Men', 'Women', 'Children', 'Unisex'], required: true },
+        subcategory: { label: 'Subcategory', type: 'select', options: [], required: true }, // populated dynamically
+        type: { label: 'Type', type: 'text', placeholder: 'e.g. T-Shirt, Dress' },
+        brand: { label: 'Brand', type: 'text', placeholder: 'e.g. Nike, Zara' },
+        size: { label: 'Size', type: 'select', options: ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'One Size'] },
+        condition: { label: 'Condition', type: 'select', options: ['New with tags', 'Like new', 'Good', 'Fair'], required: true },
+        color: { label: 'Color', type: 'text', placeholder: 'e.g. Black, Blue' }
       },
       electronics: {
         types: ['Smartphone', 'Laptop', 'Tablet', 'Console', 'Headphones', 'Camera', 'Smart Watch', 'Speaker', 'Other'],
@@ -875,10 +886,28 @@
         showSize: false
       },
       kids: {
-        types: ['Clothing', 'Shoes', 'Toys', 'Books', 'Stroller', 'Car Seat', 'Crib', 'Other'],
-        brands: ['Zara Kids', 'H&M Kids', 'Gap Kids', 'Carter\'s', 'Other'],
-        showSize: true,
-        sizeOptions: ['Newborn', '0-3m', '3-6m', '6-12m', '1-2y', '2-3y', '3-4y', '4-6y']
+        gender: { label: 'Gender', type: 'select', options: ['Girl', 'Boy', 'Unisex'], required: true },
+        subcategory: { label: 'Subcategory', type: 'select', options: ['Clothing', 'Toys & Games', 'Strollers & Car Seats', 'Baby Furniture', 'Feeding & Bottles', 'Kids Books'], required: true },
+        age_range: { label: 'Age Range', type: 'select', options: ['0-6 months', '6-12 months', '1-2 years', '2-4 years', '4+ years'] },
+        type: { label: 'Type', type: 'text', placeholder: 'e.g. Stroller, LEGO Set' },
+        brand: { label: 'Brand', type: 'text', placeholder: 'e.g. Bugaboo, Fisher-Price' },
+        condition: { label: 'Condition', type: 'select', options: ['New with tags', 'Like new', 'Good', 'Fair'], required: true },
+        color: { label: 'Color', type: 'text', placeholder: 'e.g. Pink, Blue' }
+      },
+      bags_accessories: {
+        zone: { label: 'Type', type: 'select', options: ['Bags', 'Accessories'], required: true },
+        subcategory: { label: 'Subcategory', type: 'select', options: [], required: true }, // populated dynamically
+        brand: { label: 'Brand', type: 'text', placeholder: 'e.g. Louis Vuitton, Herschel' },
+        material: { label: 'Material', type: 'select', options: ['Leather', 'Fabric', 'Synthetic', 'Other'] },
+        condition: { label: 'Condition', type: 'select', options: ['New with tags', 'Like new', 'Good', 'Fair'], required: true },
+        color: { label: 'Color', type: 'text', placeholder: 'e.g. Brown, Black' }
+      },
+      plants: {
+        type: { label: 'Type', type: 'select', options: ['Indoor Plant', 'Outdoor Plant', 'Succulent', 'Cactus', 'Herb', 'Flower', 'Tree', 'Seed/Bulb'] },
+        brand: { label: 'Variety/Name', type: 'text', placeholder: 'e.g. Monstera, Snake Plant' },
+        size: { label: 'Size', type: 'select', options: ['Small (< 20cm)', 'Medium (20-50cm)', 'Large (50-100cm)', 'Extra Large (> 100cm)'] },
+        condition: { label: 'Condition', type: 'select', options: ['Thriving', 'Healthy', 'Needs care', 'Propagation/Cutting'], required: true },
+        color: { label: 'Pot included?', type: 'select', options: ['Yes, with pot', 'No, plant only'] }
       },
       other: {
         types: ['Home Decor', 'Kitchen', 'Tools', 'Garden', 'Pet Supplies', 'Collectibles', 'Other'],
@@ -895,6 +924,8 @@
       sports: 'Sports & Leisure',
       books: 'Books & Media',
       kids: 'Kids & Baby',
+      bags_accessories: 'Bags & Accessories',
+      plants: 'Plants',
       other: 'Other'
     };
 
@@ -907,6 +938,8 @@
       sports:      ['https://images.unsplash.com/photo-1461896836934-bd45ba688509?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=300&h=400&fit=crop'],
       books:       ['https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=300&h=400&fit=crop'],
       kids:        ['https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1566004100477-7b3d6be5f4f2?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1472162072942-cd5147eb3902?w=300&h=400&fit=crop'],
+      bags_accessories: ['https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=400&fit=crop'],
+      plants:      ['https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1501004318855-cd2e69e37b83?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=300&h=400&fit=crop'],
       other:       ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=400&fit=crop']
     };
 
@@ -992,6 +1025,19 @@
     // ========================
     // STEP 2: DYNAMIC DETAILS FIELDS
     // ========================
+    // Dynamic subcategory data
+    var CLOTHING_SUBCATEGORIES = {
+      male: ['T-Shirts & Polos', 'Shirts', 'Pants & Jeans', 'Shorts', 'Jackets & Coats', 'Suits & Blazers', 'Sweaters & Hoodies', 'Activewear', 'Underwear & Socks', 'Shoes', 'Other'],
+      female: ['Tops & Blouses', 'Dresses', 'Skirts', 'Pants & Jeans', 'Shorts', 'Jackets & Coats', 'Sweaters & Hoodies', 'Activewear', 'Lingerie & Sleepwear', 'Shoes', 'Other'],
+      kids: ['T-Shirts', 'Pants', 'Dresses', 'Jackets', 'Shoes', 'School Uniforms', 'Other'],
+      unisex: ['T-Shirts & Polos', 'Pants & Jeans', 'Jackets & Coats', 'Sweaters & Hoodies', 'Activewear', 'Shoes', 'Other']
+    };
+
+    var BAGS_ACCESSORIES_SUBCATEGORIES = {
+      bags: ['Handbags', 'Backpacks', 'Crossbody Bags', 'Tote Bags', 'Clutches', 'Laptop Bags', 'Travel Bags', 'Wallets', 'Other'],
+      accessories: ['Sunglasses', 'Watches', 'Belts', 'Scarves', 'Hats & Caps', 'Jewelry', 'Hair Accessories', 'Ties & Bowties', 'Other']
+    };
+
     function renderDetailsFields() {
       var container = document.getElementById('detailsContainer');
       var cat = categoryFields[formState.category];
@@ -999,33 +1045,81 @@
 
       var html = '';
 
-      // Type dropdown
-      html += buildSelect('type', 'Type', cat.types);
+      // Check if this category uses the new structured format (has label/type properties)
+      var isNewFormat = !cat.types && !cat.brands;
 
-      // Brand dropdown
-      html += buildSelect('brand', 'Brand', cat.brands);
-
-      // Model text input
-      html += '<div class="form-group">' +
-        '<label class="form-label">Model</label>' +
-        '<input type="text" class="form-input" name="model" placeholder="e.g. iPhone 15 Pro" onchange="updateDetails(\'model\', this.value)">' +
-        '</div>';
-
-      // Condition dropdown
-      html += buildSelect('condition', 'Condition', conditionOptions);
-
-      // Year dropdown
-      html += buildSelect('year', 'Year', yearOptions);
-
-      // Size (if applicable)
-      if (cat.showSize) {
-        html += buildSelect('size', 'Size', cat.sizeOptions);
+      if (isNewFormat) {
+        // New structured format
+        var fieldKeys = Object.keys(cat);
+        fieldKeys.forEach(function(fieldKey) {
+          var field = cat[fieldKey];
+          if (field.type === 'select') {
+            html += buildSelectNew(fieldKey, field.label, field.options, field.required);
+          } else if (field.type === 'text') {
+            html += '<div class="form-group">' +
+              '<label class="form-label">' + field.label + (field.required ? ' *' : '') + '</label>' +
+              '<input type="text" class="form-input" name="' + fieldKey + '" data-field="' + fieldKey + '" placeholder="' + (field.placeholder || '') + '" onchange="updateDetails(\'' + fieldKey + '\', this.value)"' + (field.required ? ' required' : '') + '>' +
+              '</div>';
+          }
+        });
+      } else {
+        // Legacy format (electronics, furniture, vehicles, sports, books, other)
+        html += buildSelect('type', 'Type', cat.types);
+        html += buildSelect('brand', 'Brand', cat.brands);
+        html += '<div class="form-group">' +
+          '<label class="form-label">Model</label>' +
+          '<input type="text" class="form-input" name="model" placeholder="e.g. iPhone 15 Pro" onchange="updateDetails(\'model\', this.value)">' +
+          '</div>';
+        html += buildSelect('condition', 'Condition', conditionOptions);
+        html += buildSelect('year', 'Year', yearOptions);
+        if (cat.showSize) {
+          html += buildSelect('size', 'Size', cat.sizeOptions);
+        }
+        html += buildSelect('color', 'Color', colorOptions);
       }
 
-      // Color dropdown
-      html += buildSelect('color', 'Color', colorOptions);
-
       container.innerHTML = html;
+
+      // After rendering fields, add dynamic subcategory logic
+      var genderSelect = document.querySelector('#detailsContainer select[data-field="gender"]');
+      var zoneSelect = document.querySelector('#detailsContainer select[data-field="zone"]');
+
+      if (genderSelect && formState.category === 'clothing') {
+        genderSelect.addEventListener('change', function() {
+          var subSelect = document.querySelector('#detailsContainer select[data-field="subcategory"]');
+          if (!subSelect || !window.CLOTHING_SUBCATEGORIES) return;
+          var genderMap = { 'Men': 'male', 'Women': 'female', 'Children': 'kids', 'Unisex': 'unisex' };
+          var genderKey = genderMap[genderSelect.value] || 'male';
+          var subs = CLOTHING_SUBCATEGORIES[genderKey] || [];
+          subSelect.innerHTML = '<option value="">Select subcategory</option>' + subs.map(function(s) {
+            return '<option value="' + s + '">' + s + '</option>';
+          }).join('');
+        });
+      }
+
+      if (zoneSelect && formState.category === 'bags_accessories') {
+        zoneSelect.addEventListener('change', function() {
+          var subSelect = document.querySelector('#detailsContainer select[data-field="subcategory"]');
+          if (!subSelect || !window.BAGS_ACCESSORIES_SUBCATEGORIES) return;
+          var zoneKey = zoneSelect.value.toLowerCase();
+          var subs = BAGS_ACCESSORIES_SUBCATEGORIES[zoneKey] || [];
+          subSelect.innerHTML = '<option value="">Select subcategory</option>' + subs.map(function(s) {
+            return '<option value="' + s + '">' + s + '</option>';
+          }).join('');
+        });
+      }
+    }
+
+    function buildSelectNew(name, label, options, required) {
+      var optHtml = '<option value="">Select ' + label.toLowerCase() + '</option>';
+      options.forEach(function(opt) {
+        optHtml += '<option value="' + opt + '">' + opt + '</option>';
+      });
+      return '<div class="form-group">' +
+        '<label class="form-label">' + label + (required ? ' *' : '') + '</label>' +
+        '<select class="form-select" name="' + name + '" data-field="' + name + '" onchange="updateDetails(\'' + name + '\', this.value)"' + (required ? ' required' : '') + '>' +
+        optHtml +
+        '</select></div>';
     }
 
     function buildSelect(name, label, options) {
@@ -1035,7 +1129,7 @@
       });
       return '<div class="form-group">' +
         '<label class="form-label">' + label + '</label>' +
-        '<select class="form-select" name="' + name + '" onchange="updateDetails(\'' + name + '\', this.value)">' +
+        '<select class="form-select" name="' + name + '" data-field="' + name + '" onchange="updateDetails(\'' + name + '\', this.value)">' +
         optHtml +
         '</select></div>';
     }
@@ -1099,8 +1193,8 @@
 
       // Details
       var detailsHtml = '';
-      var fieldLabels = { type: 'Type', brand: 'Brand', model: 'Model', condition: 'Condition', year: 'Year', size: 'Size', color: 'Color' };
-      var fieldOrder = ['type', 'brand', 'model', 'condition', 'year', 'size', 'color'];
+      var fieldLabels = { gender: 'Gender', subcategory: 'Subcategory', zone: 'Type', type: 'Type', brand: 'Brand', model: 'Model', condition: 'Condition', year: 'Year', size: 'Size', color: 'Color', age_range: 'Age Range', material: 'Material' };
+      var fieldOrder = ['gender', 'zone', 'subcategory', 'age_range', 'type', 'brand', 'model', 'material', 'condition', 'year', 'size', 'color'];
 
       fieldOrder.forEach(function(key) {
         var val = formState.details[key];
