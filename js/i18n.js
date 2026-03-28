@@ -30,6 +30,7 @@ const translations = {
     sports: "Sports & Leisure",
     books: "Books & Media",
     kids: "Kids & Baby",
+    plants: "Plants",
     gift_corner: "Gift Corner",
 
     // Homepage
@@ -244,6 +245,7 @@ const translations = {
     sports: "Sports & Loisirs",
     books: "Livres & Médias",
     kids: "Enfants & Bébé",
+    plants: "Plantes",
     gift_corner: "Coin Cadeaux",
 
     // Homepage
@@ -458,6 +460,7 @@ const translations = {
     sports: "رياضة وترفيه",
     books: "كتب ووسائط",
     kids: "أطفال وأطفال رضع",
+    plants: "نباتات",
     gift_corner: "ركن الهدايا",
 
     // Homepage
@@ -672,6 +675,7 @@ const translations = {
     sports: "کھیل اور تفریح",
     books: "کتابیں اور میڈیا",
     kids: "بچے اور بیبی",
+    plants: "پودے",
     gift_corner: "تحائف کونا",
 
     // Homepage
