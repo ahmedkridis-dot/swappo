@@ -309,55 +309,64 @@
     /* Avatar gallery */
     .avatar-gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-      gap: 10px;
-      max-height: 240px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-height: 220px;
       overflow-y: auto;
-      padding: 8px;
+      padding: 10px;
       border: 1px solid #EBEBEB;
       border-radius: 8px;
       background: #FAFAFA;
     }
     .avatar-option {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0;
+      gap: 2px;
+      padding: 6px 4px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
       background: none;
     }
-    .avatar-option:hover { border-color: #09B1BA; transform: scale(1.05); }
+    .avatar-option:hover { border-color: #09B1BA; background: #F0FBFC; }
     .avatar-option.selected {
       border-color: #09B1BA;
-      box-shadow: 0 0 0 3px rgba(9, 177, 186, 0.3);
+      background: #E6F7F8;
+      box-shadow: 0 0 0 2px rgba(9, 177, 186, 0.2);
     }
-    .avatar-option svg { width: 64px; height: 64px; }
+    .avatar-option svg { width: 52px; height: 52px; }
     .avatar-option .avatar-name {
-      font-size: 9px;
-      color: #555;
-      margin-top: 2px;
-      text-align: center;
+      font-size: 10px;
+      color: #777;
+      font-weight: 500;
+      line-height: 1;
     }
+    .avatar-option.selected .avatar-name { color: #09B1BA; font-weight: 600; }
 
     /* Phone verification */
     .phone-input-group {
       display: flex;
-      gap: 8px;
-      align-items: center;
+      gap: 0;
+      align-items: stretch;
     }
     .phone-prefix {
       background: #F7F7F7;
       border: 1px solid #EBEBEB;
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+      padding: 0 14px;
       font-weight: 600;
+      font-size: 0.9rem;
       color: #333;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+    }
+    .phone-input-group .form-input {
+      border-radius: 0 8px 8px 0;
+      flex: 1;
     }
     .phone-input-group input { flex: 1; }
     .verification-step {
@@ -439,29 +448,29 @@
             <input class="form-input" type="text" id="signup-name" name="name" placeholder="Ahmed Mohammed" required>
           </div>
 
-          <div class="auth-field">
-            <label data-i18n="gender_label">Gender</label>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
             <div class="gender-buttons" id="gender-buttons">
               <label class="gender-btn">
-                <input type="radio" name="signup-gender" value="male"> <span data-i18n="gender_male">Male</span>
+                <input type="radio" name="signup-gender" value="male"> <span>Male</span>
               </label>
               <label class="gender-btn">
-                <input type="radio" name="signup-gender" value="female"> <span data-i18n="gender_female">Female</span>
+                <input type="radio" name="signup-gender" value="female"> <span>Female</span>
               </label>
               <label class="gender-btn">
-                <input type="radio" name="signup-gender" value="other"> <span data-i18n="gender_other">Prefer not to say</span>
+                <input type="radio" name="signup-gender" value="other"> <span>Prefer not to say</span>
               </label>
             </div>
           </div>
 
-          <div class="auth-field">
-            <label data-i18n="pseudo_label">Username</label>
-            <input type="text" id="signup-pseudo" placeholder="3-20 chars, letters/numbers/underscores" data-i18n-placeholder="pseudo_placeholder" pattern="^[a-zA-Z0-9_]{3,20}$" required>
+          <div class="form-group">
+            <label class="form-label" for="signup-pseudo">Username</label>
+            <input class="form-input" type="text" id="signup-pseudo" placeholder="Letters, numbers & underscores (3-20)" pattern="^[a-zA-Z0-9_]{3,20}$" required>
             <span class="pseudo-feedback" id="pseudo-feedback"></span>
           </div>
 
-          <div class="auth-field">
-            <label data-i18n="choose_avatar">Choose your avatar</label>
+          <div class="form-group">
+            <label class="form-label">Choose your avatar</label>
             <div class="avatar-gallery" id="avatar-gallery">
               <!-- Populated dynamically based on gender selection -->
             </div>
@@ -473,14 +482,14 @@
             <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
           </div>
 
-          <div class="auth-field">
-            <label data-i18n="phone_label">Phone Number (+971)</label>
+          <div class="form-group">
+            <label class="form-label" for="signup-phone">Phone Number</label>
             <div class="phone-input-group">
               <span class="phone-prefix">+971</span>
-              <input type="tel" id="signup-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
+              <input class="form-input" type="tel" id="signup-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
             </div>
             <div class="verification-step" id="phone-verify-step">
-              <input type="text" id="phone-code" class="code-input" placeholder="------" maxlength="6" pattern="^[0-9]{6}$">
+              <input class="form-input code-input" type="text" id="phone-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$">
               <div>
                 <button type="button" class="resend-link" id="resend-code" onclick="resendCode()" data-i18n="resend_code">Resend code</button>
                 <span id="resend-timer"></span>
