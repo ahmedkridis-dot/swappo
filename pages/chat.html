@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SwapChat — Swappo</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/style.css">
+	<style>
+		body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text); margin: 0; }
+
+		/* ═══ LAYOUT ═══ */
+		.chat-layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
+
+		/* ═══ SIDEBAR ═══ */
+		.chat-sidebar {
+			width: 340px; min-width: 340px; background: #fff; border-right: 1px solid var(--border);
+			display: flex; flex-direction: column; overflow: hidden;
+		}
+		.sidebar-header { padding: 20px 16px 12px; }
+		.sidebar-header h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+		.sidebar-header h2 i { color: var(--primary); }
+		.sidebar-search {
+			width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px;
+			font-size: 13px; font-family: inherit; background: var(--bg-light); transition: all .2s;
+		}
+		.sidebar-search:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(9,177,186,.1); }
+
+		.conv-list { flex: 1; overflow-y: auto; padding: 8px; }
+		.conv-list::-webkit-scrollbar { width: 4px; }
+		.conv-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+		.conv-card {
+			display: flex; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer;
+			transition: all .2s; border: 2px solid transparent; margin-bottom: 4px; position: relative;
+		}
+		.conv-card:hover { background: var(--bg-light); }
+		.conv-card.active { background: var(--primary-light, #E6F7F8); border-color: var(--primary); }
+		.conv-avatar {
+			width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center;
+			justify-content: center; color: #fff; font-weight: 700; font-size: 18px; flex-shrink: 0;
+		}
+		.conv-body { flex: 1; min-width: 0; }
+		.conv-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+		.conv-name { font-weight: 600; font-size: 14px; color: var(--text); }
+		.conv-time { font-size: 11px; color: var(--text-muted); }
+		.conv-preview { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+		.conv-item-tag {
+			display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--primary);
+			background: var(--primary-light, #E6F7F8); padding: 2px 8px; border-radius: 6px; font-weight: 500;
+		}
+		.conv-item-tag img { width: 16px; height: 16px; border-radius: 3px; object-fit: cover; }
+		.conv-unread {
+			position: absolute; top: 10px; right: 10px; min-width: 20px; height: 20px; border-radius: 10px;
+			background: var(--secondary, #FF4B55); color: #fff; font-size: 11px; font-weight: 700;
+			display: flex; align-items: center; justify-content: center; padding: 0 5px;
+		}
+
+		/* ═══ MAIN PANEL ═══ */
+		.chat-main { flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden; }
+
+		/* Empty state */
+		.chat-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text-muted); }
+		.chat-empty i { font-size: 56px; opacity: .3; }
+
+		/* ═══ SWAP DEAL CARD (the star!) ═══ */
+		.swap-deal {
+			padding: 16px 20px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #F0FBFC 0%, #fff 100%);
+		}
+		.swap-deal-inner {
+			display: flex; align-items: center; gap: 12px; max-width: 700px; margin: 0 auto;
+		}
+		.swap-deal-item {
+			flex: 1; display: flex; gap: 12px; align-items: center; padding: 10px 14px;
+			background: #fff; border-radius: 12px; border: 1px solid var(--border);
+			cursor: pointer; transition: all .2s; min-width: 0;
+		}
+		.swap-deal-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(9,177,186,.12); transform: translateY(-1px); }
+		.swap-deal-item img {
+			width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0;
+			background: var(--bg-light);
+		}
+		.swap-deal-item-info { min-width: 0; }
+		.swap-deal-item-label { font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: .5px; margin-bottom: 2px; }
+		.swap-deal-item-label.theirs { color: var(--text-muted); }
+		.swap-deal-item-label.mine { color: var(--primary); }
+		.swap-deal-item-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.swap-deal-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+		.swap-deal-item-cost { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 2px; }
+
+		.swap-deal-arrow {
+			width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+			background: linear-gradient(135deg, var(--primary), var(--primary-dark, #078A91));
+			display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px;
+			box-shadow: 0 4px 12px rgba(9,177,186,.3);
+		}
+
+		.swap-deal-status {
+			text-align: center; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
+		}
+		.swap-status-badge {
+			font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+			display: inline-flex; align-items: center; gap: 4px;
+		}
+		.swap-status-badge.pending { background: #FFF3CD; color: #856404; }
+		.swap-status-badge.accepted { background: #D1FAE5; color: #065F46; }
+		.swap-status-badge.completed { background: #DBEAFE; color: #1E40AF; }
+		.swap-deal-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: center; }
+		.swap-deal-actions .btn { font-size: 12px; padding: 6px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
+		.swap-deal-actions .btn-accept { background: var(--primary); color: #fff; }
+		.swap-deal-actions .btn-accept:hover { background: var(--primary-dark, #078A91); }
+		.swap-deal-actions .btn-decline { background: transparent; color: var(--secondary, #FF4B55); border: 1px solid var(--secondary, #FF4B55); }
+
+		/* ═══ CHAT HEADER (user info row) ═══ */
+		.chat-user-bar {
+			padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex;
+			align-items: center; justify-content: space-between; background: #fff;
+		}
+		.chat-user-left { display: flex; align-items: center; gap: 10px; }
+		.chat-user-avatar {
+			width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+			justify-content: center; color: #fff; font-weight: 600; font-size: 14px;
+		}
+		.chat-user-name { font-weight: 600; font-size: 14px; }
+		.chat-user-badge { font-size: 12px; color: var(--text-muted); }
+		.chat-user-right { display: flex; align-items: center; gap: 12px; }
+		.chat-user-right a, .chat-user-right button {
+			font-size: 12px; background: none; border: none; cursor: pointer; font-weight: 500; padding: 4px 8px; border-radius: 6px;
+		}
+		.chat-user-right a { color: var(--primary); text-decoration: none; }
+		.chat-user-right a:hover { background: var(--primary-light, #E6F7F8); }
+		.chat-user-right .report-btn { color: var(--secondary, #FF4B55); }
+		.chat-user-right .report-btn:hover { background: #FFF0F0; }
+
+		/* ═══ MESSAGES ═══ */
+		.chat-messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+		.chat-messages::-webkit-scrollbar { width: 4px; }
+		.chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+		.msg-system {
+			align-self: center; text-align: center; font-size: 12px; color: var(--text-muted);
+			font-style: italic; padding: 8px 16px; background: var(--bg-light); border-radius: 10px;
+			margin: 8px 0; max-width: 80%;
+		}
+		.msg-system.warning { background: #FFF3CD; color: #856404; font-style: normal; }
+		.msg-system.warning i { margin-right: 4px; }
+
+		.msg { display: flex; gap: 8px; align-items: flex-end; }
+		.msg.sent { flex-direction: row-reverse; }
+		.msg-avatar {
+			width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+			justify-content: center; color: #fff; font-weight: 600; font-size: 11px; flex-shrink: 0;
+		}
+		.msg-bubble {
+			max-width: 55%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5;
+			word-wrap: break-word; position: relative;
+		}
+		.msg.sent .msg-bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+		.msg.received .msg-bubble { background: var(--bg-light); color: var(--text); border-bottom-left-radius: 4px; }
+		.msg-time { font-size: 10px; color: var(--text-muted); white-space: nowrap; align-self: flex-end; }
+
+		/* ═══ INPUT BAR ═══ */
+		.chat-input-bar { padding: 12px 20px; border-top: 1px solid var(--border); background: #fff; }
+		.chat-input-row { display: flex; gap: 8px; align-items: center; }
+		.chat-text-input {
+			flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 24px;
+			font-family: inherit; font-size: 13px; background: var(--bg-light); transition: all .2s;
+		}
+		.chat-text-input:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(9,177,186,.1); }
+		.chat-send-btn {
+			width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff;
+			border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+			font-size: 16px; transition: all .2s; flex-shrink: 0;
+		}
+		.chat-send-btn:hover { background: var(--primary-dark, #078A91); transform: scale(1.05); }
+		.chat-send-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
+		.chat-input-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; padding-left: 4px; }
+		.chat-input-hint i { margin-right: 3px; }
+
+		/* ═══ RESPONSIVE ═══ */
+		@media (max-width: 768px) {
+			.chat-sidebar { position: fixed; left: -100%; top: 56px; width: 100%; height: calc(100vh - 56px); z-index: 200; transition: left .3s; }
+			.chat-sidebar.open { left: 0; }
+			.swap-deal-inner { flex-direction: column; }
+			.swap-deal-item { width: 100%; }
+			.swap-deal-arrow { transform: rotate(90deg); }
+			.msg-bubble { max-width: 80%; }
+			.mobile-back { display: flex !important; }
+		}
+		@media (min-width: 769px) { .mobile-back { display: none !important; } }
+	</style>
+</head>
+<body>
+	<!-- Navbar (standard structure for i18n compatibility) -->
+	<nav class="navbar">
+		<div class="container">
+			<div class="navbar-inner">
+				<a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+
+				<div class="navbar-search" style="display:none;">
+					<i class="fas fa-search"></i>
+					<input type="text" placeholder="Search items...">
+				</div>
+
+				<div class="navbar-actions">
+					<a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+					<a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+				</div>
+
+				<button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+			</div>
+		</div>
+	</nav>
+
+	<!-- ═══ CHAT LAYOUT ═══ -->
+	<div class="chat-layout">
+
+		<!-- LEFT: Conversation List -->
+		<div class="chat-sidebar" id="sidebar">
+			<div class="sidebar-header">
+				<h2><i class="fas fa-comments"></i> SwapChat</h2>
+				<input type="text" class="sidebar-search" placeholder="Search conversations..." id="searchInput">
+			</div>
+			<div class="conv-list" id="convList"></div>
+		</div>
+
+		<!-- RIGHT: Chat panel -->
+		<div class="chat-main" id="chatMain">
+			<!-- Empty state -->
+			<div class="chat-empty" id="chatEmpty">
+				<i class="fas fa-handshake"></i>
+				<div style="font-size:18px;font-weight:600;">Select a swap to chat</div>
+				<div style="font-size:13px;">Propose a swap to start a conversation!</div>
+			</div>
+
+			<!-- Swap deal card (hidden initially) -->
+			<div id="swapDeal" style="display:none;"></div>
+
+			<!-- User info bar -->
+			<div id="userBar" style="display:none;"></div>
+
+			<!-- Messages -->
+			<div class="chat-messages" id="msgArea" style="display:none;"></div>
+
+			<!-- Input -->
+			<div class="chat-input-bar" id="inputBar" style="display:none;">
+				<div class="chat-input-row">
+					<input type="text" class="chat-text-input" id="chatInput" placeholder="Type a message...">
+					<button class="chat-send-btn" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+				</div>
+				<div class="chat-input-hint"><i class="fas fa-shield-alt"></i> Phone numbers, emails & links are filtered for safety</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/mock-data.js"></script>
+	<script src="../js/demo-engine.js"></script>
+	<script src="../js/animations.js"></script>
+	<script src="../js/cookie-consent.js"></script>
+	<script src="../js/i18n.js"></script>
+	<script src="../js/app.js"></script>
+	<script>
+	/* ═══════════════════════════════════════════════════════════════════
+	   SwapChat — Redesigned with prominent Swap Deal Cards
+	   ═══════════════════════════════════════════════════════════════════ */
+
+	let activeConvId = null;
+	let currentUser = null;
+
+	// ── Map conversations to real items ──
+	const CONV_ITEM_MAP = {
+		'conv-1': { their_item_id: 'item-5',  my_item_id: 'item-6',  status: 'accepted' },
+		'conv-2': { their_item_id: 'item-14', my_item_id: 'item-23', status: 'accepted' },
+		'conv-3': { their_item_id: 'item-21', my_item_id: 'item-6',  status: 'pending' }
+	};
+
+	// ── Helpers ──
+	function timeAgo(d) {
+		if (!d) return '';
+		const m = Math.floor((Date.now() - new Date(d).getTime()) / 60000);
+		if (m < 1) return 'now';
+		if (m < 60) return m + 'm ago';
+		const h = Math.floor(m / 60);
+		if (h < 24) return h + 'h ago';
+		return Math.floor(h / 24) + 'd ago';
+	}
+	function fmtTime(d) { return d ? new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : ''; }
+	function initial(n) { return n ? n.charAt(0).toUpperCase() : '?'; }
+
+	// ── Render sidebar ──
+	function renderSidebar() {
+		const convs = DemoChat.getConversations();
+		const el = document.getElementById('convList');
+		if (!convs.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No conversations yet.</div>'; return; }
+
+		el.innerHTML = convs.map(c => {
+			const o = c.other_user || {};
+			const map = CONV_ITEM_MAP[c.id];
+			const theirItem = map ? DemoItems.getById(map.their_item_id) : null;
+			const thumb = theirItem && theirItem.photos ? theirItem.photos[0] : '';
+			const lastTime = c.messages?.length ? c.messages[c.messages.length - 1].created_at : '';
+			return `
+			<div class="conv-card ${c.id === activeConvId ? 'active' : ''}" onclick="openConv('${c.id}')">
+				<div class="conv-avatar" style="background:${o.avatar_color || 'var(--primary)'}">${initial(o.name)}</div>
+				<div class="conv-body">
+					<div class="conv-top">
+						<span class="conv-name">${o.name || 'Swapper'}</span>
+						<span class="conv-time">${timeAgo(lastTime)}</span>
+					</div>
+					<div class="conv-preview">${c.last_message || ''}</div>
+					<div class="conv-item-tag">
+						${thumb ? `<img src="${thumb}" alt="">` : '<i class="fas fa-box" style="font-size:10px;"></i>'}
+						${c.item_title || 'Swap'}
+					</div>
+				</div>
+				${c.unread_count > 0 ? `<div class="conv-unread">${c.unread_count}</div>` : ''}
+			</div>`;
+		}).join('');
+	}
+
+	// ── Open conversation ──
+	function openConv(convId) {
+		activeConvId = convId;
+		const convs = DemoChat.getConversations();
+		const conv = convs.find(c => c.id === convId);
+		if (!conv) return;
+
+		const o = conv.other_user || {};
+		conv.unread_count = 0;
+
+		// Highlight in sidebar
+		document.querySelectorAll('.conv-card').forEach(c => c.classList.remove('active'));
+		const card = document.querySelector(`[onclick="openConv('${convId}')"]`);
+		if (card) { card.classList.add('active'); const b = card.querySelector('.conv-unread'); if (b) b.remove(); }
+
+		// Show panels
+		document.getElementById('chatEmpty').style.display = 'none';
+		['swapDeal','userBar','msgArea','inputBar'].forEach(id => document.getElementById(id).style.display = '');
+
+		// ── Render SWAP DEAL CARD ──
+		const map = CONV_ITEM_MAP[convId] || {};
+		const theirItem = DemoItems.getById(map.their_item_id);
+		const myItem = DemoItems.getById(map.my_item_id);
+		const status = map.status || 'pending';
+
+		const statusLabels = { pending: '⏳ Pending', accepted: '✅ Accepted', completed: '🎉 Completed' };
+		const statusClass = status;
+
+		document.getElementById('swapDeal').innerHTML = `
+		<div class="swap-deal">
+			<div class="swap-deal-inner">
+				<div class="swap-deal-item" onclick="${theirItem ? `window.location.href='product.html?id=${theirItem.id}'` : ''}">
+					<img src="${theirItem?.photos?.[0] || 'https://via.placeholder.com/64'}" alt="${theirItem?.brand || ''}">
+					<div class="swap-deal-item-info">
+						<div class="swap-deal-item-label theirs">THEIR ITEM</div>
+						<div class="swap-deal-item-name">${theirItem ? `${theirItem.brand} ${theirItem.model}` : conv.item_title}</div>
+						<div class="swap-deal-item-meta">${theirItem ? `${theirItem.condition === 'like_new' ? 'Like New' : theirItem.condition?.charAt(0).toUpperCase() + theirItem.condition?.slice(1)} · ${theirItem.city}` : ''}</div>
+						<div class="swap-deal-item-cost"><i class="fas fa-sync-alt"></i> Swap item</div>
+					</div>
+				</div>
+
+				<div class="swap-deal-arrow"><i class="fas fa-exchange-alt"></i></div>
+
+				<div class="swap-deal-item" onclick="${myItem ? `window.location.href='product.html?id=${myItem.id}'` : ''}">
+					<img src="${myItem?.photos?.[0] || 'https://via.placeholder.com/64'}" alt="${myItem?.brand || ''}">
+					<div class="swap-deal-item-info">
+						<div class="swap-deal-item-label mine">YOUR ITEM</div>
+						<div class="swap-deal-item-name">${myItem ? `${myItem.brand} ${myItem.model}` : 'Your offer'}</div>
+						<div class="swap-deal-item-meta">${myItem ? `${myItem.condition === 'like_new' ? 'Like New' : myItem.condition?.charAt(0).toUpperCase() + myItem.condition?.slice(1)} · ${myItem.city}` : ''}</div>
+						<div class="swap-deal-item-cost"><i class="fas fa-sync-alt"></i> Swap item</div>
+					</div>
+				</div>
+			</div>
+			<div class="swap-deal-status">
+				<span class="swap-status-badge ${statusClass}">${statusLabels[status] || status}</span>
+			</div>
+			${status === 'pending' ? `
+			<div class="swap-deal-actions">
+				<button class="btn btn-accept" onclick="acceptSwap('${convId}')"><i class="fas fa-check"></i> Accept Swap</button>
+				<button class="btn btn-decline" onclick="declineSwap('${convId}')"><i class="fas fa-times"></i> Decline</button>
+			</div>` : ''}
+		</div>`;
+
+		// ── User bar ──
+		document.getElementById('userBar').innerHTML = `
+		<div class="chat-user-bar">
+			<div class="chat-user-left">
+				<button class="mobile-back" onclick="document.getElementById('sidebar').classList.add('open')" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);"><i class="fas fa-arrow-left"></i></button>
+				<div class="chat-user-avatar" style="background:${o.avatar_color || 'var(--primary)'}">${initial(o.name)}</div>
+				<div>
+					<div class="chat-user-name">${o.name || 'Swapper'}</div>
+					<div class="chat-user-badge">${o.badge_emoji || ''} ${(o.badge_tier || '').charAt(0).toUpperCase() + (o.badge_tier || '').slice(1)} · ${o.city || ''}</div>
+				</div>
+			</div>
+			<div class="chat-user-right">
+				<a href="#" onclick="event.preventDefault(); DemoNotifications.showToast('Rating feature coming soon!', 'info')"><i class="fas fa-star"></i> Rate</a>
+				<button class="report-btn" onclick="DemoNotifications.showToast('Report submitted. Our team will review within 24h.', 'info')"><i class="fas fa-flag"></i> Report</button>
+			</div>
+		</div>`;
+
+		// ── Messages ──
+		loadMessages(convId);
+		setTimeout(() => document.getElementById('chatInput').focus(), 100);
+		document.getElementById('sidebar').classList.remove('open');
+	}
+
+	// ── Load messages ──
+	function loadMessages(convId) {
+		const messages = DemoChat.getMessages(convId);
+		const area = document.getElementById('msgArea');
+		const convs = DemoChat.getConversations();
+		const conv = convs.find(c => c.id === convId);
+		const o = conv?.other_user || {};
+		const myInit = currentUser ? initial(currentUser.name) : 'Y';
+		const myColor = currentUser?.avatar_color || 'var(--primary)';
+
+		area.innerHTML = '';
+
+		// System opening
+		const sys = document.createElement('div');
+		sys.className = 'msg-system';
+		sys.textContent = '🤝 Swap accepted! You can now chat. Meet in a safe public place.';
+		area.appendChild(sys);
+
+		messages.forEach(msg => {
+			if (msg.is_system || msg.sender_id === 'system') {
+				const d = document.createElement('div');
+				d.className = 'msg-system' + (msg.content.includes('⚠️') ? ' warning' : '');
+				d.innerHTML = msg.content;
+				area.appendChild(d);
+			} else {
+				const isSent = msg.sender_id === (currentUser?.id || 'user-demo');
+				const d = document.createElement('div');
+				d.className = `msg ${isSent ? 'sent' : 'received'}`;
+
+				const av = document.createElement('div');
+				av.className = 'msg-avatar';
+				av.style.background = isSent ? myColor : (o.avatar_color || 'var(--text-muted)');
+				av.textContent = isSent ? myInit : initial(o.name);
+
+				const bub = document.createElement('div');
+				bub.className = 'msg-bubble';
+				bub.textContent = msg.content;
+
+				const tm = document.createElement('div');
+				tm.className = 'msg-time';
+				tm.textContent = fmtTime(msg.created_at);
+
+				d.appendChild(av);
+				d.appendChild(bub);
+				d.appendChild(tm);
+				area.appendChild(d);
+			}
+		});
+
+		requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
+	}
+
+	// ── Send message ──
+	function sendMsg() {
+		const input = document.getElementById('chatInput');
+		const txt = input.value.trim();
+		if (!txt || !activeConvId) return;
+
+		DemoChat.sendMessage(activeConvId, txt);
+		input.value = '';
+		document.getElementById('sendBtn').disabled = true;
+
+		loadMessages(activeConvId);
+		renderSidebar();
+
+		// Simulated reply
+		setTimeout(() => {
+			if (activeConvId) simulateReply(activeConvId);
+		}, 1500 + Math.random() * 1500);
+	}
+
+	function simulateReply(convId) {
+		if (convId !== activeConvId) return;
+		const replies = [
+			"Sounds good! When are you free?",
+			"The item is in great condition 👌",
+			"Can we meet at Dubai Mall?",
+			"I'm available this weekend!",
+			"Perfect, let's finalize 🤝",
+			"What area are you in?",
+			"I can come to your side of the city.",
+			"How about tomorrow afternoon?",
+			"Great deal! I'm excited about this swap 🎉"
+		];
+		const convs = DemoChat.getConversations();
+		const conv = convs.find(c => c.id === convId);
+		if (!conv) return;
+		const reply = { id: 'reply_' + Date.now(), sender_id: conv.other_user?.id || 'user-1', content: replies[Math.floor(Math.random() * replies.length)], created_at: new Date().toISOString(), is_system: false };
+		const mock = (MOCK_CONVERSATIONS || []).find(c => c.id === convId);
+		if (mock) { mock.messages.push(reply); mock.last_message = reply.content; }
+		loadMessages(convId);
+		renderSidebar();
+	}
+
+	// ── Accept / Decline ──
+	function acceptSwap(convId) {
+		if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'accepted';
+		if (typeof DemoNotifications !== 'undefined') DemoNotifications.showToast('Swap accepted! 🎉', 'success');
+		openConv(convId);
+	}
+	function declineSwap(convId) {
+		if (typeof DemoNotifications !== 'undefined') DemoNotifications.showToast('Swap declined.', 'info');
+		openConv(convId);
+	}
+
+	// ── Search ──
+	document.getElementById('searchInput').addEventListener('input', function(e) {
+		const q = e.target.value.toLowerCase();
+		document.querySelectorAll('.conv-card').forEach(c => {
+			const n = c.querySelector('.conv-name');
+			c.style.display = (n && n.textContent.toLowerCase().includes(q)) ? '' : 'none';
+		});
+	});
+
+	// ── Init ──
+	function chatInit() {
+		currentUser = DemoAuth.getCurrentUser();
+		if (!currentUser) { window.location.href = 'login.html'; return; }
+
+		// Navbar is updated by updateNavbarForDemo() below
+		renderSidebar();
+
+		// Auto-open first conversation
+		const convs = DemoChat.getConversations();
+		if (convs.length > 0) openConv(convs[0].id);
+
+		// Wire input
+		document.getElementById('sendBtn').addEventListener('click', sendMsg);
+		document.getElementById('chatInput').addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } });
+		document.getElementById('chatInput').addEventListener('input', function() { document.getElementById('sendBtn').disabled = !this.value.trim(); });
+
+		if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
+	}
+	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', chatInit);
+	else chatInit();
+	</script>
+</body>
+</html>

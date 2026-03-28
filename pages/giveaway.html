@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Corner — Swappo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Giveaway-specific styles */
+        .giveaway-hero {
+            background: linear-gradient(135deg, #FFF0E6 0%, #FFE6E6 100%);
+            padding: 60px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .giveaway-hero-emoji {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .giveaway-hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 12px 0;
+        }
+
+        .giveaway-hero p {
+            font-size: 16px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 32px auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .btn-primary-coral {
+            background-color: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary-coral:hover {
+            background-color: #E55555;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-outline-coral {
+            background-color: white;
+            color: #FF6B6B;
+            border: 2px solid #FF6B6B;
+            padding: 11px 31px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline-coral:hover {
+            background-color: #FFE6E6;
+            border-color: #E55555;
+        }
+
+        .hero-stats {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .hero-stats span {
+            margin: 0 16px;
+        }
+
+        /* Giveaway Info Banner */
+        .giveaway-info-banner {
+            background: linear-gradient(135deg, #FFF0E6 0%, #FFE6E6 100%);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .giveaway-info-banner h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+        }
+
+        .giveaway-info-banner > p {
+            font-size: 15px;
+            color: #666;
+            margin: 0 0 20px 0;
+        }
+
+        .claims-counter {
+            display: inline-block;
+            background: white;
+            border: 2px solid #FF6B6B;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #FF6B6B;
+        }
+
+        .claims-counter #claims-remaining {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Claims Status Bar */
+        .claims-status {
+            background-color: #F5F5F5;
+            border-left: 4px solid #FF6B6B;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+        }
+
+        .claims-status-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .claims-progress {
+            background-color: #E0E0E0;
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+        }
+
+        .claims-progress-fill {
+            background-color: #FF6B6B;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .category-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background-color: #F5F5F5;
+            color: #666;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .chip:hover {
+            background-color: #E8E8E8;
+        }
+
+        .chip.active {
+            background-color: #FF6B6B;
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        .sort-select {
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Giveaway Grid — uses product-grid from style.css */
+        .giveaway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .giveaway-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .giveaway-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Giveaway Card (custom, for claim button overlay) */
+        .giveaway-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #E0E0E0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .giveaway-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .giveaway-card-image {
+            position: relative;
+            padding-bottom: 133%;
+            background-color: #F5F5F5;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .giveaway-card-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .giveaway-free-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background-color: #FF6B6B;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+        }
+
+        .giveaway-favorite {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .giveaway-favorite:hover {
+            background-color: #FFE6E6;
+            color: #FF6B6B;
+        }
+
+        .giveaway-favorite.liked {
+            color: #FF6B6B;
+            background-color: #FFE6E6;
+        }
+
+        .giveaway-card-content {
+            padding: 16px;
+        }
+
+        .giveaway-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 6px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .giveaway-card-details {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .giveaway-card-offer {
+            background-color: #FFF0E8;
+            border-left: 3px solid #FF6B6B;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #FF6B6B;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .giveaway-card-donor {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .donor-badge {
+            color: #FFD700;
+            font-size: 12px;
+        }
+
+        .donor-rating {
+            color: #FFC107;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .giveaway-card-location {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .giveaway-card-location i {
+            color: #FF6B6B;
+        }
+
+        .giveaway-card-button {
+            width: 100%;
+            background-color: white;
+            color: #FF6B6B;
+            border: 2px solid #FF6B6B;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .giveaway-card-button:hover {
+            background-color: #FFE6E6;
+            border-color: #E55555;
+        }
+
+        .giveaway-card-button.claimed {
+            background-color: #E8E8E8;
+            color: #999;
+            border-color: #E8E8E8;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* Info Section */
+        .info-section {
+            margin-bottom: 60px;
+            background-color: #F9F9F9;
+            padding: 40px 20px;
+            border-radius: 12px;
+        }
+
+        .info-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: center;
+            margin: 0 0 40px 0;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin-bottom: 40px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: #FF6B6B;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 16px auto;
+        }
+
+        .step h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+        }
+
+        .step p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .rules-box {
+            background-color: white;
+            border: 2px solid #FF6B6B;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .rules-box h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rules-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .rules-box li {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 12px;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .rules-box li:last-child {
+            margin-bottom: 0;
+        }
+
+        .rules-box li:before {
+            content: "\2022";
+            position: absolute;
+            left: 0;
+            color: #FF6B6B;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            background: linear-gradient(135deg, #FFE6E6 0%, #FFF0E6 100%);
+            padding: 40px 20px;
+            text-align: center;
+            margin: 60px 0 0 0;
+            border-radius: 0;
+        }
+
+        .final-cta h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 20px 0;
+        }
+
+        .final-cta .btn-primary-coral {
+            padding: 14px 40px;
+            font-size: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .giveaway-info-banner {
+                padding: 24px 16px;
+            }
+
+            .giveaway-info-banner h2 {
+                font-size: 22px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .sort-select {
+                width: 100%;
+            }
+
+            .steps-grid {
+                gap: 24px;
+            }
+
+            .info-section h2 {
+                font-size: 20px;
+                margin-bottom: 32px;
+            }
+        }
+
+        /* Access Control — blurred overlay for guests */
+        .guest-overlay {
+            position: relative;
+        }
+
+        .guest-overlay .giveaway-grid,
+        .guest-overlay .filter-bar {
+            filter: blur(6px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .guest-overlay-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 48px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .guest-overlay-message h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 12px 0;
+        }
+
+        .guest-overlay-message p {
+            font-size: 15px;
+            color: #666;
+            margin: 0 0 20px 0;
+        }
+
+        /* Badge requirement message */
+        .badge-required-message {
+            text-align: center;
+            padding: 60px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .badge-required-message .badge-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .badge-required-message h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 12px 0;
+        }
+
+        .badge-required-message p {
+            font-size: 15px;
+            color: #666;
+            margin: 0 0 24px 0;
+        }
+
+        /* Main container padding */
+        main {
+            padding: 32px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-inner">
+          <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+          <div class="navbar-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+          </div>
+          <div class="navbar-actions">
+            <a href="chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>
+            <a href="profile.html" class="navbar-icon" title="My Swaps"><i class="fas fa-user-circle"></i></a>
+            <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+            <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+          </div>
+          <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Categories Bar -->
+    <div class="categories-bar">
+        <div class="categories-container">
+            <a href="index.html" class="category-item">All</a>
+            <a href="category.html?cat=clothing" class="category-item">Clothing</a>
+            <a href="category.html?cat=electronics" class="category-item">Electronics</a>
+            <a href="category.html?cat=furniture" class="category-item">Furniture</a>
+            <a href="category.html?cat=kids" class="category-item">Kids</a>
+            <a href="category.html?cat=sports" class="category-item">Sports</a>
+            <a href="category.html?cat=books" class="category-item">Books</a>
+            <a href="giveaway.html" class="category-item active">Gift Corner</a>
+            <a href="category.html?cat=other" class="category-item">Other</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Badge requirement message (shown for newcomers) -->
+        <div id="badge-required" class="badge-required-message" style="display:none;">
+            <div class="badge-icon">&#11088;</div>
+            <h2>Complete at least 1 swap to unlock Gift Corner &#11088;</h2>
+            <p>You need the Swapper badge (1+ completed swap) to access the Gift Corner and claim free items.</p>
+            <a href="catalogue.html" class="btn-primary-coral">Browse Swap Market</a>
+        </div>
+
+        <!-- Giveaway Content -->
+        <div id="giveaway-content" style="display:none;">
+            <!-- Info Banner -->
+            <div class="giveaway-info-banner">
+                <h2>&#127873; Gift Corner</h2>
+                <p>Claim free items from generous donors. Claims included in your subscription.</p>
+                <div class="claims-counter">
+                    <span id="claims-remaining">3</span>/<span id="claims-max">3</span> claims remaining this month
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="category-chips">
+                    <button class="chip active" data-category="all">All</button>
+                    <button class="chip" data-category="clothing">Clothing</button>
+                    <button class="chip" data-category="electronics">Electronics</button>
+                    <button class="chip" data-category="furniture">Furniture</button>
+                    <button class="chip" data-category="kids">Kids</button>
+                    <button class="chip" data-category="sports">Sports</button>
+                    <button class="chip" data-category="books">Books</button>
+                    <button class="chip" data-category="other">Other</button>
+                </div>
+                <select class="sort-select" id="sort-select">
+                    <option value="newest">Newest first</option>
+                    <option value="nearest">Nearest first</option>
+                </select>
+            </div>
+
+            <!-- Items area (may get blurred overlay for guests) -->
+            <div id="items-area">
+                <!-- Giveaway Grid — filled dynamically -->
+                <div class="giveaway-grid" id="giveaway-grid"></div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <h2>How Gift Corner Works</h2>
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Donate your items</h3>
+                        <p>List items you no longer need and help the community.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Browse free items</h3>
+                        <p>Discover items other Swappers are giving away in your area.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Claim & collect</h3>
+                        <p>Use your monthly claims to grab items, arrange pickup, and collect.</p>
+                    </div>
+                </div>
+
+                <div class="rules-box">
+                    <h3>&#128203; Gift Corner Rules</h3>
+                    <ul>
+                        <li>Claims limited by your plan (Free: 1/mo, Bronze: 2/mo, Silver: 3/mo, Premium: 5/mo)</li>
+                        <li>Claiming an item locks that category for 30 days</li>
+                        <li>Badge &#11088; Swapper required to participate</li>
+                        <li>Items must be physical goods in good condition</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Final CTA -->
+            <div class="final-cta">
+                <h2>Have something to give? Donate it!</h2>
+                <a href="publier.html" class="btn-primary-coral">Add a free item</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About Swappo</h4>
+                <p>The barter platform for the UAE community. Exchange items, donate freely, and connect with neighbors.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="giveaway.html">Gift Corner</a></li>
+                    <li><a href="publier.html">Donate</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Terms & Privacy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <p>Follow us on social media for updates and community stories.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Swappo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="cookie-banner">
+      <div class="cookie-banner-content">
+        <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+        <div class="cookie-banner-buttons">
+          <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+          <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+          <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo Scripts -->
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/demo-engine.js"></script>
+    <script src="../js/animations.js"></script>
+    <script src="../js/cookie-consent.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Track claimed items in this session for UI updates
+        const claimedItems = new Set();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = DemoAuth.getCurrentUser();
+            const badgeRequired = document.getElementById('badge-required');
+            const giveawayContent = document.getElementById('giveaway-content');
+            const itemsArea = document.getElementById('items-area');
+
+            // ── Not logged in: show blurred overlay ──────────────────────────
+            if (!user) {
+                giveawayContent.style.display = 'block';
+                // Hide claims counter for guests
+                document.querySelector('.claims-counter').style.display = 'none';
+                renderGiveawayItems();
+                showGuestOverlay(itemsArea);
+                return;
+            }
+
+            // ── Logged in but newcomer (0 swaps) ────────────────────────────
+            if (user.badge_tier === 'newcomer' || (user.swap_count || 0) < 1) {
+                badgeRequired.style.display = 'block';
+                giveawayContent.style.display = 'none';
+                return;
+            }
+
+            // ── Has access ──────────────────────────────────────────────────
+            giveawayContent.style.display = 'block';
+            updateClaimsCounter();
+            renderGiveawayItems();
+            setupFilters();
+
+        });
+
+        /** Render giveaway items into the grid */
+        function renderGiveawayItems(categoryFilter) {
+            const grid = document.getElementById('giveaway-grid');
+            if (!grid) return;
+
+            let items = DemoItems.getGiveaways();
+
+            // Apply category filter
+            if (categoryFilter && categoryFilter !== 'all') {
+                items = items.filter(function(item) {
+                    return item.category === categoryFilter;
+                });
+            }
+
+            if (items.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">No giveaway items found in this category.</div>';
+                return;
+            }
+
+            grid.innerHTML = items.map(function(item) {
+                return buildGiveawayCard(item);
+            }).join('');
+        }
+
+        /** Build a single giveaway card HTML */
+        function buildGiveawayCard(item) {
+            var title = (item.brand + ' ' + item.model).trim();
+            var photo = (item.photos && item.photos[0]) || '';
+            var fav = DemoItems.isFavorited(item.id);
+            var isClaimed = claimedItems.has(item.id);
+
+            var details = [];
+            if (item.condition) {
+                var condMap = { new: 'New', like_new: 'Like New', good: 'Good', fair: 'Fair' };
+                details.push(condMap[item.condition] || item.condition);
+            }
+            if (item.size) details.push(item.size);
+            if (item.color) details.push(item.color);
+            var detailStr = details.join(' \u00B7 ');
+
+            var claimBtnClass = isClaimed ? 'giveaway-card-button claimed' : 'giveaway-card-button';
+            var claimBtnText = isClaimed
+                ? '<i class="fas fa-check"></i> Claimed'
+                : '<i class="fas fa-gift"></i> Claim Item';
+
+            return '<div class="giveaway-card" data-category="' + (item.category || '') + '" data-id="' + item.id + '">' +
+                '<div class="giveaway-card-image" onclick="window.location.href=\'product.html?id=' + item.id + '\'">' +
+                    '<img src="' + photo + '" alt="' + title + '" loading="lazy">' +
+                    '<div class="giveaway-free-badge"><i class="fas fa-gift"></i> FREE</div>' +
+                    '<button class="giveaway-favorite' + (fav ? ' liked' : '') + '" type="button" onclick="event.stopPropagation(); toggleFav(this, \'' + item.id + '\')">' +
+                        '<i class="' + (fav ? 'fas fa-heart' : 'far fa-heart') + '"></i>' +
+                    '</button>' +
+                '</div>' +
+                '<div class="giveaway-card-content">' +
+                    '<h3 class="giveaway-card-title" style="cursor:pointer" onclick="window.location.href=\'product.html?id=' + item.id + '\'">' + title + '</h3>' +
+                    '<div class="giveaway-card-details">' + detailStr + '</div>' +
+                    '<div class="giveaway-card-offer"><i class="fas fa-gift"></i> Free \u2014 Claim with subscription</div>' +
+                    '<div class="giveaway-card-donor">' +
+                        '<span class="donor-badge">\u2B50</span> Donated by Swapper' +
+                    '</div>' +
+                    '<div class="giveaway-card-location">' +
+                        '<i class="fas fa-map-marker-alt"></i> ' + (item.distance || '?') + ' km \u2014 ' + (item.city || 'UAE') +
+                    '</div>' +
+                    '<button class="' + claimBtnClass + '" type="button" onclick="handleClaim(\'' + item.id + '\', this)">' +
+                        claimBtnText +
+                    '</button>' +
+                '</div>' +
+            '</div>';
+        }
+
+        /** Handle claiming a giveaway item */
+        function handleClaim(itemId, btnEl) {
+            var user = DemoAuth.getCurrentUser();
+
+            // Not logged in — redirect
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Attempt claim via DemoGiveaway
+            var result = DemoGiveaway.claim(itemId);
+
+            if (!result.success) {
+                // Determine toast type based on error
+                var errorMsg = result.error || 'Claim failed.';
+                var toastType = 'error';
+
+                if (errorMsg.indexOf('badge') >= 0 || errorMsg.indexOf('Swapper') >= 0 || errorMsg.indexOf('swap') >= 0) {
+                    toastType = 'warning';
+                } else if (errorMsg.indexOf('claims') >= 0 || errorMsg.indexOf('limit') >= 0 || errorMsg.indexOf('maximum') >= 0) {
+                    DemoNotifications.showToast('No claims left this month. Upgrade your plan!', 'warning');
+                    setTimeout(function() {
+                        window.location.href = 'pricing.html';
+                    }, 600);
+                    return;
+                } else if (errorMsg.indexOf('category') >= 0 || errorMsg.indexOf('locked') >= 0) {
+                    toastType = 'info';
+                }
+
+                DemoNotifications.showToast(errorMsg, toastType);
+                return;
+            }
+
+            // Success
+            claimedItems.add(itemId);
+            DemoNotifications.showToast('Claimed! \uD83C\uDF89', 'success');
+
+            // Update button to show claimed state
+            if (btnEl) {
+                btnEl.className = 'giveaway-card-button claimed';
+                btnEl.innerHTML = '<i class="fas fa-check"></i> Claimed';
+            }
+
+            // Update claims counter
+            updateClaimsCounter();
+
+            // Update navbar
+            if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
+        }
+
+        /** Update the claims remaining counter */
+        function updateClaimsCounter() {
+            var user = DemoAuth.getCurrentUser();
+            if (!user) return;
+            var planInfo = DemoSubscription.getPlan(user.id);
+            var remaining = planInfo.claims_limit - planInfo.claims_used;
+            var el = document.getElementById('claims-remaining');
+            if (el) el.textContent = remaining;
+            var maxEl = document.getElementById('claims-max');
+            if (maxEl) maxEl.textContent = planInfo.claims_limit;
+        }
+
+        /** Toggle favorite on a card */
+        function toggleFav(btnEl, itemId) {
+            var nowFav = DemoItems.toggleFavorite(itemId);
+            var icon = btnEl.querySelector('i');
+            if (nowFav) {
+                btnEl.classList.add('liked');
+                icon.className = 'fas fa-heart';
+            } else {
+                btnEl.classList.remove('liked');
+                icon.className = 'far fa-heart';
+            }
+        }
+
+        /** Set up category filter chips */
+        function setupFilters() {
+            document.querySelectorAll('.chip').forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+                    this.classList.add('active');
+                    var cat = this.getAttribute('data-category');
+                    renderGiveawayItems(cat);
+                });
+            });
+        }
+
+        /** Show blurred overlay with sign-up prompt for guests */
+        function showGuestOverlay(container) {
+            if (!container) return;
+            container.classList.add('guest-overlay');
+
+            var overlay = document.createElement('div');
+            overlay.className = 'guest-overlay-message';
+            overlay.innerHTML =
+                '<h2>\uD83D\uDD12 Sign up to access Gift Corner</h2>' +
+                '<p>Create a free account to browse and claim giveaway items.</p>' +
+                '<a href="login.html" class="btn-primary-coral">Join the Swap</a>';
+
+            container.style.position = 'relative';
+            container.appendChild(overlay);
+        }
+    </script>
+</body>
+</html>

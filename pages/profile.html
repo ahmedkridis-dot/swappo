@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Swaps — Swappo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* ========== PROFILE HEADER ========== */
+        .profile-header {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg);
+            font-size: 44px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .profile-main { flex: 1; }
+
+        .profile-header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 20px;
+        }
+
+        .profile-info h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-info p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .profile-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .stars { color: #FFB800; font-size: 14px; }
+        .rating-text { font-size: 13px; color: var(--text-secondary); }
+
+        /* ========== BADGES ========== */
+        .profile-badges-section { margin-top: 20px; }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--primary-light);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .tier-progress {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 20%;
+        }
+
+        .special-badges {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            font-size: 16px;
+            cursor: help;
+        }
+
+        .badge-icon.earned {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .badge-icon.locked { opacity: 0.4; }
+
+        .edit-profile-btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .edit-profile-btn:hover { opacity: 0.9; }
+
+        /* ========== STATS ROW ========== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-icon { font-size: 28px; margin-bottom: 12px; }
+        .stat-icon.swaps { color: var(--primary); }
+        .stat-icon.plan { color: var(--primary); }
+        .stat-icon.donated { color: var(--secondary); }
+        .stat-icon.saved { color: #E74C3C; }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .stat-label { font-size: 13px; color: var(--text-secondary); }
+
+        .stat-card a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .stat-card a:hover { text-decoration: underline; }
+
+        /* ========== TABS ========== */
+        .tabs-nav {
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+            background: var(--bg);
+            padding: 0;
+        }
+
+        .tab-btn {
+            padding: 14px 0;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .tab-btn:hover { color: var(--text); }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ========== ITEMS GRID ========== */
+        .items-grid,
+        .saved-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .product-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .product-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            background: var(--bg-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 10px;
+            background: rgba(0,0,0,0.7);
+            color: var(--bg);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .product-status.active { background: rgba(9,177,186,0.9); }
+        .product-status.pending { background: rgba(255,152,0,0.9); }
+        .product-status.swapped { background: rgba(76,175,80,0.9); }
+
+        .product-info { padding: 14px; }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-category {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .product-action-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            background: transparent;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .product-action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .product-action-btn i { margin-right: 4px; }
+
+        .new-item-card {
+            background: var(--bg);
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            cursor: pointer;
+        }
+
+        .new-item-card:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .new-item-card i {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .new-item-card p {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* ========== SWAP HISTORY ========== */
+        .swap-history {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .swap-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .swap-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .swap-items {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .swap-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .swap-item-img {
+            width: 60px;
+            height: 60px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .swap-item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .swap-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .swap-arrow { font-size: 20px; color: var(--primary); }
+
+        .swap-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .swap-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .swap-status.completed { background: rgba(76,175,80,0.1); color: #4CAF50; }
+        .swap-status.pending { background: rgba(255,152,0,0.1); color: #FF9800; }
+        .swap-status.cancelled { background: rgba(244,67,54,0.1); color: #F44336; }
+
+        .swap-rating { display: flex; gap: 4px; color: #FFB800; }
+
+        /* ========== SETTINGS ========== */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        .settings-section {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .settings-section h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .setting-label { flex: 1; }
+
+        .setting-label-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .setting-label-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            background: var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle-switch.active { background: var(--primary); }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: var(--bg);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s ease;
+        }
+
+        .toggle-switch.active::after { left: 22px; }
+
+        .select-language {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .account-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .account-btn:hover { background: var(--border); }
+        .account-btn.danger { color: var(--secondary); }
+
+        .settings-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .subscription-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .subscription-card.premium { border-color: #FFB800; }
+
+        .subscription-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .subscription-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFB800;
+            margin-bottom: 12px;
+        }
+
+        .subscription-benefits {
+            text-align: left;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .subscription-benefits li { margin-bottom: 6px; }
+        .subscription-benefits i { color: var(--primary); margin-right: 6px; width: 16px; }
+
+        .subscription-btn {
+            width: 100%;
+            padding: 12px;
+            background: #FFB800;
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .subscription-btn:hover { opacity: 0.9; }
+
+        /* ========== SUBSCRIPTION SIDEBAR ========== */
+        .subscription-sidebar-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .sub-sidebar-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sub-sidebar-plan {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .sub-sidebar-badge {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .sub-quota-item {
+            margin-bottom: 14px;
+        }
+
+        .sub-quota-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .sub-quota-label span:last-child {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .sub-quota-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .sub-quota-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .sub-quota-fill.swaps { background: var(--primary); }
+        .sub-quota-fill.claims { background: var(--accent); }
+        .sub-quota-fill.boosts { background: #FFB800; }
+
+        .sub-renewal {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sub-upgrade-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .sub-upgrade-btn:hover { opacity: 0.9; }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--text);
+            color: var(--bg);
+            padding: 40px 20px;
+            margin-top: 60px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        footer a { color: var(--primary-light); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-header-top {
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .edit-profile-btn { width: 100%; }
+            .profile-badges-section { width: 100%; }
+            .special-badges { justify-content: center; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+
+            .items-grid,
+            .saved-grid { grid-template-columns: repeat(2, 1fr); }
+
+            .swap-card { flex-direction: column; }
+
+            .swap-items {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .swap-right {
+                width: 100%;
+                align-items: center;
+            }
+
+            .settings-container { grid-template-columns: 1fr; }
+            .tabs-nav { gap: 12px; }
+            .tab-btn { font-size: 12px; padding: 12px 0; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 16px 12px; }
+
+            .profile-header { padding: 20px 16px; }
+            .stat-card { padding: 16px; }
+            .stat-number { font-size: 24px; }
+
+            .items-grid,
+            .saved-grid { grid-template-columns: 1fr; }
+
+            .stats-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar (standard structure for i18n compatibility) -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-inner">
+          <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+          <div class="navbar-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+          </div>
+          <div class="navbar-actions">
+            <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+            <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+          </div>
+          <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ========== MAIN CONTAINER ========== -->
+    <div class="container">
+        <!-- ========== PROFILE HEADER ========== -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <div class="avatar-circle" id="profile-avatar">?</div>
+            </div>
+
+            <div class="profile-main">
+                <div class="profile-header-top">
+                    <div class="profile-info">
+                        <h2 id="profile-name">Loading...</h2>
+                        <p id="profile-location"><i class="fas fa-map-marker-alt"></i> <span>—</span></p>
+                        <p id="profile-member-since">Member since —</p>
+                        <p id="profile-email" style="font-size:13px;color:var(--text-muted);"></p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="edit-profile-btn" onclick="document.querySelector('[data-tab=settings]').click();">
+                            <i class="fas fa-cog"></i> Settings
+                        </button>
+                        <button class="edit-profile-btn" id="logout-btn" style="background:var(--secondary);">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-badges-section">
+                    <div class="tier-badge" id="tier-badge">
+                        <span>Loading...</span>
+                    </div>
+                    <div class="tier-progress" id="tier-progress"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+
+                    <div id="all-badges" style="margin-top:16px;">
+                        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;">Tier Badges</div>
+                        <div class="special-badges" id="tier-badges-row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== STATS ROW ========== -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon swaps">🔄</div>
+                <div class="stat-number" id="stat-swaps">0</div>
+                <div class="stat-label">Swaps completed</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon plan"><i class="fas fa-crown"></i></div>
+                <div class="stat-number" id="stat-plan">Free</div>
+                <div class="stat-label">Current Plan</div>
+                <a href="pricing.html">Upgrade &rarr;</a>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon donated">🎁</div>
+                <div class="stat-number" id="stat-donated">0</div>
+                <div class="stat-label">Items donated</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon saved">❤️</div>
+                <div class="stat-number" id="stat-saved">0</div>
+                <div class="stat-label">Items saved</div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 24px;">
+            <div style="flex: 1;">
+                <!-- ========== TAB NAVIGATION ========== -->
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-tab="my-items">
+                        <i class="fas fa-box"></i> My Items
+                    </button>
+                    <button class="tab-btn" data-tab="swap-history">
+                        <i class="fas fa-history"></i> Swap History
+                    </button>
+                    <button class="tab-btn" data-tab="saved-items">
+                        <i class="fas fa-heart"></i> Saved Items
+                    </button>
+                    <button class="tab-btn" data-tab="settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+
+                <!-- ========== TAB: MY ITEMS ========== -->
+                <div class="tab-content active" id="my-items">
+                    <div class="items-grid" id="my-items-grid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- ========== TAB: SWAP HISTORY ========== -->
+                <div class="tab-content" id="swap-history">
+                    <div class="swap-history" id="swap-history-list">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- ========== TAB: SAVED ITEMS ========== -->
+                <div class="tab-content" id="saved-items">
+                    <div class="saved-grid" id="saved-items-grid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- ========== TAB: SETTINGS ========== -->
+                <div class="tab-content" id="settings">
+                    <div class="settings-container">
+                        <div>
+                            <!-- Profile Settings -->
+                            <div class="settings-section">
+                                <h3><i class="fas fa-user"></i> Profile Settings</h3>
+                                <div style="display:flex;flex-direction:column;gap:14px;">
+                                    <div>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Name</label>
+                                        <input type="text" id="settings-name" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                    </div>
+                                    <div>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Email</label>
+                                        <input type="email" id="settings-email" disabled style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg-light);color:var(--text-muted);">
+                                    </div>
+                                    <div>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">City</label>
+                                        <select id="settings-city" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                            <option value="">Select city</option>
+                                            <option value="Dubai Marina">Dubai Marina</option>
+                                            <option value="Downtown Dubai">Downtown Dubai</option>
+                                            <option value="JBR">JBR</option>
+                                            <option value="JLT">JLT</option>
+                                            <option value="Business Bay">Business Bay</option>
+                                            <option value="Al Barsha">Al Barsha</option>
+                                            <option value="Deira">Deira</option>
+                                            <option value="Jumeirah">Jumeirah</option>
+                                            <option value="Abu Dhabi">Abu Dhabi</option>
+                                            <option value="Sharjah">Sharjah</option>
+                                            <option value="Ajman">Ajman</option>
+                                            <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                                            <option value="Fujairah">Fujairah</option>
+                                            <option value="Al Ain">Al Ain</option>
+                                            <option value="Umm Al Quwain">Umm Al Quwain</option>
+                                        </select>
+                                    </div>
+                                    <button id="save-settings-btn" style="padding:12px;background:var(--primary);color:var(--bg);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+                                        <i class="fas fa-save"></i> Save Settings
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Notifications Section -->
+                            <div class="settings-section">
+                                <h3><i class="fas fa-bell"></i> Notifications</h3>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Push Notifications</div>
+                                        <div class="setting-label-desc">Receive mobile notifications</div>
+                                    </div>
+                                    <button class="toggle-switch active"></button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Email Notifications</div>
+                                        <div class="setting-label-desc">Receive emails for important updates</div>
+                                    </div>
+                                    <button class="toggle-switch active"></button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Swap Proposals</div>
+                                        <div class="setting-label-desc">Get notified of new swap offers</div>
+                                    </div>
+                                    <button class="toggle-switch active"></button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Messages</div>
+                                        <div class="setting-label-desc">New messages from other users</div>
+                                    </div>
+                                    <button class="toggle-switch active"></button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Swap Quota Low</div>
+                                        <div class="setting-label-desc">Alert when your monthly swap quota is almost used up</div>
+                                    </div>
+                                    <button class="toggle-switch"></button>
+                                </div>
+                            </div>
+
+                            <!-- Language Section -->
+                            <div class="settings-section">
+                                <h3><i class="fas fa-globe"></i> Language</h3>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Interface Language</div>
+                                        <div class="setting-label-desc">Choose your preferred language</div>
+                                    </div>
+                                    <select class="select-language">
+                                        <option selected>English</option>
+                                        <option>العربية (Arabic)</option>
+                                        <option>Français</option>
+                                        <option>اردو (Urdu)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Account Section -->
+                            <div class="settings-section">
+                                <h3><i class="fas fa-lock"></i> Account</h3>
+                                <button class="account-btn" onclick="DemoNotifications.showToast('Password change coming soon! (Demo mode)', 'info');">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
+                                <button class="account-btn" onclick="DemoNotifications.showToast('2FA coming soon! (Demo mode)', 'info');">
+                                    <i class="fas fa-shield-alt"></i> Two-Factor Authentication
+                                </button>
+                                <button class="account-btn danger" onclick="DemoNotifications.showToast('Contact support@swappo.ae to delete your account.', 'warning');">
+                                    <i class="fas fa-trash"></i> Delete Account
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar: Subscription Management -->
+                        <div class="settings-sidebar">
+                            <div class="subscription-card" id="settings-subscription-card">
+                                <div class="subscription-title" id="settings-sub-title">Loading...</div>
+                                <div class="subscription-price" id="settings-sub-price"></div>
+
+                                <div style="text-align:left;margin-bottom:16px;" id="settings-sub-quotas">
+                                    <!-- Dynamically populated: swap/claim/boost quotas -->
+                                </div>
+
+                                <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;" id="settings-sub-renewal">
+                                    Renews on --
+                                </div>
+
+                                <a href="pricing.html" class="subscription-btn" style="display:block;text-align:center;text-decoration:none;background:var(--primary);">
+                                    <i class="fas fa-arrow-up"></i> Upgrade Plan
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== SUBSCRIPTION SIDEBAR ========== -->
+            <aside style="width: 300px;">
+                <div class="subscription-sidebar-card" id="subscription-sidebar">
+                    <div class="sub-sidebar-header">
+                        <div class="sub-sidebar-plan" id="sidebar-plan-name">Free</div>
+                        <div class="sub-sidebar-badge" id="sidebar-plan-badge"></div>
+                    </div>
+
+                    <div id="sidebar-quotas">
+                        <!-- Dynamically populated -->
+                    </div>
+
+                    <div class="sub-renewal" id="sidebar-renewal">
+                        Renews on --
+                    </div>
+
+                    <a href="pricing.html" class="sub-upgrade-btn">
+                        <i class="fas fa-arrow-up"></i> Upgrade Plan
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+        <p>&copy; 2026 Swappo. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a> | <a href="#">Contact</a></p>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="cookie-banner">
+      <div class="cookie-banner-content">
+        <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+        <div class="cookie-banner-buttons">
+          <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+          <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+          <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo Engine -->
+    <script src="../js/mock-data.js"></script>
+    <script src="../js/demo-engine.js"></script>
+    <script src="../js/animations.js"></script>
+    <script src="../js/cookie-consent.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        /* ═══════════════════════════════════════════════════════════════════
+           Profile Page — Demo Engine Integration
+           ═══════════════════════════════════════════════════════════════════ */
+
+        const ALL_BADGE_TIERS = [
+            { tier: 'newcomer', emoji: '🌱', label: 'Newcomer', min_swaps: 0 },
+            { tier: 'swapper',  emoji: '⭐', label: 'Swapper',  min_swaps: 1 },
+            { tier: 'active',   emoji: '🔥', label: 'Active',   min_swaps: 5 },
+            { tier: 'pro',      emoji: '💎', label: 'Pro',      min_swaps: 15 },
+            { tier: 'elite',    emoji: '🏆', label: 'Elite',    min_swaps: 30 },
+            { tier: 'legend',   emoji: '👑', label: 'Legend',   min_swaps: 75 }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // ── Auth check ───────────────────────────────────────────────
+            const user = DemoAuth.getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // ── Profile header ───────────────────────────────────────────
+            const initials = (user.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const avatarEl = document.getElementById('profile-avatar');
+            avatarEl.textContent = initials;
+            avatarEl.style.background = user.avatar_color || 'var(--primary)';
+
+            document.getElementById('profile-name').textContent = user.name || 'User';
+            document.querySelector('#profile-location span').textContent = user.city || 'UAE';
+            document.getElementById('profile-email').textContent = user.email || '';
+
+            // Member since
+            const created = user.created_at ? new Date(user.created_at) : new Date();
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            document.getElementById('profile-member-since').textContent = 'Member since ' + monthNames[created.getMonth()] + ' ' + created.getFullYear();
+
+            // ── Badge / Tier ─────────────────────────────────────────────
+            const swapCount = user.swap_count || 0;
+            let currentTier = ALL_BADGE_TIERS[0];
+            let nextTier = null;
+            for (let i = ALL_BADGE_TIERS.length - 1; i >= 0; i--) {
+                if (swapCount >= ALL_BADGE_TIERS[i].min_swaps) {
+                    currentTier = ALL_BADGE_TIERS[i];
+                    nextTier = ALL_BADGE_TIERS[i + 1] || null;
+                    break;
+                }
+            }
+
+            document.getElementById('tier-badge').innerHTML = '<span>' + currentTier.emoji + ' ' + currentTier.label + '</span>';
+
+            if (nextTier) {
+                document.getElementById('tier-progress').innerHTML = swapCount + ' of ' + nextTier.min_swaps + ' swaps to <strong>' + nextTier.emoji + ' ' + nextTier.label + '</strong>';
+                const pct = Math.min(100, Math.round((swapCount / nextTier.min_swaps) * 100));
+                document.getElementById('progress-fill').style.width = pct + '%';
+            } else {
+                document.getElementById('tier-progress').innerHTML = 'Max tier reached!';
+                document.getElementById('progress-fill').style.width = '100%';
+            }
+
+            // ── All tier badges (earned vs locked) ──────────────────────
+            const badgesRow = document.getElementById('tier-badges-row');
+            badgesRow.innerHTML = ALL_BADGE_TIERS.map(b => {
+                const earned = swapCount >= b.min_swaps;
+                return '<div class="badge-icon ' + (earned ? 'earned' : 'locked') + '" title="' + b.label + ' (' + b.min_swaps + ' swaps)">' + b.emoji + '</div>';
+            }).join('');
+
+            // ── Stats ────────────────────────────────────────────────────
+            const planInfo = DemoSubscription.getPlan(user.id);
+            const tierInfo = planInfo.tier;
+            const userItems = DemoItems.getByUser(user.id);
+            const favorites = DemoItems.getFavorites();
+            const donatedCount = userItems.filter(i => i.is_giveaway).length;
+
+            document.getElementById('stat-swaps').textContent = swapCount;
+            document.getElementById('stat-plan').textContent = tierInfo.name;
+            document.getElementById('stat-donated').textContent = donatedCount;
+            document.getElementById('stat-saved').textContent = favorites.length;
+
+            // ── Subscription sidebar ─────────────────────────────────────
+            document.getElementById('sidebar-plan-name').textContent = tierInfo.badge + ' ' + tierInfo.name;
+            document.getElementById('sidebar-plan-badge').textContent = planInfo.plan === 'free' ? 'Free plan' : tierInfo.price + ' AED/month';
+
+            // Quota bars
+            const quotasContainer = document.getElementById('sidebar-quotas');
+            const swapsLimit = planInfo.swaps_limit === Infinity ? '\u221E' : planInfo.swaps_limit;
+            const swapsPct = planInfo.swaps_limit === Infinity ? Math.min(100, planInfo.swaps_used * 10) : Math.round((planInfo.swaps_used / planInfo.swaps_limit) * 100);
+            const claimsPct = planInfo.claims_limit > 0 ? Math.round((planInfo.claims_used / planInfo.claims_limit) * 100) : 0;
+            const boostsPct = planInfo.boosts_limit > 0 ? Math.round((planInfo.boosts_used / planInfo.boosts_limit) * 100) : 0;
+
+            quotasContainer.innerHTML =
+                '<div class="sub-quota-item">' +
+                    '<div class="sub-quota-label"><span><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;"></i>Swaps</span><span>' + planInfo.swaps_used + '/' + swapsLimit + ' used</span></div>' +
+                    '<div class="sub-quota-bar"><div class="sub-quota-fill swaps" style="width:' + Math.min(100, swapsPct) + '%"></div></div>' +
+                '</div>' +
+                '<div class="sub-quota-item">' +
+                    '<div class="sub-quota-label"><span><i class="fas fa-gift" style="color:var(--accent);margin-right:6px;"></i>Claims</span><span>' + planInfo.claims_used + '/' + planInfo.claims_limit + ' used</span></div>' +
+                    '<div class="sub-quota-bar"><div class="sub-quota-fill claims" style="width:' + Math.min(100, claimsPct) + '%"></div></div>' +
+                '</div>' +
+                '<div class="sub-quota-item">' +
+                    '<div class="sub-quota-label"><span><i class="fas fa-rocket" style="color:#FFB800;margin-right:6px;"></i>Boosts</span><span>' + planInfo.boosts_used + '/' + planInfo.boosts_limit + ' used</span></div>' +
+                    '<div class="sub-quota-bar"><div class="sub-quota-fill boosts" style="width:' + Math.min(100, boostsPct) + '%"></div></div>' +
+                '</div>';
+
+            // Renewal date
+            const renewalDate = new Date(planInfo.next_renewal);
+            document.getElementById('sidebar-renewal').innerHTML = '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            // ── Settings subscription card ───────────────────────────────
+            const settingsSubCard = document.getElementById('settings-subscription-card');
+            if (planInfo.plan === 'premium') settingsSubCard.classList.add('premium');
+            document.getElementById('settings-sub-title').textContent = tierInfo.badge + ' ' + tierInfo.name + ' Plan';
+            document.getElementById('settings-sub-price').innerHTML = planInfo.plan === 'free' ? 'Free' : tierInfo.price + ' AED<span style="font-size:12px;color:var(--text-secondary);">/month</span>';
+            document.getElementById('settings-sub-quotas').innerHTML =
+                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;width:16px;"></i>' + planInfo.swaps_used + '/' + swapsLimit + ' swaps used this month</div>' +
+                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-gift" style="color:var(--accent);margin-right:6px;width:16px;"></i>' + planInfo.claims_used + '/' + planInfo.claims_limit + ' claims used</div>' +
+                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-rocket" style="color:#FFB800;margin-right:6px;width:16px;"></i>' + planInfo.boosts_used + '/' + planInfo.boosts_limit + ' boosts used</div>';
+            document.getElementById('settings-sub-renewal').innerHTML = '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            // ── TAB: My Items ────────────────────────────────────────────
+            const itemsGrid = document.getElementById('my-items-grid');
+            let itemsHTML = '';
+            userItems.forEach(item => {
+                const title = (item.brand + ' ' + item.model).trim() || item.type;
+                const photo = (item.photos && item.photos[0]) || '';
+                const statusClass = item.status === 'active' ? 'active' : item.status === 'pending' ? 'pending' : 'swapped';
+                const statusLabel = item.status.charAt(0).toUpperCase() + item.status.slice(1);
+
+                itemsHTML += '<div class="product-card">' +
+                    '<div class="product-image">' +
+                        (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '') +
+                        '<span class="product-status ' + statusClass + '">' + statusLabel + '</span>' +
+                    '</div>' +
+                    '<div class="product-info">' +
+                        '<div class="product-title">' + title + '</div>' +
+                        '<div class="product-category">' + (item.category || '') + '</div>' +
+                        '<div class="product-actions">' +
+                            '<button class="product-action-btn" onclick="window.location.href=\'product.html?id=' + item.id + '\'"><i class="fas fa-eye"></i> View</button>' +
+                            '<button class="product-action-btn" onclick="deleteItem(\'' + item.id + '\')"><i class="fas fa-trash"></i> Delete</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            });
+
+            // Add "Drop a new item" card
+            itemsHTML += '<div class="new-item-card" onclick="window.location.href=\'publier.html\'">' +
+                '<i class="fas fa-plus"></i>' +
+                '<p>Drop a new item</p>' +
+            '</div>';
+            itemsGrid.innerHTML = itemsHTML;
+
+            // ── TAB: Swap History ────────────────────────────────────────
+            const swapList = document.getElementById('swap-history-list');
+            const swaps = DemoSwaps.getForUser(user.id);
+
+            if (swaps.length === 0) {
+                swapList.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No swaps yet. Start swapping on the <a href="catalogue.html" style="color:var(--primary);">Swap Market</a>!</div>';
+            } else {
+                swapList.innerHTML = swaps.map(swap => {
+                    // Determine which item is ours and which is theirs
+                    const isProposer = swap.proposer_id === user.id;
+                    const myItemId = isProposer ? swap.proposer_item_id : swap.receiver_item_id;
+                    const theirItemId = isProposer ? swap.receiver_item_id : swap.proposer_item_id;
+                    const otherUserId = isProposer ? swap.receiver_id : swap.proposer_id;
+
+                    const myItem = DemoItems.getById(myItemId);
+                    const theirItem = DemoItems.getById(theirItemId);
+
+                    const myItemName = myItem ? (myItem.brand + ' ' + myItem.model).trim() : 'Your item';
+                    const theirItemName = theirItem ? (theirItem.brand + ' ' + theirItem.model).trim() : 'Their item';
+                    const myPhoto = myItem && myItem.photos ? myItem.photos[0] : '';
+                    const theirPhoto = theirItem && theirItem.photos ? theirItem.photos[0] : '';
+
+                    // Other user (anonymous unless completed)
+                    let otherUserName = 'Anonymous';
+                    if (swap.status === 'completed') {
+                        const otherUser = getMockUserById(otherUserId);
+                        if (otherUser) otherUserName = otherUser.name;
+                    }
+
+                    // Status badge
+                    const statusMap = {
+                        pending:   { class: 'pending',   icon: 'clock',        label: 'Pending',   color: 'rgba(255,152,0,0.1)',  text: '#FF9800' },
+                        accepted:  { class: 'completed', icon: 'check-circle', label: 'Accepted',  color: 'rgba(76,175,80,0.1)',  text: '#4CAF50' },
+                        completed: { class: 'completed', icon: 'check-double', label: 'Completed', color: 'rgba(33,150,243,0.1)', text: '#2196F3' },
+                        rejected:  { class: 'cancelled', icon: 'times-circle', label: 'Rejected',  color: 'rgba(244,67,54,0.1)',  text: '#F44336' }
+                    };
+                    const st = statusMap[swap.status] || statusMap.pending;
+
+                    // Rating stars
+                    let ratingHTML = '';
+                    if (swap.rating) {
+                        ratingHTML = '<div class="swap-rating">';
+                        for (let s = 1; s <= 5; s++) {
+                            ratingHTML += '<i class="fas fa-star' + (s <= swap.rating ? '' : ' style="opacity:0.3"') + '"></i>';
+                        }
+                        ratingHTML += '</div>';
+                    }
+
+                    const dateStr = swap.created_at ? new Date(swap.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
+                    return '<div class="swap-card">' +
+                        '<div>' +
+                            '<div class="swap-date">' + dateStr + ' &middot; with ' + otherUserName + '</div>' +
+                            '<div class="swap-items">' +
+                                '<div class="swap-item">' +
+                                    '<div class="swap-item-img">' + (myPhoto ? '<img src="' + myPhoto + '" alt="">' : '') + '</div>' +
+                                    '<div class="swap-item-name">' + myItemName + '</div>' +
+                                '</div>' +
+                                '<div class="swap-arrow">↔️</div>' +
+                                '<div class="swap-item">' +
+                                    '<div class="swap-item-img">' + (theirPhoto ? '<img src="' + theirPhoto + '" alt="">' : '') + '</div>' +
+                                    '<div class="swap-item-name">' + theirItemName + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div style="font-size:12px;color:var(--text-muted);margin-top:8px;">' + (swap.status === 'completed' ? '1 swap used' : '') + '</div>' +
+                        '</div>' +
+                        '<div class="swap-right">' +
+                            '<span class="swap-status" style="background:' + st.color + ';color:' + st.text + ';">' +
+                                '<i class="fas fa-' + st.icon + '"></i> ' + st.label +
+                            '</span>' +
+                            ratingHTML +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            // ── TAB: Saved Items ─────────────────────────────────────────
+            const savedGrid = document.getElementById('saved-items-grid');
+            if (favorites.length === 0) {
+                savedGrid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">No saved items yet. Browse the <a href="catalogue.html" style="color:var(--primary);">Swap Market</a> and tap the heart!</div>';
+            } else {
+                savedGrid.innerHTML = favorites.map(itemId => {
+                    const item = DemoItems.getById(itemId);
+                    if (!item) return '';
+                    const title = (item.brand + ' ' + item.model).trim() || item.type;
+                    const photo = (item.photos && item.photos[0]) || '';
+                    return '<div class="product-card" onclick="window.location.href=\'product.html?id=' + item.id + '\'" style="cursor:pointer;">' +
+                        '<div class="product-image">' +
+                            (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '') +
+                            '<span class="product-status active">Active</span>' +
+                        '</div>' +
+                        '<div class="product-info">' +
+                            '<div class="product-title">' + title + '</div>' +
+                            '<div class="product-category">' + (item.category || '') + '</div>' +
+                            '<div class="product-actions">' +
+                                '<button class="product-action-btn" onclick="event.stopPropagation(); unfavorite(\'' + item.id + '\');">' +
+                                    '<i class="fas fa-heart-broken"></i> Remove' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            // ── Settings pre-fill ────────────────────────────────────────
+            document.getElementById('settings-name').value = user.name || '';
+            document.getElementById('settings-email').value = user.email || '';
+            const citySelect = document.getElementById('settings-city');
+            if (user.city) {
+                for (let i = 0; i < citySelect.options.length; i++) {
+                    if (citySelect.options[i].value === user.city) {
+                        citySelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // ── Save settings button ─────────────────────────────────────
+            document.getElementById('save-settings-btn').addEventListener('click', () => {
+                const newName = document.getElementById('settings-name').value.trim();
+                const newCity = document.getElementById('settings-city').value;
+                if (newName) {
+                    DemoAuth.updateProfile(user.id, { name: newName, city: newCity });
+                    DemoNotifications.showToast('Settings saved! (Demo mode)', 'success');
+                    // Update header display
+                    document.getElementById('profile-name').textContent = newName;
+                    document.querySelector('#profile-location span').textContent = newCity || 'UAE';
+                    const newInitials = newName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                    document.getElementById('profile-avatar').textContent = newInitials;
+                    updateNavbarForDemo();
+                } else {
+                    DemoNotifications.showToast('Name cannot be empty.', 'error');
+                }
+            });
+
+            // ── Logout ───────────────────────────────────────────────────
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                DemoAuth.signOut();
+                window.location.href = '../index.html';
+            });
+
+            // ── Tab switching ────────────────────────────────────────────
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    button.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // ── Toggle switches ──────────────────────────────────────────
+            document.querySelectorAll('.toggle-switch').forEach(t => t.addEventListener('click', () => t.classList.toggle('active')));
+
+            // ── Navbar update ────────────────────────────────────────────
+            const navProfile = document.querySelector('.navbar-profile');
+            if (navProfile) {
+                navProfile.textContent = initials;
+                navProfile.style.background = user.avatar_color || 'var(--primary)';
+                navProfile.style.borderColor = user.avatar_color || 'var(--primary)';
+            }
+        });
+
+        // ── Global helpers ───────────────────────────────────────────────
+        function deleteItem(itemId) {
+            if (!confirm('Delete this item?')) return;
+            // Remove from user items in localStorage
+            const key = 'swappo_user_items';
+            let items = JSON.parse(localStorage.getItem(key) || '[]');
+            items = items.filter(i => i.id !== itemId);
+            localStorage.setItem(key, JSON.stringify(items));
+            DemoNotifications.showToast('Item deleted.', 'success');
+            location.reload();
+        }
+
+        function unfavorite(itemId) {
+            DemoItems.toggleFavorite(itemId);
+            DemoNotifications.showToast('Removed from saved items.', 'info');
+            location.reload();
+        }
+    </script>
+</body>
+</html>

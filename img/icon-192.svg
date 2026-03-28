@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <!-- Background: Teal rounded square -->
+  <rect width="192" height="192" rx="38" fill="#09B1BA"/>
+  <!-- Handshake icon (simplified, clean) -->
+  <g transform="translate(96, 82)" fill="none" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-40,12 L-26,-4 L-6,-4 L6,-16"/>
+    <path d="M40,12 L26,-4 L6,-4 L-6,-16"/>
+    <path d="M-6,-16 L6,-16" stroke-width="9"/>
+    <path d="M-52,24 L-40,12"/>
+    <path d="M52,24 L40,12"/>
+  </g>
+  <!-- SWAPPO text -->
+  <text x="96" y="148" font-family="Inter, sans-serif" font-size="26" font-weight="800" text-anchor="middle" fill="white" letter-spacing="3">SWAPPO</text>
+</svg>

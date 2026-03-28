@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swappo — Swap your stuff. No cash needed.</title>
+  <meta name="description" content="Swappo is the UAE's first barter platform. Swap items, give away what you don't need. No cash needed.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="img/icon-192.svg">
+  <meta name="theme-color" content="#09B1BA">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Homepage-specific styles */
+    .hero-banner {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    .hero-banner img {
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-banner-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+    }
+    .hero-banner-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+    }
+    .hero-banner-content .container {
+      width: 100%;
+    }
+    .hero-text {
+      max-width: 480px;
+      color: white;
+    }
+    .hero-text h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
+    }
+    .hero-text p {
+      font-size: 1rem;
+      opacity: 0.92;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .hero-text .btn {
+      padding: 12px 28px;
+      font-size: 0.95rem;
+      border-radius: 8px;
+    }
+
+    .teasing-strip {
+      margin: 0;
+      overflow: hidden;
+      max-height: 200px;
+    }
+    .teasing-strip video {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      max-height: 200px;
+      cursor: pointer;
+    }
+
+    .feed-section {
+      padding: 32px 0;
+    }
+    .feed-section + .feed-section {
+      padding-top: 0;
+    }
+
+    @media (max-width: 768px) {
+      .hero-banner img { height: 300px; }
+      .hero-text h1 { font-size: 1.6rem; }
+      .hero-text p { font-size: 0.9rem; }
+      .hero-text { max-width: 300px; }
+    }
+    @media (max-width: 480px) {
+      .hero-banner img { height: 240px; }
+      .hero-text h1 { font-size: 1.3rem; }
+      .hero-text { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        </div>
+
+        <div class="navbar-actions">
+          <a href="pages/chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i><span class="badge-count">3</span></a>
+          <a href="pages/profile.html" class="navbar-icon" title="My Swaps"><i class="fas fa-user-circle"></i></a>
+          <a href="pages/login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="pages/publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== CATEGORIES BAR ========== -->
+  <div class="categories-bar">
+    <div class="container">
+      <div class="categories-bar-inner">
+        <a href="pages/catalogue.html" class="cat-link active" data-i18n="all">All</a>
+        <a href="pages/catalogue.html?category=clothing" class="cat-link" data-i18n="clothing">Clothing</a>
+        <a href="pages/catalogue.html?category=electronics" class="cat-link" data-i18n="electronics">Electronics</a>
+        <a href="pages/catalogue.html?category=furniture" class="cat-link" data-i18n="furniture">Furniture</a>
+        <a href="pages/catalogue.html?category=vehicles" class="cat-link" data-i18n="vehicles">Vehicles</a>
+        <a href="pages/catalogue.html?category=sports" class="cat-link" data-i18n="sports">Sports & Leisure</a>
+        <a href="pages/catalogue.html?category=books" class="cat-link" data-i18n="books">Books & Media</a>
+        <a href="pages/catalogue.html?category=kids" class="cat-link" data-i18n="kids">Kids & Baby</a>
+        <a href="pages/giveaway.html" class="cat-link" style="color:var(--secondary);">
+          <i class="fas fa-gift"></i>&nbsp;<span data-i18n="gift_corner">Gift Corner</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== HERO BANNER ========== -->
+  <section class="hero-banner">
+    <img src="img/hero-swappo.png" alt="Swap marketplace">
+    <div class="hero-banner-overlay"></div>
+    <div class="hero-banner-content">
+      <div class="container">
+        <div class="hero-text">
+          <h1 data-i18n="hero_title">Swap your stuff.<br>No cash needed.</h1>
+          <p data-i18n="hero_subtitle">The UAE's first barter platform. Exchange items with others in your community. Anonymous until you both agree.</p>
+          <a href="pages/login.html" class="btn btn-primary" data-i18n="join_swap">Join the Swap</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== POPULAR ITEMS ========== -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="popular_now">Popular right now</h2>
+        <a href="pages/catalogue.html" class="section-link" data-i18n="see_all">See all →</a>
+      </div>
+      <div class="products-grid" id="popular-grid">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TEASING VIDEO STRIP ========== -->
+  <div class="teasing-strip" onclick="var v=this.querySelector('video'); v.muted=!v.muted;">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="video/teasing.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- ========== RECENTLY ADDED ========== -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="recently_added">Recently added</h2>
+        <a href="pages/catalogue.html" class="section-link" data-i18n="see_all">See all →</a>
+      </div>
+      <div class="products-grid" id="recent-grid">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS (simplified) ========== -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="how_it_works">How it works</h2>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-icon">📸</div>
+          <h3 data-i18n="step1_title">List your item</h3>
+          <p data-i18n="step1_desc">Take a photo and fill in the details. No descriptions needed — your identity stays safe.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">🔍</div>
+          <h3 data-i18n="step2_title">Browse & discover</h3>
+          <p data-i18n="step2_desc">Explore thousands of items by category. Find exactly what you're looking for.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">🤝</div>
+          <h3 data-i18n="step3_title">Propose a swap</h3>
+          <p data-i18n="step3_desc">Send your offer. The other person sees only your item — identities stay hidden.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">✅</div>
+          <h3 data-i18n="step4_title">Swap accepted!</h3>
+          <p data-i18n="step4_desc">Both accept? Identities revealed! Chat securely in-app & exchange.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MORE ITEMS ========== -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="explore_items">Explore items</h2>
+        <a href="pages/catalogue.html" class="section-link" data-i18n="see_all">See all →</a>
+      </div>
+      <div class="products-grid" id="explore-grid">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA ========== -->
+  <section class="cta">
+    <div class="container">
+      <h2 data-i18n="ready_to_swap">Ready to swap?</h2>
+      <p>Join Swappo today. Start with 2 free swaps every month.</p>
+      <a href="pages/login.html" class="btn btn-primary btn-lg" data-i18n="create_account">Create my account — It's free</a>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="platform">Platform</h4>
+          <ul>
+            <li><a href="pages/catalogue.html">Browse items</a></li>
+            <li><a href="pages/giveaway.html">Free giveaways</a></li>
+            <li><a href="pages/publier.html">List an item</a></li>
+            <li><a href="pages/pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="company">Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="legal">Legal</h4>
+          <ul>
+            <li><a href="pages/terms.html">Terms of use</a></li>
+            <li><a href="pages/privacy.html">Privacy policy</a></li>
+            <li><a href="pages/cookies.html">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Swappo. All rights reserved. UAE</span>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="pages/cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Mode Engine -->
+  <script src="js/mock-data.js"></script>
+  <script src="js/demo-engine.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/cookie-consent.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/i18n.js"></script>
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.error('SW failed:', err));
+    }
+
+    // ── Render items into a grid ──
+    function renderGrid(gridEl, items) {
+      if (!gridEl) return;
+      gridEl.innerHTML = items.map(item => DemoItems.renderCard(item)).join('');
+    }
+
+    // ── Populate all grids ──
+    function populateGrids() {
+      // Popular: sorted by favorites
+      var popular = DemoItems.browse({ sortBy: 'popular' });
+      renderGrid(document.getElementById('popular-grid'), popular.items.slice(0, 10));
+
+      // Recently added
+      var recent = DemoItems.browse({ sortBy: 'newest' });
+      renderGrid(document.getElementById('recent-grid'), recent.items.slice(0, 10));
+
+      // Explore: random mix
+      var all = DemoItems.browse({});
+      var shuffled = all.items.sort(function() { return 0.5 - Math.random(); });
+      renderGrid(document.getElementById('explore-grid'), shuffled.slice(0, 10));
+    }
+
+    // ── Search dropdown ──
+    function initSearch() {
+      var input = document.querySelector('.navbar-search input');
+      if (!input) return;
+
+      var dropdown = document.getElementById('search-dropdown');
+      if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = 'search-dropdown';
+        dropdown.style.cssText = 'position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:360px;overflow-y:auto;z-index:1000;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.1);';
+        input.parentElement.style.position = 'relative';
+        input.parentElement.appendChild(dropdown);
+      }
+
+      var debounce;
+      input.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(function() {
+          var q = input.value.trim();
+          if (q.length < 2) { dropdown.style.display = 'none'; return; }
+
+          var result = DemoItems.browse({ search: q, limit: 8 });
+          if (result.items.length === 0) {
+            dropdown.innerHTML = '<div style="padding:16px;color:var(--text-muted);text-align:center;">No items found</div>';
+          } else {
+            dropdown.innerHTML = result.items.map(function(item) {
+              var title = (item.brand + ' ' + item.model).trim();
+              var photo = (item.photos && item.photos[0]) || '';
+              var href = 'pages/product.html?id=' + item.id;
+              return '<a href="' + href + '" style="display:flex;align-items:center;gap:12px;padding:10px 14px;text-decoration:none;color:var(--text);border-bottom:1px solid var(--border);transition:background 0.15s;" onmouseover="this.style.background=\'#f5f5f5\'" onmouseout="this.style.background=\'transparent\'">' +
+                '<img src="' + photo + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px;">' +
+                '<div><div style="font-weight:600;font-size:0.88rem;">' + title + '</div>' +
+                '<div style="font-size:0.78rem;color:var(--text-muted);">' + (item.category || '') + '</div></div></a>';
+            }).join('');
+          }
+          dropdown.style.display = 'block';
+        }, 250);
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!input.parentElement.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Category bar filtering ──
+    function initCategoryBar() {
+      var links = document.querySelectorAll('.categories-bar .cat-link');
+      links.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var i18nKey = link.getAttribute('data-i18n');
+          if (!i18nKey || i18nKey === 'all' || i18nKey === 'gift_corner') return;
+          var catMap = {
+            clothing: 'clothing', electronics: 'electronics', furniture: 'furniture',
+            vehicles: 'vehicles', sports: 'sports', books: 'books', kids: 'kids'
+          };
+          var cat = catMap[i18nKey];
+          if (!cat) return;
+          e.preventDefault();
+          links.forEach(function(l) { l.classList.remove('active'); });
+          link.classList.add('active');
+          var popular = DemoItems.browse({ category: cat, sortBy: 'popular', limit: 10 });
+          renderGrid(document.getElementById('popular-grid'), popular.items);
+          var recent = DemoItems.browse({ category: cat, sortBy: 'newest', limit: 10 });
+          renderGrid(document.getElementById('recent-grid'), recent.items);
+          var explore = DemoItems.browse({ category: cat, limit: 10 });
+          renderGrid(document.getElementById('explore-grid'), explore.items);
+        });
+      });
+    }
+
+    // ── Main init ──
+    function homeInit() {
+      populateGrids();
+      initSearch();
+      initCategoryBar();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', homeInit);
+    } else {
+      homeInit();
+    }
+  </script>
+</body>
+</html>

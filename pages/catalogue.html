@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swap Market — Swappo</title>
+  <meta name="description" content="Browse all items available for swap on Swappo. Discover thousands of items in your area.">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Filter bar — Vinted-style horizontal row */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar input[type="text"] {
+      flex: 1;
+      min-width: 180px;
+      padding: 9px 14px 9px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: var(--text);
+      background: var(--bg-light);
+      transition: var(--transition);
+    }
+
+    .filter-bar input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(9,177,186,0.1);
+      background: white;
+    }
+
+    .filter-bar .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .filter-bar .search-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      pointer-events: none;
+    }
+
+    .filter-bar select {
+      padding: 9px 30px 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: var(--text);
+      background: white;
+      cursor: pointer;
+      transition: var(--transition);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .filter-bar select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(9,177,186,0.1);
+    }
+
+    .filter-bar .clear-filters {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .filter-bar .clear-filters:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Item count */
+    .result-count {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    /* Load more */
+    .load-more-wrap {
+      text-align: center;
+      margin: 32px 0;
+    }
+
+    /* Override products-grid for catalogue: ensure 5 cols on desktop (already in style.css) */
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items...">
+        </div>
+
+        <div class="navbar-actions">
+          <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Categories bar -->
+  <div class="categories-bar">
+    <div class="container">
+      <div class="categories-bar-inner">
+        <a href="catalogue.html" class="cat-link active">All</a>
+        <a href="catalogue.html" class="cat-link">Clothing</a>
+        <a href="catalogue.html" class="cat-link">Electronics</a>
+        <a href="catalogue.html" class="cat-link">Furniture</a>
+        <a href="catalogue.html" class="cat-link">Vehicles</a>
+        <a href="catalogue.html" class="cat-link">Sports</a>
+        <a href="catalogue.html" class="cat-link">Books & Media</a>
+        <a href="catalogue.html" class="cat-link">Kids</a>
+        <a href="giveaway.html" class="cat-link" style="color:var(--secondary);">
+          <i class="fas fa-gift"></i>&nbsp; Gift Corner
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FILTER BAR (Vinted-style horizontal) ========== -->
+  <div class="container">
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="catalogue-search" placeholder="Search items...">
+      </div>
+
+      <select id="filter-category">
+        <option value="">All Categories</option>
+        <option value="clothing">Clothing & Accessories</option>
+        <option value="books">Books & Media</option>
+        <option value="kids">Kids & Baby</option>
+        <option value="sports">Sports & Leisure</option>
+        <option value="furniture">Furniture & Home</option>
+        <option value="electronics">Electronics & Phones</option>
+        <option value="vehicles">Vehicles</option>
+        <option value="other">Other</option>
+      </select>
+
+      <select id="filter-condition">
+        <option value="">All Conditions</option>
+        <option value="new">New</option>
+        <option value="like_new">Like New</option>
+        <option value="good">Good</option>
+        <option value="fair">Fair</option>
+      </select>
+
+      <select id="filter-sort">
+        <option value="newest">Newest first</option>
+        <option value="popular">Most popular</option>
+        <option value="closest">Nearest first</option>
+      </select>
+
+      <button class="clear-filters" id="clear-filters-btn"><i class="fas fa-times"></i> Clear</button>
+    </div>
+  </div>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="container">
+    <span class="result-count" id="item-count">Loading...</span>
+    <div class="products-grid" id="catalogue-grid" data-stagger-grid></div>
+
+    <!-- Load more -->
+    <div id="load-more-wrap" class="load-more-wrap" style="display:none;">
+      <button id="load-more-btn" class="btn btn-outline" style="padding:12px 32px;">Load more items</button>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="catalogue.html">Browse items</a></li>
+            <li><a href="giveaway.html">Free giveaways</a></li>
+            <li><a href="publier.html">List an item</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="terms.html">Terms of use</a></li>
+            <li><a href="privacy.html">Privacy policy</a></li>
+            <li><a href="cookies.html">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Swappo. All rights reserved. UAE</span>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Engine -->
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/demo-engine.js"></script>
+  <script src="../js/animations.js"></script>
+  <script src="../js/cookie-consent.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const preCategory = params.get('category');
+
+      let currentFilters = {
+        category: preCategory || '',
+        condition: '',
+        search: '',
+        sortBy: 'newest'
+      };
+
+      const PAGE_SIZE = 20;
+      let visibleCount = PAGE_SIZE;
+
+      // Pre-select category dropdown if URL param present
+      const catSelect = document.getElementById('filter-category');
+      const condSelect = document.getElementById('filter-condition');
+      const sortSelect = document.getElementById('filter-sort');
+      const searchInput = document.getElementById('catalogue-search');
+      const navSearch = document.querySelector('.navbar-search input');
+      const clearBtn = document.getElementById('clear-filters-btn');
+      const loadMoreBtn = document.getElementById('load-more-btn');
+      const loadMoreWrap = document.getElementById('load-more-wrap');
+
+      if (preCategory && catSelect) {
+        catSelect.value = preCategory;
+      }
+
+      // Also highlight matching category in the categories bar
+      if (preCategory) {
+        document.querySelectorAll('.cat-link').forEach(link => {
+          link.classList.remove('active');
+          const text = link.textContent.trim().toLowerCase();
+          const catMap = {
+            'all': '', 'clothing': 'clothing', 'electronics': 'electronics',
+            'furniture': 'furniture', 'vehicles': 'vehicles', 'sports': 'sports',
+            'books & media': 'books', 'kids': 'kids'
+          };
+          if (catMap[text] === preCategory) link.classList.add('active');
+        });
+      }
+
+      function renderCatalogue() {
+        const { items } = DemoItems.browse({
+          category: currentFilters.category || undefined,
+          condition: currentFilters.condition || undefined,
+          search: currentFilters.search || undefined,
+          sortBy: currentFilters.sortBy
+        });
+
+        const grid = document.getElementById('catalogue-grid');
+        const count = document.getElementById('item-count');
+
+        if (count) count.textContent = items.length + ' items found';
+
+        const visible = items.slice(0, visibleCount);
+
+        if (grid) {
+          grid.innerHTML = visible.map(item => DemoItems.renderCard(item)).join('');
+        }
+
+        if (items.length === 0 && grid) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted);">' +
+            '<i class="fas fa-search" style="font-size:2rem;margin-bottom:12px;display:block;"></i>' +
+            'No items found. Try different filters.</div>';
+        }
+
+        // Show/hide load more
+        if (loadMoreWrap) {
+          loadMoreWrap.style.display = items.length > visibleCount ? 'block' : 'none';
+        }
+      }
+
+      // Wire up filter controls
+      if (catSelect) {
+        catSelect.addEventListener('change', () => {
+          currentFilters.category = catSelect.value;
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        });
+      }
+
+      if (condSelect) {
+        condSelect.addEventListener('change', () => {
+          currentFilters.condition = condSelect.value;
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        });
+      }
+
+      if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+          currentFilters.sortBy = sortSelect.value;
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        });
+      }
+
+      // Search input — real-time filtering
+      let searchTimeout;
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            currentFilters.search = e.target.value.trim();
+            visibleCount = PAGE_SIZE;
+            renderCatalogue();
+          }, 200);
+        });
+      }
+
+      // Navbar search — also filters in real-time
+      if (navSearch) {
+        navSearch.addEventListener('input', (e) => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            currentFilters.search = e.target.value.trim();
+            if (searchInput) searchInput.value = e.target.value;
+            visibleCount = PAGE_SIZE;
+            renderCatalogue();
+          }, 200);
+        });
+      }
+
+      // Clear all filters
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          currentFilters = { category: '', condition: '', search: '', sortBy: 'newest' };
+          if (catSelect) catSelect.value = '';
+          if (condSelect) condSelect.value = '';
+          if (sortSelect) sortSelect.value = 'newest';
+          if (searchInput) searchInput.value = '';
+          if (navSearch) navSearch.value = '';
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        });
+      }
+
+      // Load more button
+      if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+          visibleCount += PAGE_SIZE;
+          renderCatalogue();
+        });
+      }
+
+      // Wire up categories bar links to filter
+      document.querySelectorAll('.cat-link').forEach(link => {
+        if (link.getAttribute('href') === 'giveaway.html') return;
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+          const text = link.textContent.trim().toLowerCase();
+          const catMap = {
+            'all': '', 'clothing': 'clothing', 'electronics': 'electronics',
+            'furniture': 'furniture', 'vehicles': 'vehicles', 'sports': 'sports',
+            'books & media': 'books', 'kids': 'kids'
+          };
+          currentFilters.category = catMap[text] || '';
+          if (catSelect) catSelect.value = currentFilters.category;
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        });
+      });
+
+      // Initial render
+      renderCatalogue();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing — Swappo</title>
+  <meta name="description" content="Choose the Swappo plan that fits your swapping style. Start free, upgrade anytime.">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Pricing hero */
+    .pricing-hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, #f0fdfd 100%);
+    }
+    .pricing-hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0 0 12px;
+    }
+    .pricing-hero p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* Pricing grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: -20px auto 60px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pricing-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .pricing-card.highlighted {
+      border: 2px solid var(--primary);
+      box-shadow: 0 8px 24px rgba(9,177,186,0.15);
+    }
+
+    .pricing-badge-top {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    .pricing-card-badge {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .pricing-card-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .pricing-card-price {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .pricing-card-price span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .pricing-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 28px;
+      width: 100%;
+      text-align: left;
+    }
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--bg-light);
+    }
+    .pricing-features li:last-child {
+      border-bottom: none;
+    }
+    .pricing-features li i {
+      font-size: 0.75rem;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .pricing-features li i.fa-check {
+      color: var(--primary);
+    }
+    .pricing-features li i.fa-xmark {
+      color: var(--text-muted);
+    }
+
+    .pricing-card .btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: var(--radius);
+    }
+
+    .badge-label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      letter-spacing: 0.02em;
+    }
+
+    /* FAQ section */
+    .faq-section {
+      max-width: 720px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+    .faq-section h2 {
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: var(--text);
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+    .faq-question {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .faq-question i {
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-question i {
+      transform: rotate(180deg);
+    }
+    .faq-answer {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-top: 12px;
+      display: none;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    /* CTA banner */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      text-align: center;
+      padding: 60px 20px;
+      margin-bottom: 0;
+    }
+    .cta-banner h2 {
+      color: #fff;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    .cta-banner p {
+      color: rgba(255,255,255,0.85);
+      font-size: 1rem;
+      margin: 0 0 24px;
+    }
+    .cta-banner .btn {
+      background: #fff;
+      color: var(--primary);
+      font-weight: 700;
+      padding: 14px 36px;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .cta-banner .btn:hover {
+      background: var(--bg-light);
+      transform: translateY(-2px);
+    }
+
+    /* Toast notification */
+    .pricing-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 500;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .pricing-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 560px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+      }
+      .pricing-hero h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        </div>
+        <div class="navbar-actions">
+          <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="pricing-hero">
+    <h1 data-i18n="pricing_heading">Choose your plan</h1>
+    <p data-i18n="pricing_subtitle">Start swapping for free. Upgrade anytime.</p>
+  </section>
+
+  <!-- Pricing Cards -->
+  <div class="pricing-grid">
+
+    <!-- Free -->
+    <div class="pricing-card">
+      <div class="pricing-card-badge">🌱</div>
+      <div class="pricing-card-name" data-i18n="plan_free">Free</div>
+      <div class="pricing-card-price" data-i18n="plan_free_price">Free</div>
+      <div class="pricing-card-subtitle" data-i18n="plan_free_subtitle">No credit card needed</div>
+      <span class="badge-label" style="background:#f5f5f5;color:#999;" data-i18n="badge_newcomer">Newcomer</span>
+      <ul class="pricing-features">
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_swaps_2">2 swaps / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_giveaway_1">1 giveaway claim / month</span></li>
+        <li><i class="fas fa-xmark"></i> <span data-i18n="feat_no_boosts">No boosts</span></li>
+        <li><i class="fas fa-xmark"></i> <span data-i18n="feat_ads_yes">Ads displayed</span></li>
+      </ul>
+      <a href="login.html" class="btn btn-outline pricing-cta" data-i18n="cta_free">Get Started Free</a>
+    </div>
+
+    <!-- Bronze -->
+    <div class="pricing-card">
+      <div class="pricing-card-badge">🥉</div>
+      <div class="pricing-card-name" data-i18n="plan_bronze">Bronze</div>
+      <div class="pricing-card-price">19 <span>AED/mo</span></div>
+      <div class="pricing-card-subtitle" data-i18n="plan_bronze_subtitle">For casual swappers</div>
+      <span class="badge-label" style="background:#fdf3e7;color:#CD7F32;" data-i18n="badge_bronze">Bronze</span>
+      <ul class="pricing-features">
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_swaps_4">4 swaps / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_giveaway_2">2 giveaway claims / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_boost_1">1 boost / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_ads_reduced">Reduced ads</span></li>
+      </ul>
+      <a href="login.html" class="btn btn-primary pricing-cta" data-i18n="cta_subscribe">Subscribe</a>
+    </div>
+
+    <!-- Silver -->
+    <div class="pricing-card">
+      <div class="pricing-card-badge">🥈</div>
+      <div class="pricing-card-name" data-i18n="plan_silver">Silver</div>
+      <div class="pricing-card-price">39 <span>AED/mo</span></div>
+      <div class="pricing-card-subtitle" data-i18n="plan_silver_subtitle">For regular swappers</div>
+      <span class="badge-label" style="background:#f5f5f5;color:#C0C0C0;" data-i18n="badge_silver">Silver</span>
+      <ul class="pricing-features">
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_swaps_6">6 swaps / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_giveaway_3">3 giveaway claims / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_boost_2">2 boosts / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_ads_reduced2">Reduced ads</span></li>
+      </ul>
+      <a href="login.html" class="btn btn-primary pricing-cta" data-i18n="cta_subscribe">Subscribe</a>
+    </div>
+
+    <!-- Premium -->
+    <div class="pricing-card highlighted">
+      <div class="pricing-badge-top" data-i18n="badge_best_value">Best Value</div>
+      <div class="pricing-card-badge">👑</div>
+      <div class="pricing-card-name" data-i18n="plan_premium">Premium</div>
+      <div class="pricing-card-price">69 <span>AED/mo</span></div>
+      <div class="pricing-card-subtitle" data-i18n="plan_premium_subtitle">For power swappers</div>
+      <span class="badge-label" style="background:var(--primary-light);color:#09B1BA;" data-i18n="badge_premium">Premium</span>
+      <ul class="pricing-features">
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_swaps_unlimited">Unlimited swaps</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_giveaway_5">5 giveaway claims / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_boost_4">4 boosts / month</span></li>
+        <li><i class="fas fa-check"></i> <span data-i18n="feat_no_ads">No ads</span></li>
+      </ul>
+      <a href="login.html" class="btn btn-primary pricing-cta" data-i18n="cta_premium">Go Premium</a>
+    </div>
+
+  </div>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <h2 data-i18n="faq_heading">Frequently Asked Questions</h2>
+
+    <div class="faq-item open">
+      <div class="faq-question" data-i18n="faq_q_cancel">
+        Can I cancel anytime?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer" data-i18n="faq_a_cancel">Yes, cancel anytime. No commitment.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" data-i18n="faq_q_downgrade">
+        What happens to my swaps if I downgrade?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer" data-i18n="faq_a_downgrade">Active swaps stay open. New quota applies next cycle.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" data-i18n="faq_q_reset">
+        When does my quota reset?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer" data-i18n="faq_a_reset">Monthly, on your signup anniversary date.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question" data-i18n="faq_q_identity">
+        Is my identity safe?
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer" data-i18n="faq_a_identity">Yes, identity is only revealed when both parties accept a swap.</div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="cta-banner">
+    <h2 data-i18n="cta_ready">Ready to start swapping?</h2>
+    <p data-i18n="cta_ready_sub">Join thousands of swappers across the UAE.</p>
+    <a href="login.html" class="btn pricing-cta" data-i18n="cta_join_free">Join for Free</a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="catalogue.html">Browse items</a></li>
+            <li><a href="giveaway.html">Free giveaways</a></li>
+            <li><a href="publier.html">List an item</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="terms.html">Terms of use</a></li>
+            <li><a href="privacy.html">Privacy policy</a></li>
+            <li><a href="cookies.html">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Swappo. All rights reserved. UAE</span>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="pricing-toast" id="pricing-toast"></div>
+
+  <!-- Scripts -->
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/demo-engine.js"></script>
+  <script src="../js/animations.js"></script>
+  <script src="../js/cookie-consent.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // FAQ accordion
+      document.querySelectorAll('.faq-question').forEach(q => {
+        q.addEventListener('click', () => {
+          const item = q.closest('.faq-item');
+          item.classList.toggle('open');
+        });
+      });
+
+      // CTA buttons — toast + redirect
+      const toast = document.getElementById('pricing-toast');
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+
+      document.querySelectorAll('.pricing-cta').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          showToast('Subscription coming soon! Using free plan for demo.');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading... — Swappo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* ============ BREADCRUMB ============ */
+    .breadcrumb {
+      background: var(--bg);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .breadcrumb-list {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .breadcrumb-list a { color: var(--primary); font-weight: 500; }
+    .breadcrumb-list a:hover { color: var(--primary-dark); }
+    .breadcrumb-list span { color: var(--text-muted); }
+
+    /* ============ PRODUCT LAYOUT ============ */
+    .product-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      background: var(--bg-light);
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    /* ============ PHOTO GALLERY ============ */
+    .photo-gallery { display: flex; flex-direction: column; gap: 12px; }
+    .main-photo-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .main-photo {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .main-photo:hover { transform: scale(1.05); }
+    .photo-count-badge {
+      position: absolute; bottom: 12px; right: 12px;
+      background: rgba(0,0,0,0.6); color: white;
+      padding: 6px 12px; border-radius: var(--radius);
+      font-size: 12px; font-weight: 600;
+    }
+    .thumbnail-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .thumbnail {
+      position: relative; aspect-ratio: 1;
+      background: var(--bg); border: 2px solid transparent;
+      border-radius: var(--radius); cursor: pointer;
+      overflow: hidden; transition: border-color 0.2s;
+    }
+    .thumbnail:hover { border-color: var(--primary); }
+    .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+    .thumbnail.active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+    .thumbnail.blurred img { filter: blur(8px); }
+    .thumbnail-lock {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5); color: white; font-size: 18px;
+    }
+    .thumbnail-lock-text {
+      position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; font-weight: 600; text-align: center; white-space: nowrap; width: 95%;
+    }
+
+    /* ============ PRODUCT INFO (right column) ============ */
+    .product-info { display: flex; flex-direction: column; gap: 24px; }
+    .product-header {
+      background: var(--bg); padding: 24px;
+      border-radius: var(--radius-lg); border: 1px solid var(--border);
+    }
+    .product-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+    .product-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .category-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--primary-light); color: var(--primary-dark);
+      padding: 6px 12px; border-radius: var(--radius);
+      font-size: 13px; font-weight: 600;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent); color: white;
+      padding: 6px 12px; border-radius: var(--radius);
+      font-size: 13px; font-weight: 600;
+    }
+    .swap-info {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px; background: var(--primary-light);
+      border-radius: var(--radius); margin-top: 20px;
+    }
+    .swap-info-icon { font-size: 24px; color: var(--primary); }
+    .swap-info-text { font-size: 14px; color: var(--text); }
+    .swap-info-text strong { font-weight: 700; }
+
+    /* ============ DETAILS CARD ============ */
+    .details-card {
+      background: var(--bg); padding: 24px;
+      border-radius: var(--radius-lg); border: 1px solid var(--border);
+    }
+    .details-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    .detail-row {
+      display: flex; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+    .detail-value { font-size: 14px; font-weight: 600; }
+    .location-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 16px 0; font-size: 14px; color: var(--text-secondary);
+    }
+    .location-row strong { font-weight: 600; }
+    .posted-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 0; font-size: 13px; color: var(--text-muted);
+    }
+    .interested-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 0; font-size: 13px; color: var(--text-secondary);
+    }
+    .interested-row i { color: var(--secondary); font-size: 14px; }
+
+    /* ============ ACTION BUTTONS ============ */
+    .action-buttons {
+      background: var(--bg); padding: 24px;
+      border-radius: var(--radius-lg); border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .action-buttons .btn-primary {
+      padding: 16px 24px; font-size: 15px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      border-radius: var(--radius);
+    }
+    .action-buttons .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(9, 177, 186, 0.3);
+    }
+    .action-buttons .btn-primary:active { transform: translateY(0); }
+    .secondary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-secondary {
+      background: var(--bg-light); color: var(--primary);
+      padding: 12px 16px; border: 2px solid var(--primary);
+      border-radius: var(--radius); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-secondary:hover { background: var(--primary-light); }
+    .btn-secondary.active { background: var(--primary); color: white; }
+    .text-link {
+      color: var(--primary); font-size: 13px; font-weight: 500;
+      cursor: pointer; text-align: center; padding: 8px 0;
+    }
+    .text-link:hover { color: var(--primary-dark); text-decoration: underline; }
+
+    /* ============ SELLER CARD ============ */
+    .seller-card {
+      background: var(--bg); padding: 24px;
+      border-radius: var(--radius-lg); border: 1px solid var(--border);
+      text-align: center;
+    }
+    .seller-avatar {
+      width: 80px; height: 80px; background: var(--bg-light);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 36px; margin: 0 auto 16px; color: var(--text-muted);
+    }
+    .seller-name { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .seller-badge {
+      display: inline-block; background: var(--primary-light); color: var(--primary-dark);
+      padding: 6px 12px; border-radius: var(--radius);
+      font-size: 12px; font-weight: 600; margin-bottom: 16px;
+    }
+    .seller-info {
+      display: flex; flex-direction: column; gap: 8px;
+      padding: 16px 0; border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .seller-info-item { display: flex; justify-content: space-between; }
+    .seller-disclaimer {
+      font-size: 12px; color: var(--text-muted);
+      margin-top: 16px; font-style: italic;
+    }
+
+    /* ============ SIMILAR ITEMS ============ */
+    .similar-section {
+      margin-top: 64px; padding-top: 48px;
+      border-top: 2px solid var(--border);
+    }
+    .section-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+    .product-grid-similar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .product-card-image {
+      width: 100%; aspect-ratio: 1;
+      background: var(--bg-light); position: relative; overflow: hidden;
+    }
+    .product-card-image img { width: 100%; height: 100%; object-fit: cover; }
+    .product-card-badge {
+      position: absolute; top: 8px; right: 8px;
+      background: var(--accent); color: white;
+      padding: 4px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 600;
+    }
+    .product-card-body { padding: 12px; }
+    .product-card-title {
+      font-size: 13px; font-weight: 600; margin-bottom: 6px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .product-card-category { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+
+    /* ============ SWAP MODAL ============ */
+    .modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+      z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal.open { display: flex; }
+    .modal-content {
+      background: var(--bg); border-radius: var(--radius-lg);
+      padding: 32px 24px; max-width: 600px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 20px; font-weight: 700; }
+    .modal-close {
+      font-size: 24px; color: var(--text-muted); cursor: pointer;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { color: var(--text); }
+    .user-items-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px; margin: 24px 0;
+    }
+    .user-item {
+      position: relative; border: 2px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .user-item:hover { border-color: var(--primary); }
+    .user-item.selected { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+    .user-item-image { width: 100%; aspect-ratio: 1; background: var(--bg-light); overflow: hidden; }
+    .user-item-image img { width: 100%; height: 100%; object-fit: cover; }
+    .user-item-checkbox {
+      position: absolute; top: 8px; right: 8px;
+      width: 24px; height: 24px; background: white;
+      border: 2px solid var(--primary); border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--primary); font-weight: 700;
+    }
+    .user-item-title {
+      padding: 8px; font-size: 12px; font-weight: 600;
+      background: var(--bg-light);
+    }
+    .modal-info {
+      background: var(--primary-light); padding: 12px;
+      border-radius: var(--radius); font-size: 13px;
+      color: var(--primary-dark); margin-bottom: 20px;
+    }
+    .modal-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+    .modal-empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .modal-empty-link {
+      color: var(--primary); font-weight: 600;
+      cursor: pointer; margin-top: 12px; display: inline-block;
+    }
+    .modal-actions {
+      display: flex; gap: 12px; margin-top: 24px;
+      padding-top: 24px; border-top: 1px solid var(--border);
+    }
+    .modal-actions .btn-primary { flex: 1; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 768px) {
+      .product-grid { grid-template-columns: 1fr; gap: 24px; }
+      .product-title { font-size: 22px; }
+      .thumbnail-strip { grid-template-columns: repeat(4, 1fr); }
+      .secondary-actions { grid-template-columns: 1fr; }
+      .product-grid-similar { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .breadcrumb { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .modal-content { padding: 24px 16px; }
+      .user-items-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    }
+    @media (max-width: 480px) {
+      .product-container { padding: 16px; }
+      .product-grid { gap: 20px; }
+      .product-title { font-size: 20px; }
+      .product-header, .details-card, .action-buttons, .seller-card { padding: 16px; }
+      .thumbnail-strip { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .product-card-title { font-size: 12px; }
+      .section-title { font-size: 20px; }
+      .product-grid-similar { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+      .seller-avatar { width: 60px; height: 60px; font-size: 28px; }
+      .modal-content { padding: 20px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<!-- Navbar (standard structure for i18n compatibility) -->
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+      <div class="navbar-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+      </div>
+      <div class="navbar-actions">
+
+        <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+        <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+      </div>
+      <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ BREADCRUMB ============ -->
+<div class="breadcrumb">
+  <div class="breadcrumb-list" id="breadcrumb-list">
+    <a href="../index.html">Home</a>
+    <span>&rsaquo;</span>
+    <a href="catalogue.html">Swap Market</a>
+    <span>&rsaquo;</span>
+    <span id="breadcrumb-category">...</span>
+    <span>&rsaquo;</span>
+    <span id="breadcrumb-item">...</span>
+  </div>
+</div>
+
+<!-- ============ MAIN CONTENT ============ -->
+<div class="product-container" id="product-container">
+  <div class="product-grid">
+    <!-- LEFT: PHOTO GALLERY -->
+    <div class="photo-gallery">
+      <div class="main-photo-container">
+        <img id="mainPhoto" src="" alt="" class="main-photo">
+        <div class="photo-count-badge" id="photo-count-badge">
+          <i class="fas fa-images" style="margin-right: 6px;"></i><span>0</span> photos
+        </div>
+      </div>
+      <div class="thumbnail-strip" id="thumbnail-strip"></div>
+    </div>
+
+    <!-- RIGHT: ITEM INFO -->
+    <div class="product-info">
+      <!-- Product Header -->
+      <div class="product-header">
+        <h1 class="product-title" id="product-title">...</h1>
+        <div class="product-meta" id="product-meta"></div>
+        <div class="swap-info" id="swap-info"></div>
+      </div>
+
+      <!-- Item Details -->
+      <div class="details-card" id="details-card"></div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons" id="action-buttons"></div>
+
+      <!-- Seller Info -->
+      <div class="seller-card" id="seller-card"></div>
+    </div>
+  </div>
+
+  <!-- ============ SIMILAR ITEMS ============ -->
+  <div class="similar-section" id="similar-section" style="display:none;">
+    <h2 class="section-title">You might also like</h2>
+    <div class="product-grid-similar" id="similar-grid"></div>
+  </div>
+</div>
+
+<!-- ============ SWAP PROPOSAL MODAL ============ -->
+<div id="swapModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Choose an item to offer</h2>
+      <button class="modal-close" onclick="closeSwapModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-info" id="modal-info">
+      <i class="fas fa-info-circle"></i>
+      Select one of your items to propose for this swap. Both parties use 1 swap from their monthly quota.
+    </div>
+
+    <div class="user-items-grid" id="my-items-grid"></div>
+
+    <div id="emptyState" class="modal-empty" style="display: none;">
+      <div class="modal-empty-icon">📦</div>
+      <p>You don't have any items listed yet.</p>
+      <a href="publier.html" class="modal-empty-link">
+        <i class="fas fa-plus"></i> List your first item
+      </a>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="confirmSwap()" id="confirm-swap-btn" style="opacity: 0.5; cursor: not-allowed;" disabled>
+        Confirm Swap
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+        <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="catalogue.html">Browse items</a></li>
+          <li><a href="giveaway.html">Free giveaways</a></li>
+          <li><a href="publier.html">List an item</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="cookies.html">Cookie Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Swappo. All rights reserved. UAE</span>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-facebook"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-banner" class="cookie-banner">
+  <div class="cookie-banner-content">
+    <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+    <div class="cookie-banner-buttons">
+      <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+      <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+      <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+    </div>
+  </div>
+</div>
+
+<!-- Demo Engine Scripts -->
+<script src="../js/mock-data.js"></script>
+<script src="../js/demo-engine.js"></script>
+<script src="../js/animations.js"></script>
+<script src="../js/cookie-consent.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/app.js"></script>
+<script>
+  // ============ GLOBALS ============
+  let currentItem = null;
+  let currentUser = null;
+  let selectedSwapItemId = null;
+
+  // ============ HELPERS ============
+  function timeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return mins + 'm ago';
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return hours + 'h ago';
+    const days = Math.floor(hours / 24);
+    return days + 'd ago';
+  }
+
+  function conditionLabel(c) {
+    var map = { new: 'New', like_new: 'Like New', good: 'Good', fair: 'Fair' };
+    return map[c] || c;
+  }
+
+  function capitalizeFirst(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function showToast(message) {
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#171717;color:white;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.2);animation:fadeInUp 0.3s ease;';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2500);
+    setTimeout(function() { toast.remove(); }, 3000);
+  }
+
+  // ============ MAIN INIT ============
+  document.addEventListener('DOMContentLoaded', function() {
+    initDemoMode();
+
+    var params = new URLSearchParams(window.location.search);
+    var itemId = params.get('id');
+
+    if (!itemId) {
+      window.location.href = 'catalogue.html';
+      return;
+    }
+
+    var item = DemoItems.getById(itemId);
+    if (!item) {
+      document.getElementById('product-container').innerHTML =
+        '<div style="text-align:center;padding:80px;">' +
+          '<h2 style="margin-bottom:16px;">Item not found</h2>' +
+          '<a href="catalogue.html" style="color:var(--primary);font-weight:600;">Back to Swap Market</a>' +
+        '</div>';
+      return;
+    }
+
+    currentItem = item;
+    currentUser = DemoAuth.getCurrentUser();
+    var isGuest = !currentUser;
+    var owner = getMockUserById(item.user_id);
+    var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type;
+    var interestedCount = Math.floor(Math.random() * 15) + 1;
+
+    // ── Page title ──
+    document.title = title + ' \u2014 Swappo';
+
+    // ── Breadcrumb ──
+    document.getElementById('breadcrumb-category').innerHTML =
+      '<a href="catalogue.html?category=' + item.category + '" style="color:var(--primary);text-decoration:none;font-weight:500;">' + capitalizeFirst(item.category) + '</a>';
+    document.getElementById('breadcrumb-item').textContent = title;
+
+    // ── Photo gallery ──
+    var photos = item.photos || [];
+    if (photos.length > 0) {
+      document.getElementById('mainPhoto').src = photos[0];
+      document.getElementById('mainPhoto').alt = title;
+    }
+    document.getElementById('photo-count-badge').innerHTML =
+      '<i class="fas fa-images" style="margin-right:6px;"></i>' + photos.length + ' photos';
+
+    var strip = document.getElementById('thumbnail-strip');
+    strip.innerHTML = photos.map(function(photo, idx) {
+      // Guest: photos 3 and 4 (index 2,3) are blurred
+      if (isGuest && idx >= 2) {
+        return '<div class="thumbnail blurred" onclick="handleLockedPhoto(event)">' +
+          '<img src="' + photo + '" alt="Photo ' + (idx + 1) + '" style="filter:blur(10px);">' +
+          '<div class="thumbnail-lock"><i class="fas fa-lock"></i></div>' +
+          '<div class="thumbnail-lock-text" style="color:white;font-size:9px;">Sign up</div>' +
+        '</div>';
+      }
+      return '<div class="thumbnail ' + (idx === 0 ? 'active' : '') + '" onclick="switchPhoto(this, ' + idx + ')">' +
+        '<img src="' + photo + '" alt="Photo ' + (idx + 1) + '">' +
+      '</div>';
+    }).join('');
+
+    // ── Product header ──
+    document.getElementById('product-title').textContent = title;
+
+    var metaHTML = '<div class="category-chip"><i class="fas fa-tag"></i> ' + capitalizeFirst(item.category) + '</div>';
+    if (item.is_boosted) {
+      metaHTML += '<div class="badge"><i class="fas fa-bolt"></i> Boosted</div>';
+    }
+    if (item.is_giveaway) {
+      metaHTML += '<div class="badge" style="background:var(--secondary);"><i class="fas fa-gift"></i> Free Giveaway</div>';
+    }
+    document.getElementById('product-meta').innerHTML = metaHTML;
+
+    // ── Swap info ──
+    var swapInfoHTML = '';
+    var user = DemoAuth.getCurrentUser();
+    if (item.is_giveaway) {
+      swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-gift"></i></div>' +
+        '<div class="swap-info-text"><strong>Free Item</strong><br>Use 1 claim from your monthly quota</div>';
+    } else if (user) {
+      var planInfo = DemoSubscription.getPlan(user.id);
+      var remaining = planInfo.swaps_limit === Infinity ? '∞' : (planInfo.swaps_limit - planInfo.swaps_used);
+      swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-sync-alt"></i></div>' +
+        '<div class="swap-info-text"><strong>' + remaining + ' swaps remaining</strong><br>Uses 1 swap from your ' + planInfo.tier.name + ' plan</div>';
+    } else {
+      swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-sync-alt"></i></div>' +
+        '<div class="swap-info-text"><strong>Swap this item</strong><br>Sign up to start swapping</div>';
+    }
+    var swapInfoEl = document.getElementById('swap-info');
+    if (swapInfoEl) swapInfoEl.innerHTML = swapInfoHTML;
+
+    // ── Item details card ──
+    var details = [
+      { label: 'Type', value: item.type },
+      { label: 'Brand', value: item.brand },
+      { label: 'Model', value: item.model },
+      { label: 'Condition', value: item.condition ? conditionLabel(item.condition) : null },
+      { label: 'Year', value: item.year },
+      { label: 'Size', value: item.size },
+      { label: 'Color', value: item.color },
+      { label: 'Category', value: capitalizeFirst(item.category) }
+    ].filter(function(d) { return d.value; });
+
+    var detailsHTML = '<div class="details-title">Item Details</div>';
+    details.forEach(function(d) {
+      detailsHTML += '<div class="detail-row"><span class="detail-label">' + d.label + '</span><span class="detail-value">' + d.value + '</span></div>';
+    });
+
+    detailsHTML += '<div class="location-row"><i class="fas fa-map-marker-alt" style="color:var(--primary);"></i>';
+    if (item.distance) {
+      detailsHTML += '<strong>' + item.distance + ' km</strong> away \u2014 ';
+    }
+    detailsHTML += (item.city || 'UAE') + '</div>';
+
+    detailsHTML += '<div class="posted-row"><i class="fas fa-clock"></i> Posted ' + timeAgo(item.created_at) + '</div>';
+
+    detailsHTML += '<div class="interested-row"><i class="fas fa-heart"></i> <strong>' + interestedCount + ' people</strong> interested</div>';
+
+    document.getElementById('details-card').innerHTML = detailsHTML;
+
+    // ── Action buttons ──
+    var isFav = DemoItems.isFavorited(item.id);
+    var actionsHTML = '';
+
+    if (item.is_giveaway) {
+      // Giveaway: Claim button
+      if (isGuest) {
+        actionsHTML += '<button class="btn-primary" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+          '<i class="fas fa-gift"></i> Join to Claim</button>';
+      } else {
+        actionsHTML += '<button class="btn-primary" id="claim-btn" onclick="claimGiveaway()" style="background:var(--secondary);">' +
+          '<i class="fas fa-gift"></i> Claim Item</button>';
+      }
+    } else {
+      // Swap: Propose button
+      if (isGuest) {
+        actionsHTML += '<button class="btn-primary" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+          '<i class="fas fa-exchange-alt"></i> Join to Propose a Swap</button>';
+      } else {
+        actionsHTML += '<button class="btn-primary" onclick="openSwapModal()">' +
+          '<i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
+      }
+    }
+
+    // Favorite button
+    actionsHTML += '<div class="secondary-actions">';
+    actionsHTML += '<button class="btn-secondary' + (isFav ? ' active' : '') + '" id="saveBtn" onclick="toggleFavorite()"' +
+      (isFav ? ' style="background:var(--secondary);border-color:var(--secondary);color:white;"' : '') + '>' +
+      '<i class="' + (isFav ? 'fas' : 'far') + ' fa-heart"></i> ' + (isFav ? 'Saved' : 'Save') + '</button>';
+    actionsHTML += '<button class="btn-secondary" onclick="reportItem()" style="color:var(--secondary);border-color:var(--secondary);">' +
+      '<i class="fas fa-flag"></i> Report</button>';
+    actionsHTML += '</div>';
+
+    document.getElementById('action-buttons').innerHTML = actionsHTML;
+
+    // ── Seller card (anonymous) ──
+    var sellerHTML = '<div class="seller-avatar">?</div>';
+    sellerHTML += '<div class="seller-name">Anonymous Swapper</div>';
+    if (owner) {
+      sellerHTML += '<div class="seller-badge">' + owner.badge_emoji + ' ' + capitalizeFirst(owner.badge_tier) + '</div>';
+      sellerHTML += '<div class="seller-info">';
+      sellerHTML += '<div class="seller-info-item"><span>Location:</span><strong>' + (owner.city || 'UAE') + '</strong></div>';
+      sellerHTML += '<div class="seller-info-item"><span>Member since:</span><strong>' + owner.created_at.slice(0, 7).replace('-', '/') + '</strong></div>';
+      sellerHTML += '</div>';
+    }
+    sellerHTML += '<p class="seller-disclaimer">Identity revealed after both parties accept the swap.</p>';
+    document.getElementById('seller-card').innerHTML = sellerHTML;
+
+    // ── Similar items ──
+    var similar = DemoItems.getSimilar(itemId, 4);
+    if (similar.length > 0) {
+      document.getElementById('similar-section').style.display = '';
+      var simGrid = document.getElementById('similar-grid');
+      simGrid.innerHTML = similar.map(function(si) {
+        var siTitle = ((si.brand || '') + ' ' + (si.model || '')).trim() || si.type;
+        var siPhoto = (si.photos && si.photos[0]) || '';
+        return '<div class="product-card" onclick="window.location.href=\'product.html?id=' + si.id + '\'" style="cursor:pointer;">' +
+          '<div class="product-card-image">' +
+            '<img src="' + siPhoto + '" alt="' + siTitle + '" loading="lazy">' +
+          '</div>' +
+          '<div class="product-card-body">' +
+            '<div class="product-card-title">' + siTitle + '</div>' +
+            '<div class="product-card-category">' + capitalizeFirst(si.category) + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // ── Load modal items if logged in ──
+    if (currentUser) {
+      loadMyItemsInModal();
+    }
+
+    // ── Close modal on backdrop click ──
+    document.getElementById('swapModal').addEventListener('click', function(event) {
+      if (event.target === this) closeSwapModal();
+    });
+  });
+
+  // ============ PHOTO GALLERY ============
+  function switchPhoto(element, index) {
+    document.querySelectorAll('.thumbnail').forEach(function(t) { t.classList.remove('active'); });
+    element.classList.add('active');
+    if (currentItem && currentItem.photos && currentItem.photos[index]) {
+      document.getElementById('mainPhoto').src = currentItem.photos[index];
+    }
+  }
+
+  function handleLockedPhoto(event) {
+    event.preventDefault();
+    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+  }
+
+  // ============ FAVORITE ============
+  function toggleFavorite() {
+    if (!currentItem) return;
+    if (!currentUser) {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+      return;
+    }
+    var nowFav = DemoItems.toggleFavorite(currentItem.id);
+    var btn = document.getElementById('saveBtn');
+    if (nowFav) {
+      btn.innerHTML = '<i class="fas fa-heart"></i> Saved';
+      btn.style.background = 'var(--secondary)';
+      btn.style.borderColor = 'var(--secondary)';
+      btn.style.color = 'white';
+      btn.classList.add('active');
+      showToast('Added to favorites');
+    } else {
+      btn.innerHTML = '<i class="far fa-heart"></i> Save';
+      btn.style.background = 'var(--bg-light)';
+      btn.style.borderColor = 'var(--primary)';
+      btn.style.color = 'var(--primary)';
+      btn.classList.remove('active');
+      showToast('Removed from favorites');
+    }
+  }
+
+  // ============ GIVEAWAY CLAIM ============
+  function claimGiveaway() {
+    if (!currentItem || !currentUser) return;
+    var result = DemoGiveaway.claim(currentItem.id);
+    if (result.success) {
+      showToast('Item claimed successfully! \u2705');
+      var btn = document.getElementById('claim-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-check"></i> Claimed';
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+      }
+      updateNavbarForDemo();
+    } else {
+      showToast(result.error || 'Could not claim item');
+    }
+  }
+
+  // ============ SWAP MODAL ============
+  function openSwapModal() {
+    if (!currentUser) {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+      return;
+    }
+    selectedSwapItemId = null;
+    document.getElementById('swapModal').classList.add('open');
+    // Refresh items
+    loadMyItemsInModal();
+  }
+
+  function closeSwapModal() {
+    document.getElementById('swapModal').classList.remove('open');
+    selectedSwapItemId = null;
+    document.querySelectorAll('.user-item').forEach(function(el) {
+      el.classList.remove('selected');
+      var cb = el.querySelector('.user-item-checkbox');
+      if (cb) cb.textContent = '\u2610';
+    });
+    var btn = document.getElementById('confirm-swap-btn');
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
+  }
+
+  function loadMyItemsInModal() {
+    var grid = document.getElementById('my-items-grid');
+    var emptyState = document.getElementById('emptyState');
+    var myItems = DemoItems.getByUser(currentUser.id).filter(function(i) { return i.status === 'active'; });
+
+    if (myItems.length === 0) {
+      grid.style.display = 'none';
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    grid.style.display = '';
+    emptyState.style.display = 'none';
+
+    grid.innerHTML = myItems.map(function(mi) {
+      var photo = (mi.photos && mi.photos[0]) || '';
+      var miTitle = ((mi.brand || '') + ' ' + (mi.model || '')).trim() || mi.type;
+      return '<div class="user-item" data-item="' + mi.id + '" onclick="toggleItemSelection(this)">' +
+        '<div class="user-item-image">' +
+          (photo ? '<img src="' + photo + '" alt="' + miTitle + '">'
+                 : '<div style="width:100%;height:100%;background:var(--bg-light);display:flex;align-items:center;justify-content:center;font-size:2rem;">📦</div>') +
+        '</div>' +
+        '<div class="user-item-checkbox">\u2610</div>' +
+        '<div class="user-item-title">' + miTitle + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function toggleItemSelection(element) {
+    var itemId = element.getAttribute('data-item');
+
+    // Single selection mode
+    if (element.classList.contains('selected')) {
+      element.classList.remove('selected');
+      element.querySelector('.user-item-checkbox').textContent = '\u2610';
+      selectedSwapItemId = null;
+    } else {
+      // Deselect others
+      document.querySelectorAll('.user-item.selected').forEach(function(el) {
+        el.classList.remove('selected');
+        el.querySelector('.user-item-checkbox').textContent = '\u2610';
+      });
+      element.classList.add('selected');
+      element.querySelector('.user-item-checkbox').textContent = '\u2713';
+      selectedSwapItemId = itemId;
+    }
+
+    var btn = document.getElementById('confirm-swap-btn');
+    btn.disabled = !selectedSwapItemId;
+    btn.style.opacity = selectedSwapItemId ? '1' : '0.5';
+    btn.style.cursor = selectedSwapItemId ? 'pointer' : 'not-allowed';
+  }
+
+  function confirmSwap() {
+    if (!selectedSwapItemId || !currentItem) return;
+
+    var result = DemoSwaps.propose(selectedSwapItemId, currentItem.id);
+    if (result.success) {
+      closeSwapModal();
+      showToast('Swap proposal sent! \u2705');
+      updateNavbarForDemo();
+    } else {
+      showToast(result.error || 'Could not send proposal');
+    }
+  }
+
+  // ============ REPORT ============
+  function reportItem() {
+    if (!currentUser) {
+      window.location.href = 'login.html';
+      return;
+    }
+    var labels = ['Fake item', 'Inappropriate', 'Scam/Fraud', 'Counterfeit', 'Banned item', 'Other'];
+    var idx = prompt('Why are you reporting?\n\n' + labels.map(function(l, i) { return (i + 1) + '. ' + l; }).join('\n'));
+    if (idx && idx >= 1 && idx <= 6) {
+      showToast('Report submitted. Our team will review this item.');
+    }
+  }
+</script>
+
+</body>
+</html>

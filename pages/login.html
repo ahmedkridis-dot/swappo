@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join the Swap — Swappo</title>
+  <meta name="description" content="Create your Swappo account or log in to start swapping. Start swapping today.">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .auth-page {
+      background: #F5F5F5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 56px);
+      padding: 40px 16px;
+    }
+
+    .auth-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+    }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid #EBEBEB;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 12px 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #999;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s;
+    }
+
+    .auth-tab:hover {
+      color: #171717;
+    }
+
+    .auth-tab.active {
+      color: #09B1BA;
+      border-bottom-color: #09B1BA;
+    }
+
+    /* Tab content */
+    .auth-tab-content {
+      display: none;
+    }
+
+    .auth-tab-content.active {
+      display: block;
+    }
+
+    /* Form */
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .auth-form .form-group {
+      margin-bottom: 0;
+    }
+
+    .auth-form .form-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #171717;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .auth-form .form-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      font-size: 0.9rem;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      background: #fff;
+      color: #171717;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+
+    .auth-form .form-input:focus {
+      outline: none;
+      border-color: #09B1BA;
+    }
+
+    /* Checkbox */
+    .auth-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    .auth-checkbox input {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: #09B1BA;
+    }
+
+    .auth-checkbox label {
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .auth-checkbox a {
+      color: #09B1BA;
+      text-decoration: none;
+    }
+
+    .auth-checkbox a:hover {
+      text-decoration: underline;
+    }
+
+    /* Primary button */
+    .auth-btn {
+      width: 100%;
+      height: 44px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .auth-btn-primary {
+      background: #09B1BA;
+      color: #fff;
+    }
+
+    .auth-btn-primary:hover {
+      background: #078A91;
+    }
+
+    /* Divider */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: #999;
+      font-size: 0.82rem;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #EBEBEB;
+    }
+
+    /* Social buttons */
+    .auth-social {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .auth-social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 44px;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #171717;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .auth-social-btn:hover {
+      border-color: #09B1BA;
+      background: #F0FBFC;
+    }
+
+    .auth-social-btn i {
+      font-size: 1rem;
+    }
+
+    /* Footer link */
+    .auth-footer-link {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 20px;
+    }
+
+    .auth-footer-link a {
+      color: #09B1BA;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .auth-footer-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Forgot password */
+    .auth-forgot {
+      text-align: right;
+      margin-top: -4px;
+    }
+
+    .auth-forgot a {
+      font-size: 0.82rem;
+      color: #09B1BA;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .auth-forgot a:hover {
+      text-decoration: underline;
+    }
+
+    /* Demo hint */
+    .demo-hint {
+      background: #F0FBFC;
+      border: 1px solid #D0ECEE;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.84rem;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .demo-hint strong {
+      color: #09B1BA;
+    }
+
+    .demo-hint code {
+      background: #E6F7F8;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .auth-page {
+        padding: 24px 12px;
+      }
+
+      .auth-card {
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items...">
+        </div>
+
+        <div class="navbar-actions">
+          <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== AUTH PAGE ========== -->
+  <div class="auth-page">
+    <div class="auth-card">
+
+      <!-- Demo hint -->
+      <div class="demo-hint">
+        <strong>Demo Account:</strong><br>
+        Email: <code>demo@swappo.ae</code> &middot; Password: <code>demo123</code>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('signup', this)">Sign Up</button>
+        <button class="auth-tab" onclick="switchTab('login', this)">Log In</button>
+      </div>
+
+      <!-- ========== SIGN UP TAB ========== -->
+      <div id="signup" class="auth-tab-content active">
+        <form class="auth-form" onsubmit="handleSignup(event)">
+          <div class="form-group">
+            <label class="form-label" for="signup-name">Full Name</label>
+            <input class="form-input" type="text" id="signup-name" name="name" placeholder="Ahmed Mohammed" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-email">Email Address</label>
+            <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Password</label>
+            <input class="form-input" type="password" id="signup-password" name="password" placeholder="At least 8 characters" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-confirm">Confirm Password</label>
+            <input class="form-input" type="password" id="signup-confirm" name="confirm" placeholder="Re-enter password" required>
+          </div>
+
+          <div class="auth-checkbox">
+            <input type="checkbox" id="terms-agree" name="terms" required>
+            <label for="terms-agree">I agree to <a href="terms.html">Terms of use</a> and <a href="privacy.html">Privacy policy</a></label>
+          </div>
+
+          <button type="submit" class="auth-btn auth-btn-primary">
+            Join the Swap — It's Free
+          </button>
+        </form>
+
+        <div class="auth-divider">or continue with</div>
+
+        <div class="auth-social">
+          <button type="button" class="auth-social-btn" onclick="handleSocialSignup('google')">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          <button type="button" class="auth-social-btn" onclick="handleSocialSignup('apple')">
+            <i class="fab fa-apple"></i> Continue with Apple
+          </button>
+          <button type="button" class="auth-social-btn" onclick="handleSocialSignup('facebook')">
+            <i class="fab fa-facebook-f"></i> Continue with Facebook
+          </button>
+        </div>
+
+        <div class="auth-footer-link">
+          Already have an account? <a href="#" onclick="switchTab('login'); return false;">Log in</a>
+        </div>
+      </div>
+
+      <!-- ========== LOG IN TAB ========== -->
+      <div id="login" class="auth-tab-content">
+        <form class="auth-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email Address</label>
+            <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input class="form-input" type="password" id="login-password" name="password" placeholder="Your password" required>
+          </div>
+
+          <div class="auth-forgot">
+            <a href="#">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="auth-btn auth-btn-primary">
+            Log In
+          </button>
+        </form>
+
+        <div class="auth-divider">or continue with</div>
+
+        <div class="auth-social">
+          <button type="button" class="auth-social-btn" onclick="handleSocialLogin('google')">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          <button type="button" class="auth-social-btn" onclick="handleSocialLogin('apple')">
+            <i class="fab fa-apple"></i> Continue with Apple
+          </button>
+          <button type="button" class="auth-social-btn" onclick="handleSocialLogin('facebook')">
+            <i class="fab fa-facebook-f"></i> Continue with Facebook
+          </button>
+        </div>
+
+        <div class="auth-footer-link">
+          Don't have an account? <a href="#" onclick="switchTab('signup'); return false;">Sign up</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="catalogue.html">Browse items</a></li>
+            <li><a href="giveaway.html">Free giveaways</a></li>
+            <li><a href="publier.html">List an item</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="terms.html">Terms of use</a></li>
+            <li><a href="privacy.html">Privacy policy</a></li>
+            <li><a href="cookies.html">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Swappo. All rights reserved. UAE</span>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Engine -->
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/demo-engine.js"></script>
+  <script src="../js/animations.js"></script>
+  <script src="../js/cookie-consent.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    /* ========================
+       Tab Switching
+       ======================== */
+    function switchTab(tabName, element) {
+      document.querySelectorAll('.auth-tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      if (element) element.classList.add('active');
+    }
+
+    // ---- Toast notification ----
+    function showToast(message, type = 'info') {
+      const existing = document.querySelector('.auth-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'auth-toast';
+      toast.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        padding: 14px 20px; border-radius: 8px; font-size: 0.9rem;
+        font-weight: 500; max-width: 400px; animation: fadeIn 0.3s ease;
+        background: ${type === 'error' ? '#FF4B55' : type === 'success' ? '#22C55E' : '#09B1BA'};
+        color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      `;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    function setLoading(btn, loading) {
+      if (loading) {
+        btn.dataset.originalText = btn.textContent;
+        btn.textContent = 'Loading...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+      } else {
+        btn.textContent = btn.dataset.originalText || btn.textContent;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+
+    /* ========================
+       Signup Handler → DemoAuth
+       ======================== */
+    async function handleSignup(event) {
+      event.preventDefault();
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+      const btn = event.target.querySelector('button[type="submit"]');
+
+      if (password !== confirm) { showToast('Passwords do not match', 'error'); return; }
+      if (password.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
+      if (!name) { showToast('Please enter your name', 'error'); return; }
+
+      setLoading(btn, true);
+      try {
+        const result = DemoAuth.signUp(email, password, name);
+        if (result.error) { showToast(result.error, 'error'); setLoading(btn, false); return; }
+
+        showToast('Welcome to Swappo! You get 2 free swaps every month!', 'success');
+        setTimeout(() => {
+          const params = new URLSearchParams(window.location.search);
+          const redirect = params.get('redirect') || '../index.html';
+          window.location.href = redirect;
+        }, 1500);
+      } catch (err) {
+        showToast(err.message || 'Signup failed', 'error');
+        setLoading(btn, false);
+      }
+    }
+
+    /* ========================
+       Login Handler → DemoAuth
+       ======================== */
+    async function handleLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const btn = event.target.querySelector('button[type="submit"]');
+
+      setLoading(btn, true);
+      try {
+        const result = DemoAuth.signIn(email, password);
+        if (result.error) { showToast(result.error, 'error'); setLoading(btn, false); return; }
+
+        showToast('Welcome back!', 'success');
+        setTimeout(() => {
+          const params = new URLSearchParams(window.location.search);
+          const redirect = params.get('redirect') || '../index.html';
+          window.location.href = redirect;
+        }, 1000);
+      } catch (err) {
+        showToast(err.message || 'Login failed', 'error');
+        setLoading(btn, false);
+      }
+    }
+
+    /* ========================
+       OAuth Handlers (Demo)
+       ======================== */
+    function handleSocialSignup(provider) {
+      showToast('OAuth with ' + provider + ' coming soon! Use email for the demo.', 'info');
+    }
+    function handleSocialLogin(provider) {
+      showToast('OAuth with ' + provider + ' coming soon! Use email for the demo.', 'info');
+    }
+
+    /* ========================
+       Forgot Password (Demo)
+       ======================== */
+    document.querySelector('.auth-forgot a').addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast('Password reset is not available in demo mode. Use demo@swappo.ae / demo123', 'info');
+    });
+
+    /* ========================
+       Redirect if already logged in
+       ======================== */
+    (function() {
+      if (DemoAuth.isLoggedIn()) {
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect') || '../index.html';
+        window.location.href = redirect;
+      }
+    })();
+  </script>
+</body>
+</html>
