@@ -149,6 +149,7 @@
         <a href="catalogue.html" class="cat-link">Sports</a>
         <a href="catalogue.html" class="cat-link">Books & Media</a>
         <a href="catalogue.html" class="cat-link">Kids</a>
+        <a href="catalogue.html?category=bags_accessories" class="cat-link">Bags & Accessories</a>
         <a href="giveaway.html" class="cat-link" style="color:var(--secondary);">
           <i class="fas fa-gift"></i>&nbsp; Gift Corner
         </a>
@@ -173,6 +174,7 @@
         <option value="furniture">Furniture & Home</option>
         <option value="electronics">Electronics & Phones</option>
         <option value="vehicles">Vehicles</option>
+        <option value="bags_accessories">Bags & Accessories</option>
         <option value="other">Other</option>
       </select>
 
@@ -308,7 +310,7 @@
           const catMap = {
             'all': '', 'clothing': 'clothing', 'electronics': 'electronics',
             'furniture': 'furniture', 'vehicles': 'vehicles', 'sports': 'sports',
-            'books & media': 'books', 'kids': 'kids'
+            'books & media': 'books', 'kids': 'kids', 'bags & accessories': 'bags_accessories'
           };
           if (catMap[text] === preCategory) link.classList.add('active');
         });
@@ -429,7 +431,7 @@
           const catMap = {
             'all': '', 'clothing': 'clothing', 'electronics': 'electronics',
             'furniture': 'furniture', 'vehicles': 'vehicles', 'sports': 'sports',
-            'books & media': 'books', 'kids': 'kids'
+            'books & media': 'books', 'kids': 'kids', 'bags & accessories': 'bags_accessories'
           };
           currentFilters.category = catMap[text] || '';
           if (catSelect) catSelect.value = currentFilters.category;

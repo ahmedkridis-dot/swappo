@@ -12,16 +12,37 @@ const SUBSCRIPTION_TIERS = {
   premium: { name: 'Premium', price: 69, badge: '\u{1F451}', swaps: Infinity, claims: 5, boosts: 4, ads: false, color: '#09B1BA' }
 };
 
+// ─── CLOTHING SUBCATEGORIES ─────────────────────────────────────────────────
+const CLOTHING_SUBCATEGORIES = {
+  male: ['Shirts', 'T-shirts', 'Trousers', 'Jeans', 'Shorts', 'Suits & Blazers', 'Jackets & Coats', 'Sweaters & Hoodies', 'Underwear', 'Men Shoes', 'Traditional (Kandora/Thobe)'],
+  female: ['Dresses', 'Tops & Blouses', 'Trousers & Jeans', 'Skirts', 'Abayas & Modest Wear', 'Jackets & Coats', 'Sweaters & Hoodies', 'Lingerie', 'Women Shoes', 'Swimwear'],
+  kids: ['Baby (0-2y)', 'Girl (2-14y)', 'Boy (2-14y)', 'Teen Girl', 'Teen Boy', 'Kids Shoes'],
+  unisex: ['Sportswear', 'Pyjamas', 'Clothing Accessories']
+};
+
+const BAGS_ACCESSORIES_SUBCATEGORIES = {
+  bags: ['Handbags', 'Backpacks', 'Luggage & Travel', 'Sports Bags', 'Clutches & Pouches', 'Business/Laptop Bags', 'Tote Bags'],
+  accessories: ['Watches', 'Sunglasses', 'Jewellery', 'Belts', 'Wallets', 'Scarves & Shawls', 'Hats & Caps']
+};
+
+const KIDS_SUBCATEGORIES = {
+  girl: ['Clothing', 'Toys & Games', 'Strollers & Car Seats', 'Baby Furniture', 'Feeding & Bottles', 'Kids Books'],
+  boy: ['Clothing', 'Toys & Games', 'Strollers & Car Seats', 'Baby Furniture', 'Feeding & Bottles', 'Kids Books'],
+  unisex: ['Clothing', 'Toys & Games', 'Strollers & Car Seats', 'Baby Furniture', 'Feeding & Bottles', 'Kids Books']
+};
+
+const KIDS_AGE_RANGES = ['0-6 months', '6-12 months', '1-2 years', '2-4 years', '4+ years'];
+
 // ─── MOCK USERS ─────────────────────────────────────────────────────────────
 const MOCK_USERS = [
-  { id: 'user-1', name: 'Ahmed Al-Maktoum', email: 'ahmed@example.com', city: 'Dubai Marina', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 7, plan: 'silver', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#09B1BA', created_at: '2025-11-15' },
-  { id: 'user-2', name: 'Fatima Al-Hashimi', email: 'fatima@example.com', city: 'JBR', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 3, plan: 'bronze', swaps_used: 2, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#FF4B55', created_at: '2026-01-20' },
-  { id: 'user-3', name: 'John Mitchell', email: 'john@example.com', city: 'Business Bay', badge_tier: 'pro', badge_emoji: '\u{1F48E}', swap_count: 18, plan: 'premium', swaps_used: 5, claims_used: 2, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#FF8C00', created_at: '2025-08-01' },
-  { id: 'user-4', name: 'Maria Santos', email: 'maria@example.com', city: 'Downtown Dubai', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 2, plan: 'free', swaps_used: 1, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#8B5CF6', created_at: '2026-02-10' },
-  { id: 'user-5', name: 'Omar Khalid', email: 'omar@example.com', city: 'Sharjah', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 9, plan: 'bronze', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#059669', created_at: '2025-09-05' },
-  { id: 'user-6', name: 'Sarah Connor', email: 'sarah@example.com', city: 'Abu Dhabi', badge_tier: 'newcomer', badge_emoji: '\u{1F331}', swap_count: 0, plan: 'free', swaps_used: 0, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#EC4899', created_at: '2026-03-20' },
-  { id: 'user-7', name: 'Raj Patel', email: 'raj@example.com', city: 'Al Barsha', badge_tier: 'elite', badge_emoji: '\u{1F3C6}', swap_count: 35, plan: 'premium', swaps_used: 8, claims_used: 3, boosts_used: 2, billing_start: '2026-03-01', avatar_color: '#F59E0B', created_at: '2025-06-01' },
-  { id: 'user-8', name: 'Layla Nouri', email: 'layla@example.com', city: 'JLT', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 4, plan: 'silver', swaps_used: 2, claims_used: 0, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#6366F1', created_at: '2026-01-05' }
+  { id: 'user-1', name: 'Ahmed Al-Maktoum', email: 'ahmed@example.com', city: 'Dubai Marina', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 7, plan: 'silver', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#09B1BA', created_at: '2025-11-15', gender: 'male', pseudo: 'ahmed_dxb', avatar: 'cool' },
+  { id: 'user-2', name: 'Fatima Al-Hashimi', email: 'fatima@example.com', city: 'JBR', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 3, plan: 'bronze', swaps_used: 2, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#FF4B55', created_at: '2026-01-20', gender: 'female', pseudo: 'fatima_h', avatar: 'hijabi' },
+  { id: 'user-3', name: 'John Mitchell', email: 'john@example.com', city: 'Business Bay', badge_tier: 'pro', badge_emoji: '\u{1F48E}', swap_count: 18, plan: 'premium', swaps_used: 5, claims_used: 2, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#FF8C00', created_at: '2025-08-01', gender: 'male', pseudo: 'john_m', avatar: 'techie' },
+  { id: 'user-4', name: 'Maria Santos', email: 'maria@example.com', city: 'Downtown Dubai', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 2, plan: 'free', swaps_used: 1, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#8B5CF6', created_at: '2026-02-10', gender: 'female', pseudo: 'maria_s', avatar: 'sunny' },
+  { id: 'user-5', name: 'Omar Khalid', email: 'omar@example.com', city: 'Sharjah', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 9, plan: 'bronze', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#059669', created_at: '2025-09-05', gender: 'male', pseudo: 'omar_k', avatar: 'sporty' },
+  { id: 'user-6', name: 'Sarah Connor', email: 'sarah@example.com', city: 'Abu Dhabi', badge_tier: 'newcomer', badge_emoji: '\u{1F331}', swap_count: 0, plan: 'free', swaps_used: 0, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#EC4899', created_at: '2026-03-20', gender: 'female', pseudo: 'sarah_c', avatar: 'athlete' },
+  { id: 'user-7', name: 'Raj Patel', email: 'raj@example.com', city: 'Al Barsha', badge_tier: 'elite', badge_emoji: '\u{1F3C6}', swap_count: 35, plan: 'premium', swaps_used: 8, claims_used: 3, boosts_used: 2, billing_start: '2026-03-01', avatar_color: '#F59E0B', created_at: '2025-06-01', gender: 'male', pseudo: 'raj_pro', avatar: 'royal' },
+  { id: 'user-8', name: 'Layla Nouri', email: 'layla@example.com', city: 'JLT', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 4, plan: 'silver', swaps_used: 2, claims_used: 0, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#6366F1', created_at: '2026-01-05', gender: 'female', pseudo: 'layla_n', avatar: 'chic' }
 ];
 
 // ─── DEMO USER ──────────────────────────────────────────────────────────────
@@ -40,7 +61,10 @@ const DEMO_USER = {
   boosts_used: 0,
   billing_start: '2026-03-01',
   avatar_color: '#09B1BA',
-  created_at: '2026-03-01'
+  created_at: '2026-03-01',
+  gender: 'male',
+  pseudo: 'demo_swapper',
+  avatar: 'happy'
 };
 
 // ─── MOCK ITEMS (30 items across 8 categories) ─────────────────────────────
@@ -51,6 +75,8 @@ const MOCK_ITEMS = [
     id: 'item-1',
     user_id: 'user-1',
     category: 'clothing',
+    subcategory: 'Men Shoes',
+    clothing_gender: 'male',
     type: 'Sneakers',
     brand: 'Nike',
     model: 'Air Max 90',
@@ -80,6 +106,8 @@ const MOCK_ITEMS = [
     id: 'item-2',
     user_id: 'user-2',
     category: 'clothing',
+    subcategory: 'Jackets & Coats',
+    clothing_gender: 'female',
     type: 'Jacket',
     brand: 'Zara',
     model: 'Oversized Leather Jacket',
@@ -109,6 +137,8 @@ const MOCK_ITEMS = [
     id: 'item-3',
     user_id: 'user-4',
     category: 'clothing',
+    subcategory: 'Men Shoes',
+    clothing_gender: 'male',
     type: 'Running Shoes',
     brand: 'Adidas',
     model: 'Ultraboost 23',
@@ -138,6 +168,8 @@ const MOCK_ITEMS = [
     id: 'item-4',
     user_id: 'user-5',
     category: 'clothing',
+    subcategory: 'Dresses',
+    clothing_gender: 'female',
     type: 'Dress',
     brand: 'H&M',
     model: 'Linen Wrap Dress',
@@ -167,6 +199,8 @@ const MOCK_ITEMS = [
     id: 'item-5',
     user_id: 'user-8',
     category: 'clothing',
+    subcategory: 'Sweaters & Hoodies',
+    clothing_gender: 'male',
     type: 'Hoodie',
     brand: 'Nike',
     model: 'Tech Fleece Hoodie',
@@ -196,6 +230,8 @@ const MOCK_ITEMS = [
     id: 'item-6',
     user_id: 'user-demo',
     category: 'clothing',
+    subcategory: 'Shirts',
+    clothing_gender: 'male',
     type: 'Polo Shirt',
     brand: 'Ralph Lauren',
     model: 'Classic Fit Mesh Polo',
@@ -1019,6 +1055,158 @@ const MOCK_ITEMS = [
     views_count: 63
   },
 
+  // ── BAGS & ACCESSORIES (5 items) ────────────────────────────────────────
+  {
+    id: 'item-bag-1',
+    user_id: 'user-2',
+    category: 'bags_accessories',
+    subcategory: 'Handbags',
+    type: 'Handbag',
+    brand: 'Louis Vuitton',
+    model: 'Speedy Bandouli\u00e8re 30',
+    condition: 'like_new',
+    year: 2024,
+    size: '30x21x17 cm',
+    color: 'Monogram Canvas',
+    photos: [
+      'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: true,
+    boost_expires_at: '2026-04-12T23:59:59',
+    status: 'active',
+    created_at: '2026-03-20',
+    lat: 25.0760,
+    lng: 55.1330,
+    city: 'JBR',
+    distance: 0.9,
+    favorites_count: 56,
+    views_count: 410
+  },
+  {
+    id: 'item-bag-2',
+    user_id: 'user-6',
+    category: 'bags_accessories',
+    subcategory: 'Backpacks',
+    type: 'Backpack',
+    brand: 'Herschel',
+    model: 'Little America',
+    condition: 'good',
+    year: 2023,
+    size: '25L',
+    color: 'Navy',
+    photos: [
+      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1581605405669-fcdf81165afa?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1622560480654-d96214fdc887?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1491637639811-60e2756cc1c7?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: true,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-22',
+    lat: 24.4539,
+    lng: 54.3773,
+    city: 'Abu Dhabi',
+    distance: 18.5,
+    favorites_count: 12,
+    views_count: 78
+  },
+  {
+    id: 'item-bag-3',
+    user_id: 'user-1',
+    category: 'bags_accessories',
+    subcategory: 'Sunglasses',
+    type: 'Sunglasses',
+    brand: 'Ray-Ban',
+    model: 'Aviator Classic RB3025',
+    condition: 'like_new',
+    year: 2025,
+    size: '58mm',
+    color: 'Gold/Green',
+    photos: [
+      'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-18',
+    lat: 25.0780,
+    lng: 55.1340,
+    city: 'Dubai Marina',
+    distance: 1.0,
+    favorites_count: 28,
+    views_count: 195
+  },
+  {
+    id: 'item-bag-4',
+    user_id: 'user-5',
+    category: 'bags_accessories',
+    subcategory: 'Watches',
+    type: 'Watch',
+    brand: 'Casio',
+    model: 'G-Shock GA-2100',
+    condition: 'good',
+    year: 2024,
+    size: '45mm',
+    color: 'Black',
+    photos: [
+      'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1612817159949-195b6eb9e31a?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-15',
+    lat: 25.3380,
+    lng: 55.4120,
+    city: 'Sharjah',
+    distance: 14.8,
+    favorites_count: 19,
+    views_count: 142
+  },
+  {
+    id: 'item-bag-5',
+    user_id: 'user-4',
+    category: 'bags_accessories',
+    subcategory: 'Wallets',
+    type: 'Wallet',
+    brand: 'Coach',
+    model: 'Slim Bifold Wallet',
+    condition: 'good',
+    year: 2023,
+    size: null,
+    color: 'Saddle Brown',
+    photos: [
+      'https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1606503153255-59d7ae48de5b?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1612902456551-404b5b40f6eb?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1559563458-527698bf5295?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: true,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-24',
+    lat: 25.1972,
+    lng: 55.2744,
+    city: 'Downtown Dubai',
+    distance: 3.4,
+    favorites_count: 9,
+    views_count: 55
+  },
+
   // ── OTHER (2 items) ─────────────────────────────────────────────────────
   {
     id: 'item-30',
@@ -1238,6 +1426,10 @@ window.MOCK_CONVERSATIONS = MOCK_CONVERSATIONS;
 window.BADGE_TIERS = BADGE_TIERS;
 window.ITEM_CONDITIONS = ITEM_CONDITIONS;
 window.CATEGORY_META = CATEGORY_META;
+window.CLOTHING_SUBCATEGORIES = CLOTHING_SUBCATEGORIES;
+window.BAGS_ACCESSORIES_SUBCATEGORIES = BAGS_ACCESSORIES_SUBCATEGORIES;
+window.KIDS_SUBCATEGORIES = KIDS_SUBCATEGORIES;
+window.KIDS_AGE_RANGES = KIDS_AGE_RANGES;
 
 // Helper functions
 window.getMockUserById = getMockUserById;

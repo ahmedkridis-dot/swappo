@@ -131,6 +131,7 @@
         </a>
         <a href="pages/catalogue.html?category=kids" class="cat-link" data-i18n="kids">Kids & Baby</a>
         <a href="pages/catalogue.html?category=plants" class="cat-link" data-i18n="plants">Plants</a>
+        <a href="pages/catalogue.html?category=bags_accessories" class="cat-link" data-i18n="bags_accessories">Bags & Accessories</a>
         <a href="pages/catalogue.html?category=clothing" class="cat-link" data-i18n="clothing">Clothing</a>
         <a href="pages/catalogue.html?category=electronics" class="cat-link" data-i18n="electronics">Electronics</a>
         <a href="pages/catalogue.html?category=furniture" class="cat-link" data-i18n="furniture">Furniture</a>
@@ -394,7 +395,8 @@
           if (!i18nKey || i18nKey === 'all' || i18nKey === 'gift_corner') return;
           var catMap = {
             clothing: 'clothing', electronics: 'electronics', furniture: 'furniture',
-            vehicles: 'vehicles', sports: 'sports', books: 'books', kids: 'kids'
+            vehicles: 'vehicles', sports: 'sports', books: 'books', kids: 'kids',
+            bags_accessories: 'bags_accessories'
           };
           var cat = catMap[i18nKey];
           if (!cat) return;

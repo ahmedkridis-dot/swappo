@@ -492,6 +492,7 @@
 
 <!-- Demo Engine Scripts -->
 <script src="../js/mock-data.js"></script>
+<script src="../js/avatars.js"></script>
 <script src="../js/demo-engine.js"></script>
 <script src="../js/animations.js"></script>
 <script src="../js/cookie-consent.js"></script>
@@ -689,8 +690,15 @@
     document.getElementById('action-buttons').innerHTML = actionsHTML;
 
     // ── Seller card (anonymous) ──
-    var sellerHTML = '<div class="seller-avatar">?</div>';
-    sellerHTML += '<div class="seller-name">Anonymous Swapper</div>';
+    var sellerAvatarHTML = '';
+    if (owner && owner.avatar && window.getAvatarSVG) {
+      sellerAvatarHTML = '<div class="seller-avatar">' + getAvatarSVG(owner.avatar) + '</div>';
+    } else {
+      sellerAvatarHTML = '<div class="seller-avatar">?</div>';
+    }
+    var sellerName = (owner && owner.pseudo) ? owner.pseudo : 'Anonymous Swapper';
+    var sellerHTML = sellerAvatarHTML;
+    sellerHTML += '<div class="seller-name">' + sellerName + '</div>';
     if (owner) {
       sellerHTML += '<div class="seller-badge">' + owner.badge_emoji + ' ' + capitalizeFirst(owner.badge_tier) + '</div>';
       sellerHTML += '<div class="seller-info">';

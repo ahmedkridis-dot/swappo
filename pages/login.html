@@ -267,6 +267,119 @@
       font-size: 0.82rem;
     }
 
+    /* Gender buttons */
+    .gender-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .gender-btn {
+      flex: 1;
+      text-align: center;
+      padding: 10px 8px;
+      border: 2px solid var(--border, #EBEBEB);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .gender-btn input[type="radio"] { display: none; }
+    .gender-btn:hover { border-color: #09B1BA; }
+    .gender-btn.selected {
+      border-color: #09B1BA;
+      background: #E6F7F8;
+      color: #09B1BA;
+      font-weight: 600;
+    }
+
+    /* Pseudo feedback */
+    .pseudo-feedback {
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+      min-height: 16px;
+    }
+    .pseudo-feedback.available { color: #22C55E; }
+    .pseudo-feedback.taken { color: #EF4444; }
+    .pseudo-feedback.invalid { color: #F59E0B; }
+
+    /* Avatar gallery */
+    .avatar-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 8px;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      background: #FAFAFA;
+    }
+    .avatar-option {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0;
+      background: none;
+    }
+    .avatar-option:hover { border-color: #09B1BA; transform: scale(1.05); }
+    .avatar-option.selected {
+      border-color: #09B1BA;
+      box-shadow: 0 0 0 3px rgba(9, 177, 186, 0.3);
+    }
+    .avatar-option svg { width: 64px; height: 64px; }
+    .avatar-option .avatar-name {
+      font-size: 9px;
+      color: #555;
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    /* Phone verification */
+    .phone-input-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .phone-prefix {
+      background: #F7F7F7;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+    }
+    .phone-input-group input { flex: 1; }
+    .verification-step {
+      display: none;
+      margin-top: 12px;
+    }
+    .verification-step.active { display: block; }
+    .code-input {
+      letter-spacing: 8px;
+      font-size: 20px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .resend-link {
+      font-size: 12px;
+      color: #09B1BA;
+      cursor: pointer;
+      margin-top: 8px;
+      display: inline-block;
+    }
+    .resend-link.disabled { color: #999; pointer-events: none; }
+
     /* Responsive */
     @media (max-width: 480px) {
       .auth-page {
@@ -326,9 +439,53 @@
             <input class="form-input" type="text" id="signup-name" name="name" placeholder="Ahmed Mohammed" required>
           </div>
 
+          <div class="auth-field">
+            <label data-i18n="gender_label">Gender</label>
+            <div class="gender-buttons" id="gender-buttons">
+              <label class="gender-btn">
+                <input type="radio" name="signup-gender" value="male"> <span data-i18n="gender_male">Male</span>
+              </label>
+              <label class="gender-btn">
+                <input type="radio" name="signup-gender" value="female"> <span data-i18n="gender_female">Female</span>
+              </label>
+              <label class="gender-btn">
+                <input type="radio" name="signup-gender" value="other"> <span data-i18n="gender_other">Prefer not to say</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label data-i18n="pseudo_label">Username</label>
+            <input type="text" id="signup-pseudo" placeholder="3-20 chars, letters/numbers/underscores" data-i18n-placeholder="pseudo_placeholder" pattern="^[a-zA-Z0-9_]{3,20}$" required>
+            <span class="pseudo-feedback" id="pseudo-feedback"></span>
+          </div>
+
+          <div class="auth-field">
+            <label data-i18n="choose_avatar">Choose your avatar</label>
+            <div class="avatar-gallery" id="avatar-gallery">
+              <!-- Populated dynamically based on gender selection -->
+            </div>
+            <input type="hidden" id="signup-avatar" value="">
+          </div>
+
           <div class="form-group">
             <label class="form-label" for="signup-email">Email Address</label>
             <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="auth-field">
+            <label data-i18n="phone_label">Phone Number (+971)</label>
+            <div class="phone-input-group">
+              <span class="phone-prefix">+971</span>
+              <input type="tel" id="signup-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
+            </div>
+            <div class="verification-step" id="phone-verify-step">
+              <input type="text" id="phone-code" class="code-input" placeholder="------" maxlength="6" pattern="^[0-9]{6}$">
+              <div>
+                <button type="button" class="resend-link" id="resend-code" onclick="resendCode()" data-i18n="resend_code">Resend code</button>
+                <span id="resend-timer"></span>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -475,6 +632,7 @@
 
   <!-- Demo Engine -->
   <script src="../js/mock-data.js"></script>
+  <script src="../js/avatars.js"></script>
   <script src="../js/demo-engine.js"></script>
   <script src="../js/animations.js"></script>
   <script src="../js/cookie-consent.js"></script>
@@ -529,26 +687,42 @@
     async function handleSignup(event) {
       event.preventDefault();
       const name = document.getElementById('signup-name').value.trim();
+      const gender = document.querySelector('input[name="signup-gender"]:checked')?.value;
+      const pseudo = document.getElementById('signup-pseudo').value.trim();
+      const avatar = document.getElementById('signup-avatar').value;
       const email = document.getElementById('signup-email').value.trim();
+      const phone = document.getElementById('signup-phone').value.trim();
       const password = document.getElementById('signup-password').value;
       const confirm = document.getElementById('signup-confirm').value;
-      const btn = event.target.querySelector('button[type="submit"]');
+      const terms = document.getElementById('terms-agree')?.checked;
 
+      if (!name) { showToast('Please enter your name', 'error'); return; }
+      if (!gender) { showToast('Please select your gender', 'error'); return; }
+      if (!pseudo || pseudo.length < 3) { showToast('Please choose a username (3+ characters)', 'error'); return; }
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(pseudo)) { showToast('Username: letters, numbers and underscores only (3-20 chars)', 'error'); return; }
+      if (!avatar) { showToast('Please select an avatar', 'error'); return; }
+      if (!phone || !/^5[0-9]{8}$/.test(phone)) { showToast('Please enter a valid UAE phone number', 'error'); return; }
       if (password !== confirm) { showToast('Passwords do not match', 'error'); return; }
       if (password.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
-      if (!name) { showToast('Please enter your name', 'error'); return; }
+      if (!terms) { showToast('Please accept the terms', 'error'); return; }
 
+      const btn = event.target.querySelector('button[type="submit"]');
       setLoading(btn, true);
+
+      // Demo mode: accept code 123456
+      const code = document.getElementById('phone-code')?.value;
+      if (code && code !== '123456') { showToast('Invalid verification code. Use 123456 for demo.', 'error'); setLoading(btn, false); return; }
+
       try {
-        const result = DemoAuth.signUp(email, password, name);
+        const result = DemoAuth.signUp(email, password, name, { gender, pseudo, avatar, phone });
         if (result.error) { showToast(result.error, 'error'); setLoading(btn, false); return; }
 
-        showToast('Welcome to Swappo! You get 2 free swaps every month!', 'success');
+        showToast('Welcome to Swappo! 🎉', 'success');
         setTimeout(() => {
           const params = new URLSearchParams(window.location.search);
           const redirect = params.get('redirect') || '../index.html';
           window.location.href = redirect;
-        }, 1500);
+        }, 1200);
       } catch (err) {
         showToast(err.message || 'Signup failed', 'error');
         setLoading(btn, false);
@@ -597,6 +771,107 @@
     document.querySelector('.auth-forgot a').addEventListener('click', (e) => {
       e.preventDefault();
       showToast('Password reset is not available in demo mode. Use demo@swappo.ae / demo123', 'info');
+    });
+
+    /* ========================
+       Gender Selection
+       ======================== */
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input').checked = true;
+        updateAvatarGallery();
+      });
+    });
+
+    /* ========================
+       Pseudo Validation (debounced)
+       ======================== */
+    let pseudoTimeout;
+    document.getElementById('signup-pseudo').addEventListener('input', function() {
+      clearTimeout(pseudoTimeout);
+      const val = this.value.trim();
+      const fb = document.getElementById('pseudo-feedback');
+      if (val.length < 3) {
+        fb.textContent = val.length > 0 ? '3 characters minimum' : '';
+        fb.className = 'pseudo-feedback invalid';
+        return;
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(val)) {
+        fb.textContent = 'Letters, numbers and underscores only';
+        fb.className = 'pseudo-feedback invalid';
+        return;
+      }
+      pseudoTimeout = setTimeout(() => {
+        // Check uniqueness against mock data
+        const taken = (window.MOCK_USERS || []).some(u => u.pseudo === val.toLowerCase()) || val.toLowerCase() === 'demo_swapper';
+        fb.textContent = taken ? 'This username is already taken' : 'Username available!';
+        fb.className = 'pseudo-feedback ' + (taken ? 'taken' : 'available');
+      }, 300);
+    });
+
+    /* ========================
+       Avatar Gallery
+       ======================== */
+    function updateAvatarGallery() {
+      const gender = document.querySelector('input[name="signup-gender"]:checked')?.value || 'other';
+      const gallery = document.getElementById('avatar-gallery');
+      if (!window.getAvatarsByGender) { gallery.innerHTML = '<p>Loading avatars...</p>'; return; }
+      const avatars = getAvatarsByGender(gender);
+      gallery.innerHTML = avatars.map(([key, data]) =>
+        `<button type="button" class="avatar-option" data-avatar="${key}" onclick="selectAvatar(this, '${key}')">
+          ${data.svg}
+          <span class="avatar-name">${data.name}</span>
+        </button>`
+      ).join('');
+    }
+
+    function selectAvatar(el, key) {
+      document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('signup-avatar').value = key;
+    }
+
+    /* ========================
+       Phone Verification (Demo)
+       ======================== */
+    function sendPhoneCode() {
+      const phone = document.getElementById('signup-phone').value;
+      if (!/^5[0-9]{8}$/.test(phone)) {
+        showToast('Please enter a valid UAE mobile number', 'error');
+        return;
+      }
+      document.getElementById('phone-verify-step').classList.add('active');
+      showToast('Demo mode: verification code is 123456', 'info');
+      startResendTimer();
+    }
+
+    function resendCode() {
+      showToast('Demo mode: code resent — use 123456', 'info');
+      startResendTimer();
+    }
+
+    function startResendTimer() {
+      const link = document.getElementById('resend-code');
+      const timer = document.getElementById('resend-timer');
+      link.classList.add('disabled');
+      let seconds = 60;
+      timer.textContent = `(${seconds}s)`;
+      const interval = setInterval(() => {
+        seconds--;
+        timer.textContent = `(${seconds}s)`;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          link.classList.remove('disabled');
+          timer.textContent = '';
+        }
+      }, 1000);
+    }
+
+    // Initialize avatar gallery on load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateAvatarGallery();
     });
 
     /* ========================

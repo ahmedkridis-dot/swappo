@@ -78,7 +78,7 @@ function _categoryMeta(catKey) {
 const DemoAuth = {
 
   /** Sign up a new user. Returns { success, user?, error? } */
-  signUp(email, password, name) {
+  signUp(email, password, name, extras = {}) {
     if (!email || !password || !name) {
       return { success: false, error: 'All fields are required.' };
     }
@@ -115,6 +115,12 @@ const DemoAuth = {
       boosts_used: 0,
       billing_start: new Date().toISOString().slice(0, 10),
       avatar_color: avatarColors[Math.floor(Math.random() * avatarColors.length)],
+      gender: extras.gender || 'other',
+      pseudo: extras.pseudo || name.split(' ')[0].toLowerCase(),
+      avatar: extras.avatar || 'happy',
+      phone: extras.phone || '',
+      phone_verified: !!extras.phone,
+      email_verified: false,
       created_at: new Date().toISOString().slice(0, 10)
     };
 

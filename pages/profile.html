@@ -1043,6 +1043,7 @@
 
     <!-- Demo Engine -->
     <script src="../js/mock-data.js"></script>
+    <script src="../js/avatars.js"></script>
     <script src="../js/demo-engine.js"></script>
     <script src="../js/animations.js"></script>
     <script src="../js/cookie-consent.js"></script>
@@ -1071,12 +1072,17 @@
             }
 
             // ── Profile header ───────────────────────────────────────────
-            const initials = (user.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
             const avatarEl = document.getElementById('profile-avatar');
-            avatarEl.textContent = initials;
-            avatarEl.style.background = user.avatar_color || 'var(--primary)';
+            if (user.avatar && window.getAvatarSVG) {
+              avatarEl.innerHTML = getAvatarSVG(user.avatar);
+              avatarEl.style.background = 'none';
+            } else {
+              const initials = (user.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+              avatarEl.textContent = initials;
+              avatarEl.style.background = user.avatar_color || 'var(--primary)';
+            }
 
-            document.getElementById('profile-name').textContent = user.name || 'User';
+            document.getElementById('profile-name').textContent = user.pseudo || user.name || 'User';
             document.querySelector('#profile-location span').textContent = user.city || 'UAE';
             document.getElementById('profile-email').textContent = user.email || '';
 
