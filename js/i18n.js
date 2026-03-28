@@ -34,8 +34,8 @@ const translations = {
     gift_corner: "Gift Corner",
 
     // Homepage
-    hero_title: "Swap your stuff.\nNo cash needed.",
-    hero_subtitle: "The UAE's first barter platform. Exchange items with others in your community. Anonymous until you both agree.",
+    hero_title: "Someone needs what you have.\nSwap it.",
+    hero_subtitle: "The UAE's first barter platform. Trade items with your community. Start free.",
     how_it_works: "How it works",
     step1_title: "List your item",
     step1_desc: "Upload photos and details about what you want to swap.",
@@ -249,8 +249,8 @@ const translations = {
     gift_corner: "Coin Cadeaux",
 
     // Homepage
-    hero_title: "Échangez vos affaires.\nSans argent.",
-    hero_subtitle: "Échangez des articles avec d'autres dans votre communauté. Anonyme jusqu'à ce que vous soyez d'accord.",
+    hero_title: "Quelqu'un a besoin de ce que vous avez.\nÉchangez-le.",
+    hero_subtitle: "La première plateforme de troc aux EAU. Échangez avec votre communauté. Commencez gratuitement.",
     how_it_works: "Comment ça marche",
     step1_title: "Listez votre article",
     step1_desc: "Téléchargez des photos et les détails de ce que vous voulez échanger.",
@@ -464,8 +464,8 @@ const translations = {
     gift_corner: "ركن الهدايا",
 
     // Homepage
-    hero_title: "تبادل أشياءك.\nبدون نقود.",
-    hero_subtitle: "تبادل الأشياء مع الآخرين في مجتمعك. مجهول الهوية حتى يوافق الطرفان.",
+    hero_title: "شخص ما يحتاج ما لديك.\nبادله.",
+    hero_subtitle: "أول منصة مقايضة في الإمارات. تبادل مع مجتمعك. ابدأ مجاناً.",
     how_it_works: "كيف يعمل",
     step1_title: "ضع قائمة بعنصرك",
     step1_desc: "حمّل الصور والتفاصيل حول ما تريد تبديله.",
@@ -679,8 +679,8 @@ const translations = {
     gift_corner: "تحائف کونا",
 
     // Homepage
-    hero_title: "اپنی چیزوں کو تبدیل کریں۔\nبغیر نقد رقم کے۔",
-    hero_subtitle: "اپنی کمیونٹی میں دوسروں کے ساتھ چیزوں کو تبدیل کریں۔ جب تک دونوں طرف سے اتفاق نہ ہو تک خفیہ۔",
+    hero_title: "کسی کو آپ کی چیز کی ضرورت ہے۔\nاسے تبدیل کریں۔",
+    hero_subtitle: "امارات کا پہلا بارٹر پلیٹ فارم۔ اپنی کمیونٹی کے ساتھ تبادلہ کریں۔ مفت شروع کریں۔",
     how_it_works: "یہ کیسے کام کرتا ہے",
     step1_title: "اپنی چیز کی فہرست بنائیں",
     step1_desc: "تصاویر اور اپ لوڈ کریں جو آپ تبدیل کرنا چاہتے ہیں۔",
