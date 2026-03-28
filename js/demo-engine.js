@@ -763,6 +763,123 @@ const DemoSwaps = {
     const local = _getArray(STORAGE_KEYS.SWAPS).find(s => s.id === swapId);
     if (local) return local;
     return (MOCK_SWAPS || []).find(s => s.id === swapId) || null;
+  },
+
+  // Get swaps proposed BY the user (sent requests)
+  getSent(userId) {
+    const all = [...MOCK_SWAPS, ..._getArray(STORAGE_KEYS.SWAPS)];
+    return all.filter(s => s.proposer_id === userId)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  },
+
+  // Get swaps proposed TO the user (received requests)
+  getReceived(userId) {
+    const all = [...MOCK_SWAPS, ..._getArray(STORAGE_KEYS.SWAPS)];
+    return all.filter(s => s.receiver_id === userId)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  },
+
+  // Get completed/rejected/cancelled swaps (history)
+  getHistory(userId) {
+    const all = [...MOCK_SWAPS, ..._getArray(STORAGE_KEYS.SWAPS)];
+    return all.filter(s =>
+      (s.proposer_id === userId || s.receiver_id === userId) &&
+      ['completed', 'rejected', 'cancelled', 'expired'].includes(s.status)
+    ).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  },
+
+  // Get count of pending requests (for badge)
+  getPendingCount(userId) {
+    const all = [...MOCK_SWAPS, ..._getArray(STORAGE_KEYS.SWAPS)];
+    return all.filter(s =>
+      (s.proposer_id === userId || s.receiver_id === userId) && s.status === 'pending'
+    ).length;
+  },
+
+  // Cancel a pending swap (by proposer)
+  cancel(swapId) {
+    const user = DemoAuth.getCurrentUser();
+    if (!user) return { success: false, error: 'Not logged in' };
+
+    let swaps = _getArray(STORAGE_KEYS.SWAPS);
+    let swap = swaps.find(s => s.id === swapId);
+    let isMock = false;
+
+    if (!swap) {
+      swap = MOCK_SWAPS.find(s => s.id === swapId);
+      isMock = true;
+    }
+    if (!swap) return { success: false, error: 'Swap not found' };
+    if (swap.proposer_id !== user.id) return { success: false, error: 'Not your swap' };
+    if (swap.status !== 'pending') return { success: false, error: 'Can only cancel pending swaps' };
+
+    if (isMock) {
+      swap = Object.assign({}, swap);
+      swaps.push(swap);
+    }
+    swap.status = 'cancelled';
+    swap.completed_at = new Date().toISOString().slice(0, 10);
+    _set(STORAGE_KEYS.SWAPS, swaps);
+
+    DemoNotifications.add({
+      type: 'swap_cancelled',
+      title: 'Swap Cancelled',
+      message: 'You cancelled your swap request.'
+    });
+
+    return { success: true };
+  },
+
+  // Rate a completed swap
+  rate(swapId, stars) {
+    if (stars < 1 || stars > 5) return { success: false, error: 'Rating must be 1-5' };
+
+    let swaps = _getArray(STORAGE_KEYS.SWAPS);
+    let swap = swaps.find(s => s.id === swapId);
+    let isMock = false;
+
+    if (!swap) {
+      swap = MOCK_SWAPS.find(s => s.id === swapId);
+      isMock = true;
+    }
+    if (!swap) return { success: false, error: 'Swap not found' };
+    if (swap.status !== 'completed' && swap.status !== 'accepted') return { success: false, error: 'Can only rate completed swaps' };
+
+    if (isMock) {
+      swap = Object.assign({}, swap);
+      swaps.push(swap);
+    }
+    swap.rating = stars;
+    _set(STORAGE_KEYS.SWAPS, swaps);
+
+    return { success: true };
+  },
+
+  // Check for expired swaps (7 days without response)
+  checkExpired() {
+    const now = new Date();
+    const all = [...MOCK_SWAPS, ..._getArray(STORAGE_KEYS.SWAPS)];
+    let swaps = _getArray(STORAGE_KEYS.SWAPS);
+    let changed = false;
+
+    all.forEach(s => {
+      if (s.status === 'pending') {
+        const created = new Date(s.created_at);
+        const daysDiff = (now - created) / (1000 * 60 * 60 * 24);
+        if (daysDiff >= 7) {
+          let local = swaps.find(ls => ls.id === s.id);
+          if (!local) {
+            local = Object.assign({}, s);
+            swaps.push(local);
+          }
+          local.status = 'expired';
+          local.completed_at = new Date().toISOString().slice(0, 10);
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) _set(STORAGE_KEYS.SWAPS, swaps);
   }
 };
 

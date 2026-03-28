@@ -340,92 +340,240 @@
             color: var(--text);
         }
 
-        /* ========== SWAP HISTORY ========== */
-        .swap-history {
+        /* ========== SWAP DASHBOARD ========== */
+        .swap-tabs {
             display: flex;
-            flex-direction: column;
-            gap: 16px;
+            gap: 0;
+            border-bottom: 2px solid #EBEBEB;
+            margin-bottom: 20px;
         }
-
-        .swap-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .swap-date {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .swap-items {
+        .swap-tab {
             flex: 1;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #999;
             display: flex;
             align-items: center;
-            gap: 16px;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
         }
-
-        .swap-item {
-            display: flex;
-            flex-direction: column;
+        .swap-tab:hover { color: #333; }
+        .swap-tab.active {
+            color: #09B1BA;
+            border-bottom-color: #09B1BA;
+            font-weight: 600;
+        }
+        .swap-tab-count {
+            background: #FF4B55;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
+            padding: 0 5px;
         }
-
-        .swap-item-img {
-            width: 60px;
-            height: 60px;
-            background: var(--bg-light);
+        .swap-tab-count:empty { display: none; }
+        .swap-tab-content { display: none; }
+        .swap-tab-content.active { display: block; }
+        .swap-badge {
+            background: #FF4B55;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
             border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        /* Swap request cards */
+        .swap-request-card {
+            background: white;
+            border: 1px solid #EBEBEB;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.2s;
+        }
+        .swap-request-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .swap-request-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .swap-request-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .swap-request-user .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #F0F0F0;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            margin-bottom: 8px;
         }
-
-        .swap-item-img img {
-            width: 100%;
-            height: 100%;
+        .swap-request-user .user-avatar svg { width: 36px; height: 36px; }
+        .swap-request-user .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #171717;
+        }
+        .swap-request-date {
+            font-size: 12px;
+            color: #999;
+        }
+        .swap-request-items {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .swap-request-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #F9F9F9;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .swap-request-item img {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
             object-fit: cover;
         }
-
-        .swap-item-name {
-            font-size: 13px;
+        .swap-request-item .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .swap-request-item .item-title {
             font-weight: 600;
-            color: var(--text);
-            text-align: center;
+            font-size: 13px;
+            color: #171717;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
-        .swap-arrow { font-size: 20px; color: var(--primary); }
-
-        .swap-right {
+        .swap-request-item .item-category {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        .swap-arrow-icon {
+            color: #09B1BA;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .swap-request-footer {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 12px;
-        }
-
-        .swap-status {
-            display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .swap-status-badge {
             font-size: 12px;
             font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
+        .swap-status-badge.pending { background: rgba(255,152,0,0.1); color: #FF9800; }
+        .swap-status-badge.accepted { background: rgba(76,175,80,0.1); color: #4CAF50; }
+        .swap-status-badge.completed { background: rgba(33,150,243,0.1); color: #2196F3; }
+        .swap-status-badge.rejected { background: rgba(244,67,54,0.1); color: #F44336; }
+        .swap-status-badge.cancelled { background: rgba(158,158,158,0.1); color: #9E9E9E; }
+        .swap-status-badge.expired { background: rgba(158,158,158,0.1); color: #9E9E9E; }
+        .swap-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .swap-actions .btn-accept {
+            background: #09B1BA;
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .swap-actions .btn-accept:hover { background: #078A91; }
+        .swap-actions .btn-reject {
+            background: white;
+            color: #F44336;
+            border: 1px solid #F44336;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .swap-actions .btn-reject:hover { background: #FFF5F5; }
+        .swap-actions .btn-cancel {
+            background: white;
+            color: #999;
+            border: 1px solid #EBEBEB;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .swap-actions .btn-cancel:hover { background: #F5F5F5; color: #666; }
+        .swap-rating-input {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .swap-rating-input .star {
+            font-size: 20px;
+            cursor: pointer;
+            color: #DDD;
+            transition: color 0.15s;
+        }
+        .swap-rating-input .star:hover,
+        .swap-rating-input .star.active { color: #FFB800; }
+        .swap-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: #999;
+        }
+        .swap-empty i { font-size: 40px; margin-bottom: 12px; display: block; color: #DDD; }
+        .swap-empty p { font-size: 14px; }
 
-        .swap-status.completed { background: rgba(76,175,80,0.1); color: #4CAF50; }
-        .swap-status.pending { background: rgba(255,152,0,0.1); color: #FF9800; }
-        .swap-status.cancelled { background: rgba(244,67,54,0.1); color: #F44336; }
-
-        .swap-rating { display: flex; gap: 4px; color: #FFB800; }
+        @media (max-width: 480px) {
+            .swap-request-items { flex-direction: column; }
+            .swap-arrow-icon { transform: rotate(90deg); }
+            .swap-request-footer { flex-direction: column; align-items: stretch; }
+            .swap-actions { justify-content: stretch; }
+            .swap-actions button { flex: 1; }
+        }
 
         /* ========== SETTINGS ========== */
         .settings-container {
@@ -702,17 +850,11 @@
             .items-grid,
             .saved-grid { grid-template-columns: repeat(2, 1fr); }
 
-            .swap-card { flex-direction: column; }
-
-            .swap-items {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .swap-right {
-                width: 100%;
-                align-items: center;
-            }
+            .swap-request-items { flex-direction: column; }
+            .swap-arrow-icon { transform: rotate(90deg); }
+            .swap-request-footer { flex-direction: column; align-items: stretch; }
+            .swap-actions { justify-content: stretch; }
+            .swap-actions button { flex: 1; }
 
             .settings-container { grid-template-columns: 1fr; }
             .tabs-nav { gap: 12px; }
@@ -830,8 +972,8 @@
                     <button class="tab-btn active" data-tab="my-items">
                         <i class="fas fa-box"></i> My Items
                     </button>
-                    <button class="tab-btn" data-tab="swap-history">
-                        <i class="fas fa-history"></i> Swap History
+                    <button class="tab-btn" data-tab="swap-dashboard">
+                        <i class="fas fa-exchange-alt"></i> My Swaps <span class="swap-badge" id="swap-badge" style="display:none;"></span>
                     </button>
                     <button class="tab-btn" data-tab="saved-items">
                         <i class="fas fa-heart"></i> Saved Items
@@ -848,10 +990,34 @@
                     </div>
                 </div>
 
-                <!-- ========== TAB: SWAP HISTORY ========== -->
-                <div class="tab-content" id="swap-history">
-                    <div class="swap-history" id="swap-history-list">
-                        <!-- Dynamically populated -->
+                <!-- ========== TAB: SWAP DASHBOARD ========== -->
+                <div class="tab-content" id="swap-dashboard">
+                    <!-- Sub-tabs -->
+                    <div class="swap-tabs">
+                        <button class="swap-tab active" data-swap-tab="sent" onclick="switchSwapTab('sent', this)">
+                            <i class="fas fa-paper-plane"></i> Sent <span class="swap-tab-count" id="sent-count"></span>
+                        </button>
+                        <button class="swap-tab" data-swap-tab="received" onclick="switchSwapTab('received', this)">
+                            <i class="fas fa-inbox"></i> Received <span class="swap-tab-count" id="received-count"></span>
+                        </button>
+                        <button class="swap-tab" data-swap-tab="history" onclick="switchSwapTab('history', this)">
+                            <i class="fas fa-history"></i> History
+                        </button>
+                    </div>
+
+                    <!-- Sent requests -->
+                    <div class="swap-tab-content active" id="swap-sent">
+                        <div class="swap-list" id="swap-sent-list"></div>
+                    </div>
+
+                    <!-- Received requests -->
+                    <div class="swap-tab-content" id="swap-received">
+                        <div class="swap-list" id="swap-received-list"></div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="swap-tab-content" id="swap-history-tab">
+                        <div class="swap-list" id="swap-history-list-tab"></div>
                     </div>
                 </div>
 
@@ -1205,81 +1371,202 @@
             '</div>';
             itemsGrid.innerHTML = itemsHTML;
 
-            // ── TAB: Swap History ────────────────────────────────────────
-            const swapList = document.getElementById('swap-history-list');
-            const swaps = DemoSwaps.getForUser(user.id);
+            // ── TAB: SWAP DASHBOARD ────────────────────────────────────────
+            // Check expired swaps first
+            if (DemoSwaps.checkExpired) DemoSwaps.checkExpired();
 
-            if (swaps.length === 0) {
-                swapList.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No swaps yet. Start swapping on the <a href="catalogue.html" style="color:var(--primary);">Swap Market</a>!</div>';
-            } else {
-                swapList.innerHTML = swaps.map(swap => {
-                    // Determine which item is ours and which is theirs
-                    const isProposer = swap.proposer_id === user.id;
-                    const myItemId = isProposer ? swap.proposer_item_id : swap.receiver_item_id;
-                    const theirItemId = isProposer ? swap.receiver_item_id : swap.proposer_item_id;
-                    const otherUserId = isProposer ? swap.receiver_id : swap.proposer_id;
-
-                    const myItem = DemoItems.getById(myItemId);
-                    const theirItem = DemoItems.getById(theirItemId);
-
-                    const myItemName = myItem ? (myItem.brand + ' ' + myItem.model).trim() : 'Your item';
-                    const theirItemName = theirItem ? (theirItem.brand + ' ' + theirItem.model).trim() : 'Their item';
-                    const myPhoto = myItem && myItem.photos ? myItem.photos[0] : '';
-                    const theirPhoto = theirItem && theirItem.photos ? theirItem.photos[0] : '';
-
-                    // Other user (anonymous unless completed)
-                    let otherUserName = 'Anonymous';
-                    if (swap.status === 'completed') {
-                        const otherUser = getMockUserById(otherUserId);
-                        if (otherUser) otherUserName = otherUser.name;
-                    }
-
-                    // Status badge
-                    const statusMap = {
-                        pending:   { class: 'pending',   icon: 'clock',        label: 'Pending',   color: 'rgba(255,152,0,0.1)',  text: '#FF9800' },
-                        accepted:  { class: 'completed', icon: 'check-circle', label: 'Accepted',  color: 'rgba(76,175,80,0.1)',  text: '#4CAF50' },
-                        completed: { class: 'completed', icon: 'check-double', label: 'Completed', color: 'rgba(33,150,243,0.1)', text: '#2196F3' },
-                        rejected:  { class: 'cancelled', icon: 'times-circle', label: 'Rejected',  color: 'rgba(244,67,54,0.1)',  text: '#F44336' }
-                    };
-                    const st = statusMap[swap.status] || statusMap.pending;
-
-                    // Rating stars
-                    let ratingHTML = '';
-                    if (swap.rating) {
-                        ratingHTML = '<div class="swap-rating">';
-                        for (let s = 1; s <= 5; s++) {
-                            ratingHTML += '<i class="fas fa-star' + (s <= swap.rating ? '' : ' style="opacity:0.3"') + '"></i>';
-                        }
-                        ratingHTML += '</div>';
-                    }
-
-                    const dateStr = swap.created_at ? new Date(swap.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
-
-                    return '<div class="swap-card">' +
-                        '<div>' +
-                            '<div class="swap-date">' + dateStr + ' &middot; with ' + otherUserName + '</div>' +
-                            '<div class="swap-items">' +
-                                '<div class="swap-item">' +
-                                    '<div class="swap-item-img">' + (myPhoto ? '<img src="' + myPhoto + '" alt="">' : '') + '</div>' +
-                                    '<div class="swap-item-name">' + myItemName + '</div>' +
-                                '</div>' +
-                                '<div class="swap-arrow">↔️</div>' +
-                                '<div class="swap-item">' +
-                                    '<div class="swap-item-img">' + (theirPhoto ? '<img src="' + theirPhoto + '" alt="">' : '') + '</div>' +
-                                    '<div class="swap-item-name">' + theirItemName + '</div>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div style="font-size:12px;color:var(--text-muted);margin-top:8px;">' + (swap.status === 'completed' ? '1 swap used' : '') + '</div>' +
-                        '</div>' +
-                        '<div class="swap-right">' +
-                            '<span class="swap-status" style="background:' + st.color + ';color:' + st.text + ';">' +
-                                '<i class="fas fa-' + st.icon + '"></i> ' + st.label +
-                            '</span>' +
-                            ratingHTML +
-                        '</div>' +
-                    '</div>';
-                }).join('');
+            function switchSwapTab(tab, btn) {
+                document.querySelectorAll('.swap-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.swap-tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('swap-' + tab).classList.add('active');
             }
+
+            function findItem(itemId) {
+                const allItems = [...(window.MOCK_ITEMS || []), ...(JSON.parse(localStorage.getItem('swappo_user_items') || '[]'))];
+                return allItems.find(i => i.id === itemId);
+            }
+
+            function findUser(userId) {
+                if (userId === 'user-demo') return window.DEMO_USER;
+                const mockUser = (window.MOCK_USERS || []).find(u => u.id === userId);
+                if (mockUser) return mockUser;
+                const localUsers = JSON.parse(localStorage.getItem('swappo_users') || '[]');
+                return localUsers.find(u => u.id === userId) || { pseudo: 'Unknown', avatar: null };
+            }
+
+            function getItemPhoto(item) {
+                if (!item || !item.photos || !item.photos.length) return '';
+                return item.photos[0];
+            }
+
+            function getItemTitle(item) {
+                if (!item) return 'Unknown item';
+                return (item.brand || '') + ' ' + (item.model || item.type || '');
+            }
+
+            function getUserAvatarHTML(u) {
+                if (u && u.avatar && window.getAvatarSVG) {
+                    return getAvatarSVG(u.avatar);
+                }
+                return '<span style="font-size:16px;color:#999;">?</span>';
+            }
+
+            function statusBadgeHTML(status) {
+                var map = {
+                    pending:   { icon: 'clock',        label: 'Pending' },
+                    accepted:  { icon: 'check-circle', label: 'Accepted' },
+                    completed: { icon: 'check-double', label: 'Completed' },
+                    rejected:  { icon: 'times-circle', label: 'Rejected' },
+                    cancelled: { icon: 'ban',          label: 'Cancelled' },
+                    expired:   { icon: 'hourglass-end',label: 'Expired' }
+                };
+                var s = map[status] || map.pending;
+                return '<span class="swap-status-badge ' + status + '"><i class="fas fa-' + s.icon + '"></i> ' + s.label + '</span>';
+            }
+
+            function daysAgo(dateStr) {
+                var d = new Date(dateStr);
+                var now = new Date();
+                var diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+                if (diff === 0) return 'Today';
+                if (diff === 1) return 'Yesterday';
+                return diff + ' days ago';
+            }
+
+            function renderSwapCard(swap, perspective) {
+                var isProposer = swap.proposer_id === user.id;
+                var otherUserId = isProposer ? swap.receiver_id : swap.proposer_id;
+                var otherUser = findUser(otherUserId);
+                var myItemId = isProposer ? swap.proposer_item_id : swap.receiver_item_id;
+                var theirItemId = isProposer ? swap.receiver_item_id : swap.proposer_item_id;
+                var myItem = findItem(myItemId);
+                var theirItem = findItem(theirItemId);
+
+                var actionsHTML = '';
+                if (perspective === 'sent' && swap.status === 'pending') {
+                    actionsHTML = '<div class="swap-actions"><button class="btn-cancel" onclick="cancelSwap(\'' + swap.id + '\')"><i class="fas fa-times"></i> Cancel</button></div>';
+                } else if (perspective === 'received' && swap.status === 'pending') {
+                    actionsHTML = '<div class="swap-actions"><button class="btn-accept" onclick="acceptSwap(\'' + swap.id + '\')"><i class="fas fa-check"></i> Accept</button><button class="btn-reject" onclick="rejectSwap(\'' + swap.id + '\')"><i class="fas fa-times"></i> Decline</button></div>';
+                } else if (perspective === 'history' && (swap.status === 'completed' || swap.status === 'accepted') && !swap.rating) {
+                    actionsHTML = '<div class="swap-rating-input" data-swap="' + swap.id + '">' +
+                        [1,2,3,4,5].map(function(n) {
+                            return '<span class="star" data-star="' + n + '" onclick="rateSwap(\'' + swap.id + '\',' + n + ')">&#9733;</span>';
+                        }).join('') + '</div>';
+                } else if (swap.rating) {
+                    actionsHTML = '<div class="swap-rating" style="color:#FFB800;">' + '\u2605'.repeat(swap.rating) + '<span style="color:#DDD;">' + '\u2605'.repeat(5 - swap.rating) + '</span></div>';
+                }
+
+                return '<div class="swap-request-card">' +
+                    '<div class="swap-request-header">' +
+                        '<div class="swap-request-user">' +
+                            '<div class="user-avatar">' + getUserAvatarHTML(otherUser) + '</div>' +
+                            '<span class="user-name">' + (otherUser.pseudo || 'Anonymous') + '</span>' +
+                        '</div>' +
+                        '<span class="swap-request-date">' + daysAgo(swap.created_at) + '</span>' +
+                    '</div>' +
+                    '<div class="swap-request-items">' +
+                        '<div class="swap-request-item">' +
+                            '<img src="' + getItemPhoto(isProposer ? myItem : theirItem) + '" alt="">' +
+                            '<div class="item-info"><div class="item-title">' + getItemTitle(isProposer ? myItem : theirItem) + '</div><div class="item-category">' + (isProposer ? 'Your item' : 'Their offer') + '</div></div>' +
+                        '</div>' +
+                        '<i class="fas fa-exchange-alt swap-arrow-icon"></i>' +
+                        '<div class="swap-request-item">' +
+                            '<img src="' + getItemPhoto(isProposer ? theirItem : myItem) + '" alt="">' +
+                            '<div class="item-info"><div class="item-title">' + getItemTitle(isProposer ? theirItem : myItem) + '</div><div class="item-category">' + (isProposer ? 'Requested' : 'Your item') + '</div></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="swap-request-footer">' +
+                        statusBadgeHTML(swap.status) +
+                        actionsHTML +
+                    '</div>' +
+                '</div>';
+            }
+
+            function cancelSwap(swapId) {
+                if (!confirm('Cancel this swap request?')) return;
+                var result = DemoSwaps.cancel(swapId);
+                if (result.success) {
+                    DemoNotifications.showToast('Swap cancelled', 'info');
+                    renderSwapDashboard();
+                } else {
+                    DemoNotifications.showToast(result.error, 'error');
+                }
+            }
+
+            function acceptSwap(swapId) {
+                var result = DemoSwaps.respond(swapId, true);
+                if (result.success) {
+                    DemoNotifications.showToast('Swap accepted! Identities revealed.', 'success');
+                    renderSwapDashboard();
+                } else {
+                    DemoNotifications.showToast(result.error, 'error');
+                }
+            }
+
+            function rejectSwap(swapId) {
+                if (!confirm('Decline this swap request?')) return;
+                var result = DemoSwaps.respond(swapId, false);
+                if (result.success) {
+                    DemoNotifications.showToast('Swap declined', 'info');
+                    renderSwapDashboard();
+                } else {
+                    DemoNotifications.showToast(result.error, 'error');
+                }
+            }
+
+            function rateSwap(swapId, stars) {
+                var result = DemoSwaps.rate(swapId, stars);
+                if (result.success) {
+                    DemoNotifications.showToast('Thanks for rating!', 'success');
+                    renderSwapDashboard();
+                } else {
+                    DemoNotifications.showToast(result.error, 'error');
+                }
+            }
+
+            function renderSwapDashboard() {
+                var sent = DemoSwaps.getSent ? DemoSwaps.getSent(user.id) : [];
+                var received = DemoSwaps.getReceived ? DemoSwaps.getReceived(user.id) : [];
+                var history = DemoSwaps.getHistory ? DemoSwaps.getHistory(user.id) : [];
+
+                var sentPending = sent.filter(function(s) { return s.status === 'pending'; }).length;
+                var receivedPending = received.filter(function(s) { return s.status === 'pending'; }).length;
+                var totalPending = sentPending + receivedPending;
+
+                // Update badge counts
+                document.getElementById('sent-count').textContent = sentPending > 0 ? sentPending : '';
+                document.getElementById('received-count').textContent = receivedPending > 0 ? receivedPending : '';
+                var badge = document.getElementById('swap-badge');
+                if (totalPending > 0) { badge.textContent = totalPending; badge.style.display = 'inline-flex'; }
+                else { badge.style.display = 'none'; }
+
+                // Render sent
+                var sentList = document.getElementById('swap-sent-list');
+                if (sent.length === 0) {
+                    sentList.innerHTML = '<div class="swap-empty"><i class="fas fa-paper-plane"></i><p>No swap requests sent yet.<br><a href="catalogue.html" style="color:#09B1BA;">Browse items to swap</a></p></div>';
+                } else {
+                    sentList.innerHTML = sent.map(function(s) { return renderSwapCard(s, 'sent'); }).join('');
+                }
+
+                // Render received
+                var receivedList = document.getElementById('swap-received-list');
+                if (received.length === 0) {
+                    receivedList.innerHTML = '<div class="swap-empty"><i class="fas fa-inbox"></i><p>No swap requests received yet.</p></div>';
+                } else {
+                    receivedList.innerHTML = received.map(function(s) { return renderSwapCard(s, 'received'); }).join('');
+                }
+
+                // Render history
+                var historyList = document.getElementById('swap-history-list-tab');
+                if (history.length === 0) {
+                    historyList.innerHTML = '<div class="swap-empty"><i class="fas fa-history"></i><p>No completed swaps yet.</p></div>';
+                } else {
+                    historyList.innerHTML = history.map(function(s) { return renderSwapCard(s, 'history'); }).join('');
+                }
+            }
+
+            renderSwapDashboard();
 
             // ── TAB: Saved Items ─────────────────────────────────────────
             const savedGrid = document.getElementById('saved-items-grid');

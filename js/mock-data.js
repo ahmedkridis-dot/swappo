@@ -1295,6 +1295,50 @@ const MOCK_SWAPS = [
     created_at: '2026-03-15',
     completed_at: '2026-03-17',
     rating: 5
+  },
+  {
+    id: 'swap-6',
+    proposer_id: 'user-3',
+    receiver_id: 'user-demo',
+    proposer_item_id: 'item-7',
+    receiver_item_id: 'item-11',
+    status: 'pending',
+    created_at: '2026-03-27',
+    completed_at: null,
+    rating: null
+  },
+  {
+    id: 'swap-7',
+    proposer_id: 'user-demo',
+    receiver_id: 'user-4',
+    proposer_item_id: 'item-6',
+    receiver_item_id: 'item-4',
+    status: 'rejected',
+    created_at: '2026-03-05',
+    completed_at: '2026-03-06',
+    rating: null
+  },
+  {
+    id: 'swap-8',
+    proposer_id: 'user-5',
+    receiver_id: 'user-demo',
+    proposer_item_id: 'item-19',
+    receiver_item_id: 'item-22',
+    status: 'pending',
+    created_at: '2026-03-26',
+    completed_at: null,
+    rating: null
+  },
+  {
+    id: 'swap-9',
+    proposer_id: 'user-demo',
+    receiver_id: 'user-7',
+    proposer_item_id: 'item-11',
+    receiver_item_id: 'item-23',
+    status: 'cancelled',
+    created_at: '2026-03-02',
+    completed_at: '2026-03-03',
+    rating: null
   }
 ];
 
