@@ -701,6 +701,13 @@
     sellerHTML += '<div class="seller-name">' + sellerName + '</div>';
     if (owner) {
       sellerHTML += '<div class="seller-badge">' + owner.badge_emoji + ' ' + capitalizeFirst(owner.badge_tier) + '</div>';
+      if (window.DemoBadges && owner) {
+        var ownerBadges = DemoBadges.getAllBadges(owner.id, owner.swap_count || 0);
+        sellerHTML += '<div style="display:flex;gap:4px;justify-content:center;margin-top:4px;flex-wrap:wrap;">';
+        sellerHTML += DemoBadges.renderBadge(ownerBadges.level);
+        ownerBadges.specials.forEach(function(b) { sellerHTML += DemoBadges.renderBadge(b); });
+        sellerHTML += '</div>';
+      }
       sellerHTML += '<div class="seller-info">';
       sellerHTML += '<div class="seller-info-item"><span>Location:</span><strong>' + (owner.city || 'UAE') + '</strong></div>';
       sellerHTML += '<div class="seller-info-item"><span>Member since:</span><strong>' + owner.created_at.slice(0, 7).replace('-', '/') + '</strong></div>';
@@ -803,6 +810,11 @@
   function openSwapModal() {
     if (!currentUser) {
       window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+      return;
+    }
+    // Publish gate: user must have at least one active item before proposing
+    if (window.checkPublishGate && checkPublishGate()) {
+      showPublishGate();
       return;
     }
     selectedSwapItemId = null;

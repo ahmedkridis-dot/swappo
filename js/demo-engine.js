@@ -133,6 +133,17 @@ const DemoAuth = {
     // Auto-login
     _set(STORAGE_KEYS.CURRENT_USER, newUser);
 
+    // Early adopter auto-enrollment
+    const earlyResult = DemoEarlyAdopter.register(newUser.id);
+    if (earlyResult.isPioneer) {
+      newUser.badges = ['pioneer'];
+      // Update stored user
+      const users = _getArray(STORAGE_KEYS.USERS);
+      const idx = users.findIndex(u => u.id === newUser.id);
+      if (idx >= 0) users[idx] = newUser;
+      _set(STORAGE_KEYS.USERS, users);
+    }
+
     return { success: true, user: newUser };
   },
 
@@ -605,6 +616,12 @@ const DemoItems = {
   /** Get favorited item IDs */
   getFavorites() {
     return _getArray(STORAGE_KEYS.FAVORITES);
+  },
+
+  /** Check if user has at least one active item */
+  hasActiveItems(userId) {
+    const allItems = [...MOCK_ITEMS, ..._getArray(STORAGE_KEYS.USER_ITEMS)];
+    return allItems.some(i => i.user_id === userId && i.status === 'active');
   },
 
   /** Check if item is favorited */
@@ -1307,6 +1324,190 @@ if (document.readyState === 'loading') {
   initDemoMode();
 }
 
+
+// ─── EARLY ADOPTER PROGRAM ──────────────────────────────────────────────────
+const DemoEarlyAdopter = {
+  MAX_SPOTS: 500,
+  STORAGE_KEY: 'swappo_early_adopter_count',
+
+  getCount() {
+    const count = parseInt(localStorage.getItem(this.STORAGE_KEY) || '0');
+    return Math.min(count, this.MAX_SPOTS);
+  },
+
+  getRemaining() {
+    return Math.max(0, this.MAX_SPOTS - this.getCount());
+  },
+
+  isFull() {
+    return this.getCount() >= this.MAX_SPOTS;
+  },
+
+  register(userId) {
+    if (this.isFull()) return { success: false, isPioneer: false };
+    const count = this.getCount() + 1;
+    localStorage.setItem(this.STORAGE_KEY, count.toString());
+
+    // Mark user as pioneer
+    const pioneers = JSON.parse(localStorage.getItem('swappo_pioneers') || '[]');
+    if (!pioneers.includes(userId)) {
+      pioneers.push(userId);
+      localStorage.setItem('swappo_pioneers', JSON.stringify(pioneers));
+    }
+
+    // Upgrade to bronze for 6 months
+    if (window.DemoSubscription) {
+      DemoSubscription.upgradePlan(userId, 'bronze');
+    }
+
+    return { success: true, isPioneer: true, spotsLeft: this.getRemaining() };
+  },
+
+  isPioneer(userId) {
+    const pioneers = JSON.parse(localStorage.getItem('swappo_pioneers') || '[]');
+    // Also check mock users - first 5 mock users are pioneers
+    const mockPioneers = ['user-1', 'user-2', 'user-3', 'user-7'];
+    return pioneers.includes(userId) || mockPioneers.includes(userId);
+  }
+};
+
+window.DemoEarlyAdopter = DemoEarlyAdopter;
+
+// ─── SWAP SUGGESTIONS ───────────────────────────────────────────────────────
+const DemoSuggestions = {
+  getForUser(userId, limit) {
+    limit = limit || 5;
+    var user = DemoAuth.getCurrentUser();
+    if (!user) return [];
+
+    // Get user's items to know their categories
+    var userItems = DemoItems.getByUser(userId);
+    var userCategories = [...new Set(userItems.map(function(i) { return i.category; }))];
+
+    // Get browsing history (stored categories)
+    var browsed = JSON.parse(localStorage.getItem('swappo_browsed_categories') || '[]');
+    var interestCategories = [...new Set([...userCategories, ...browsed])];
+
+    // Find matching items from other users
+    var allItems = [...MOCK_ITEMS, ..._getArray(STORAGE_KEYS.USER_ITEMS)];
+    var suggestions = allItems.filter(function(item) {
+      if (item.user_id === userId) return false;
+      if (item.status !== 'active') return false;
+      if (item.is_giveaway) return false;
+      // Prefer same categories
+      if (interestCategories.length > 0 && !interestCategories.includes(item.category)) return false;
+      return true;
+    });
+
+    // Sort by: same city first, then by favorites
+    var userCity = user.city || '';
+    suggestions.sort(function(a, b) {
+      var aCity = (a.city || '') === userCity ? 1 : 0;
+      var bCity = (b.city || '') === userCity ? 1 : 0;
+      if (bCity !== aCity) return bCity - aCity;
+      return (b.favorites_count || 0) - (a.favorites_count || 0);
+    });
+
+    return suggestions.slice(0, limit);
+  },
+
+  trackBrowsedCategory(category) {
+    if (!category) return;
+    var browsed = JSON.parse(localStorage.getItem('swappo_browsed_categories') || '[]');
+    if (!browsed.includes(category)) {
+      browsed.push(category);
+      if (browsed.length > 10) browsed.shift();
+      localStorage.setItem('swappo_browsed_categories', JSON.stringify(browsed));
+    }
+  }
+};
+
+window.DemoSuggestions = DemoSuggestions;
+
+// ─── BADGES & GAMIFICATION ──────────────────────────────────────────────────
+const BADGE_LEVELS = [
+  { id: 'newcomer', name: 'Newcomer',  emoji: '🌱', min: 0,   color: '#999' },
+  { id: 'swapper',  name: 'Swapper',   emoji: '⭐', min: 3,   color: '#CD7F32' },
+  { id: 'trader',   name: 'Trader',    emoji: '🔥', min: 10,  color: '#C0C0C0' },
+  { id: 'expert',   name: 'Expert',    emoji: '💎', min: 25,  color: '#FFD700' },
+  { id: 'master',   name: 'Master',    emoji: '👑', min: 50,  color: '#B9F2FF' },
+  { id: 'legend',   name: 'Legend',    emoji: '🏆', min: 100, color: '#FF6B6B' }
+];
+
+const SPECIAL_BADGES = [
+  { id: 'pioneer',       name: 'Pioneer',       emoji: '🚀', desc: 'First 500 users' },
+  { id: 'generous',      name: 'Generous',       emoji: '🎁', desc: '5+ giveaways' },
+  { id: 'speed_swapper', name: 'Speed Swapper',  emoji: '⚡', desc: 'Swap in < 24h' },
+  { id: 'collector',     name: 'Collector',      emoji: '📦', desc: '20+ active items' },
+  { id: 'trusted',       name: 'Trusted',        emoji: '💖', desc: '4.5 avg, 10+ reviews' }
+];
+
+const DemoBadges = {
+  getLevelBadge(swapCount) {
+    var badge = BADGE_LEVELS[0];
+    for (var i = BADGE_LEVELS.length - 1; i >= 0; i--) {
+      if (swapCount >= BADGE_LEVELS[i].min) { badge = BADGE_LEVELS[i]; break; }
+    }
+    return badge;
+  },
+
+  getNextLevel(swapCount) {
+    for (var i = 0; i < BADGE_LEVELS.length; i++) {
+      if (swapCount < BADGE_LEVELS[i].min) return BADGE_LEVELS[i];
+    }
+    return null;
+  },
+
+  getSpecialBadges(userId) {
+    var badges = [];
+
+    // Pioneer
+    if (window.DemoEarlyAdopter && DemoEarlyAdopter.isPioneer(userId)) {
+      badges.push(SPECIAL_BADGES.find(function(b) { return b.id === 'pioneer'; }));
+    }
+
+    // Generous (5+ giveaways)
+    var allItems = [...(window.MOCK_ITEMS || []), ...(JSON.parse(localStorage.getItem('swappo_user_items') || '[]'))];
+    var giveaways = allItems.filter(function(i) { return i.user_id === userId && i.is_giveaway; });
+    if (giveaways.length >= 5) {
+      badges.push(SPECIAL_BADGES.find(function(b) { return b.id === 'generous'; }));
+    }
+
+    // Collector (20+ active items)
+    var activeItems = allItems.filter(function(i) { return i.user_id === userId && i.status === 'active'; });
+    if (activeItems.length >= 20) {
+      badges.push(SPECIAL_BADGES.find(function(b) { return b.id === 'collector'; }));
+    }
+
+    return badges.filter(Boolean);
+  },
+
+  getAllBadges(userId, swapCount) {
+    var level = this.getLevelBadge(swapCount);
+    var specials = this.getSpecialBadges(userId);
+    return { level: level, specials: specials };
+  },
+
+  renderBadge(badge) {
+    return '<span class="user-badge" style="background:' + (badge.color || '#E6F7F8') + '20;color:' + (badge.color || '#09B1BA') + ';padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;">' + badge.emoji + ' ' + badge.name + '</span>';
+  },
+
+  // Streak check
+  getMonthlyStreak(userId) {
+    var swaps = window.DemoSwaps ? DemoSwaps.getForUser(userId) : [];
+    var now = new Date();
+    var thisMonth = swaps.filter(function(s) {
+      if (s.status !== 'completed' && s.status !== 'accepted') return false;
+      var d = new Date(s.completed_at || s.created_at);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+    return thisMonth.length;
+  }
+};
+
+window.BADGE_LEVELS = BADGE_LEVELS;
+window.SPECIAL_BADGES = SPECIAL_BADGES;
+window.DemoBadges = DemoBadges;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    EXPOSE TO GLOBAL SCOPE

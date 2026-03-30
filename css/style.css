@@ -694,6 +694,61 @@ input, select, textarea { font-family: var(--font); }
 .cta .btn-primary { background: white; color: var(--primary); }
 .cta .btn-primary:hover { background: #F5F5F5; }
 
+/* Early Adopter Banner */
+.early-adopter-section {
+  padding: 32px 0;
+  background: linear-gradient(135deg, #F0FBFC 0%, #E6F7F8 100%);
+}
+.early-adopter-card {
+  text-align: center;
+  padding: 32px 24px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.early-adopter-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+.early-adopter-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #171717;
+  margin: 0 0 8px;
+}
+.early-adopter-subtitle {
+  font-size: 15px;
+  color: #555;
+  margin: 0 0 20px;
+}
+.early-adopter-subtitle strong {
+  color: #09B1BA;
+}
+.early-adopter-progress {
+  margin-bottom: 20px;
+}
+.early-adopter-bar {
+  height: 10px;
+  background: #DDD;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.early-adopter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #09B1BA, #07D4DF);
+  border-radius: 5px;
+  transition: width 0.6s ease;
+}
+.early-adopter-count {
+  font-size: 13px;
+  color: #777;
+}
+.early-adopter-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  font-weight: 600;
+}
+
 /* ========================
    VIDEO PROMO BANNER
    ======================== */
@@ -1136,6 +1191,24 @@ input, select, textarea { font-family: var(--font); }
   }
   .cookie-banner-buttons { width: 100%; }
   .cookie-banner-buttons button { flex: 1; }
+}
+
+/* Suggestions carousel */
+.suggestions-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+.suggestions-scroll::-webkit-scrollbar { height: 4px; }
+.suggestions-scroll::-webkit-scrollbar-thumb { background: #09B1BA; border-radius: 2px; }
+.suggestions-scroll .product-card {
+  min-width: 200px;
+  max-width: 220px;
+  scroll-snap-align: start;
+  flex-shrink: 0;
 }
 
 /* Accessibility: respect reduced motion */

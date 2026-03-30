@@ -459,6 +459,11 @@
 
 	// ── Send message ──
 	function sendMsg() {
+		// Publish gate: user must have at least one active item before chatting
+		if (window.checkPublishGate && checkPublishGate()) {
+			showPublishGate();
+			return;
+		}
 		const input = document.getElementById('chatInput');
 		const txt = input.value.trim();
 		if (!txt || !activeConvId) return;

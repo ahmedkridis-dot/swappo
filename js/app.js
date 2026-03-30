@@ -274,3 +274,39 @@ function closeMobileMenu() {
   if (drawer) drawer.classList.remove('is-open');
   document.body.style.overflow = '';
 }
+
+// ─── PUBLISH GATE MODAL ─────────────────────────────────────────────────────
+function checkPublishGate() {
+  if (!window.DemoAuth || !DemoAuth.isLoggedIn()) return false;
+  var user = DemoAuth.getCurrentUser();
+  if (!user) return false;
+  if (!window.DemoItems || !DemoItems.hasActiveItems) return false;
+  return !DemoItems.hasActiveItems(user.id);
+}
+
+function showPublishGate() {
+  if (document.getElementById('publish-gate-modal')) return;
+
+  var overlay = document.createElement('div');
+  overlay.id = 'publish-gate-modal';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+  var pagesPrefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
+
+  overlay.innerHTML = '<div style="background:white;border-radius:16px;padding:36px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.15);">' +
+    '<div style="font-size:48px;margin-bottom:16px;">📦</div>' +
+    '<h3 style="font-size:20px;font-weight:700;color:#171717;margin:0 0 10px;">Publish your first item to unlock swaps!</h3>' +
+    '<p style="font-size:14px;color:#666;margin:0 0 24px;line-height:1.6;">Other swappers want to see what you have to offer. List at least one item to start exchanging.</p>' +
+    '<a href="' + pagesPrefix + 'publier.html" style="display:block;background:#09B1BA;color:white;padding:14px 24px;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;margin-bottom:12px;transition:background 0.2s;">Publish my first item</a>' +
+    '<button onclick="this.closest(\'#publish-gate-modal\').remove();" style="background:none;border:none;color:#999;font-size:13px;cursor:pointer;padding:8px;">Maybe later</button>' +
+  '</div>';
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  document.body.appendChild(overlay);
+}
+
+window.checkPublishGate = checkPublishGate;
+window.showPublishGate = showPublishGate;

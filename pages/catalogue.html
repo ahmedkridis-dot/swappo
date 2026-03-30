@@ -485,6 +485,7 @@
       if (catSelect) {
         catSelect.addEventListener('change', () => {
           currentFilters.category = catSelect.value;
+          if (window.DemoSuggestions) DemoSuggestions.trackBrowsedCategory(currentFilters.category);
           visibleCount = PAGE_SIZE;
           renderCatalogue();
           updateSubcategoryBar();
@@ -570,6 +571,7 @@
             'books & media': 'books', 'kids': 'kids', 'bags & accessories': 'bags_accessories'
           };
           currentFilters.category = catMap[text] || '';
+          if (window.DemoSuggestions) DemoSuggestions.trackBrowsedCategory(currentFilters.category);
           if (catSelect) catSelect.value = currentFilters.category;
           visibleCount = PAGE_SIZE;
           renderCatalogue();

@@ -158,6 +158,24 @@
     </div>
   </section>
 
+  <!-- ========== EARLY ADOPTER BANNER ========== -->
+  <section class="early-adopter-section" id="early-adopter-banner">
+    <div class="container">
+      <div class="early-adopter-card">
+        <div class="early-adopter-icon">🚀</div>
+        <h3 class="early-adopter-title" id="early-adopter-title">Join the first 500 Early Adopters</h3>
+        <p class="early-adopter-subtitle">Get <strong>Bronze plan FREE for 6 months</strong> + permanent Pioneer badge</p>
+        <div class="early-adopter-progress">
+          <div class="early-adopter-bar">
+            <div class="early-adopter-fill" id="early-adopter-fill" style="width: 6%;"></div>
+          </div>
+          <span class="early-adopter-count" id="early-adopter-count"><strong id="ea-remaining">470</strong> / 500 spots remaining</span>
+        </div>
+        <a href="pages/login.html" class="btn btn-primary early-adopter-btn">Claim your spot</a>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== POPULAR ITEMS ========== -->
   <section class="feed-section">
     <div class="container">
@@ -166,6 +184,19 @@
         <a href="pages/catalogue.html" class="section-link" data-i18n="see_all">See all →</a>
       </div>
       <div class="products-grid" id="popular-grid">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SUGGESTED FOR YOU ========== -->
+  <section class="feed-section suggestions-section" id="suggestions-section" style="display:none;">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">✨ Suggested swaps for you</h2>
+        <a href="pages/catalogue.html" class="section-link">See all →</a>
+      </div>
+      <div class="suggestions-scroll" id="suggestions-grid">
         <!-- Populated dynamically -->
       </div>
     </div>
@@ -425,6 +456,48 @@
     } else {
       homeInit();
     }
+
+    // Suggestions for logged-in users
+    (function() {
+      if (!window.DemoAuth || !DemoAuth.isLoggedIn()) return;
+      if (!window.DemoSuggestions) return;
+      var user = DemoAuth.getCurrentUser();
+      var suggestions = DemoSuggestions.getForUser(user.id, 6);
+      if (suggestions.length === 0) return;
+
+      var section = document.getElementById('suggestions-section');
+      var grid = document.getElementById('suggestions-grid');
+      if (!section || !grid) return;
+
+      section.style.display = 'block';
+      grid.innerHTML = suggestions.map(function(item) {
+        return DemoItems.renderCard(item);
+      }).join('');
+    })();
+
+    // Early Adopter counter
+    (function() {
+      if (!window.DemoEarlyAdopter) return;
+      var remaining = DemoEarlyAdopter.getRemaining();
+      var count = DemoEarlyAdopter.getCount();
+      var pct = Math.round((count / DemoEarlyAdopter.MAX_SPOTS) * 100);
+
+      var titleEl = document.getElementById('early-adopter-title');
+      var countEl = document.getElementById('ea-remaining');
+      var fillEl = document.getElementById('early-adopter-fill');
+      var banner = document.getElementById('early-adopter-banner');
+
+      if (countEl) countEl.textContent = remaining;
+      if (fillEl) fillEl.style.width = pct + '%';
+
+      if (remaining <= 0 && titleEl) {
+        titleEl.textContent = '500 Early Adopters have joined Swappo!';
+        var subtitle = banner.querySelector('.early-adopter-subtitle');
+        if (subtitle) subtitle.textContent = 'Join them and start swapping today.';
+        var btn = banner.querySelector('.early-adopter-btn');
+        if (btn) btn.textContent = 'Join Swappo';
+      }
+    })();
   </script>
 </body>
 </html>

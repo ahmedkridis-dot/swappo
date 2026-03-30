@@ -1271,6 +1271,16 @@
 
             document.getElementById('tier-badge').innerHTML = '<span>' + currentTier.emoji + ' ' + currentTier.label + '</span>';
 
+            // Pioneer badge
+            if (window.DemoEarlyAdopter && DemoEarlyAdopter.isPioneer(user.id)) {
+              var pioneerBadge = document.createElement('span');
+              pioneerBadge.className = 'tier-badge pioneer-badge';
+              pioneerBadge.innerHTML = '🚀 Pioneer';
+              pioneerBadge.style.cssText = 'background:#E6F7F8;color:#09B1BA;font-weight:600;margin-left:8px;';
+              var tierEl = document.getElementById('tier-badge');
+              if (tierEl && tierEl.parentNode) tierEl.parentNode.insertBefore(pioneerBadge, tierEl.nextSibling);
+            }
+
             if (nextTier) {
                 document.getElementById('tier-progress').innerHTML = swapCount + ' of ' + nextTier.min_swaps + ' swaps to <strong>' + nextTier.emoji + ' ' + nextTier.label + '</strong>';
                 const pct = Math.min(100, Math.round((swapCount / nextTier.min_swaps) * 100));
@@ -1286,6 +1296,48 @@
                 const earned = swapCount >= b.min_swaps;
                 return '<div class="badge-icon ' + (earned ? 'earned' : 'locked') + '" title="' + b.label + ' (' + b.min_swaps + ' swaps)">' + b.emoji + '</div>';
             }).join('');
+
+            // ── DemoBadges enhanced display ─────────────────────────────
+            if (window.DemoBadges) {
+              var badgeInfo = DemoBadges.getAllBadges(user.id, user.swap_count || 0);
+              var tierBadgeEl = document.getElementById('tier-badge');
+              if (tierBadgeEl) {
+                tierBadgeEl.innerHTML = badgeInfo.level.emoji + ' ' + badgeInfo.level.name;
+                tierBadgeEl.style.color = badgeInfo.level.color;
+              }
+
+              // Special badges row
+              if (badgesRow && badgeInfo.specials.length > 0) {
+                var specialsHTML = badgeInfo.specials.map(function(b) {
+                  return DemoBadges.renderBadge(b);
+                }).join(' ');
+                badgesRow.insertAdjacentHTML('afterend', '<div id="special-badges-row" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">' + specialsHTML + '</div>');
+              }
+
+              // Next level progress
+              var nextLevel = DemoBadges.getNextLevel(user.swap_count || 0);
+              var progressEl = document.getElementById('tier-progress');
+              if (progressEl && nextLevel) {
+                var current = user.swap_count || 0;
+                var prevMin = badgeInfo.level.min;
+                var pctBadge = Math.round(((current - prevMin) / (nextLevel.min - prevMin)) * 100);
+                progressEl.innerHTML = '<div style="font-size:12px;color:#777;margin-bottom:4px;">' + current + ' / ' + nextLevel.min + ' swaps to ' + nextLevel.emoji + ' ' + nextLevel.name + '</div>' +
+                  '<div style="height:6px;background:#EEE;border-radius:3px;overflow:hidden;"><div style="height:100%;width:' + pctBadge + '%;background:' + badgeInfo.level.color + ';border-radius:3px;transition:width 0.5s;"></div></div>';
+              }
+
+              // Monthly streak
+              var streakCount = DemoBadges.getMonthlyStreak(user.id);
+              if (streakCount >= 3) {
+                var streakHTML = '<div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13px;">';
+                streakHTML += '🔥 <strong>' + streakCount + ' swaps this month!</strong> ';
+                if (streakCount >= 5) streakHTML += '— Hot Swapper badge earned!';
+                else streakHTML += '— ' + (5 - streakCount) + ' more for Hot Swapper badge';
+                streakHTML += '</div>';
+                var specialRow = document.getElementById('special-badges-row');
+                if (specialRow) specialRow.insertAdjacentHTML('afterend', streakHTML);
+                else if (badgesRow) badgesRow.insertAdjacentHTML('afterend', streakHTML);
+              }
+            }
 
             // ── Stats ────────────────────────────────────────────────────
             const planInfo = DemoSubscription.getPlan(user.id);
