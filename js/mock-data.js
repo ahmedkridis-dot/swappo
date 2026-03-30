@@ -33,6 +33,12 @@ const KIDS_SUBCATEGORIES = {
 
 const KIDS_AGE_RANGES = ['0-6 months', '6-12 months', '1-2 years', '2-4 years', '4+ years'];
 
+const GAMING_SUBCATEGORIES = {
+  consoles_hardware: ['Consoles', 'Gaming PC/Laptop', 'Gaming Monitors', 'PC Components', 'Controllers', 'Gaming Headsets', 'Gaming Keyboards & Mice', 'Gaming Chairs'],
+  games: ['PS5/PS4 Games', 'Xbox Games', 'Nintendo Switch Games', 'PC Games', 'Retro/Collector Games'],
+  accessories: ['Mouse Pads XXL', 'Webcams & Microphones', 'LED/RGB Lighting', 'Stands & Charging Stations', 'Prepaid Cards (PSN/Xbox/Steam)', 'Gaming Figures & Merch']
+};
+
 // ─── MOCK USERS ─────────────────────────────────────────────────────────────
 const MOCK_USERS = [
   { id: 'user-1', name: 'Ahmed Al-Maktoum', email: 'ahmed@example.com', city: 'Dubai Marina', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 7, plan: 'silver', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#09B1BA', created_at: '2025-11-15', gender: 'male', pseudo: 'ahmed_dxb', avatar: 'cool' },
@@ -1207,6 +1213,188 @@ const MOCK_ITEMS = [
     views_count: 55
   },
 
+  // ── GAMING (6 items) ───────────────────────────────────────────────────────
+  {
+    id: 'item-game-1',
+    user_id: 'user-3',
+    category: 'gaming',
+    type: 'Console',
+    brand: 'Sony',
+    model: 'PlayStation 5 Slim',
+    condition: 'like_new',
+    year: 2025,
+    size: null,
+    color: 'White',
+    platform: 'PS5',
+    subcategory: 'Consoles',
+    photos: [
+      'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1622297845775-5ff3fef71d13?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1621259182978-fbf93132d53d?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1617096200347-cb04ae810b1d?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: true,
+    boost_expires_at: '2026-04-02T00:00:00',
+    status: 'active',
+    created_at: '2026-03-28',
+    lat: 25.2048, lng: 55.2708,
+    city: 'Downtown Dubai',
+    distance: 3.2,
+    favorites_count: 42,
+    views_count: 210
+  },
+  {
+    id: 'item-game-2',
+    user_id: 'user-1',
+    category: 'gaming',
+    type: 'Gaming Headset',
+    brand: 'SteelSeries',
+    model: 'Arctis Nova Pro',
+    condition: 'good',
+    year: 2025,
+    size: null,
+    color: 'Black',
+    platform: 'Multi',
+    subcategory: 'Gaming Headsets',
+    photos: [
+      'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-25',
+    lat: 25.0780, lng: 55.1340,
+    city: 'Dubai Marina',
+    distance: 1.1,
+    favorites_count: 18,
+    views_count: 89
+  },
+  {
+    id: 'item-game-3',
+    user_id: 'user-7',
+    category: 'gaming',
+    type: 'Gaming Keyboard',
+    brand: 'Razer',
+    model: 'Huntsman V3 Pro',
+    condition: 'like_new',
+    year: 2025,
+    size: null,
+    color: 'Black/RGB',
+    platform: 'PC',
+    subcategory: 'Gaming Keyboards & Mice',
+    photos: [
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1595225476474-87563907a212?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-26',
+    lat: 25.1972, lng: 55.2744,
+    city: 'Business Bay',
+    distance: 4.1,
+    favorites_count: 25,
+    views_count: 112
+  },
+  {
+    id: 'item-game-4',
+    user_id: 'user-5',
+    category: 'gaming',
+    type: 'Video Game',
+    brand: 'Nintendo',
+    model: 'Zelda: Tears of the Kingdom',
+    condition: 'like_new',
+    year: 2023,
+    size: null,
+    color: null,
+    platform: 'Switch',
+    subcategory: 'Nintendo Switch Games',
+    photos: [
+      'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: true,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-24',
+    lat: 24.4539, lng: 54.3773,
+    city: 'Abu Dhabi',
+    distance: 8.5,
+    favorites_count: 31,
+    views_count: 165
+  },
+  {
+    id: 'item-game-5',
+    user_id: 'user-2',
+    category: 'gaming',
+    type: 'Gaming Chair',
+    brand: 'Secretlab',
+    model: 'Titan Evo 2024',
+    condition: 'good',
+    year: 2024,
+    size: 'Regular',
+    color: 'Black/Teal',
+    platform: null,
+    subcategory: 'Gaming Chairs',
+    photos: [
+      'https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1589363460442-f9f8d9e1a6e3?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1616626625495-34c6a5e47424?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-27',
+    lat: 25.2285, lng: 55.2866,
+    city: 'DIFC',
+    distance: 5.3,
+    favorites_count: 14,
+    views_count: 76
+  },
+  {
+    id: 'item-game-6',
+    user_id: 'user-8',
+    category: 'gaming',
+    type: 'Graphics Card',
+    brand: 'NVIDIA',
+    model: 'GeForce RTX 4070 Super',
+    condition: 'like_new',
+    year: 2025,
+    size: null,
+    color: 'Black/Silver',
+    platform: 'PC',
+    subcategory: 'PC Components',
+    photos: [
+      'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1555618254-5e28676c9dc5?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1625225233840-695456021cde?w=400&h=530&fit=crop'
+    ],
+    is_giveaway: false,
+    is_boosted: false,
+    boost_expires_at: null,
+    status: 'active',
+    created_at: '2026-03-29',
+    lat: 25.0780, lng: 55.1340,
+    city: 'Dubai Marina',
+    distance: 1.5,
+    favorites_count: 37,
+    views_count: 198
+  },
+
   // ── OTHER (2 items) ─────────────────────────────────────────────────────
   {
     id: 'item-30',
@@ -1474,6 +1662,7 @@ window.CLOTHING_SUBCATEGORIES = CLOTHING_SUBCATEGORIES;
 window.BAGS_ACCESSORIES_SUBCATEGORIES = BAGS_ACCESSORIES_SUBCATEGORIES;
 window.KIDS_SUBCATEGORIES = KIDS_SUBCATEGORIES;
 window.KIDS_AGE_RANGES = KIDS_AGE_RANGES;
+window.GAMING_SUBCATEGORIES = GAMING_SUBCATEGORIES;
 
 // Helper functions
 window.getMockUserById = getMockUserById;

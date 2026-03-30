@@ -239,6 +239,7 @@
         <a href="catalogue.html" class="cat-link active">All</a>
         <a href="catalogue.html" class="cat-link">Clothing</a>
         <a href="catalogue.html" class="cat-link">Electronics</a>
+        <a href="catalogue.html?category=gaming" class="cat-link" data-i18n="gaming">Gaming & Consoles</a>
         <a href="catalogue.html" class="cat-link">Furniture</a>
         <a href="catalogue.html" class="cat-link">Vehicles</a>
         <a href="catalogue.html" class="cat-link">Sports</a>
@@ -270,6 +271,7 @@
         <option value="electronics">Electronics & Phones</option>
         <option value="vehicles">Vehicles</option>
         <option value="bags_accessories">Bags & Accessories</option>
+        <option value="gaming">Gaming & Consoles</option>
         <option value="other">Other</option>
       </select>
 
@@ -421,7 +423,8 @@
           const catMap = {
             'all': '', 'clothing': 'clothing', 'electronics': 'electronics',
             'furniture': 'furniture', 'vehicles': 'vehicles', 'sports': 'sports',
-            'books & media': 'books', 'kids': 'kids', 'bags & accessories': 'bags_accessories'
+            'books & media': 'books', 'kids': 'kids', 'bags & accessories': 'bags_accessories',
+            'gaming & consoles': 'gaming'
           };
           if (catMap[text] === preCategory) link.classList.add('active');
         });
@@ -568,7 +571,8 @@
           const catMap = {
             'all': '', 'clothing': 'clothing', 'electronics': 'electronics',
             'furniture': 'furniture', 'vehicles': 'vehicles', 'sports': 'sports',
-            'books & media': 'books', 'kids': 'kids', 'bags & accessories': 'bags_accessories'
+            'books & media': 'books', 'kids': 'kids', 'bags & accessories': 'bags_accessories',
+            'gaming & consoles': 'gaming'
           };
           currentFilters.category = catMap[text] || '';
           if (window.DemoSuggestions) DemoSuggestions.trackBrowsedCategory(currentFilters.category);
@@ -668,6 +672,27 @@
               renderCatalogue();
             });
           });
+        } else if (cat === 'gaming' && window.GAMING_SUBCATEGORIES) {
+          bar.style.display = 'block';
+          zoneFilter.style.display = 'flex';
+          zoneFilter.innerHTML = '<button class="zone-btn" data-zone="consoles_hardware"><i class="fas fa-gamepad"></i> Hardware</button>' +
+            '<button class="zone-btn" data-zone="games"><i class="fas fa-compact-disc"></i> Games</button>' +
+            '<button class="zone-btn" data-zone="accessories"><i class="fas fa-headset"></i> Accessories</button>';
+          zoneFilter.querySelectorAll('.zone-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              if (btn.classList.contains('active')) {
+                btn.classList.remove('active');
+                currentSubFilters.zone = null;
+                subChips.style.display = 'none';
+              } else {
+                zoneFilter.querySelectorAll('.zone-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentSubFilters.zone = btn.dataset.zone;
+                showGamingSubcategories(btn.dataset.zone);
+              }
+              renderCatalogue();
+            });
+          });
         }
       }
 
@@ -720,6 +745,29 @@
       function showBagsSubcategories(zone) {
         var subChips = document.getElementById('subcategory-chips');
         var subs = (window.BAGS_ACCESSORIES_SUBCATEGORIES || {})[zone] || [];
+        if (subs.length === 0) { subChips.style.display = 'none'; return; }
+        subChips.style.display = 'flex';
+        subChips.innerHTML = subs.map(function(s) {
+          return '<button class="sub-chip" data-sub="' + s + '">' + s + '</button>';
+        }).join('');
+        subChips.querySelectorAll('.sub-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            if (chip.classList.contains('active')) {
+              chip.classList.remove('active');
+              currentSubFilters.subcategory = null;
+            } else {
+              subChips.querySelectorAll('.sub-chip').forEach(function(c) { c.classList.remove('active'); });
+              chip.classList.add('active');
+              currentSubFilters.subcategory = chip.dataset.sub;
+            }
+            renderCatalogue();
+          });
+        });
+      }
+
+      function showGamingSubcategories(zone) {
+        var subChips = document.getElementById('subcategory-chips');
+        var subs = (window.GAMING_SUBCATEGORIES || {})[zone] || [];
         if (subs.length === 0) { subChips.style.display = 'none'; return; }
         subChips.style.display = 'flex';
         subChips.innerHTML = subs.map(function(s) {

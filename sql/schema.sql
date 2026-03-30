@@ -40,7 +40,7 @@ CREATE TABLE public.items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   -- Structured fields (NO free text)
-  category TEXT NOT NULL CHECK (category IN ('clothing','books','kids','sports','furniture','electronics','vehicles','plants','bags_accessories','other')),
+  category TEXT NOT NULL CHECK (category IN ('clothing','books','kids','sports','furniture','electronics','vehicles','plants','bags_accessories','gaming','other')),
   type TEXT NOT NULL,           -- e.g. "T-Shirt", "Sofa", "iPhone"
   brand TEXT,                   -- optional brand
   model TEXT,                   -- optional model
@@ -351,6 +351,7 @@ BEGIN
     WHEN 'other'       THEN 12
     WHEN 'furniture'   THEN 15
     WHEN 'electronics' THEN 20
+    WHEN 'gaming'      THEN 15
     WHEN 'vehicles'    THEN 40
     ELSE 12
   END;

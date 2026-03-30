@@ -637,6 +637,10 @@
                 <div class="category-btn-icon"><i class="fas fa-shopping-bag"></i></div>
                 <div class="category-btn-label" data-i18n="bags_accessories">Bags & Accessories</div>
               </button>
+              <button type="button" class="category-btn" data-category="gaming" onclick="selectCategory(this, 'gaming')">
+                <div class="category-btn-icon"><i class="fas fa-gamepad"></i></div>
+                <div class="category-btn-label" data-i18n="gaming">Gaming & Consoles</div>
+              </button>
               <button type="button" class="category-btn" data-category="other" onclick="selectCategory(this, 'other')">
                 <div class="category-btn-icon">&#x1F4E6;</div>
                 <div class="category-btn-label">Other</div>
@@ -902,6 +906,15 @@
         condition: { label: 'Condition', type: 'select', options: ['New with tags', 'Like new', 'Good', 'Fair'], required: true },
         color: { label: 'Color', type: 'text', placeholder: 'e.g. Brown, Black' }
       },
+      gaming: {
+        zone: { label: 'Zone', type: 'select', options: ['Consoles & Hardware', 'Games', 'Accessories'], required: true },
+        subcategory: { label: 'Subcategory', type: 'select', options: [], required: true },
+        platform: { label: 'Platform', type: 'select', options: ['PlayStation', 'Xbox', 'Nintendo', 'PC', 'Multi-platform'] },
+        brand: { label: 'Brand', type: 'text', placeholder: 'e.g. Sony, Razer, Logitech' },
+        condition: { label: 'Condition', type: 'select', options: ['New sealed', 'Like new', 'Good', 'Fair'], required: true },
+        year: { label: 'Year', type: 'select', options: ['2026', '2025', '2024', '2023', '2022', '2021', '2020', 'Before 2020'] },
+        color: { label: 'Color', type: 'text', placeholder: 'e.g. Black, White, RGB' }
+      },
       plants: {
         type: { label: 'Type', type: 'select', options: ['Indoor Plant', 'Outdoor Plant', 'Succulent', 'Cactus', 'Herb', 'Flower', 'Tree', 'Seed/Bulb'] },
         brand: { label: 'Variety/Name', type: 'text', placeholder: 'e.g. Monstera, Snake Plant' },
@@ -925,6 +938,7 @@
       books: 'Books & Media',
       kids: 'Kids & Baby',
       bags_accessories: 'Bags & Accessories',
+      gaming: 'Gaming & Consoles',
       plants: 'Plants',
       other: 'Other'
     };
@@ -939,6 +953,7 @@
       books:       ['https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=300&h=400&fit=crop'],
       kids:        ['https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1566004100477-7b3d6be5f4f2?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1472162072942-cd5147eb3902?w=300&h=400&fit=crop'],
       bags_accessories: ['https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=400&fit=crop'],
+      gaming:          ['https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=300&h=400&fit=crop'],
       plants:      ['https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1501004318855-cd2e69e37b83?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=300&h=400&fit=crop'],
       other:       ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=400&fit=crop']
     };
@@ -1103,6 +1118,19 @@
           if (!subSelect || !window.BAGS_ACCESSORIES_SUBCATEGORIES) return;
           var zoneKey = zoneSelect.value.toLowerCase();
           var subs = BAGS_ACCESSORIES_SUBCATEGORIES[zoneKey] || [];
+          subSelect.innerHTML = '<option value="">Select subcategory</option>' + subs.map(function(s) {
+            return '<option value="' + s + '">' + s + '</option>';
+          }).join('');
+        });
+      }
+
+      if (zoneSelect && formState.category === 'gaming') {
+        zoneSelect.addEventListener('change', function() {
+          var subSelect = document.querySelector('#detailsContainer select[data-field="subcategory"]');
+          if (!subSelect || !window.GAMING_SUBCATEGORIES) return;
+          var zoneMap = { 'Consoles & Hardware': 'consoles_hardware', 'Games': 'games', 'Accessories': 'accessories' };
+          var zoneKey = zoneMap[zoneSelect.value] || 'consoles_hardware';
+          var subs = GAMING_SUBCATEGORIES[zoneKey] || [];
           subSelect.innerHTML = '<option value="">Select subcategory</option>' + subs.map(function(s) {
             return '<option value="' + s + '">' + s + '</option>';
           }).join('');

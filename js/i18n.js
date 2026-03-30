@@ -98,6 +98,13 @@ const translations = {
     subcat_kids_books: "Kids Books",
     age_range: "Age Range",
 
+    // Gaming & Consoles
+    gaming: "Gaming & Consoles",
+    zone_consoles: "Consoles & Hardware",
+    zone_games: "Games",
+    zone_gaming_acc: "Gaming Accessories",
+    platform_filter: "Platform",
+
     // Homepage
     hero_title: "Someone needs what you have.\nSwap it.",
     hero_subtitle: "The UAE's first barter platform. Trade items with your community. Start free.",
@@ -400,6 +407,13 @@ const translations = {
     subcat_feeding: "Alimentation & Biberons",
     subcat_kids_books: "Livres enfants",
     age_range: "Tranche d'âge",
+
+    // Gaming & Consoles
+    gaming: "Gaming & Consoles",
+    zone_consoles: "Consoles & Matériel",
+    zone_games: "Jeux",
+    zone_gaming_acc: "Accessoires Gaming",
+    platform_filter: "Plateforme",
 
     // Homepage
     hero_title: "Quelqu'un a besoin de ce que vous avez.\nÉchangez-le.",
@@ -704,6 +718,13 @@ const translations = {
     subcat_kids_books: "كتب أطفال",
     age_range: "الفئة العمرية",
 
+    // Gaming & Consoles
+    gaming: "ألعاب وأجهزة",
+    zone_consoles: "أجهزة ومعدات",
+    zone_games: "ألعاب",
+    zone_gaming_acc: "إكسسوارات الألعاب",
+    platform_filter: "المنصة",
+
     // Homepage
     hero_title: "شخص ما يحتاج ما لديك.\nبادله.",
     hero_subtitle: "أول منصة مقايضة في الإمارات. تبادل مع مجتمعك. ابدأ مجاناً.",
@@ -1006,6 +1027,13 @@ const translations = {
     subcat_feeding: "فیڈنگ اور بوتلیں",
     subcat_kids_books: "بچوں کی کتابیں",
     age_range: "عمر کی حد",
+
+    // Gaming & Consoles
+    gaming: "گیمنگ اور کنسولز",
+    zone_consoles: "کنسولز اور ہارڈویئر",
+    zone_games: "گیمز",
+    zone_gaming_acc: "گیمنگ لوازمات",
+    platform_filter: "پلیٹ فارم",
 
     // Homepage
     hero_title: "کسی کو آپ کی چیز کی ضرورت ہے۔\nاسے تبدیل کریں۔",
