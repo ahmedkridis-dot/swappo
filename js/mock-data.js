@@ -41,14 +41,14 @@ const GAMING_SUBCATEGORIES = {
 
 // ─── MOCK USERS ─────────────────────────────────────────────────────────────
 const MOCK_USERS = [
-  { id: 'user-1', name: 'Ahmed Al-Maktoum', email: 'ahmed@example.com', city: 'Dubai Marina', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 7, plan: 'silver', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#09B1BA', created_at: '2025-11-15', gender: 'male', pseudo: 'ahmed_dxb', avatar: 'cool' },
-  { id: 'user-2', name: 'Fatima Al-Hashimi', email: 'fatima@example.com', city: 'JBR', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 3, plan: 'bronze', swaps_used: 2, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#FF4B55', created_at: '2026-01-20', gender: 'female', pseudo: 'fatima_h', avatar: 'hijabi' },
-  { id: 'user-3', name: 'John Mitchell', email: 'john@example.com', city: 'Business Bay', badge_tier: 'pro', badge_emoji: '\u{1F48E}', swap_count: 18, plan: 'premium', swaps_used: 5, claims_used: 2, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#FF8C00', created_at: '2025-08-01', gender: 'male', pseudo: 'john_m', avatar: 'techie' },
-  { id: 'user-4', name: 'Maria Santos', email: 'maria@example.com', city: 'Downtown Dubai', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 2, plan: 'free', swaps_used: 1, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#8B5CF6', created_at: '2026-02-10', gender: 'female', pseudo: 'maria_s', avatar: 'sunny' },
-  { id: 'user-5', name: 'Omar Khalid', email: 'omar@example.com', city: 'Sharjah', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 9, plan: 'bronze', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#059669', created_at: '2025-09-05', gender: 'male', pseudo: 'omar_k', avatar: 'sporty' },
-  { id: 'user-6', name: 'Sarah Connor', email: 'sarah@example.com', city: 'Abu Dhabi', badge_tier: 'newcomer', badge_emoji: '\u{1F331}', swap_count: 0, plan: 'free', swaps_used: 0, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#EC4899', created_at: '2026-03-20', gender: 'female', pseudo: 'sarah_c', avatar: 'athlete' },
-  { id: 'user-7', name: 'Raj Patel', email: 'raj@example.com', city: 'Al Barsha', badge_tier: 'elite', badge_emoji: '\u{1F3C6}', swap_count: 35, plan: 'premium', swaps_used: 8, claims_used: 3, boosts_used: 2, billing_start: '2026-03-01', avatar_color: '#F59E0B', created_at: '2025-06-01', gender: 'male', pseudo: 'raj_pro', avatar: 'royal' },
-  { id: 'user-8', name: 'Layla Nouri', email: 'layla@example.com', city: 'JLT', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 4, plan: 'silver', swaps_used: 2, claims_used: 0, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#6366F1', created_at: '2026-01-05', gender: 'female', pseudo: 'layla_n', avatar: 'chic' }
+  { id: 'user-1', name: 'Ahmed Al-Maktoum', email: 'ahmed@example.com', city: 'Dubai Marina', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 7, plan: 'silver', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#09B1BA', created_at: '2025-11-15', pseudo: 'ahmed_dxb', avatar: 'cool' },
+  { id: 'user-2', name: 'Fatima Al-Hashimi', email: 'fatima@example.com', city: 'JBR', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 3, plan: 'bronze', swaps_used: 2, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#FF4B55', created_at: '2026-01-20', pseudo: 'fatima_h', avatar: 'hijabi' },
+  { id: 'user-3', name: 'John Mitchell', email: 'john@example.com', city: 'Business Bay', badge_tier: 'pro', badge_emoji: '\u{1F48E}', swap_count: 18, plan: 'premium', swaps_used: 5, claims_used: 2, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#FF8C00', created_at: '2025-08-01', pseudo: 'john_m', avatar: 'techie' },
+  { id: 'user-4', name: 'Maria Santos', email: 'maria@example.com', city: 'Downtown Dubai', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 2, plan: 'free', swaps_used: 1, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#8B5CF6', created_at: '2026-02-10', pseudo: 'maria_s', avatar: 'sunny' },
+  { id: 'user-5', name: 'Omar Khalid', email: 'omar@example.com', city: 'Sharjah', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 9, plan: 'bronze', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#059669', created_at: '2025-09-05', pseudo: 'omar_k', avatar: 'sporty' },
+  { id: 'user-6', name: 'Sarah Connor', email: 'sarah@example.com', city: 'Abu Dhabi', badge_tier: 'newcomer', badge_emoji: '\u{1F331}', swap_count: 0, plan: 'free', swaps_used: 0, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#EC4899', created_at: '2026-03-20', pseudo: 'sarah_c', avatar: 'athlete' },
+  { id: 'user-7', name: 'Raj Patel', email: 'raj@example.com', city: 'Al Barsha', badge_tier: 'elite', badge_emoji: '\u{1F3C6}', swap_count: 35, plan: 'premium', swaps_used: 8, claims_used: 3, boosts_used: 2, billing_start: '2026-03-01', avatar_color: '#F59E0B', created_at: '2025-06-01', pseudo: 'raj_pro', avatar: 'royal' },
+  { id: 'user-8', name: 'Layla Nouri', email: 'layla@example.com', city: 'JLT', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 4, plan: 'silver', swaps_used: 2, claims_used: 0, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#6366F1', created_at: '2026-01-05', pseudo: 'layla_n', avatar: 'chic' }
 ];
 
 // ─── DEMO USER ──────────────────────────────────────────────────────────────
@@ -68,7 +68,6 @@ const DEMO_USER = {
   billing_start: '2026-03-01',
   avatar_color: '#09B1BA',
   created_at: '2026-03-01',
-  gender: 'male',
   pseudo: 'demo_swapper',
   avatar: 'happy'
 };

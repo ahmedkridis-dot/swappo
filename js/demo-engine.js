@@ -115,7 +115,7 @@ const DemoAuth = {
       boosts_used: 0,
       billing_start: new Date().toISOString().slice(0, 10),
       avatar_color: avatarColors[Math.floor(Math.random() * avatarColors.length)],
-      gender: extras.gender || 'other',
+      gender: extras.gender || '',
       pseudo: extras.pseudo || name.split(' ')[0].toLowerCase(),
       avatar: extras.avatar || 'happy',
       phone: extras.phone || '',

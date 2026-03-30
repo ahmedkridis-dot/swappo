@@ -4,7 +4,7 @@
  * Cache-first for assets, Network-first for HTML and API calls
  */
 
-const CACHE_NAME = 'swappo-v3';
+const CACHE_NAME = 'swappo-v4';
 const ASSET_CACHE = 'swappo-assets-v3';
 const API_CACHE = 'swappo-api-v3';
 

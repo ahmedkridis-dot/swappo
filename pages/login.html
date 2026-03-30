@@ -25,7 +25,7 @@
       border-radius: 8px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
       width: 100%;
-      max-width: 420px;
+      max-width: 560px;
       padding: 32px;
     }
 
@@ -50,23 +50,12 @@
       transition: color 0.2s;
     }
 
-    .auth-tab:hover {
-      color: #171717;
-    }
-
-    .auth-tab.active {
-      color: #09B1BA;
-      border-bottom-color: #09B1BA;
-    }
+    .auth-tab:hover { color: #171717; }
+    .auth-tab.active { color: #09B1BA; border-bottom-color: #09B1BA; }
 
     /* Tab content */
-    .auth-tab-content {
-      display: none;
-    }
-
-    .auth-tab-content.active {
-      display: block;
-    }
+    .auth-tab-content { display: none; }
+    .auth-tab-content.active { display: block; }
 
     /* Form */
     .auth-form {
@@ -75,9 +64,7 @@
       gap: 14px;
     }
 
-    .auth-form .form-group {
-      margin-bottom: 0;
-    }
+    .auth-form .form-group { margin-bottom: 0; }
 
     .auth-form .form-label {
       font-size: 0.85rem;
@@ -100,9 +87,17 @@
       box-sizing: border-box;
     }
 
-    .auth-form .form-input:focus {
-      outline: none;
-      border-color: #09B1BA;
+    .auth-form .form-input:focus { outline: none; border-color: #09B1BA; }
+
+    /* 2-column layout on desktop */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .form-row { grid-template-columns: 1fr; }
     }
 
     /* Checkbox */
@@ -116,288 +111,159 @@
     }
 
     .auth-checkbox input {
-      width: 18px;
-      height: 18px;
-      min-width: 18px;
-      margin-top: 2px;
-      cursor: pointer;
-      accent-color: #09B1BA;
+      width: 18px; height: 18px; min-width: 18px;
+      margin-top: 2px; cursor: pointer; accent-color: #09B1BA;
     }
 
-    .auth-checkbox label {
-      cursor: pointer;
-      line-height: 1.5;
-    }
-
-    .auth-checkbox a {
-      color: #09B1BA;
-      text-decoration: none;
-    }
-
-    .auth-checkbox a:hover {
-      text-decoration: underline;
-    }
+    .auth-checkbox label { cursor: pointer; line-height: 1.5; }
+    .auth-checkbox a { color: #09B1BA; text-decoration: none; }
+    .auth-checkbox a:hover { text-decoration: underline; }
 
     /* Primary button */
     .auth-btn {
-      width: 100%;
-      height: 44px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
+      width: 100%; height: 44px; font-size: 0.95rem; font-weight: 600;
+      border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s;
     }
-
-    .auth-btn-primary {
-      background: #09B1BA;
-      color: #fff;
-    }
-
-    .auth-btn-primary:hover {
-      background: #078A91;
-    }
+    .auth-btn-primary { background: #09B1BA; color: #fff; }
+    .auth-btn-primary:hover { background: #078A91; }
 
     /* Divider */
     .auth-divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 20px 0;
-      color: #999;
-      font-size: 0.82rem;
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; color: #999; font-size: 0.82rem;
     }
-
-    .auth-divider::before,
-    .auth-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #EBEBEB;
+    .auth-divider::before, .auth-divider::after {
+      content: ''; flex: 1; height: 1px; background: #EBEBEB;
     }
 
     /* Social buttons */
-    .auth-social {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .auth-social { display: flex; flex-direction: column; gap: 10px; }
 
     .auth-social-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      height: 44px;
-      border: 1px solid #EBEBEB;
-      border-radius: 8px;
-      background: #fff;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #171717;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      height: 44px; border: 1px solid #EBEBEB; border-radius: 8px;
+      background: #fff; font-size: 0.9rem; font-weight: 500; color: #171717;
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
     }
-
-    .auth-social-btn:hover {
-      border-color: #09B1BA;
-      background: #F0FBFC;
-    }
-
-    .auth-social-btn i {
-      font-size: 1rem;
-    }
+    .auth-social-btn:hover { border-color: #09B1BA; background: #F0FBFC; }
+    .auth-social-btn i { font-size: 1rem; }
 
     /* Footer link */
     .auth-footer-link {
-      text-align: center;
-      font-size: 0.85rem;
-      color: #555;
-      margin-top: 20px;
+      text-align: center; font-size: 0.85rem; color: #555; margin-top: 20px;
     }
-
-    .auth-footer-link a {
-      color: #09B1BA;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .auth-footer-link a:hover {
-      text-decoration: underline;
-    }
+    .auth-footer-link a { color: #09B1BA; font-weight: 600; text-decoration: none; }
+    .auth-footer-link a:hover { text-decoration: underline; }
 
     /* Forgot password */
-    .auth-forgot {
-      text-align: right;
-      margin-top: -4px;
-    }
-
-    .auth-forgot a {
-      font-size: 0.82rem;
-      color: #09B1BA;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .auth-forgot a:hover {
-      text-decoration: underline;
-    }
-
-    /* Demo hint */
-    .demo-hint {
-      background: #F0FBFC;
-      border: 1px solid #D0ECEE;
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
-      font-size: 0.84rem;
-      color: #333;
-      line-height: 1.6;
-    }
-
-    .demo-hint strong {
-      color: #09B1BA;
-    }
-
-    .demo-hint code {
-      background: #E6F7F8;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 0.82rem;
-    }
-
-    /* Gender buttons */
-    .gender-buttons {
-      display: flex;
-      gap: 8px;
-    }
-    .gender-btn {
-      flex: 1;
-      text-align: center;
-      padding: 10px 8px;
-      border: 2px solid var(--border, #EBEBEB);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-    .gender-btn input[type="radio"] { display: none; }
-    .gender-btn:hover { border-color: #09B1BA; }
-    .gender-btn.selected {
-      border-color: #09B1BA;
-      background: #E6F7F8;
-      color: #09B1BA;
-      font-weight: 600;
-    }
+    .auth-forgot { text-align: right; margin-top: -4px; }
+    .auth-forgot a { font-size: 0.82rem; color: #09B1BA; text-decoration: none; font-weight: 500; }
+    .auth-forgot a:hover { text-decoration: underline; }
 
     /* Pseudo feedback */
     .pseudo-feedback {
-      font-size: 12px;
-      margin-top: 4px;
-      display: block;
-      min-height: 16px;
+      font-size: 12px; margin-top: 4px; display: block; min-height: 16px;
     }
     .pseudo-feedback.available { color: #22C55E; }
     .pseudo-feedback.taken { color: #EF4444; }
     .pseudo-feedback.invalid { color: #F59E0B; }
 
-    /* Avatar gallery */
-    .avatar-gallery {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      max-height: 220px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid #EBEBEB;
-      border-radius: 8px;
-      background: #FAFAFA;
+    /* Avatar picker button */
+    .avatar-picker-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px; border: 2px dashed #EBEBEB; border-radius: 12px;
+      background: #FAFAFA; cursor: pointer; transition: all 0.2s;
+      width: 100%;
+    }
+    .avatar-picker-btn:hover { border-color: #09B1BA; background: #F0FBFC; }
+    .avatar-picker-btn.has-avatar { border-style: solid; border-color: #09B1BA; background: #E6F7F8; }
+    .avatar-picker-btn svg { width: 48px; height: 48px; flex-shrink: 0; }
+    .avatar-picker-placeholder {
+      width: 48px; height: 48px; border-radius: 50%; background: #EBEBEB;
+      display: flex; align-items: center; justify-content: center;
+      color: #999; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .avatar-picker-text { font-size: 0.88rem; color: #555; font-weight: 500; }
+    .avatar-picker-btn.has-avatar .avatar-picker-text { color: #09B1BA; }
+
+    /* Avatar Modal */
+    .avatar-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 10000; display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .avatar-modal-overlay.active { display: flex; }
+    .avatar-modal {
+      background: #fff; border-radius: 16px; width: 100%; max-width: 520px;
+      max-height: 80vh; display: flex; flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .avatar-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid #EBEBEB;
+    }
+    .avatar-modal-header h3 { font-size: 1.1rem; font-weight: 700; color: #171717; margin: 0; }
+    .avatar-modal-close {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: #F5F5F5; cursor: pointer; font-size: 1.1rem; color: #555;
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .avatar-modal-close:hover { background: #EBEBEB; }
+    .avatar-modal-body {
+      padding: 20px 24px; overflow-y: auto; flex: 1;
+    }
+    .avatar-pair-row {
+      display: flex; gap: 12px; justify-content: center; margin-bottom: 12px;
     }
     .avatar-option {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      padding: 6px 4px;
-      border-radius: 12px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: none;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 6px; border-radius: 12px; border: 2px solid transparent;
+      cursor: pointer; transition: all 0.2s; background: none; width: 90px;
     }
     .avatar-option:hover { border-color: #09B1BA; background: #F0FBFC; }
     .avatar-option.selected {
-      border-color: #09B1BA;
-      background: #E6F7F8;
+      border-color: #09B1BA; background: #E6F7F8;
       box-shadow: 0 0 0 2px rgba(9, 177, 186, 0.2);
     }
-    .avatar-option svg { width: 52px; height: 52px; }
+    .avatar-option svg { width: 56px; height: 56px; }
     .avatar-option .avatar-name {
-      font-size: 10px;
-      color: #777;
-      font-weight: 500;
-      line-height: 1;
+      font-size: 10px; color: #777; font-weight: 500; line-height: 1.2; text-align: center;
     }
     .avatar-option.selected .avatar-name { color: #09B1BA; font-weight: 600; }
+    .avatar-modal-footer {
+      padding: 16px 24px; border-top: 1px solid #EBEBEB;
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .avatar-modal-footer button {
+      padding: 10px 24px; border-radius: 8px; font-size: 0.9rem;
+      font-weight: 600; cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .avatar-modal-cancel { background: #F5F5F5; color: #555; }
+    .avatar-modal-cancel:hover { background: #EBEBEB; }
+    .avatar-modal-confirm { background: #09B1BA; color: #fff; }
+    .avatar-modal-confirm:hover { background: #078A91; }
 
     /* Phone verification */
-    .phone-input-group {
-      display: flex;
-      gap: 0;
-      align-items: stretch;
-    }
+    .phone-input-group { display: flex; gap: 0; align-items: stretch; }
     .phone-prefix {
-      background: #F7F7F7;
-      border: 1px solid #EBEBEB;
-      border-right: none;
-      border-radius: 8px 0 0 8px;
-      padding: 0 14px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #333;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
+      background: #F7F7F7; border: 1px solid #EBEBEB; border-right: none;
+      border-radius: 8px 0 0 8px; padding: 0 14px; font-weight: 600;
+      font-size: 0.9rem; color: #333; white-space: nowrap;
+      display: flex; align-items: center;
     }
-    .phone-input-group .form-input {
-      border-radius: 0 8px 8px 0;
-      flex: 1;
-    }
-    .phone-input-group input { flex: 1; }
-    .verification-step {
-      display: none;
-      margin-top: 12px;
-    }
+    .phone-input-group .form-input { border-radius: 0 8px 8px 0; flex: 1; }
+    .verification-step { display: none; margin-top: 12px; }
     .verification-step.active { display: block; }
-    .code-input {
-      letter-spacing: 8px;
-      font-size: 20px;
-      text-align: center;
-      font-weight: 700;
-    }
+    .code-input { letter-spacing: 8px; font-size: 20px; text-align: center; font-weight: 700; }
     .resend-link {
-      font-size: 12px;
-      color: #09B1BA;
-      cursor: pointer;
-      margin-top: 8px;
-      display: inline-block;
+      font-size: 12px; color: #09B1BA; cursor: pointer; margin-top: 8px; display: inline-block;
     }
     .resend-link.disabled { color: #999; pointer-events: none; }
 
     /* Responsive */
     @media (max-width: 480px) {
-      .auth-page {
-        padding: 24px 12px;
-      }
-
-      .auth-card {
-        padding: 24px 20px;
-      }
+      .auth-page { padding: 24px 12px; }
+      .auth-card { padding: 24px 20px; }
     }
   </style>
 </head>
@@ -428,111 +294,94 @@
   <div class="auth-page">
     <div class="auth-card">
 
-      <!-- Demo hint -->
-      <div class="demo-hint">
-        <strong>Demo Account:</strong><br>
-        Email: <code>demo@swappo.ae</code> &middot; Password: <code>demo123</code>
-      </div>
-
       <!-- Tab Switcher -->
       <div class="auth-tabs">
-        <button class="auth-tab active" onclick="switchTab('signup', this)">Sign Up</button>
-        <button class="auth-tab" onclick="switchTab('login', this)">Log In</button>
+        <button class="auth-tab active" onclick="switchTab('signup', this)" data-i18n="auth_signup">Sign Up</button>
+        <button class="auth-tab" onclick="switchTab('login', this)" data-i18n="auth_login">Log In</button>
       </div>
 
       <!-- ========== SIGN UP TAB ========== -->
       <div id="signup" class="auth-tab-content active">
         <form class="auth-form" onsubmit="handleSignup(event)">
-          <div class="form-group">
-            <label class="form-label" for="signup-name">Full Name</label>
-            <input class="form-input" type="text" id="signup-name" name="name" placeholder="Ahmed Mohammed" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Gender</label>
-            <div class="gender-buttons" id="gender-buttons">
-              <label class="gender-btn">
-                <input type="radio" name="signup-gender" value="male"> <span>Male</span>
-              </label>
-              <label class="gender-btn">
-                <input type="radio" name="signup-gender" value="female"> <span>Female</span>
-              </label>
-              <label class="gender-btn">
-                <input type="radio" name="signup-gender" value="other"> <span>Prefer not to say</span>
-              </label>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="signup-name" data-i18n="auth_full_name">Full Name</label>
+              <input class="form-input" type="text" id="signup-name" name="name" data-i18n-placeholder="auth_name_placeholder" placeholder="Ahmed Mohammed" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="signup-pseudo" data-i18n="auth_username">Username</label>
+              <input class="form-input" type="text" id="signup-pseudo" data-i18n-placeholder="auth_username_placeholder" placeholder="Letters, numbers & underscores (3-20)" pattern="^[a-zA-Z0-9_]{3,20}$" required>
+              <span class="pseudo-feedback" id="pseudo-feedback"></span>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="signup-pseudo">Username</label>
-            <input class="form-input" type="text" id="signup-pseudo" placeholder="Letters, numbers & underscores (3-20)" pattern="^[a-zA-Z0-9_]{3,20}$" required>
-            <span class="pseudo-feedback" id="pseudo-feedback"></span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Choose your avatar</label>
-            <div class="avatar-gallery" id="avatar-gallery">
-              <!-- Populated dynamically based on gender selection -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="signup-email" data-i18n="auth_email">Email Address</label>
+              <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
             </div>
-            <input type="hidden" id="signup-avatar" value="">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="signup-email">Email Address</label>
-            <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="signup-phone">Phone Number</label>
-            <div class="phone-input-group">
-              <span class="phone-prefix">+971</span>
-              <input class="form-input" type="tel" id="signup-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
-            </div>
-            <div class="verification-step" id="phone-verify-step">
-              <input class="form-input code-input" type="text" id="phone-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$">
-              <div>
-                <button type="button" class="resend-link" id="resend-code" onclick="resendCode()" data-i18n="resend_code">Resend code</button>
-                <span id="resend-timer"></span>
+            <div class="form-group">
+              <label class="form-label" for="signup-phone" data-i18n="auth_phone">Phone Number</label>
+              <div class="phone-input-group">
+                <span class="phone-prefix">+971</span>
+                <input class="form-input" type="tel" id="signup-phone" data-i18n-placeholder="auth_phone_placeholder" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
+              </div>
+              <div class="verification-step" id="phone-verify-step">
+                <input class="form-input code-input" type="text" id="phone-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$">
+                <div>
+                  <button type="button" class="resend-link" id="resend-code" onclick="resendCode()" data-i18n="resend_code">Resend code</button>
+                  <span id="resend-timer"></span>
+                </div>
               </div>
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="signup-password">Password</label>
-            <input class="form-input" type="password" id="signup-password" name="password" placeholder="At least 8 characters" required>
+            <label class="form-label" data-i18n="auth_choose_avatar">Choose your avatar</label>
+            <button type="button" class="avatar-picker-btn" id="avatar-picker-btn" onclick="openAvatarModal()">
+              <div class="avatar-picker-placeholder" id="avatar-preview"><i class="fas fa-user"></i></div>
+              <span class="avatar-picker-text" data-i18n="auth_tap_choose_avatar">Tap to choose your avatar</span>
+            </button>
+            <input type="hidden" id="signup-avatar" value="">
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="signup-confirm">Confirm Password</label>
-            <input class="form-input" type="password" id="signup-confirm" name="confirm" placeholder="Re-enter password" required>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="signup-password" data-i18n="auth_password">Password</label>
+              <input class="form-input" type="password" id="signup-password" name="password" data-i18n-placeholder="auth_password_placeholder" placeholder="At least 8 characters" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="signup-confirm" data-i18n="auth_confirm_password">Confirm Password</label>
+              <input class="form-input" type="password" id="signup-confirm" name="confirm" data-i18n-placeholder="auth_confirm_placeholder" placeholder="Re-enter password" required>
+            </div>
           </div>
 
           <div class="auth-checkbox">
             <input type="checkbox" id="terms-agree" name="terms" required>
-            <label for="terms-agree">I agree to <a href="terms.html">Terms of use</a> and <a href="privacy.html">Privacy policy</a></label>
+            <label for="terms-agree" data-i18n="auth_terms_agree">I agree to <a href="terms.html">Terms of use</a> and <a href="privacy.html">Privacy policy</a></label>
           </div>
 
-          <button type="submit" class="auth-btn auth-btn-primary">
+          <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_join_free">
             Join the Swap — It's Free
           </button>
         </form>
 
-        <div class="auth-divider">or continue with</div>
+        <div class="auth-divider" data-i18n="auth_or_continue">or continue with</div>
 
         <div class="auth-social">
           <button type="button" class="auth-social-btn" onclick="handleSocialSignup('google')">
-            <i class="fab fa-google"></i> Continue with Google
+            <i class="fab fa-google"></i> <span data-i18n="auth_google">Continue with Google</span>
           </button>
           <button type="button" class="auth-social-btn" onclick="handleSocialSignup('apple')">
-            <i class="fab fa-apple"></i> Continue with Apple
+            <i class="fab fa-apple"></i> <span data-i18n="auth_apple">Continue with Apple</span>
           </button>
           <button type="button" class="auth-social-btn" onclick="handleSocialSignup('facebook')">
-            <i class="fab fa-facebook-f"></i> Continue with Facebook
+            <i class="fab fa-facebook-f"></i> <span data-i18n="auth_facebook">Continue with Facebook</span>
           </button>
         </div>
 
         <div class="auth-footer-link">
-          Already have an account? <a href="#" onclick="switchTab('login'); return false;">Log in</a>
+          <span data-i18n="auth_already_account">Already have an account?</span> <a href="#" onclick="switchTab('login'); return false;" data-i18n="auth_login">Log in</a>
         </div>
       </div>
 
@@ -540,43 +389,60 @@
       <div id="login" class="auth-tab-content">
         <form class="auth-form" onsubmit="handleLogin(event)">
           <div class="form-group">
-            <label class="form-label" for="login-email">Email Address</label>
+            <label class="form-label" for="login-email" data-i18n="auth_email">Email Address</label>
             <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" required>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="login-password">Password</label>
-            <input class="form-input" type="password" id="login-password" name="password" placeholder="Your password" required>
+            <label class="form-label" for="login-password" data-i18n="auth_password">Password</label>
+            <input class="form-input" type="password" id="login-password" name="password" data-i18n-placeholder="auth_login_password_placeholder" placeholder="Your password" required>
           </div>
 
           <div class="auth-forgot">
-            <a href="#">Forgot password?</a>
+            <a href="#" data-i18n="auth_forgot_password">Forgot password?</a>
           </div>
 
-          <button type="submit" class="auth-btn auth-btn-primary">
+          <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_login_btn">
             Log In
           </button>
         </form>
 
-        <div class="auth-divider">or continue with</div>
+        <div class="auth-divider" data-i18n="auth_or_continue">or continue with</div>
 
         <div class="auth-social">
           <button type="button" class="auth-social-btn" onclick="handleSocialLogin('google')">
-            <i class="fab fa-google"></i> Continue with Google
+            <i class="fab fa-google"></i> <span data-i18n="auth_google">Continue with Google</span>
           </button>
           <button type="button" class="auth-social-btn" onclick="handleSocialLogin('apple')">
-            <i class="fab fa-apple"></i> Continue with Apple
+            <i class="fab fa-apple"></i> <span data-i18n="auth_apple">Continue with Apple</span>
           </button>
           <button type="button" class="auth-social-btn" onclick="handleSocialLogin('facebook')">
-            <i class="fab fa-facebook-f"></i> Continue with Facebook
+            <i class="fab fa-facebook-f"></i> <span data-i18n="auth_facebook">Continue with Facebook</span>
           </button>
         </div>
 
         <div class="auth-footer-link">
-          Don't have an account? <a href="#" onclick="switchTab('signup'); return false;">Sign up</a>
+          <span data-i18n="auth_no_account">Don't have an account?</span> <a href="#" onclick="switchTab('signup'); return false;" data-i18n="auth_signup">Sign up</a>
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ========== AVATAR MODAL ========== -->
+  <div class="avatar-modal-overlay" id="avatar-modal">
+    <div class="avatar-modal">
+      <div class="avatar-modal-header">
+        <h3 data-i18n="avatar_modal_title">Choose your avatar</h3>
+        <button class="avatar-modal-close" onclick="closeAvatarModal()">&times;</button>
+      </div>
+      <div class="avatar-modal-body" id="avatar-modal-body">
+        <!-- Populated by JS -->
+      </div>
+      <div class="avatar-modal-footer">
+        <button class="avatar-modal-cancel" onclick="closeAvatarModal()" data-i18n="avatar_modal_cancel">Cancel</button>
+        <button class="avatar-modal-confirm" onclick="confirmAvatar()" data-i18n="avatar_modal_confirm">Confirm</button>
+      </div>
     </div>
   </div>
 
@@ -586,32 +452,32 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
-          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+          <p data-i18n="footer_tagline">The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
         </div>
         <div class="footer-col">
-          <h4>Platform</h4>
+          <h4 data-i18n="footer_platform">Platform</h4>
           <ul>
-            <li><a href="catalogue.html">Browse items</a></li>
-            <li><a href="giveaway.html">Free giveaways</a></li>
-            <li><a href="publier.html">List an item</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="catalogue.html" data-i18n="nav_catalogue">Browse items</a></li>
+            <li><a href="giveaway.html" data-i18n="nav_giveaway">Free giveaways</a></li>
+            <li><a href="publier.html" data-i18n="nav_publish">List an item</a></li>
+            <li><a href="pricing.html" data-i18n="nav_pricing">Pricing</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Company</h4>
+          <h4 data-i18n="footer_company">Company</h4>
           <ul>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
+            <li><a href="#" data-i18n="footer_about">About</a></li>
+            <li><a href="#" data-i18n="footer_contact">Contact</a></li>
+            <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+            <li><a href="#" data-i18n="footer_careers">Careers</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Legal</h4>
+          <h4 data-i18n="footer_legal">Legal</h4>
           <ul>
-            <li><a href="terms.html">Terms of use</a></li>
-            <li><a href="privacy.html">Privacy policy</a></li>
-            <li><a href="cookies.html">Cookie policy</a></li>
+            <li><a href="terms.html" data-i18n="footer_terms">Terms of use</a></li>
+            <li><a href="privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+            <li><a href="cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
           </ul>
         </div>
       </div>
@@ -655,7 +521,17 @@
       document.querySelectorAll('.auth-tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
       document.getElementById(tabName).classList.add('active');
-      if (element) element.classList.add('active');
+      if (element) {
+        element.classList.add('active');
+      } else {
+        // Find the right tab button
+        document.querySelectorAll('.auth-tab').forEach(t => {
+          if ((tabName === 'signup' && t.textContent.trim().match(/sign\s*up/i)) ||
+              (tabName === 'login' && t.textContent.trim().match(/log\s*in/i))) {
+            t.classList.add('active');
+          }
+        });
+      }
     }
 
     // ---- Toast notification ----
@@ -691,12 +567,82 @@
     }
 
     /* ========================
-       Signup Handler → DemoAuth
+       Avatar Modal
+       ======================== */
+    let pendingAvatar = null;
+
+    function openAvatarModal() {
+      const modal = document.getElementById('avatar-modal');
+      const body = document.getElementById('avatar-modal-body');
+      if (!window.getAvatarPairs) { showToast('Loading avatars...', 'info'); return; }
+
+      const pairs = getAvatarPairs();
+      const currentAvatar = document.getElementById('signup-avatar').value;
+      pendingAvatar = currentAvatar || null;
+
+      body.innerHTML = pairs.map(pair =>
+        `<div class="avatar-pair-row">
+          <button type="button" class="avatar-option${currentAvatar === pair.left.key ? ' selected' : ''}" data-avatar="${pair.left.key}" onclick="selectModalAvatar(this, '${pair.left.key}')">
+            ${pair.left.svg}
+            <span class="avatar-name">${pair.left.name}</span>
+          </button>
+          <button type="button" class="avatar-option${currentAvatar === pair.right.key ? ' selected' : ''}" data-avatar="${pair.right.key}" onclick="selectModalAvatar(this, '${pair.right.key}')">
+            ${pair.right.svg}
+            <span class="avatar-name">${pair.right.name}</span>
+          </button>
+        </div>`
+      ).join('');
+
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAvatarModal() {
+      document.getElementById('avatar-modal').classList.remove('active');
+      document.body.style.overflow = '';
+      pendingAvatar = null;
+    }
+
+    function selectModalAvatar(el, key) {
+      document.querySelectorAll('#avatar-modal-body .avatar-option').forEach(a => a.classList.remove('selected'));
+      el.classList.add('selected');
+      pendingAvatar = key;
+    }
+
+    function confirmAvatar() {
+      if (!pendingAvatar) { showToast('Please select an avatar', 'error'); return; }
+
+      document.getElementById('signup-avatar').value = pendingAvatar;
+
+      // Update the picker button
+      const btn = document.getElementById('avatar-picker-btn');
+      const preview = document.getElementById('avatar-preview');
+      const svg = getAvatarSVG(pendingAvatar);
+      const name = getAvatarName(pendingAvatar);
+
+      preview.outerHTML = svg;
+      btn.querySelector('.avatar-picker-text').textContent = name;
+      btn.classList.add('has-avatar');
+
+      closeAvatarModal();
+    }
+
+    // Close modal on overlay click
+    document.getElementById('avatar-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeAvatarModal();
+    });
+
+    // Close modal on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeAvatarModal();
+    });
+
+    /* ========================
+       Signup Handler
        ======================== */
     async function handleSignup(event) {
       event.preventDefault();
       const name = document.getElementById('signup-name').value.trim();
-      const gender = document.querySelector('input[name="signup-gender"]:checked')?.value;
       const pseudo = document.getElementById('signup-pseudo').value.trim();
       const avatar = document.getElementById('signup-avatar').value;
       const email = document.getElementById('signup-email').value.trim();
@@ -706,7 +652,6 @@
       const terms = document.getElementById('terms-agree')?.checked;
 
       if (!name) { showToast('Please enter your name', 'error'); return; }
-      if (!gender) { showToast('Please select your gender', 'error'); return; }
       if (!pseudo || pseudo.length < 3) { showToast('Please choose a username (3+ characters)', 'error'); return; }
       if (!/^[a-zA-Z0-9_]{3,20}$/.test(pseudo)) { showToast('Username: letters, numbers and underscores only (3-20 chars)', 'error'); return; }
       if (!avatar) { showToast('Please select an avatar', 'error'); return; }
@@ -723,10 +668,10 @@
       if (code && code !== '123456') { showToast('Invalid verification code. Use 123456 for demo.', 'error'); setLoading(btn, false); return; }
 
       try {
-        const result = DemoAuth.signUp(email, password, name, { gender, pseudo, avatar, phone });
+        const result = DemoAuth.signUp(email, password, name, { pseudo, avatar, phone });
         if (result.error) { showToast(result.error, 'error'); setLoading(btn, false); return; }
 
-        showToast('Welcome to Swappo! 🎉', 'success');
+        showToast('Welcome to Swappo!', 'success');
         setTimeout(() => {
           const params = new URLSearchParams(window.location.search);
           const redirect = params.get('redirect') || '../index.html';
@@ -739,7 +684,7 @@
     }
 
     /* ========================
-       Login Handler → DemoAuth
+       Login Handler
        ======================== */
     async function handleLogin(event) {
       event.preventDefault();
@@ -783,18 +728,6 @@
     });
 
     /* ========================
-       Gender Selection
-       ======================== */
-    document.querySelectorAll('.gender-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
-        this.classList.add('selected');
-        this.querySelector('input').checked = true;
-        updateAvatarGallery();
-      });
-    });
-
-    /* ========================
        Pseudo Validation (debounced)
        ======================== */
     let pseudoTimeout;
@@ -813,34 +746,11 @@
         return;
       }
       pseudoTimeout = setTimeout(() => {
-        // Check uniqueness against mock data
         const taken = (window.MOCK_USERS || []).some(u => u.pseudo === val.toLowerCase()) || val.toLowerCase() === 'demo_swapper';
         fb.textContent = taken ? 'This username is already taken' : 'Username available!';
         fb.className = 'pseudo-feedback ' + (taken ? 'taken' : 'available');
       }, 300);
     });
-
-    /* ========================
-       Avatar Gallery
-       ======================== */
-    function updateAvatarGallery() {
-      const gender = document.querySelector('input[name="signup-gender"]:checked')?.value || 'other';
-      const gallery = document.getElementById('avatar-gallery');
-      if (!window.getAvatarsByGender) { gallery.innerHTML = '<p>Loading avatars...</p>'; return; }
-      const avatars = getAvatarsByGender(gender);
-      gallery.innerHTML = avatars.map(([key, data]) =>
-        `<button type="button" class="avatar-option" data-avatar="${key}" onclick="selectAvatar(this, '${key}')">
-          ${data.svg}
-          <span class="avatar-name">${data.name}</span>
-        </button>`
-      ).join('');
-    }
-
-    function selectAvatar(el, key) {
-      document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
-      el.classList.add('selected');
-      document.getElementById('signup-avatar').value = key;
-    }
 
     /* ========================
        Phone Verification (Demo)
@@ -877,11 +787,6 @@
         }
       }, 1000);
     }
-
-    // Initialize avatar gallery on load
-    document.addEventListener('DOMContentLoaded', function() {
-      updateAvatarGallery();
-    });
 
     /* ========================
        Redirect if already logged in
