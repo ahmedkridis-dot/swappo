@@ -270,7 +270,7 @@ input, select, textarea { font-family: var(--font); }
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1050;
   transition: box-shadow var(--dur-slow) ease;
 }
 .navbar--scrolled {
