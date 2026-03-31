@@ -157,8 +157,8 @@
         <div class="early-adopter-left">
           <span class="early-adopter-icon">🚀</span>
           <div class="early-adopter-text">
-            <h3 class="early-adopter-title" id="early-adopter-title">Join the first 500 Early Adopters</h3>
-            <p class="early-adopter-subtitle"><strong>Bronze plan FREE 6 months</strong> + Pioneer badge</p>
+            <h3 class="early-adopter-title" id="early-adopter-title" data-i18n="early_adopter_title">Join the first 500 Early Adopters</h3>
+            <p class="early-adopter-subtitle" id="early-adopter-subtitle"><strong>Bronze plan FREE 6 months</strong> + Pioneer badge</p>
           </div>
         </div>
         <div class="early-adopter-right">
@@ -168,7 +168,7 @@
             </div>
             <span class="early-adopter-count" id="early-adopter-count"><strong id="ea-remaining">470</strong> / 500</span>
           </div>
-          <a href="pages/login.html" class="btn btn-primary btn-sm early-adopter-btn">Claim your spot</a>
+          <a href="pages/login.html" class="btn btn-primary btn-sm early-adopter-btn" data-i18n="early_adopter_claim">Claim your spot</a>
         </div>
       </div>
     </div>
@@ -279,32 +279,32 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
-          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+          <p data-i18n="footer_tagline">The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
         </div>
         <div class="footer-col">
-          <h4 data-i18n="platform">Platform</h4>
+          <h4 data-i18n="footer_platform">Platform</h4>
           <ul>
-            <li><a href="pages/catalogue.html">Browse items</a></li>
-            <li><a href="pages/giveaway.html">Free giveaways</a></li>
-            <li><a href="pages/publier.html">List an item</a></li>
-            <li><a href="pages/pricing.html">Pricing</a></li>
+            <li><a href="pages/catalogue.html" data-i18n="footer_browse_items">Browse items</a></li>
+            <li><a href="pages/giveaway.html" data-i18n="footer_free_giveaways">Free giveaways</a></li>
+            <li><a href="pages/publier.html" data-i18n="footer_list_item">List an item</a></li>
+            <li><a href="pages/pricing.html" data-i18n="footer_pricing">Pricing</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4 data-i18n="company">Company</h4>
+          <h4 data-i18n="footer_company">Company</h4>
           <ul>
-            <li><a href="#">About</a></li>
+            <li><a href="#" data-i18n="footer_about">About</a></li>
             <li><a href="pages/impact.html" data-i18n="impact_nav">Our Impact</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
+            <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+            <li><a href="#" data-i18n="footer_careers">Careers</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4 data-i18n="legal">Legal</h4>
+          <h4 data-i18n="footer_legal">Legal</h4>
           <ul>
-            <li><a href="pages/terms.html">Terms of use</a></li>
-            <li><a href="pages/privacy.html">Privacy policy</a></li>
-            <li><a href="pages/cookies.html">Cookie policy</a></li>
+            <li><a href="pages/terms.html" data-i18n="footer_terms">Terms of use</a></li>
+            <li><a href="pages/privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+            <li><a href="pages/cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
           </ul>
         </div>
       </div>
@@ -488,12 +488,29 @@
       if (countEl) countEl.textContent = remaining;
       if (fillEl) fillEl.style.width = pct + '%';
 
+      // Update subtitle HTML with i18n (contains <strong> tags, can't use data-i18n)
+      var subtitleEl = document.getElementById('early-adopter-subtitle');
+      function updateEASubtitle() {
+        if (subtitleEl && remaining > 0 && typeof t === 'function') {
+          subtitleEl.innerHTML = t('early_adopter_subtitle_html');
+        }
+      }
+      updateEASubtitle();
+      document.addEventListener('languageChanged', updateEASubtitle);
+
       if (remaining <= 0 && titleEl) {
-        titleEl.textContent = '500 Early Adopters have joined Swappo!';
+        titleEl.textContent = typeof t === 'function' ? t('early_adopter_full_title') : '500 Early Adopters have joined Swappo!';
+        titleEl.setAttribute('data-i18n', 'early_adopter_full_title');
         var subtitle = banner.querySelector('.early-adopter-subtitle');
-        if (subtitle) subtitle.textContent = 'Join them and start swapping today.';
+        if (subtitle) {
+          subtitle.textContent = typeof t === 'function' ? t('early_adopter_full_subtitle') : 'Stay tuned for the next wave.';
+          subtitle.setAttribute('data-i18n', 'early_adopter_full_subtitle');
+        }
         var btn = banner.querySelector('.early-adopter-btn');
-        if (btn) btn.textContent = 'Join Swappo';
+        if (btn) {
+          btn.textContent = typeof t === 'function' ? t('join_swap') : 'Join the Swap';
+          btn.setAttribute('data-i18n', 'join_swap');
+        }
       }
     })();
   </script>

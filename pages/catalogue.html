@@ -219,7 +219,7 @@
 
         <div class="navbar-search">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search items...">
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
         </div>
 
         <div class="navbar-actions">
@@ -250,38 +250,38 @@
     <div class="filter-bar">
       <div class="search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" id="catalogue-search" placeholder="Search items...">
+        <input type="text" id="catalogue-search" placeholder="Search items..." data-i18n-placeholder="catalogue_search_placeholder">
       </div>
 
       <select id="filter-category">
-        <option value="">All Categories</option>
-        <option value="clothing">Clothing & Accessories</option>
-        <option value="books">Books & Media</option>
-        <option value="kids">Kids & Baby</option>
-        <option value="sports">Sports & Leisure</option>
-        <option value="furniture">Furniture & Home</option>
-        <option value="electronics">Electronics & Phones</option>
-        <option value="vehicles">Vehicles</option>
-        <option value="bags_accessories">Bags & Accessories</option>
-        <option value="gaming">Gaming & Consoles</option>
-        <option value="other">Other</option>
+        <option value="" data-i18n="all_categories">All Categories</option>
+        <option value="clothing" data-i18n="publish_cat_clothing">Clothing & Accessories</option>
+        <option value="books" data-i18n="publish_cat_books">Books & Media</option>
+        <option value="kids" data-i18n="publish_cat_kids">Kids & Baby</option>
+        <option value="sports" data-i18n="publish_cat_sports">Sports & Leisure</option>
+        <option value="furniture" data-i18n="publish_cat_furniture">Furniture & Home</option>
+        <option value="electronics" data-i18n="publish_cat_electronics">Electronics & Phones</option>
+        <option value="vehicles" data-i18n="publish_cat_vehicles">Vehicles</option>
+        <option value="bags_accessories" data-i18n="publish_cat_bags">Bags & Accessories</option>
+        <option value="gaming" data-i18n="publish_cat_gaming">Gaming & Consoles</option>
+        <option value="other" data-i18n="publish_cat_other">Other</option>
       </select>
 
       <select id="filter-condition">
-        <option value="">All Conditions</option>
-        <option value="new">New</option>
-        <option value="like_new">Like New</option>
-        <option value="good">Good</option>
-        <option value="fair">Fair</option>
+        <option value="" data-i18n="all_conditions">All Conditions</option>
+        <option value="new" data-i18n="condition_new">New</option>
+        <option value="like_new" data-i18n="condition_like_new">Like New</option>
+        <option value="good" data-i18n="condition_good">Good</option>
+        <option value="fair" data-i18n="condition_fair">Fair</option>
       </select>
 
       <select id="filter-sort">
-        <option value="newest">Newest first</option>
-        <option value="popular">Most popular</option>
-        <option value="closest">Nearest first</option>
+        <option value="newest" data-i18n="newest_first">Newest first</option>
+        <option value="popular" data-i18n="most_popular">Most popular</option>
+        <option value="closest" data-i18n="nearest_first">Nearest first</option>
       </select>
 
-      <button class="clear-filters" id="clear-filters-btn"><i class="fas fa-times"></i> Clear</button>
+      <button class="clear-filters" id="clear-filters-btn"><i class="fas fa-times"></i> <span data-i18n="clear">Clear</span></button>
     </div>
 
     <!-- Dynamic Subcategory Filters (shown for clothing, kids, bags_accessories) -->
@@ -318,32 +318,32 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
-          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+          <p data-i18n="footer_tagline">The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
         </div>
         <div class="footer-col">
-          <h4>Platform</h4>
+          <h4 data-i18n="footer_platform">Platform</h4>
           <ul>
-            <li><a href="catalogue.html">Browse items</a></li>
-            <li><a href="giveaway.html">Free giveaways</a></li>
-            <li><a href="publier.html">List an item</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="catalogue.html" data-i18n="footer_browse_items">Browse items</a></li>
+            <li><a href="giveaway.html" data-i18n="footer_free_giveaways">Free giveaways</a></li>
+            <li><a href="publier.html" data-i18n="footer_list_item">List an item</a></li>
+            <li><a href="pricing.html" data-i18n="footer_pricing">Pricing</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Company</h4>
+          <h4 data-i18n="footer_company">Company</h4>
           <ul>
-            <li><a href="#">About</a></li>
+            <li><a href="#" data-i18n="footer_about">About</a></li>
             <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
+            <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+            <li><a href="#" data-i18n="footer_careers">Careers</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Legal</h4>
+          <h4 data-i18n="footer_legal">Legal</h4>
           <ul>
-            <li><a href="terms.html">Terms of use</a></li>
-            <li><a href="privacy.html">Privacy policy</a></li>
-            <li><a href="cookies.html">Cookie policy</a></li>
+            <li><a href="terms.html" data-i18n="footer_terms">Terms of use</a></li>
+            <li><a href="privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+            <li><a href="cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
           </ul>
         </div>
       </div>

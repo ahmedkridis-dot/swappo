@@ -569,19 +569,19 @@
           <div class="steps-list">
             <div class="step active" data-step="1">
               <div class="step-circle">1</div>
-              <div class="step-label">Category</div>
+              <div class="step-label" data-i18n="publish_step_category">Category</div>
             </div>
             <div class="step" data-step="2">
               <div class="step-circle">2</div>
-              <div class="step-label">Details</div>
+              <div class="step-label" data-i18n="publish_step_details">Details</div>
             </div>
             <div class="step" data-step="3">
               <div class="step-circle">3</div>
-              <div class="step-label">Photos</div>
+              <div class="step-label" data-i18n="publish_step_photos">Photos</div>
             </div>
             <div class="step" data-step="4">
               <div class="step-circle">4</div>
-              <div class="step-label">Review</div>
+              <div class="step-label" data-i18n="publish_step_review">Review</div>
             </div>
           </div>
         </div>
@@ -591,68 +591,68 @@
 
           <!-- ========== STEP 1: CATEGORY ========== -->
           <div class="step-section active" data-section="category">
-            <h2 class="step-title">What are you listing?</h2>
-            <p class="step-subtitle">Step 1 of 4 — Select a category</p>
+            <h2 class="step-title" data-i18n="publish_what_listing">What are you listing?</h2>
+            <p class="step-subtitle" data-i18n="publish_step1_subtitle">Step 1 of 4 — Select a category</p>
 
             <div class="categories-select">
               <button type="button" class="category-btn" data-category="clothing" onclick="selectCategory(this, 'clothing')">
                 <div class="category-btn-icon">&#x1F455;</div>
-                <div class="category-btn-label">Clothing & Accessories</div>
+                <div class="category-btn-label" data-i18n="publish_cat_clothing">Clothing & Accessories</div>
               </button>
               <button type="button" class="category-btn" data-category="books" onclick="selectCategory(this, 'books')">
                 <div class="category-btn-icon">&#x1F4DA;</div>
-                <div class="category-btn-label">Books & Media</div>
+                <div class="category-btn-label" data-i18n="publish_cat_books">Books & Media</div>
               </button>
               <button type="button" class="category-btn" data-category="kids" onclick="selectCategory(this, 'kids')">
                 <div class="category-btn-icon">&#x1F476;</div>
-                <div class="category-btn-label">Kids & Baby</div>
+                <div class="category-btn-label" data-i18n="publish_cat_kids">Kids & Baby</div>
               </button>
               <button type="button" class="category-btn" data-category="plants" onclick="selectCategory(this, 'plants')">
                 <div class="category-btn-icon"><i class="fas fa-leaf"></i></div>
-                <div class="category-btn-label" data-i18n="plants">Plants</div>
+                <div class="category-btn-label" data-i18n="publish_cat_plants">Plants</div>
               </button>
               <button type="button" class="category-btn" data-category="sports" onclick="selectCategory(this, 'sports')">
                 <div class="category-btn-icon">&#x26BD;</div>
-                <div class="category-btn-label">Sports & Leisure</div>
+                <div class="category-btn-label" data-i18n="publish_cat_sports">Sports & Leisure</div>
               </button>
               <button type="button" class="category-btn" data-category="furniture" onclick="selectCategory(this, 'furniture')">
                 <div class="category-btn-icon">&#x1FA91;</div>
-                <div class="category-btn-label">Furniture & Home</div>
+                <div class="category-btn-label" data-i18n="publish_cat_furniture">Furniture & Home</div>
               </button>
               <button type="button" class="category-btn" data-category="electronics" onclick="selectCategory(this, 'electronics')">
                 <div class="category-btn-icon">&#x1F4F1;</div>
-                <div class="category-btn-label">Electronics & Phones</div>
+                <div class="category-btn-label" data-i18n="publish_cat_electronics">Electronics & Phones</div>
               </button>
               <button type="button" class="category-btn" data-category="vehicles" onclick="selectCategory(this, 'vehicles')">
                 <div class="category-btn-icon">&#x1F697;</div>
-                <div class="category-btn-label">Vehicles</div>
+                <div class="category-btn-label" data-i18n="publish_cat_vehicles">Vehicles</div>
               </button>
               <button type="button" class="category-btn" data-category="bags_accessories" onclick="selectCategory(this, 'bags_accessories')">
                 <div class="category-btn-icon"><i class="fas fa-shopping-bag"></i></div>
-                <div class="category-btn-label" data-i18n="bags_accessories">Bags & Accessories</div>
+                <div class="category-btn-label" data-i18n="publish_cat_bags">Bags & Accessories</div>
               </button>
               <button type="button" class="category-btn" data-category="gaming" onclick="selectCategory(this, 'gaming')">
                 <div class="category-btn-icon"><i class="fas fa-gamepad"></i></div>
-                <div class="category-btn-label" data-i18n="gaming">Gaming & Consoles</div>
+                <div class="category-btn-label" data-i18n="publish_cat_gaming">Gaming & Consoles</div>
               </button>
               <button type="button" class="category-btn" data-category="other" onclick="selectCategory(this, 'other')">
                 <div class="category-btn-icon">&#x1F4E6;</div>
-                <div class="category-btn-label">Other</div>
+                <div class="category-btn-label" data-i18n="publish_cat_other">Other</div>
               </button>
             </div>
 
             <div class="step-actions">
               <div></div>
               <button type="button" class="btn-next" id="btnNextStep1" disabled onclick="nextStep()">
-                Next <i class="fas fa-arrow-right"></i>
+                <span data-i18n="publish_next">Next</span> <i class="fas fa-arrow-right"></i>
               </button>
             </div>
           </div>
 
           <!-- ========== STEP 2: DETAILS ========== -->
           <div class="step-section" data-section="details">
-            <h2 class="step-title">Item details</h2>
-            <p class="step-subtitle">Step 2 of 4 — Provide specific information</p>
+            <h2 class="step-title" data-i18n="publish_item_details">Item details</h2>
+            <p class="step-subtitle" data-i18n="publish_step2_subtitle">Step 2 of 4 — Provide specific information</p>
 
             <div id="detailsContainer" class="details-grid">
               <!-- Details will be populated by JavaScript based on category -->
@@ -660,18 +660,18 @@
 
             <div class="step-actions">
               <button type="button" class="btn-back" onclick="prevStep()">
-                <i class="fas fa-arrow-left"></i> Back
+                <i class="fas fa-arrow-left"></i> <span data-i18n="publish_back">Back</span>
               </button>
               <button type="button" class="btn-next" onclick="nextStep()">
-                Next <i class="fas fa-arrow-right"></i>
+                <span data-i18n="publish_next">Next</span> <i class="fas fa-arrow-right"></i>
               </button>
             </div>
           </div>
 
           <!-- ========== STEP 3: PHOTOS ========== -->
           <div class="step-section" data-section="photos">
-            <h2 class="step-title">Add photos of your item</h2>
-            <p class="step-subtitle">Step 3 of 4 — Click slots to add demo photos</p>
+            <h2 class="step-title" data-i18n="publish_add_photos">Add photos of your item</h2>
+            <p class="step-subtitle" data-i18n="publish_step3_subtitle">Step 3 of 4 — Click slots to add demo photos</p>
 
             <div class="photo-grid" id="photoGrid">
               <div class="photo-slot" data-index="0" onclick="togglePhoto(0)">
@@ -689,23 +689,23 @@
             </div>
 
             <div class="photo-tips">
-              <strong>Demo mode:</strong> Click each slot to add a placeholder photo for your category.
+              <span data-i18n="publish_photo_tip">Demo mode: Click each slot to add a placeholder photo for your category.</span>
             </div>
 
             <div class="step-actions">
               <button type="button" class="btn-back" onclick="prevStep()">
-                <i class="fas fa-arrow-left"></i> Back
+                <i class="fas fa-arrow-left"></i> <span data-i18n="publish_back">Back</span>
               </button>
               <button type="button" class="btn-next" onclick="nextStep()">
-                Next <i class="fas fa-arrow-right"></i>
+                <span data-i18n="publish_next">Next</span> <i class="fas fa-arrow-right"></i>
               </button>
             </div>
           </div>
 
           <!-- ========== STEP 4: REVIEW ========== -->
           <div class="step-section" data-section="review">
-            <h2 class="step-title">Review your listing</h2>
-            <p class="step-subtitle">Step 4 of 4 — Make sure everything looks good</p>
+            <h2 class="step-title" data-i18n="publish_review_listing">Review your listing</h2>
+            <p class="step-subtitle" data-i18n="publish_step4_subtitle">Step 4 of 4 — Make sure everything looks good</p>
 
             <div class="review-card">
               <!-- Photos -->
@@ -735,15 +735,15 @@
             <!-- Giveaway Option -->
             <div class="giveaway-option" id="giveawayOption" onclick="toggleGiveaway()">
               <input type="checkbox" id="giveawayCheckbox">
-              <label for="giveawayCheckbox"><i class="fas fa-gift"></i> Offer as Giveaway (FREE)</label>
+              <label for="giveawayCheckbox"><i class="fas fa-gift"></i> <span data-i18n="publish_giveaway_option">Offer as Giveaway (FREE)</span></label>
             </div>
 
             <div class="step-actions">
               <button type="button" class="btn-back" onclick="prevStep()">
-                <i class="fas fa-arrow-left"></i> Back
+                <i class="fas fa-arrow-left"></i> <span data-i18n="publish_back">Back</span>
               </button>
               <button type="button" class="btn-publish" id="btnPublish" onclick="publishItem(event)">
-                <i class="fas fa-check"></i> Publish listing
+                <i class="fas fa-check"></i> <span data-i18n="publish_btn">Publish listing</span>
               </button>
             </div>
           </div>
@@ -759,32 +759,32 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
-          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+          <p data-i18n="footer_tagline">The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
         </div>
         <div class="footer-col">
-          <h4>Platform</h4>
+          <h4 data-i18n="footer_platform">Platform</h4>
           <ul>
-            <li><a href="catalogue.html">Browse items</a></li>
-            <li><a href="giveaway.html">Free giveaways</a></li>
-            <li><a href="publier.html">List an item</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="catalogue.html" data-i18n="footer_browse_items">Browse items</a></li>
+            <li><a href="giveaway.html" data-i18n="footer_free_giveaways">Free giveaways</a></li>
+            <li><a href="publier.html" data-i18n="footer_list_item">List an item</a></li>
+            <li><a href="pricing.html" data-i18n="footer_pricing">Pricing</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Company</h4>
+          <h4 data-i18n="footer_company">Company</h4>
           <ul>
-            <li><a href="#">About</a></li>
+            <li><a href="#" data-i18n="footer_about">About</a></li>
             <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
+            <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+            <li><a href="#" data-i18n="footer_careers">Careers</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Legal</h4>
+          <h4 data-i18n="footer_legal">Legal</h4>
           <ul>
-            <li><a href="terms.html">Terms of use</a></li>
-            <li><a href="privacy.html">Privacy policy</a></li>
-            <li><a href="cookies.html">Cookie policy</a></li>
+            <li><a href="terms.html" data-i18n="footer_terms">Terms of use</a></li>
+            <li><a href="privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+            <li><a href="cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
           </ul>
         </div>
       </div>
