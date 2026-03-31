@@ -54,22 +54,23 @@ const MOCK_USERS = [
 // ─── DEMO USER ──────────────────────────────────────────────────────────────
 const DEMO_USER = {
   id: 'user-demo',
-  name: 'Demo User',
+  name: 'Ahmed Tester',
   email: 'demo@swappo.ae',
   password: 'demo123',
   city: 'Dubai Marina',
-  badge_tier: 'swapper',
-  badge_emoji: '\u{2B50}',
-  swap_count: 2,
-  plan: 'bronze',
-  swaps_used: 1,
-  claims_used: 0,
+  badge_tier: 'pro',
+  badge_emoji: '\u{1F48E}',
+  swap_count: 18,
+  plan: 'premium',
+  swaps_used: 2,
+  claims_used: 1,
   boosts_used: 0,
   billing_start: '2026-03-01',
   avatar_color: '#09B1BA',
-  created_at: '2026-03-01',
-  pseudo: 'demo_swapper',
-  avatar: 'happy'
+  created_at: '2025-09-15',
+  pseudo: 'ahmed_test',
+  avatar: 'happy',
+  badges: ['pioneer', 'generous', 'speed_swapper']
 };
 
 // ─── MOCK ITEMS (30 items across 8 categories) ─────────────────────────────
@@ -1423,6 +1424,132 @@ const MOCK_ITEMS = [
     distance: 1.1,
     favorites_count: 13,
     views_count: 95
+  },
+
+  // ── DEMO USER ITEMS (owned by user-demo) ────────────────────────────────
+  {
+    id: 'item-demo-1',
+    user_id: 'user-demo',
+    category: 'electronics',
+    type: 'Smartphone',
+    brand: 'Apple',
+    model: 'iPhone 14 Pro',
+    condition: 'like_new',
+    year: 2023,
+    size: '128 GB',
+    color: 'Space Black',
+    photos: [
+      'https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1591337676887-a217a6c6f780?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1580910051074-3eb694886f3f?w=400&h=530&fit=crop'
+    ],
+    is_boosted: true,
+    is_giveaway: false,
+    created_at: '2026-03-10',
+    lat: 25.0800,
+    lng: 55.1380,
+    city: 'Dubai Marina',
+    distance: 0,
+    favorites_count: 24,
+    views_count: 180
+  },
+  {
+    id: 'item-demo-2',
+    user_id: 'user-demo',
+    category: 'clothing',
+    clothing_gender: 'male',
+    type: 'Sneakers',
+    brand: 'Adidas',
+    model: 'Yeezy Boost 350 V2',
+    condition: 'good',
+    year: 2024,
+    size: '42 EU',
+    color: 'Cream White',
+    photos: [
+      'https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=530&fit=crop'
+    ],
+    is_boosted: false,
+    is_giveaway: false,
+    created_at: '2026-03-15',
+    lat: 25.0800,
+    lng: 55.1380,
+    city: 'Dubai Marina',
+    distance: 0,
+    favorites_count: 11,
+    views_count: 67
+  },
+  {
+    id: 'item-demo-3',
+    user_id: 'user-demo',
+    category: 'books',
+    type: 'Book Set',
+    brand: 'Various',
+    model: 'Startup & Business Collection',
+    condition: 'good',
+    year: 2023,
+    photos: [
+      'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=530&fit=crop'
+    ],
+    is_boosted: false,
+    is_giveaway: true,
+    created_at: '2026-03-20',
+    lat: 25.0800,
+    lng: 55.1380,
+    city: 'Dubai Marina',
+    distance: 0,
+    favorites_count: 8,
+    views_count: 45
+  },
+  {
+    id: 'item-demo-4',
+    user_id: 'user-demo',
+    category: 'electronics',
+    type: 'Tablet',
+    brand: 'Apple',
+    model: 'iPad Air M1',
+    condition: 'like_new',
+    year: 2024,
+    size: '256 GB',
+    color: 'Starlight',
+    photos: [
+      'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1561154464-82e9aab32f4e?w=400&h=530&fit=crop'
+    ],
+    is_boosted: false,
+    is_giveaway: false,
+    created_at: '2026-03-25',
+    lat: 25.0800,
+    lng: 55.1380,
+    city: 'Dubai Marina',
+    distance: 0,
+    favorites_count: 19,
+    views_count: 112
+  },
+  {
+    id: 'item-demo-5',
+    user_id: 'user-demo',
+    category: 'sports',
+    type: 'Fitness Equipment',
+    brand: 'Peloton',
+    model: 'Bike+',
+    condition: 'like_new',
+    year: 2025,
+    color: 'Black/Red',
+    photos: [
+      'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=530&fit=crop'
+    ],
+    is_boosted: false,
+    is_giveaway: false,
+    created_at: '2026-03-28',
+    lat: 25.0800,
+    lng: 55.1380,
+    city: 'Dubai Marina',
+    distance: 0,
+    favorites_count: 15,
+    views_count: 88
   }
 ];
 

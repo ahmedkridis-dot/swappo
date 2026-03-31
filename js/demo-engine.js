@@ -1513,6 +1513,19 @@ window.DemoBadges = DemoBadges;
    EXPOSE TO GLOBAL SCOPE
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/** Reset all demo data — clears localStorage and re-seeds fresh state */
+function resetDemoData() {
+  Object.values(STORAGE_KEYS).forEach(function(key) {
+    localStorage.removeItem(key);
+  });
+  localStorage.removeItem('swappo_early_adopter_count');
+  localStorage.removeItem('swappo_pioneers');
+  localStorage.removeItem('swappo_browsed_categories');
+  localStorage.removeItem('language');
+  initDemoMode();
+  DemoNotifications.showToast('Demo data reset! All fresh.', 'success', 3000);
+}
+
 window.DemoAuth = DemoAuth;
 window.DemoSubscription = DemoSubscription;
 window.DemoItems = DemoItems;
@@ -1522,3 +1535,4 @@ window.DemoNotifications = DemoNotifications;
 window.DemoGiveaway = DemoGiveaway;
 window.updateNavbarForDemo = updateNavbarForDemo;
 window.initDemoMode = initDemoMode;
+window.resetDemoData = resetDemoData;

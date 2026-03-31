@@ -424,6 +424,19 @@
         <div class="auth-footer-link">
           <span data-i18n="auth_no_account">Don't have an account?</span> <a href="#" onclick="switchTab('signup'); return false;" data-i18n="auth_signup">Sign up</a>
         </div>
+
+        <!-- Quick Demo Access -->
+        <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--border);text-align:center;">
+          <button type="button" onclick="quickDemoLogin()" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;padding:10px 24px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-size:0.9rem;display:inline-flex;align-items:center;gap:8px;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(9,177,186,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <i class="fas fa-bolt"></i> <span data-i18n="auth_quick_demo">Quick Demo (Premium)</span>
+          </button>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;" data-i18n="auth_demo_hint">demo@swappo.ae / demo123 — Full access to test everything</div>
+        </div>
+        <div style="margin-top:8px;text-align:center;">
+          <button type="button" onclick="resetAndDemo()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:6px 16px;border-radius:var(--radius);font-size:0.78rem;cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='var(--secondary)'" onmouseout="this.style.color='var(--text-secondary)'">
+            <i class="fas fa-sync-alt"></i> <span data-i18n="auth_reset_demo">Reset Demo Data</span>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -726,6 +739,30 @@
       e.preventDefault();
       showToast('Password reset is not available in demo mode. Use demo@swappo.ae / demo123', 'info');
     });
+
+    /* ========================
+       Quick Demo Login
+       ======================== */
+    function quickDemoLogin() {
+      var result = DemoAuth.signIn('demo@swappo.ae', 'demo123');
+      if (result.success) {
+        showToast('Welcome Ahmed! Premium account loaded.', 'success');
+        setTimeout(function() {
+          var params = new URLSearchParams(window.location.search);
+          var redirect = params.get('redirect') || '../index.html';
+          window.location.href = redirect;
+        }, 800);
+      }
+    }
+    window.quickDemoLogin = quickDemoLogin;
+
+    function resetAndDemo() {
+      if (window.resetDemoData) {
+        resetDemoData();
+        showToast('Demo data reset! You can now log in fresh.', 'success');
+      }
+    }
+    window.resetAndDemo = resetAndDemo;
 
     /* ========================
        Pseudo Validation (debounced)
