@@ -11,6 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/landing-upgrade.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -135,16 +136,27 @@
     })();
   </script>
 
-  <!-- ========== HERO BANNER ========== -->
+  <!-- ========== HERO BANNER (UPGRADED) ========== -->
   <section class="hero-banner">
     <img src="img/hero-swappo.png" alt="Swap marketplace">
     <div class="hero-banner-overlay"></div>
     <div class="hero-banner-content">
       <div class="container">
         <div class="hero-text">
-          <h1 data-i18n="hero_title">Someone needs what you have.<br>Swap it.</h1>
+          <h1 data-i18n="hero_title_v2">Someone needs what you have. <span data-i18n="hero_title_accent">Swap it.</span></h1>
           <p data-i18n="hero_subtitle">The UAE's first barter platform. Trade items with your community. Start free.</p>
           <a href="pages/login.html" class="btn btn-primary" data-i18n="join_swap">Join the Swap</a>
+          <div class="hero-trust">
+            <span><span class="check">&#10003;</span> <span data-i18n="trust_items">5,000+ items listed</span></span>
+            <span><span class="check">&#10003;</span> <span data-i18n="trust_categories">12 categories</span></span>
+            <span><span class="check">&#10003;</span> <span data-i18n="trust_anonymous">100% anonymous until you agree</span></span>
+          </div>
+        </div>
+        <div class="hero-floating-area">
+          <div class="hero-floating-item float-phone"><i class="fas fa-mobile-alt"></i><span data-i18n="float_phone">Phone</span></div>
+          <div class="hero-floating-item float-bag"><i class="fas fa-shopping-bag"></i><span data-i18n="float_bag">Bag</span></div>
+          <div class="hero-floating-item float-plant"><i class="fas fa-leaf"></i><span data-i18n="float_plant">Plant</span></div>
+          <div class="hero-floating-item float-console"><i class="fas fa-gamepad"></i><span data-i18n="float_console">Console</span></div>
         </div>
       </div>
     </div>
@@ -220,32 +232,30 @@
     </div>
   </section>
 
-  <!-- ========== HOW IT WORKS (simplified) ========== -->
-  <section class="how-it-works" id="how-it-works">
+  <!-- ========== HOW IT WORKS (UPGRADED) ========== -->
+  <section class="how-it-works reveal" id="how-it-works">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header" style="justify-content:center;">
         <h2 class="section-title" data-i18n="how_it_works">How it works</h2>
       </div>
       <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-icon">📸</div>
-          <h3 data-i18n="step1_title">List your item</h3>
-          <p data-i18n="step1_desc">Take a photo and fill in the details. No descriptions needed — your identity stays safe.</p>
+        <div class="step-card card-hover">
+          <div class="step-number">1</div>
+          <div class="step-icon-circle"><i class="fas fa-camera"></i></div>
+          <h3 data-i18n="step1_title_v2">Drop an Item</h3>
+          <p data-i18n="step1_desc_v2">Snap a photo, fill the details, and list it in seconds.</p>
         </div>
-        <div class="step-card">
-          <div class="step-icon">🔍</div>
-          <h3 data-i18n="step2_title">Browse & discover</h3>
-          <p data-i18n="step2_desc">Explore thousands of items by category. Find exactly what you're looking for.</p>
+        <div class="step-card card-hover">
+          <div class="step-number">2</div>
+          <div class="step-icon-circle"><i class="fas fa-exchange-alt"></i></div>
+          <h3 data-i18n="step2_title_v2">Find a Match</h3>
+          <p data-i18n="step2_desc_v2">Browse thousands of items. Propose a swap.</p>
         </div>
-        <div class="step-card">
-          <div class="step-icon">🤝</div>
-          <h3 data-i18n="step3_title">Propose a swap</h3>
-          <p data-i18n="step3_desc">Send your offer. The other person sees only your item — identities stay hidden.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-icon">✅</div>
-          <h3 data-i18n="step4_title">Swap accepted!</h3>
-          <p data-i18n="step4_desc">Both accept? Identities revealed! Chat securely in-app & exchange.</p>
+        <div class="step-card card-hover">
+          <div class="step-number">3</div>
+          <div class="step-icon-circle"><i class="fas fa-handshake"></i></div>
+          <h3 data-i18n="step3_title_v2">Swap & Meet</h3>
+          <p data-i18n="step3_desc_v2">Both agree? Identities revealed. Meet up and swap!</p>
         </div>
       </div>
     </div>
@@ -264,12 +274,211 @@
     </div>
   </section>
 
-  <!-- ========== CTA ========== -->
-  <section class="cta">
+  <!-- ========== CATEGORIES GRID ========== -->
+  <section class="categories-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="browse_categories">Browse Categories</h2>
+      <div class="category-icon-grid">
+        <a href="pages/catalogue.html?category=clothing" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-tshirt"></i></div><div class="cat-name" data-i18n="clothing">Clothing</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=electronics" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-mobile-alt"></i></div><div class="cat-name" data-i18n="electronics">Electronics</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=furniture" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-couch"></i></div><div class="cat-name" data-i18n="furniture">Furniture</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=kids" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-baby"></i></div><div class="cat-name" data-i18n="kids">Kids & Baby</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=vehicles" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-car"></i></div><div class="cat-name" data-i18n="vehicles">Vehicles</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=sports" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-futbol"></i></div><div class="cat-name" data-i18n="sports">Sports</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=books" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-book"></i></div><div class="cat-name" data-i18n="books">Books & Media</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=gaming" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-gamepad"></i></div><div class="cat-name" data-i18n="gaming">Gaming</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=bags_accessories" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-shopping-bag"></i></div><div class="cat-name" data-i18n="bags_accessories">Bags & Accessories</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/catalogue.html?category=plants" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-leaf"></i></div><div class="cat-name" data-i18n="plants">Plants</div><div class="cat-count" data-i18n="cat_count_items">240+ items</div></a>
+        <a href="pages/giveaway.html" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-gift"></i></div><div class="cat-name" data-i18n="gift_corner">Gift Corner</div><div class="cat-count" data-i18n="cat_free_items">Free items!</div></a>
+        <a href="pages/catalogue.html" class="category-icon-card card-hover"><div class="cat-icon"><i class="fas fa-th"></i></div><div class="cat-name" data-i18n="all">All Categories</div><div class="cat-count" data-i18n="cat_browse_all">Browse all</div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== LIVE SWAP FEED ========== -->
+  <section class="swap-feed-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="happening_now">Happening Right Now</h2>
+      <div class="swap-feed-grid">
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#10B981;">SM</div>
+            <div><div class="swap-user-name">Sara M.</div><div class="swap-time" data-i18n="swap_2min">2 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name">iPhone 13</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name">MacBook Air</span></div>
+        </div>
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#09B1BA;">AK</div>
+            <div><div class="swap-user-name">Ahmed K.</div><div class="swap-time" data-i18n="swap_5min">5 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name">Nike Shoes</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name">Adidas Jacket</span></div>
+        </div>
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#8B5CF6;">FH</div>
+            <div><div class="swap-user-name">Fatima H.</div><div class="swap-time" data-i18n="swap_8min">8 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name" data-i18n="swap_plants">Plant Collection</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name" data-i18n="swap_bookshelf">Bookshelf</span></div>
+        </div>
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#F59E0B;">OS</div>
+            <div><div class="swap-user-name">Omar S.</div><div class="swap-time" data-i18n="swap_12min">12 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name">PS5 Controller</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name" data-i18n="swap_chair">Gaming Chair</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WHY SWAPPO ========== -->
+  <section class="why-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="why_swappo">Why Swappo?</h2>
+      <div class="why-grid">
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F4B0;</div>
+          <h3 data-i18n="why_save_title">Save Money</h3>
+          <p data-i18n="why_save_desc">Why buy when you can swap? Get what you need for free.</p>
+        </div>
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F331;</div>
+          <h3 data-i18n="why_eco_title">Eco-Friendly</h3>
+          <p data-i18n="why_eco_desc">Every swap = one less item in a landfill.</p>
+        </div>
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F6E1;</div>
+          <h3 data-i18n="why_safe_title">Safe & Anonymous</h3>
+          <p data-i18n="why_safe_desc">Stay anonymous until both sides agree to swap.</p>
+        </div>
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F49A;</div>
+          <h3 data-i18n="why_community_title">Community First</h3>
+          <p data-i18n="why_community_desc">Join thousands already swapping in the UAE.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== IMPACT COUNTER ========== -->
+  <section class="impact-counter-section reveal">
+    <div class="container">
+      <h2 data-i18n="the_swappo_effect">The Swappo Effect</h2>
+      <div class="impact-counters">
+        <div class="impact-stat"><div class="impact-number" data-target="12450" data-suffix="+">0</div><div class="impact-label" data-i18n="impact_items_swapped">Items Swapped</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="8200" data-suffix="+">0</div><div class="impact-label" data-i18n="impact_happy_swappers">Happy Swappers</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="15" data-suffix=" tons">0</div><div class="impact-label" data-i18n="impact_co2_saved">CO&#x2082; Saved</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="2500000" data-prefix="AED " data-suffix="+">0</div><div class="impact-label" data-i18n="impact_value_exchanged">Value Exchanged</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PRICING PLANS ========== -->
+  <section class="pricing-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="choose_plan">Choose Your Plan</h2>
+      <p class="pricing-subtitle" data-i18n="pricing_subtitle">Start free. Upgrade anytime.</p>
+      <div class="pricing-toggle">
+        <button class="active" data-i18n="monthly">Monthly</button>
+        <button data-i18n="annual">Annual <span class="save-badge" data-i18n="save_20">Save 20%</span></button>
+      </div>
+      <div class="plans-grid">
+        <!-- Free -->
+        <div class="plan-card card-hover">
+          <div class="plan-name" data-i18n="plan_free">Free</div>
+          <div class="plan-price"><span class="currency">AED</span> 0<span class="period" data-i18n="per_month">/mo</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_2_swaps">2 swaps/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_1_claim">1 giveaway claim</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_standard_support">Standard support</span></li>
+          </ul>
+          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
+        </div>
+        <!-- Bronze -->
+        <div class="plan-card card-hover">
+          <div class="plan-name" data-i18n="plan_bronze">Bronze</div>
+          <div class="plan-price"><span class="currency">AED</span> 19<span class="period" data-i18n="per_month">/mo</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_4_swaps">4 swaps/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_2_claims">2 giveaway claims</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_1_boost">1 boost/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_reduced_ads">Reduced ads</span></li>
+          </ul>
+          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
+        </div>
+        <!-- Silver -->
+        <div class="plan-card card-hover">
+          <div class="plan-name" data-i18n="plan_silver">Silver</div>
+          <div class="plan-price"><span class="currency">AED</span> 39<span class="period" data-i18n="per_month">/mo</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_6_swaps">6 swaps/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_3_claims">3 giveaway claims</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_2_boosts">2 boosts/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_no_ads">No ads</span></li>
+          </ul>
+          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
+        </div>
+        <!-- Premium -->
+        <div class="plan-card premium card-hover">
+          <div class="most-popular-badge" data-i18n="most_popular">Most Popular</div>
+          <div class="plan-name" data-i18n="plan_premium">Premium</div>
+          <div class="plan-price"><span class="currency">AED</span> 69<span class="period" data-i18n="per_month">/mo</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_unlimited_swaps">Unlimited swaps</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_5_claims">5 giveaway claims</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_4_boosts">4 boosts/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_no_ads">No ads</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="plan_vip_support">VIP support</span></li>
+          </ul>
+          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TESTIMONIALS ========== -->
+  <section class="testimonials-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="community_loves">Our Community Loves Swappo</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#09B1BA;">LR</div>
+            <div><div class="testimonial-name">Layla R.</div><div class="testimonial-badge badge-silver" data-i18n="badge_silver">Silver Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_1">"I swapped my old PlayStation for a brand new bookshelf. Couldn't believe it!"</p>
+        </div>
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#8B5CF6;">MK</div>
+            <div><div class="testimonial-name">Mohammed K.</div><div class="testimonial-badge badge-premium" data-i18n="badge_premium">Premium Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_2">"Swappo changed how I think about stuff I don't use. One person's clutter is another's treasure!"</p>
+        </div>
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#F59E0B;">NA</div>
+            <div><div class="testimonial-name">Noor A.</div><div class="testimonial-badge badge-bronze" data-i18n="badge_bronze">Bronze Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_3">"The anonymous feature is genius. I felt safe from the very first swap."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== APP DOWNLOAD CTA ========== -->
+  <section class="cta-download reveal">
     <div class="container">
       <h2 data-i18n="ready_to_swap">Ready to swap?</h2>
-      <p>The UAE's first barter platform. Trade items with your community. Start free.</p>
-      <a href="pages/login.html" class="btn btn-primary btn-lg" data-i18n="create_account">Create my account — It's free</a>
+      <p data-i18n="cta_subtitle">Download Swappo and start trading with your community today.</p>
+      <div class="store-buttons">
+        <a href="#" class="store-btn"><i class="fab fa-apple"></i> <span>App Store</span></a>
+        <a href="#" class="store-btn"><i class="fab fa-google-play"></i> <span>Google Play</span></a>
+      </div>
     </div>
   </section>
 
@@ -471,6 +680,61 @@
       grid.innerHTML = suggestions.map(function(item) {
         return DemoItems.renderCard(item);
       }).join('');
+    })();
+
+    // ── Scroll Reveal ──
+    (function() {
+      var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.reveal').forEach(function(el) {
+        revealObserver.observe(el);
+      });
+    })();
+
+    // ── Impact Counter Animation ──
+    (function() {
+      var counters = document.querySelectorAll('.impact-number');
+      if (!counters.length) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            var target = parseInt(el.getAttribute('data-target'));
+            var suffix = el.getAttribute('data-suffix') || '';
+            var prefix = el.getAttribute('data-prefix') || '';
+            var current = 0;
+            var increment = target / 60;
+            var timer = setInterval(function() {
+              current += increment;
+              if (current >= target) {
+                current = target;
+                clearInterval(timer);
+              }
+              el.textContent = prefix + Math.floor(current).toLocaleString() + suffix;
+            }, 25);
+            observer.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+      counters.forEach(function(c) { observer.observe(c); });
+    })();
+
+    // ── Pricing Toggle ──
+    (function() {
+      var toggle = document.querySelector('.pricing-toggle');
+      if (!toggle) return;
+      var btns = toggle.querySelectorAll('button');
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          btns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+        });
+      });
     })();
 
     // Early Adopter counter
