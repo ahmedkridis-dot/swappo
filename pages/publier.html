@@ -547,24 +547,18 @@
     </div>
   </nav>
 
-  <!-- Categories bar -->
-  <div class="categories-bar">
-    <div class="container">
-      <div class="categories-bar-inner">
-        <a href="catalogue.html" class="cat-link">All</a>
-        <a href="catalogue.html" class="cat-link">Clothing</a>
-        <a href="catalogue.html" class="cat-link">Electronics</a>
-        <a href="catalogue.html" class="cat-link">Furniture</a>
-        <a href="catalogue.html" class="cat-link">Vehicles</a>
-        <a href="catalogue.html" class="cat-link">Sports</a>
-        <a href="catalogue.html" class="cat-link">Books & Media</a>
-        <a href="catalogue.html" class="cat-link">Kids</a>
-        <a href="giveaway.html" class="cat-link" style="color:var(--secondary);">
-          <i class="fas fa-gift"></i>&nbsp; Gift Corner
-        </a>
-      </div>
-    </div>
-  </div>
+  <!-- ========== MEGA MENU ========== -->
+  <div id="mega-menu-mount"></div>
+  <script src="../js/mega-menu.js"></script>
+  <script>
+    (function(){
+      var mount = document.getElementById('mega-menu-mount');
+      if (mount && typeof renderMegaMenuBar === 'function') {
+        mount.innerHTML = renderMegaMenuBar(true);
+        if (typeof initMegaMenu === 'function') initMegaMenu();
+      }
+    })();
+  </script>
 
   <!-- ========== MAIN CONTENT ========== -->
   <div class="publish-page">

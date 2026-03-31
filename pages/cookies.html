@@ -112,24 +112,18 @@
     </div>
   </nav>
 
-  <!-- Categories bar -->
-  <div class="categories-bar">
-    <div class="container">
-      <div class="categories-bar-inner">
-        <a href="catalogue.html" class="cat-link" data-i18n="all">All</a>
-        <a href="catalogue.html" class="cat-link" data-i18n="clothing">Clothing</a>
-        <a href="catalogue.html" class="cat-link" data-i18n="electronics">Electronics</a>
-        <a href="catalogue.html" class="cat-link" data-i18n="furniture">Furniture</a>
-        <a href="catalogue.html" class="cat-link" data-i18n="vehicles">Vehicles</a>
-        <a href="catalogue.html" class="cat-link" data-i18n="sports">Sports</a>
-        <a href="catalogue.html" class="cat-link" data-i18n="books">Books & Media</a>
-        <a href="catalogue.html" class="cat-link" data-i18n="kids">Kids</a>
-        <a href="giveaway.html" class="cat-link" style="color:var(--secondary);">
-          <i class="fas fa-gift"></i>&nbsp; Gift Corner
-        </a>
-      </div>
-    </div>
-  </div>
+  <!-- ========== MEGA MENU ========== -->
+  <div id="mega-menu-mount"></div>
+  <script src="../js/mega-menu.js"></script>
+  <script>
+    (function(){
+      var mount = document.getElementById('mega-menu-mount');
+      if (mount && typeof renderMegaMenuBar === 'function') {
+        mount.innerHTML = renderMegaMenuBar(true);
+        if (typeof initMegaMenu === 'function') initMegaMenu();
+      }
+    })();
+  </script>
 
   <!-- ========== LEGAL CONTENT ========== -->
   <section class="legal-page">

@@ -122,27 +122,18 @@
     </div>
   </nav>
 
-  <!-- ========== CATEGORIES BAR ========== -->
-  <div class="categories-bar">
-    <div class="container">
-      <div class="categories-bar-inner">
-        <a href="pages/giveaway.html" class="cat-link" style="color:var(--secondary);font-weight:700;">
-          <i class="fas fa-gift"></i>&nbsp;<span data-i18n="gift_corner">Gift Corner</span>
-        </a>
-        <a href="pages/catalogue.html?category=kids" class="cat-link" data-i18n="kids">Kids & Baby</a>
-        <a href="pages/catalogue.html?category=plants" class="cat-link" data-i18n="plants">Plants</a>
-        <a href="pages/catalogue.html?category=bags_accessories" class="cat-link" data-i18n="bags_accessories">Bags & Accessories</a>
-        <a href="pages/catalogue.html?category=clothing" class="cat-link" data-i18n="clothing">Clothing</a>
-        <a href="pages/catalogue.html?category=electronics" class="cat-link" data-i18n="electronics">Electronics</a>
-        <a href="pages/catalogue.html?category=gaming" class="cat-link" data-i18n="gaming">Gaming & Consoles</a>
-        <a href="pages/catalogue.html?category=furniture" class="cat-link" data-i18n="furniture">Furniture</a>
-        <a href="pages/catalogue.html?category=vehicles" class="cat-link" data-i18n="vehicles">Vehicles</a>
-        <a href="pages/catalogue.html?category=sports" class="cat-link" data-i18n="sports">Sports & Leisure</a>
-        <a href="pages/catalogue.html?category=books" class="cat-link" data-i18n="books">Books & Media</a>
-        <a href="pages/catalogue.html" class="cat-link active" data-i18n="all">All</a>
-      </div>
-    </div>
-  </div>
+  <!-- ========== MEGA MENU ========== -->
+  <div id="mega-menu-mount"></div>
+  <script src="js/mega-menu.js"></script>
+  <script>
+    (function(){
+      var mount = document.getElementById('mega-menu-mount');
+      if (mount && typeof renderMegaMenuBar === 'function') {
+        mount.innerHTML = renderMegaMenuBar(false);
+        if (typeof initMegaMenu === 'function') initMegaMenu();
+      }
+    })();
+  </script>
 
   <!-- ========== HERO BANNER ========== -->
   <section class="hero-banner">

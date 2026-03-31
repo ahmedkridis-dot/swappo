@@ -4,7 +4,7 @@
     {
       "name": "swappo-dev",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "3000", "--directory", "/Users/kardous/Documents/Claude/Projects/EHVOILA/ehvoila"],
+      "runtimeArgs": ["-m", "http.server", "3000", "--directory", "/Users/kardous/Developer/swappo"],
       "port": 3000
     }
   ]
