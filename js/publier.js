@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================
 // FORM STATE MANAGEMENT
 // ========================
-var formState = {
+window.formState = {
   currentStep: 1,
   category: null,
   photos: [],
@@ -30,7 +30,7 @@ var formState = {
 // ========================
 // CATEGORY DATA
 // ========================
-var categoryFields = {
+window.categoryFields = {
   clothing: {
     gender: { label: 'Gender', type: 'select', options: ['Men', 'Women', 'Children', 'Unisex'], required: true },
     subcategory: { label: 'Subcategory', type: 'select', options: [], required: true },
@@ -107,7 +107,7 @@ var categoryFields = {
   }
 };
 
-var categoryNames = {
+window.categoryNames = {
   clothing: 'Clothing & Accessories',
   electronics: 'Electronics & Phones',
   furniture: 'Furniture & Home',
@@ -122,7 +122,7 @@ var categoryNames = {
 };
 
 // Unsplash placeholder photos by category
-var categoryPhotos = {
+window.categoryPhotos = {
   clothing:    ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1434389677669-e08b4cda3a4a?w=300&h=400&fit=crop'],
   electronics: ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1585792180666-f7347c490ee2?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=400&fit=crop'],
   furniture:   ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=300&h=400&fit=crop'],
@@ -136,14 +136,14 @@ var categoryPhotos = {
   other:       ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=300&h=400&fit=crop', 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=300&h=400&fit=crop']
 };
 
-var conditionOptions = ['New', 'Like New', 'Good', 'Fair'];
-var colorOptions = ['Black', 'White', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige', 'Pink', 'Other'];
-var yearOptions = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
+window.conditionOptions = ['New', 'Like New', 'Good', 'Fair'];
+window.colorOptions = ['Black', 'White', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige', 'Pink', 'Other'];
+window.yearOptions = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
 
 // ========================
 // STEP NAVIGATION
 // ========================
-function nextStep() {
+window.nextStep = function() {
   if (formState.currentStep === 1 && !formState.category) {
     DemoNotifications.showToast('Please select a category first.', 'warning');
     return;
@@ -155,7 +155,7 @@ function nextStep() {
   }
 }
 
-function prevStep() {
+window.prevStep = function() {
   if (formState.currentStep > 1) {
     formState.currentStep--;
     updateStepUI();
@@ -163,7 +163,7 @@ function prevStep() {
   }
 }
 
-function updateStepUI() {
+window.updateStepUI = function() {
   var steps = document.querySelectorAll('.step');
   var sections = document.querySelectorAll('.step-section');
 
@@ -190,19 +190,19 @@ function updateStepUI() {
   }
 }
 
-function getSectionName(stepNum) {
+window.getSectionName = function(stepNum) {
   var names = { 1: 'category', 2: 'details', 3: 'photos', 4: 'review' };
   return names[stepNum];
 }
 
-function scrollToTop() {
+window.scrollToTop = function() {
   document.querySelector('.publish-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ========================
 // STEP 1: CATEGORY SELECTION
 // ========================
-function selectCategory(btn, category) {
+window.selectCategory = function(btn, category) {
   document.querySelectorAll('.category-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
   formState.category = category;
@@ -215,25 +215,25 @@ function selectCategory(btn, category) {
 // ========================
 // STEP 2: DYNAMIC DETAILS FIELDS
 // ========================
-var CLOTHING_SUBCATEGORIES = {
+window.CLOTHING_SUBCATEGORIES = {
   male: ['T-Shirts & Polos', 'Shirts', 'Pants & Jeans', 'Shorts', 'Jackets & Coats', 'Suits & Blazers', 'Sweaters & Hoodies', 'Activewear', 'Underwear & Socks', 'Shoes', 'Other'],
   female: ['Tops & Blouses', 'Dresses', 'Skirts', 'Pants & Jeans', 'Shorts', 'Jackets & Coats', 'Sweaters & Hoodies', 'Activewear', 'Lingerie & Sleepwear', 'Shoes', 'Other'],
   kids: ['T-Shirts', 'Pants', 'Dresses', 'Jackets', 'Shoes', 'School Uniforms', 'Other'],
   unisex: ['T-Shirts & Polos', 'Pants & Jeans', 'Jackets & Coats', 'Sweaters & Hoodies', 'Activewear', 'Shoes', 'Other']
 };
 
-var BAGS_ACCESSORIES_SUBCATEGORIES = {
+window.BAGS_ACCESSORIES_SUBCATEGORIES = {
   bags: ['Handbags', 'Backpacks', 'Crossbody Bags', 'Tote Bags', 'Clutches', 'Laptop Bags', 'Travel Bags', 'Wallets', 'Other'],
   accessories: ['Sunglasses', 'Watches', 'Belts', 'Scarves', 'Hats & Caps', 'Jewelry', 'Hair Accessories', 'Ties & Bowties', 'Other']
 };
 
-var GAMING_SUBCATEGORIES = {
+window.GAMING_SUBCATEGORIES = {
   consoles_hardware: ['PlayStation 5', 'PlayStation 4', 'Xbox Series X/S', 'Xbox One', 'Nintendo Switch', 'Gaming PC', 'VR Headset', 'Other'],
   games: ['PS5 Games', 'PS4 Games', 'Xbox Games', 'Nintendo Games', 'PC Games', 'Other'],
   accessories: ['Controllers', 'Headsets', 'Keyboards', 'Mice', 'Monitors', 'Chairs', 'Other']
 };
 
-function renderDetailsFields() {
+window.renderDetailsFields = function() {
   var container = document.getElementById('detailsContainer');
   var cat = categoryFields[formState.category];
   if (!cat) { container.innerHTML = '<p>Select a category first.</p>'; return; }
@@ -314,7 +314,7 @@ function renderDetailsFields() {
   }
 }
 
-function buildSelectNew(name, label, options, required) {
+window.buildSelectNew = function(name, label, options, required) {
   var optHtml = '<option value="">Select ' + label.toLowerCase() + '</option>';
   options.forEach(function(opt) {
     optHtml += '<option value="' + opt + '">' + opt + '</option>';
@@ -326,7 +326,7 @@ function buildSelectNew(name, label, options, required) {
     '</select></div>';
 }
 
-function buildSelect(name, label, options) {
+window.buildSelect = function(name, label, options) {
   var optHtml = '<option value="">Select ' + label.toLowerCase() + '</option>';
   options.forEach(function(opt) {
     optHtml += '<option value="' + opt + '">' + opt + '</option>';
@@ -338,14 +338,14 @@ function buildSelect(name, label, options) {
     '</select></div>';
 }
 
-function updateDetails(field, value) {
+window.updateDetails = function(field, value) {
   formState.details[field] = value;
 }
 
 // ========================
 // STEP 3: PHOTOS (DEMO)
 // ========================
-function togglePhoto(index) {
+window.togglePhoto = function(index) {
   var cat = formState.category || 'other';
   var photos = categoryPhotos[cat] || categoryPhotos.other;
 
@@ -357,7 +357,7 @@ function togglePhoto(index) {
   refreshPhotoGrid();
 }
 
-function refreshPhotoGrid() {
+window.refreshPhotoGrid = function() {
   var slots = document.querySelectorAll('.photo-slot');
   var cat = formState.category || 'other';
   var photos = categoryPhotos[cat] || categoryPhotos.other;
@@ -376,7 +376,7 @@ function refreshPhotoGrid() {
 // ========================
 // STEP 4: REVIEW
 // ========================
-function populateReview() {
+window.populateReview = function() {
   document.getElementById('reviewCategory').textContent = categoryNames[formState.category] || 'Other';
 
   var photosHtml = '';
@@ -408,7 +408,7 @@ function populateReview() {
 // ========================
 // GIVEAWAY TOGGLE
 // ========================
-function toggleGiveaway() {
+window.toggleGiveaway = function() {
   var cb = document.getElementById('giveawayCheckbox');
   cb.checked = !cb.checked;
   formState.isGiveaway = cb.checked;
@@ -418,7 +418,7 @@ function toggleGiveaway() {
 // ========================
 // PUBLISH
 // ========================
-function publishItem(e) {
+window.publishItem = function(e) {
   e.preventDefault();
 
   var user = DemoAuth.getCurrentUser();
