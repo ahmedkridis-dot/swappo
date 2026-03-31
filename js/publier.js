@@ -233,6 +233,25 @@ window.GAMING_SUBCATEGORIES = {
   accessories: ['Controllers', 'Headsets', 'Keyboards', 'Mice', 'Monitors', 'Chairs', 'Other']
 };
 
+// Map field keys to i18n keys
+window.getFieldLabel = function(fieldKey, fallback) {
+  var i18nMap = {
+    type: 'detail_type', brand: 'detail_brand', model: 'detail_model',
+    condition: 'detail_condition', year: 'detail_year', size: 'detail_size',
+    color: 'detail_color', gender: 'detail_gender', subcategory: 'detail_subcategory',
+    age_range: 'detail_age_range', material: 'detail_material', platform: 'detail_platform',
+    zone: 'detail_zone'
+  };
+  var key = i18nMap[fieldKey];
+  if (key && typeof t === 'function') return t(key);
+  return fallback || fieldKey;
+};
+
+window.getSelectPlaceholder = function(label) {
+  var prefix = (typeof t === 'function') ? t('field_select') : 'Select';
+  return prefix + ' ' + label.toLowerCase();
+};
+
 window.renderDetailsFields = function() {
   var container = document.getElementById('detailsContainer');
   var cat = categoryFields[formState.category];
@@ -246,28 +265,29 @@ window.renderDetailsFields = function() {
     var fieldKeys = Object.keys(cat);
     fieldKeys.forEach(function(fieldKey) {
       var field = cat[fieldKey];
+      var label = getFieldLabel(fieldKey, field.label);
       if (field.type === 'select') {
-        html += buildSelectNew(fieldKey, field.label, field.options, field.required);
+        html += buildSelectNew(fieldKey, label, field.options, field.required);
       } else if (field.type === 'text') {
         html += '<div class="form-group">' +
-          '<label class="form-label">' + field.label + (field.required ? ' *' : '') + '</label>' +
+          '<label class="form-label">' + label + (field.required ? ' *' : '') + '</label>' +
           '<input type="text" class="form-input" name="' + fieldKey + '" data-field="' + fieldKey + '" placeholder="' + (field.placeholder || '') + '" onchange="updateDetails(\'' + fieldKey + '\', this.value)"' + (field.required ? ' required' : '') + '>' +
           '</div>';
       }
     });
   } else {
-    html += buildSelect('type', 'Type', cat.types);
-    html += buildSelect('brand', 'Brand', cat.brands);
+    html += buildSelect('type', getFieldLabel('type', 'Type'), cat.types);
+    html += buildSelect('brand', getFieldLabel('brand', 'Brand'), cat.brands);
     html += '<div class="form-group">' +
-      '<label class="form-label">Model</label>' +
+      '<label class="form-label">' + getFieldLabel('model', 'Model') + '</label>' +
       '<input type="text" class="form-input" name="model" placeholder="e.g. iPhone 15 Pro" onchange="updateDetails(\'model\', this.value)">' +
       '</div>';
-    html += buildSelect('condition', 'Condition', conditionOptions);
-    html += buildSelect('year', 'Year', yearOptions);
+    html += buildSelect('condition', getFieldLabel('condition', 'Condition'), conditionOptions);
+    html += buildSelect('year', getFieldLabel('year', 'Year'), yearOptions);
     if (cat.showSize) {
-      html += buildSelect('size', 'Size', cat.sizeOptions);
+      html += buildSelect('size', getFieldLabel('size', 'Size'), cat.sizeOptions);
     }
-    html += buildSelect('color', 'Color', colorOptions);
+    html += buildSelect('color', getFieldLabel('color', 'Color'), colorOptions);
   }
 
   container.innerHTML = html;
@@ -282,7 +302,7 @@ window.renderDetailsFields = function() {
       var genderMap = { 'Men': 'male', 'Women': 'female', 'Children': 'kids', 'Unisex': 'unisex' };
       var genderKey = genderMap[genderSelect.value] || 'male';
       var subs = CLOTHING_SUBCATEGORIES[genderKey] || [];
-      subSelect.innerHTML = '<option value="">Select subcategory</option>' + subs.map(function(s) {
+      subSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('subcategory', 'Subcategory')) + '</option>' + subs.map(function(s) {
         return '<option value="' + s + '">' + s + '</option>';
       }).join('');
     });
@@ -294,7 +314,7 @@ window.renderDetailsFields = function() {
       if (!subSelect) return;
       var zoneKey = zoneSelect.value.toLowerCase();
       var subs = BAGS_ACCESSORIES_SUBCATEGORIES[zoneKey] || [];
-      subSelect.innerHTML = '<option value="">Select subcategory</option>' + subs.map(function(s) {
+      subSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('subcategory', 'Subcategory')) + '</option>' + subs.map(function(s) {
         return '<option value="' + s + '">' + s + '</option>';
       }).join('');
     });
@@ -307,7 +327,7 @@ window.renderDetailsFields = function() {
       var zoneMap = { 'Consoles & Hardware': 'consoles_hardware', 'Games': 'games', 'Accessories': 'accessories' };
       var zoneKey = zoneMap[zoneSelect.value] || 'consoles_hardware';
       var subs = GAMING_SUBCATEGORIES[zoneKey] || [];
-      subSelect.innerHTML = '<option value="">Select subcategory</option>' + subs.map(function(s) {
+      subSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('subcategory', 'Subcategory')) + '</option>' + subs.map(function(s) {
         return '<option value="' + s + '">' + s + '</option>';
       }).join('');
     });
@@ -315,7 +335,7 @@ window.renderDetailsFields = function() {
 }
 
 window.buildSelectNew = function(name, label, options, required) {
-  var optHtml = '<option value="">Select ' + label.toLowerCase() + '</option>';
+  var optHtml = '<option value="">' + getSelectPlaceholder(label) + '</option>';
   options.forEach(function(opt) {
     optHtml += '<option value="' + opt + '">' + opt + '</option>';
   });
@@ -327,7 +347,7 @@ window.buildSelectNew = function(name, label, options, required) {
 }
 
 window.buildSelect = function(name, label, options) {
-  var optHtml = '<option value="">Select ' + label.toLowerCase() + '</option>';
+  var optHtml = '<option value="">' + getSelectPlaceholder(label) + '</option>';
   options.forEach(function(opt) {
     optHtml += '<option value="' + opt + '">' + opt + '</option>';
   });
@@ -377,7 +397,9 @@ window.refreshPhotoGrid = function() {
 // STEP 4: REVIEW
 // ========================
 window.populateReview = function() {
-  document.getElementById('reviewCategory').textContent = categoryNames[formState.category] || 'Other';
+  var catKey = 'publish_cat_' + (formState.category === 'bags_accessories' ? 'bags' : formState.category);
+  var catLabel = (typeof t === 'function') ? t(catKey) : (categoryNames[formState.category] || 'Other');
+  document.getElementById('reviewCategory').textContent = catLabel;
 
   var photosHtml = '';
   for (var i = 0; i < 4; i++) {
@@ -390,14 +412,13 @@ window.populateReview = function() {
   document.getElementById('reviewPhotos').innerHTML = photosHtml;
 
   var detailsHtml = '';
-  var fieldLabels = { gender: 'Gender', subcategory: 'Subcategory', zone: 'Type', type: 'Type', brand: 'Brand', model: 'Model', condition: 'Condition', year: 'Year', size: 'Size', color: 'Color', age_range: 'Age Range', material: 'Material' };
   var fieldOrder = ['gender', 'zone', 'subcategory', 'age_range', 'type', 'brand', 'model', 'material', 'condition', 'year', 'size', 'color'];
 
   fieldOrder.forEach(function(key) {
     var val = formState.details[key];
     if (val) {
       detailsHtml += '<div class="review-section">' +
-        '<div class="review-label">' + (fieldLabels[key] || key) + '</div>' +
+        '<div class="review-label">' + getFieldLabel(key, key) + '</div>' +
         '<div class="review-value">' + val + '</div>' +
         '</div>';
     }
