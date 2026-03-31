@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Impact — Swappo</title>
+  <meta name="description" content="Every swap makes a difference. See how Swappo is building a greener, more connected UAE community.">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/svg+xml" href="../img/icon-192.svg">
+  <meta name="theme-color" content="#09B1BA">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ========== IMPACT PAGE STYLES ========== */
+
+    /* Hero */
+    .impact-hero {
+      position: relative;
+      padding: 80px 0 60px;
+      background: linear-gradient(135deg, #E6F7F8 0%, #F0FBFC 40%, #FFFFFF 100%);
+      overflow: hidden;
+      text-align: center;
+    }
+    .impact-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 60'%3E%3Cpath fill='%23ffffff' d='M0,30 C360,60 720,0 1080,30 C1260,45 1380,40 1440,35 L1440,60 L0,60 Z'/%3E%3C/svg%3E") no-repeat center bottom;
+      background-size: cover;
+    }
+    .impact-hero h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .impact-hero h1 span {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .impact-hero p {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* Decorative blobs */
+    .impact-hero .blob {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--primary);
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .impact-hero .blob-1 { width: 300px; height: 300px; top: -80px; right: -60px; }
+    .impact-hero .blob-2 { width: 200px; height: 200px; bottom: 20px; left: -40px; }
+    .impact-hero .blob-3 { width: 120px; height: 120px; top: 40px; left: 15%; }
+
+    /* Live Counters */
+    .impact-counters {
+      padding: 60px 0;
+      background: #fff;
+    }
+    .counters-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .counter-card {
+      text-align: center;
+      padding: 32px 20px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-light);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .counter-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .counter-icon {
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .counter-value {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .counter-label {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Section common */
+    .impact-section {
+      padding: 72px 0;
+    }
+    .impact-section--alt {
+      background: #F6FCFC;
+    }
+    .impact-section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .impact-section-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    /* Wave dividers */
+    .wave-divider {
+      position: relative;
+      height: 50px;
+      overflow: hidden;
+    }
+    .wave-divider svg {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Why Swapping Matters — 3 pillar cards */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .pillar-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .pillar-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .pillar-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+    }
+    .pillar-card .pillar-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-lg);
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+    .pillar-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .pillar-card p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Impact Timeline */
+    .timeline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .timeline-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      padding: 0 12px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .timeline-step.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .timeline-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 32px;
+      right: -10%;
+      width: 20%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    }
+    .timeline-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 16px rgba(9, 177, 186, 0.3);
+    }
+    .timeline-step h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .timeline-step p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Gift Corner Effect */
+    .gift-section {
+      text-align: center;
+    }
+    .gift-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--primary-light);
+      padding: 16px 32px;
+      border-radius: var(--radius-full);
+      margin-bottom: 28px;
+    }
+    .gift-stat-icon { font-size: 1.4rem; }
+    .gift-stat-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .gift-stat-label {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* UAE Vision */
+    .uae-vision {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      padding: 56px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .uae-vision::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='30' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E") repeat;
+      pointer-events: none;
+    }
+    .uae-vision h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .uae-vision p {
+      font-size: 1rem;
+      opacity: 0.92;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.7;
+      position: relative;
+    }
+    .uae-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 28px;
+      position: relative;
+    }
+    .uae-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Final CTA */
+    .impact-cta {
+      padding: 80px 0;
+      text-align: center;
+      background: #fff;
+    }
+    .impact-cta h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .impact-cta p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+    .impact-cta .btn {
+      padding: 14px 36px;
+      font-size: 1rem;
+    }
+    .impact-cta .cta-count {
+      margin-top: 16px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .impact-cta .cta-count strong {
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .impact-hero { padding: 56px 0 40px; }
+      .impact-hero h1 { font-size: 1.8rem; }
+      .impact-hero p { font-size: 1rem; }
+      .counters-grid { grid-template-columns: 1fr; gap: 16px; }
+      .counter-value { font-size: 2rem; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .impact-section { padding: 48px 0; }
+      .impact-section-title { font-size: 1.5rem; }
+      .timeline {
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+      }
+      .timeline-step::after { display: none; }
+      .timeline-step { padding: 0; }
+      .uae-badges { flex-direction: column; gap: 12px; }
+      .impact-cta h2 { font-size: 1.6rem; }
+    }
+    @media (max-width: 480px) {
+      .impact-hero h1 { font-size: 1.5rem; }
+      .counter-card { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        </div>
+        <div class="navbar-actions">
+          <a href="chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>
+          <a href="profile.html" class="navbar-icon" title="My Swaps"><i class="fas fa-user-circle"></i></a>
+          <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== MEGA MENU ========== -->
+  <div id="mega-menu-mount"></div>
+  <script src="../js/mega-menu.js"></script>
+  <script>
+    (function(){
+      var mount = document.getElementById('mega-menu-mount');
+      if (mount && typeof renderMegaMenuBar === 'function') {
+        mount.innerHTML = renderMegaMenuBar(true);
+        if (typeof initMegaMenu === 'function') initMegaMenu();
+      }
+    })();
+  </script>
+
+  <!-- ========== HERO ========== -->
+  <section class="impact-hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <h1>Every Swap Makes a <span>Difference</span></h1>
+      <p data-i18n="impact_hero_subtitle">Join a community that trades smarter, wastes less, and connects more.</p>
+    </div>
+  </section>
+
+  <!-- ========== LIVE COUNTERS ========== -->
+  <section class="impact-counters">
+    <div class="container">
+      <div class="counters-grid">
+        <div class="counter-card">
+          <span class="counter-icon">🌍</span>
+          <div class="counter-value" data-counter="co2">0</div>
+          <div class="counter-label" data-i18n="impact_co2_label">kg of CO2 saved</div>
+        </div>
+        <div class="counter-card">
+          <span class="counter-icon">📦</span>
+          <div class="counter-value" data-counter="items">0</div>
+          <div class="counter-label" data-i18n="impact_items_label">items given a second life</div>
+        </div>
+        <div class="counter-card">
+          <span class="counter-icon">🤝</span>
+          <div class="counter-value" data-counter="connections">0</div>
+          <div class="counter-label" data-i18n="impact_connections_label">connections made</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wave -->
+  <div class="wave-divider">
+    <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+      <path fill="#F6FCFC" d="M0,25 C480,50 960,0 1440,25 L1440,50 L0,50 Z"/>
+    </svg>
+  </div>
+
+  <!-- ========== WHY SWAPPING MATTERS ========== -->
+  <section class="impact-section impact-section--alt">
+    <div class="container">
+      <h2 class="impact-section-title" data-i18n="impact_why_title">Why Swapping Matters</h2>
+      <p class="impact-section-subtitle" data-i18n="impact_why_subtitle">Three reasons to swap instead of throw away.</p>
+      <div class="pillars-grid">
+        <div class="pillar-card" data-animate>
+          <div class="pillar-icon">🌱</div>
+          <h3 data-i18n="impact_planet_title">Save the Planet, One Swap at a Time</h3>
+          <p data-i18n="impact_planet_text">Every item reused saves an average of 3.9 kg of CO2. The UAE generates 1.8 kg of waste per person per day. Every swap is a step toward diverting 75% of waste from landfills by 2030.</p>
+        </div>
+        <div class="pillar-card" data-animate>
+          <div class="pillar-icon">🤝</div>
+          <h3 data-i18n="impact_community_title">200+ Nationalities. One Community.</h3>
+          <p data-i18n="impact_community_text">In a country where 88.5% of residents are expats, Swappo creates real human connections. Trade with neighbors, give to those leaving, discover people who share your interests.</p>
+        </div>
+        <div class="pillar-card" data-animate>
+          <div class="pillar-icon">💡</div>
+          <h3 data-i18n="impact_smart_title">Swap Smart.</h3>
+          <p data-i18n="impact_smart_text">Why buy new when someone has exactly what you need? No price negotiations, no haggling. Just fair trades based on what things are worth to you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wave -->
+  <div class="wave-divider" style="transform:rotate(180deg);">
+    <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+      <path fill="#F6FCFC" d="M0,25 C480,50 960,0 1440,25 L1440,50 L0,50 Z"/>
+    </svg>
+  </div>
+
+  <!-- ========== HOW YOU MAKE AN IMPACT (Timeline) ========== -->
+  <section class="impact-section">
+    <div class="container">
+      <h2 class="impact-section-title" data-i18n="impact_how_title">How You Make an Impact</h2>
+      <p class="impact-section-subtitle" data-i18n="impact_how_subtitle">See the ripple effect of a single swap.</p>
+      <div class="timeline">
+        <div class="timeline-step" data-animate>
+          <div class="timeline-icon"><i class="fas fa-camera"></i></div>
+          <h4 data-i18n="impact_step1_title">You publish</h4>
+          <p data-i18n="impact_step1_desc">List an item you no longer need</p>
+        </div>
+        <div class="timeline-step" data-animate>
+          <div class="timeline-icon"><i class="fas fa-exchange-alt"></i></div>
+          <h4 data-i18n="impact_step2_title">Someone swaps</h4>
+          <p data-i18n="impact_step2_desc">A fair trade happens between two people</p>
+        </div>
+        <div class="timeline-step" data-animate>
+          <div class="timeline-icon"><i class="fas fa-trash-alt" style="text-decoration:line-through;"></i></div>
+          <h4 data-i18n="impact_step3_title">2 items saved</h4>
+          <p data-i18n="impact_step3_desc">Two items stay out of landfill</p>
+        </div>
+        <div class="timeline-step" data-animate>
+          <div class="timeline-icon"><i class="fas fa-cloud"></i></div>
+          <h4 data-i18n="impact_step4_title">7.8 kg CO2 avoided</h4>
+          <p data-i18n="impact_step4_desc">3.9 kg saved per item reused</p>
+        </div>
+        <div class="timeline-step" data-animate>
+          <div class="timeline-icon"><i class="fas fa-user-friends"></i></div>
+          <h4 data-i18n="impact_step5_title">A connection made</h4>
+          <p data-i18n="impact_step5_desc">Two people meet through swapping</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== THE GIFT CORNER EFFECT ========== -->
+  <section class="impact-section impact-section--alt gift-section">
+    <div class="container">
+      <h2 class="impact-section-title" data-i18n="impact_gift_title">Give. Don't Throw Away.</h2>
+      <p class="impact-section-subtitle" data-i18n="impact_gift_text">Every year, thousands of expats leave the UAE and throw away perfectly good items. With Gift Corner, those items find a new home instead of a landfill.</p>
+      <div class="gift-stat">
+        <span class="gift-stat-icon">🎁</span>
+        <span class="gift-stat-value" data-counter="gifts">0</span>
+        <span class="gift-stat-label" data-i18n="impact_gifts_label">items gifted through Gift Corner</span>
+      </div>
+      <br>
+      <a href="giveaway.html" class="btn btn-primary" data-i18n="impact_gift_cta">Explore Gift Corner</a>
+    </div>
+  </section>
+
+  <!-- ========== UAE VISION ========== -->
+  <section class="uae-vision">
+    <div class="container">
+      <h2 data-i18n="impact_uae_title">Aligned with the UAE's Vision</h2>
+      <p data-i18n="impact_uae_text">Swappo proudly supports the UAE Circular Economy Policy 2021-2031 and the national goal of reducing waste by 75% by 2030.</p>
+      <div class="uae-badges">
+        <div class="uae-badge">🔄 <span data-i18n="impact_uae_circular">UAE Circular Economy</span></div>
+        <div class="uae-badge">🎯 <span data-i18n="impact_uae_sdg12">SDG 12 — Responsible Consumption</span></div>
+        <div class="uae-badge">🌍 <span data-i18n="impact_uae_sdg13">SDG 13 — Climate Action</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FINAL CTA ========== -->
+  <section class="impact-cta">
+    <div class="container">
+      <h2 data-i18n="impact_cta_title">Ready to Make a Difference?</h2>
+      <p data-i18n="impact_cta_subtitle">Someone needs what you have. Swap it.</p>
+      <a href="login.html" class="btn btn-primary btn-lg" data-i18n="impact_cta_btn">Join Swappo — It's Free</a>
+      <div class="cta-count">
+        <span data-i18n="impact_cta_join">Join</span>
+        <strong id="impact-user-count">500</strong>
+        <span data-i18n="impact_cta_others">other swappers already making an impact</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+          <p>The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="platform">Platform</h4>
+          <ul>
+            <li><a href="catalogue.html">Browse items</a></li>
+            <li><a href="giveaway.html">Free giveaways</a></li>
+            <li><a href="publier.html">List an item</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="company">Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="impact.html">Our Impact</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="legal">Legal</h4>
+          <ul>
+            <li><a href="terms.html">Terms of use</a></li>
+            <li><a href="privacy.html">Privacy policy</a></li>
+            <li><a href="cookies.html">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Swappo. All rights reserved. UAE</span>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/demo-engine.js"></script>
+  <script src="../js/animations.js"></script>
+  <script src="../js/cookie-consent.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    // ── Animated Counters ──
+    (function() {
+      // Demo impact values (in production these come from the database)
+      var totalSwaps = 247;
+      var totalGifts = 83;
+
+      var co2 = Math.round((totalSwaps * 2 + totalGifts) * 3.9);
+      var items = totalSwaps * 2 + totalGifts;
+      var connections = totalSwaps;
+
+      var targets = {
+        co2: co2,
+        items: items,
+        connections: connections,
+        gifts: totalGifts
+      };
+
+      function animateCounter(el, target) {
+        var duration = 1800;
+        var start = 0;
+        var startTime = null;
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var progress = Math.min((timestamp - startTime) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+          var current = Math.round(eased * target);
+          el.textContent = current.toLocaleString();
+          if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      // Intersection Observer for counters
+      var counterEls = document.querySelectorAll('[data-counter]');
+      var observed = new Set();
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting && !observed.has(entry.target)) {
+            observed.add(entry.target);
+            var key = entry.target.getAttribute('data-counter');
+            if (targets[key] !== undefined) {
+              animateCounter(entry.target, targets[key]);
+            }
+          }
+        });
+      }, { threshold: 0.1 });
+
+      counterEls.forEach(function(el) { observer.observe(el); });
+
+      // Scroll reveal for [data-animate] elements
+      var animateEls = document.querySelectorAll('[data-animate]');
+      var animObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry, index) {
+          if (entry.isIntersecting) {
+            // Stagger animation
+            var el = entry.target;
+            var siblings = Array.from(el.parentElement.children).filter(function(c) { return c.hasAttribute('data-animate'); });
+            var idx = siblings.indexOf(el);
+            setTimeout(function() {
+              el.classList.add('visible');
+            }, idx * 150);
+            animObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      animateEls.forEach(function(el) { animObserver.observe(el); });
+
+      // User count
+      var countEl = document.getElementById('impact-user-count');
+      if (countEl && window.DemoEarlyAdopter) {
+        countEl.textContent = DemoEarlyAdopter.getCount() || 500;
+      }
+    })();
+  </script>
+</body>
+</html>
