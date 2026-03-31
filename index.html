@@ -16,86 +16,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Homepage-specific styles */
-    .hero-banner {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-    }
-    .hero-banner img {
-      width: 100%;
-      height: 420px;
-      object-fit: cover;
-      display: block;
-    }
-    .hero-banner-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
-    }
-    .hero-banner-content {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-    }
-    .hero-banner-content .container {
-      width: 100%;
-    }
-    .hero-text {
-      max-width: 480px;
-      color: white;
-    }
-    .hero-text h1 {
-      font-size: 2.4rem;
-      font-weight: 800;
-      line-height: 1.15;
-      margin-bottom: 12px;
-      letter-spacing: -0.03em;
-    }
-    .hero-text p {
-      font-size: 1rem;
-      opacity: 0.92;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-    .hero-text .btn {
-      padding: 12px 28px;
-      font-size: 0.95rem;
-      border-radius: 8px;
-    }
-
-    .teasing-strip {
-      margin: 0;
-      overflow: hidden;
-      max-height: 200px;
-    }
-    .teasing-strip video {
-      width: 100%;
-      display: block;
-      object-fit: cover;
-      max-height: 200px;
-      cursor: pointer;
-    }
-
-    .feed-section {
-      padding: 32px 0;
-    }
-    .feed-section + .feed-section {
-      padding-top: 0;
-    }
-
-    @media (max-width: 768px) {
-      .hero-banner img { height: 300px; }
-      .hero-text h1 { font-size: 1.6rem; }
-      .hero-text p { font-size: 0.9rem; }
-      .hero-text { max-width: 300px; }
-    }
-    @media (max-width: 480px) {
-      .hero-banner img { height: 240px; }
-      .hero-text h1 { font-size: 1.3rem; }
-      .hero-text { padding: 0 16px; }
-    }
+    /* Homepage-specific styles (non-hero) */
+    .teasing-strip { margin: 0; overflow: hidden; max-height: 200px; }
+    .teasing-strip video { width: 100%; display: block; object-fit: cover; max-height: 200px; cursor: pointer; }
+    .feed-section + .feed-section { padding-top: 0; }
   </style>
 </head>
 <body>
