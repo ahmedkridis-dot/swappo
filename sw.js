@@ -4,9 +4,9 @@
  * Cache-first for assets, Network-first for HTML and API calls
  */
 
-const CACHE_NAME = 'swappo-v8';
-const ASSET_CACHE = 'swappo-assets-v5';
-const API_CACHE = 'swappo-api-v5';
+const CACHE_NAME = 'swappo-v9';
+const ASSET_CACHE = 'swappo-assets-v6';
+const API_CACHE = 'swappo-api-v6';
 
 // Files to pre-cache during install
 const PRECACHE_URLS = [
@@ -18,6 +18,7 @@ const PRECACHE_URLS = [
   '/js/demo-engine.js',
   '/js/i18n.js',
   '/js/animations.js',
+  '/js/publier.js',
   '/js/cookie-consent.js',
   '/pages/catalogue.html',
   '/pages/login.html',
