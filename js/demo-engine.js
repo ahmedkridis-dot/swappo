@@ -88,8 +88,8 @@ const DemoAuth = {
     email = email.trim().toLowerCase();
     name = name.trim();
 
-    // Check demo user
-    if (email === DEMO_USER.email) {
+    // Check demo users
+    if (email === DEMO_USER.email || (typeof DEMO_USER_FREE !== 'undefined' && email === DEMO_USER_FREE.email)) {
       return { success: false, error: 'Email already registered.' };
     }
 
@@ -154,10 +154,14 @@ const DemoAuth = {
     }
     email = email.trim().toLowerCase();
 
-    // Check demo user
+    // Check demo users (premium + free)
     if (email === DEMO_USER.email && password === DEMO_USER.password) {
       _set(STORAGE_KEYS.CURRENT_USER, DEMO_USER);
       return { success: true, user: DEMO_USER };
+    }
+    if (typeof DEMO_USER_FREE !== 'undefined' && email === DEMO_USER_FREE.email && password === DEMO_USER_FREE.password) {
+      _set(STORAGE_KEYS.CURRENT_USER, DEMO_USER_FREE);
+      return { success: true, user: DEMO_USER_FREE };
     }
 
     // Check registered users

@@ -73,6 +73,28 @@ const DEMO_USER = {
   badges: ['pioneer', 'generous', 'speed_swapper']
 };
 
+// ─── DEMO USER FREE (for testing free plan experience) ──────────────────────
+const DEMO_USER_FREE = {
+  id: 'user-demo-free',
+  name: 'Sara Demo',
+  email: 'free@swappo.ae',
+  password: 'free123',
+  city: 'Abu Dhabi',
+  badge_tier: 'newcomer',
+  badge_emoji: '\u{1F331}',
+  swap_count: 1,
+  plan: 'free',
+  swaps_used: 1,
+  claims_used: 0,
+  boosts_used: 0,
+  billing_start: '2026-03-15',
+  avatar_color: '#EC4899',
+  created_at: '2026-03-10',
+  pseudo: 'sara_free',
+  avatar: 'sunny',
+  badges: []
+};
+
 // ─── MOCK ITEMS (30 items across 8 categories) ─────────────────────────────
 const MOCK_ITEMS = [
 
@@ -1550,6 +1572,55 @@ const MOCK_ITEMS = [
     distance: 0,
     favorites_count: 15,
     views_count: 88
+  },
+
+  // ── FREE DEMO USER ITEMS (owned by user-demo-free) ─────────────────────────
+  {
+    id: 'item-free-1',
+    user_id: 'user-demo-free',
+    category: 'clothing',
+    type: 'Dress',
+    brand: 'Zara',
+    model: 'Summer Floral Dress',
+    condition: 'like_new',
+    year: 2025,
+    color: 'Blue',
+    photos: [
+      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=530&fit=crop',
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=530&fit=crop'
+    ],
+    is_boosted: false,
+    is_giveaway: false,
+    created_at: '2026-03-20',
+    lat: 24.4539,
+    lng: 54.3773,
+    city: 'Abu Dhabi',
+    distance: 0,
+    favorites_count: 5,
+    views_count: 32
+  },
+  {
+    id: 'item-free-2',
+    user_id: 'user-demo-free',
+    category: 'books',
+    type: 'Book',
+    brand: 'Penguin',
+    model: 'Atomic Habits',
+    condition: 'good',
+    year: 2023,
+    color: null,
+    photos: [
+      'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=530&fit=crop'
+    ],
+    is_boosted: false,
+    is_giveaway: true,
+    created_at: '2026-03-22',
+    lat: 24.4539,
+    lng: 54.3773,
+    city: 'Abu Dhabi',
+    distance: 0,
+    favorites_count: 12,
+    views_count: 67
   }
 ];
 

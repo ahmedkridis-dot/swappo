@@ -378,12 +378,18 @@
           <span data-i18n="auth_already_account">Already have an account?</span> <a href="#" onclick="switchTab('login'); return false;" data-i18n="auth_login">Log in</a>
         </div>
 
-        <!-- Quick Demo -->
+        <!-- Quick Demo Options -->
         <div style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--gray-border,#E5E7EB);text-align:center;">
-          <button type="button" onclick="quickDemoLogin()" class="btn-pill btn-pill-teal" style="font-size:0.88rem;padding:10px 24px;">
-            <i class="fas fa-bolt"></i> <span data-i18n="auth_quick_demo">Quick Demo (Premium)</span>
-          </button>
-          <div style="font-size:0.72rem;color:var(--gray-muted,#9CA3AF);margin-top:6px;" data-i18n="auth_demo_hint">demo@swappo.ae / demo123</div>
+          <p style="font-size:12px;font-weight:600;color:var(--gray-text,#6B7280);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">Try a demo account</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button type="button" onclick="quickDemoFree()" style="background:white;border:2px solid var(--gray-border,#E5E7EB);color:var(--navy,#1A1A2E);padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor=''">
+              🌱 Free Plan
+            </button>
+            <button type="button" onclick="quickDemoLogin()" style="background:linear-gradient(135deg,var(--teal,#09B1BA),var(--teal-dark,#067A80));color:white;border:none;padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
+              👑 Premium Plan
+            </button>
+          </div>
+          <div style="font-size:0.7rem;color:var(--gray-muted,#9CA3AF);margin-top:8px;">Full access to test all features</div>
         </div>
       </div>
 
@@ -432,12 +438,18 @@
           <span data-i18n="auth_no_account">Don't have an account?</span> <a href="#" onclick="switchTab('signup'); return false;" data-i18n="auth_signup">Sign up</a>
         </div>
 
-        <!-- Quick Demo -->
+        <!-- Quick Demo Options -->
         <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--gray-border,#E5E7EB);text-align:center;">
-          <button type="button" onclick="quickDemoLogin()" class="btn-pill btn-pill-teal" style="font-size:0.88rem;padding:10px 24px;">
-            <i class="fas fa-bolt"></i> <span data-i18n="auth_quick_demo">Quick Demo (Premium)</span>
-          </button>
-          <div style="font-size:0.72rem;color:var(--gray-muted,#9CA3AF);margin-top:6px;" data-i18n="auth_demo_hint">demo@swappo.ae / demo123</div>
+          <p style="font-size:12px;font-weight:600;color:var(--gray-text,#6B7280);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">Try a demo account</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button type="button" onclick="quickDemoFree()" style="background:white;border:2px solid var(--gray-border,#E5E7EB);color:var(--navy,#1A1A2E);padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor=''">
+              🌱 Free Plan
+            </button>
+            <button type="button" onclick="quickDemoLogin()" style="background:linear-gradient(135deg,var(--teal,#09B1BA),var(--teal-dark,#067A80));color:white;border:none;padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
+              👑 Premium Plan
+            </button>
+          </div>
+          <div style="font-size:0.7rem;color:var(--gray-muted,#9CA3AF);margin-top:8px;">Full access to test all features</div>
         </div>
         <div style="margin-top:8px;text-align:center;">
           <button type="button" onclick="resetAndDemo()" style="background:none;border:1px solid var(--gray-border,#E5E7EB);color:var(--gray-text,#6B7280);padding:6px 16px;border-radius:var(--radius-pill,999px);font-size:0.78rem;cursor:pointer;">
@@ -844,6 +856,19 @@
       }
     }
     window.quickDemoLogin = quickDemoLogin;
+
+    function quickDemoFree() {
+      var result = DemoAuth.signIn('free@swappo.ae', 'free123');
+      if (result.success) {
+        showToast('Welcome Sara! Free plan — 2 swaps/month, 1 claim.', 'success');
+        setTimeout(function() {
+          var params = new URLSearchParams(window.location.search);
+          var redirect = params.get('redirect') || '../index.html';
+          window.location.href = redirect;
+        }, 800);
+      }
+    }
+    window.quickDemoFree = quickDemoFree;
 
     function resetAndDemo() {
       if (window.resetDemoData) {
