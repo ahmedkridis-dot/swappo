@@ -1238,7 +1238,11 @@ function updateNavbarForDemo() {
       avatarArea.id = 'nav-avatar-area';
       avatarArea.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;';
       const profilePath = _inPagesDir() ? 'profile.html' : 'pages/profile.html';
-      avatarArea.onclick = () => { window.location.href = profilePath; };
+      avatarArea.onclick = function(e) {
+        // Don't navigate to profile if logout button was clicked
+        if (e.target.closest('.nav-logout-btn')) return;
+        window.location.href = profilePath;
+      };
       navbar.appendChild(avatarArea);
     }
   }
@@ -1251,7 +1255,7 @@ function updateNavbarForDemo() {
       avatarArea.innerHTML =
         '<div style="width:32px;height:32px;border-radius:50%;background:' + color + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">' + initial + '</div>' +
         '<span style="font-size:13px;font-weight:600;color:var(--text,#171717);">' + user.name + '</span>' +
-        '<button onclick="event.stopPropagation();DemoAuth.signOut();window.location.href=\'' + loginPath + '\';" style="background:none;border:1px solid var(--gray-border,#E5E7EB);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-text,#6B7280);font-size:12px;margin-left:4px;transition:all 0.2s;" onmouseover="this.style.borderColor=\'#FF4B55\';this.style.color=\'#FF4B55\'" onmouseout="this.style.borderColor=\'\';this.style.color=\'\'"><i class="fas fa-sign-out-alt"></i></button>';
+        '<button class="nav-logout-btn" onclick="event.stopPropagation();event.preventDefault();DemoAuth.signOut();window.location.href=\'' + loginPath + '\';" style="background:none;border:1px solid var(--gray-border,#E5E7EB);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-text,#6B7280);font-size:12px;margin-left:4px;transition:all 0.2s;" onmouseover="this.style.borderColor=\'#FF4B55\';this.style.color=\'#FF4B55\'" onmouseout="this.style.borderColor=\'\';this.style.color=\'\'"><i class="fas fa-sign-out-alt"></i></button>';
       avatarArea.style.display = 'flex';
     } else {
       avatarArea.style.display = 'none';
