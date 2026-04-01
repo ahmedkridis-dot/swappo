@@ -168,20 +168,24 @@
             box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,0.08));
         }
 
-        .stat-icon { font-size: 28px; margin-bottom: 12px; }
-        .stat-icon.swaps { color: var(--primary); }
-        .stat-icon.plan { color: var(--primary); }
-        .stat-icon.donated { color: var(--secondary); }
-        .stat-icon.saved { color: #E74C3C; }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; margin: 0 auto 14px;
+        }
+        .stat-icon.swaps { background: var(--teal-bg, #E6F7F8); color: var(--teal, #09B1BA); }
+        .stat-icon.plan { background: var(--teal-bg, #E6F7F8); color: var(--teal, #09B1BA); }
+        .stat-icon.donated { background: #FFF3E0; color: #FF9800; }
+        .stat-icon.saved { background: #FFE5E5; color: #E74C3C; }
 
         .stat-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text);
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--navy, #1A1A2E);
             margin-bottom: 4px;
         }
 
-        .stat-label { font-size: 13px; color: var(--text-secondary); }
+        .stat-label { font-size: 13px; color: var(--gray-text, #6B7280); }
 
         .stat-card a {
             color: var(--primary);
@@ -197,29 +201,32 @@
         /* ========== TABS ========== */
         .tabs-nav {
             display: flex;
-            gap: 24px;
-            border-bottom: 1px solid var(--border);
+            gap: 8px;
             margin-bottom: 24px;
-            background: var(--bg);
-            padding: 0;
+            background: var(--gray-bg, #F8F9FA);
+            padding: 4px;
+            border-radius: var(--radius-md, 12px);
         }
 
         .tab-btn {
-            padding: 14px 0;
+            padding: 10px 18px;
             background: none;
             border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-secondary);
-            font-size: 14px;
+            border-radius: var(--radius-sm, 8px);
+            color: var(--gray-text, #6B7280);
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
-        .tab-btn:hover { color: var(--text); }
+        .tab-btn:hover { color: var(--navy, #1A1A2E); background: rgba(255,255,255,0.6); }
 
         .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            color: var(--teal, #09B1BA);
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
         .tab-content { display: none; }
@@ -736,11 +743,12 @@
 
         /* ========== SUBSCRIPTION SIDEBAR ========== */
         .subscription-sidebar-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
+            background: white;
+            border: 1px solid var(--gray-border, #E5E7EB);
+            border-radius: var(--radius-lg, 16px);
+            padding: 24px;
             margin-bottom: 16px;
+            box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.04));
         }
 
         .sub-sidebar-header {
@@ -904,6 +912,17 @@
 
     <!-- ========== MAIN CONTAINER ========== -->
     <div class="container">
+        <!-- ========== DASHBOARD HEADER ========== -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 20px;">
+            <div>
+                <h1 style="font-size:28px;font-weight:700;color:var(--navy,#1A1A2E);margin:0;" data-i18n="dashboard_title">Dashboard</h1>
+                <p style="font-size:14px;color:var(--gray-text,#6B7280);margin:4px 0 0;" id="dashboard-welcome">Welcome back</p>
+            </div>
+            <a href="publier.html" class="btn-pill btn-pill-teal" style="font-size:14px;padding:10px 24px;">
+                <i class="fas fa-plus"></i> <span data-i18n="drop_item">Drop an Item</span>
+            </a>
+        </div>
+
         <!-- ========== PROFILE HEADER ========== -->
         <div class="profile-header">
             <div class="profile-avatar">
@@ -973,8 +992,8 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 24px;">
-            <div style="flex: 1;">
+        <div style="display: flex; gap: 24px; align-items: flex-start;">
+            <div style="flex: 1; min-width: 0;">
                 <!-- ========== TAB NAVIGATION ========== -->
                 <div class="tabs-nav">
                     <button class="tab-btn active" data-tab="my-items">
@@ -1258,6 +1277,8 @@
             }
 
             document.getElementById('profile-name').textContent = user.pseudo || user.name || 'User';
+            var welcomeEl = document.getElementById('dashboard-welcome');
+            if (welcomeEl) welcomeEl.textContent = 'Welcome back, ' + (user.name || user.pseudo || 'Swapper');
             document.querySelector('#profile-location span').textContent = user.city || 'UAE';
             document.getElementById('profile-email').textContent = user.email || '';
 
