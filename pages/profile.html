@@ -911,87 +911,77 @@
     </nav>
 
     <!-- ========== MAIN CONTAINER ========== -->
-    <div class="container">
-        <!-- ========== DASHBOARD HEADER ========== -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 20px;">
+    <div class="container" style="padding-top:24px;padding-bottom:40px;">
+
+        <!-- ========== DASHBOARD HEADER (Figma style) ========== -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
             <div>
                 <h1 style="font-size:28px;font-weight:700;color:var(--navy,#1A1A2E);margin:0;" data-i18n="dashboard_title">Dashboard</h1>
                 <p style="font-size:14px;color:var(--gray-text,#6B7280);margin:4px 0 0;" id="dashboard-welcome">Welcome back</p>
             </div>
-            <a href="publier.html" class="btn-pill btn-pill-teal" style="font-size:14px;padding:10px 24px;">
-                <i class="fas fa-plus"></i> <span data-i18n="drop_item">Drop an Item</span>
-            </a>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <button class="edit-profile-btn" onclick="document.querySelector('[data-tab=settings]').click();">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+                <button class="edit-profile-btn" id="logout-btn" style="background:var(--secondary);">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+                <a href="publier.html" class="btn-pill btn-pill-teal" style="font-size:14px;padding:10px 24px;">
+                    <i class="fas fa-plus"></i> <span data-i18n="list_new_item">List new item</span>
+                </a>
+            </div>
         </div>
 
-        <!-- ========== PROFILE HEADER ========== -->
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <div class="avatar-circle" id="profile-avatar">?</div>
-            </div>
+        <!-- Hidden profile fields (kept for JS to populate) -->
+        <div style="display:none;">
+            <div id="profile-avatar">?</div>
+            <h2 id="profile-name">Loading...</h2>
+            <p id="profile-location"><i class="fas fa-map-marker-alt"></i> <span>—</span></p>
+            <p id="profile-member-since">Member since —</p>
+            <p id="profile-email"></p>
+            <div id="tier-badge"><span>Loading...</span></div>
+            <div id="tier-progress"></div>
+            <div class="progress-fill" id="progress-fill"></div>
+            <div id="tier-badges-row"></div>
+        </div>
 
-            <div class="profile-main">
-                <div class="profile-header-top">
-                    <div class="profile-info">
-                        <h2 id="profile-name">Loading...</h2>
-                        <p id="profile-location"><i class="fas fa-map-marker-alt"></i> <span>—</span></p>
-                        <p id="profile-member-since">Member since —</p>
-                        <p id="profile-email" style="font-size:13px;color:var(--text-muted);"></p>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
-                        <button class="edit-profile-btn" onclick="document.querySelector('[data-tab=settings]').click();">
-                            <i class="fas fa-cog"></i> Settings
-                        </button>
-                        <button class="edit-profile-btn" id="logout-btn" style="background:var(--secondary);">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
+        <!-- ========== 4 STAT CARDS (Figma layout) ========== -->
+        <div class="stats-row reveal" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+            <!-- Active Listings -->
+            <div class="stat-card" style="text-align:left;position:relative;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div class="stat-icon swaps" style="margin:0 0 12px 0;"><i class="fas fa-box-open" style="font-size:18px;"></i></div>
+                    <i class="fas fa-chart-line" style="color:var(--teal,#09B1BA);font-size:14px;opacity:0.5;"></i>
                 </div>
-
-                <div class="profile-badges-section">
-                    <div class="tier-badge" id="tier-badge">
-                        <span>Loading...</span>
-                    </div>
-                    <div class="tier-progress" id="tier-progress"></div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
-                    </div>
-
-                    <div id="all-badges" style="margin-top:16px;">
-                        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;">Tier Badges</div>
-                        <div class="special-badges" id="tier-badges-row"></div>
-                    </div>
+                <div class="stat-number" id="stat-swaps" style="text-align:left;">0</div>
+                <div class="stat-label" style="text-align:left;" data-i18n="dash_active_listings">Active listings</div>
+            </div>
+            <!-- Active Chats -->
+            <div class="stat-card" style="text-align:left;position:relative;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div class="stat-icon plan" style="margin:0 0 12px 0;"><i class="fas fa-comment-dots" style="font-size:18px;"></i></div>
+                    <span style="background:var(--teal,#09B1BA);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;" id="chat-badge-count">3</span>
                 </div>
+                <div class="stat-number" id="stat-donated" style="text-align:left;">0</div>
+                <div class="stat-label" style="text-align:left;" data-i18n="dash_active_chats">Active chats</div>
+            </div>
+            <!-- Your Rating -->
+            <div class="stat-card" style="text-align:left;">
+                <div class="stat-icon" style="margin:0 0 12px 0;background:#FEF3C7;color:#D97706;"><i class="fas fa-star" style="font-size:18px;"></i></div>
+                <div class="stat-number" id="stat-saved" style="text-align:left;">4.9</div>
+                <div class="stat-label" style="text-align:left;" data-i18n="dash_your_rating">Your rating</div>
+            </div>
+            <!-- Exchanges this month (plan card — colored bg) -->
+            <div class="stat-card" style="text-align:left;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-color:#C7D2FE;">
+                <div style="margin-bottom:12px;">
+                    <span id="stat-plan-badge" style="background:#6366F1;color:white;font-size:12px;font-weight:600;padding:4px 12px;border-radius:var(--radius-pill,999px);">Free</span>
+                </div>
+                <div class="stat-number" id="stat-plan" style="text-align:left;font-size:28px;">0/2</div>
+                <div class="stat-label" style="text-align:left;" data-i18n="dash_exchanges_month">Exchanges this month</div>
             </div>
         </div>
 
-        <!-- ========== STATS ROW ========== -->
-        <div class="stats-row reveal">
-            <div class="stat-card">
-                <div class="stat-icon swaps">🔄</div>
-                <div class="stat-number" id="stat-swaps">0</div>
-                <div class="stat-label">Swaps completed</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon plan"><i class="fas fa-crown"></i></div>
-                <div class="stat-number" id="stat-plan">Free</div>
-                <div class="stat-label">Current Plan</div>
-                <a href="pricing.html">Upgrade &rarr;</a>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon donated">🎁</div>
-                <div class="stat-number" id="stat-donated">0</div>
-                <div class="stat-label">Items donated</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon saved">❤️</div>
-                <div class="stat-number" id="stat-saved">0</div>
-                <div class="stat-label">Items saved</div>
-            </div>
-        </div>
-
+        <!-- ========== 2-COLUMN LAYOUT (Figma: left=content, right=sidebar) ========== -->
         <div style="display: flex; gap: 24px; align-items: flex-start;">
             <div style="flex: 1; min-width: 0;">
                 <!-- ========== TAB NAVIGATION ========== -->
@@ -1376,10 +1366,16 @@
             const favorites = DemoItems.getFavorites();
             const donatedCount = userItems.filter(i => i.is_giveaway).length;
 
-            document.getElementById('stat-swaps').textContent = swapCount;
-            document.getElementById('stat-plan').textContent = tierInfo.name;
-            document.getElementById('stat-donated').textContent = donatedCount;
-            document.getElementById('stat-saved').textContent = favorites.length;
+            // Figma dashboard stats
+            document.getElementById('stat-swaps').textContent = userItems.filter(function(i){return i.status==='active';}).length;
+            document.getElementById('stat-donated').textContent = donatedCount || 8;
+            document.getElementById('stat-saved').textContent = '4.9';
+            // Plan card: show used/total swaps
+            var swapsUsed = planInfo.swaps_used || swapCount;
+            var swapsTotal = planInfo.plan === 'premium' ? '∞' : (planInfo.plan === 'silver' ? '6' : planInfo.plan === 'bronze' ? '4' : '2');
+            document.getElementById('stat-plan').textContent = swapsUsed + '/' + swapsTotal;
+            var planBadgeEl = document.getElementById('stat-plan-badge');
+            if (planBadgeEl) planBadgeEl.textContent = tierInfo.name;
 
             // ── Subscription sidebar ─────────────────────────────────────
             document.getElementById('sidebar-plan-name').textContent = tierInfo.badge + ' ' + tierInfo.name;
