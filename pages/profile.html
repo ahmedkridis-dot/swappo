@@ -1268,7 +1268,7 @@
 
             document.getElementById('profile-name').textContent = user.pseudo || user.name || 'User';
             var welcomeEl = document.getElementById('dashboard-welcome');
-            if (welcomeEl) welcomeEl.textContent = 'Welcome back, ' + (user.name || user.pseudo || 'Swapper');
+            if (welcomeEl) welcomeEl.textContent = 'Welcome back, ' + (user.pseudo || user.name || 'Swapper');
             document.querySelector('#profile-location span').textContent = user.city || 'UAE';
             document.getElementById('profile-email').textContent = user.email || '';
 
