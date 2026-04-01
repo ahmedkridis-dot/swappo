@@ -69,7 +69,7 @@
       top: -14px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--primary);
+      background: var(--coral, #FF6B6B);
       color: #fff;
       font-size: 0.75rem;
       font-weight: 700;
@@ -209,37 +209,37 @@
       display: block;
     }
 
-    /* CTA banner */
+    /* CTA banner — dark navy */
     .cta-banner {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: var(--navy, #1A1A2E);
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px;
       margin-bottom: 0;
     }
     .cta-banner h2 {
       color: #fff;
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 700;
       margin: 0 0 12px;
     }
     .cta-banner p {
-      color: rgba(255,255,255,0.85);
+      color: rgba(255,255,255,0.7);
       font-size: 1rem;
-      margin: 0 0 24px;
+      margin: 0 0 28px;
     }
     .cta-banner .btn {
       background: #fff;
-      color: var(--primary);
+      color: var(--navy, #1A1A2E);
       font-weight: 700;
       padding: 14px 36px;
-      border-radius: var(--radius);
+      border-radius: var(--radius-pill, 999px);
       font-size: 1rem;
       border: none;
       cursor: pointer;
-      transition: var(--transition);
+      transition: all 0.3s ease;
     }
     .cta-banner .btn:hover {
-      background: var(--bg-light);
+      background: #f0f0f0;
       transform: translateY(-2px);
     }
 
@@ -308,10 +308,14 @@
   <section class="pricing-hero">
     <h1 data-i18n="pricing_heading">Choose your plan</h1>
     <p data-i18n="pricing_subtitle">Start swapping for free. Upgrade anytime.</p>
+    <div class="toggle-pills" style="margin-top:28px;">
+      <button class="active" data-i18n="monthly">Monthly</button>
+      <button data-i18n="annual">Annual <span style="color:var(--coral,#FF6B6B);font-weight:600;font-size:12px;margin-left:4px;" data-i18n="save_20">Save 20%</span></button>
+    </div>
   </section>
 
   <!-- Pricing Cards -->
-  <div class="pricing-grid">
+  <div class="pricing-grid reveal">
 
     <!-- Free -->
     <div class="pricing-card">
@@ -363,7 +367,7 @@
 
     <!-- Premium -->
     <div class="pricing-card highlighted">
-      <div class="pricing-badge-top" data-i18n="badge_best_value">Best Value</div>
+      <div class="pricing-badge-top" data-i18n="most_popular">Most Popular</div>
       <div class="pricing-card-badge">👑</div>
       <div class="pricing-card-name" data-i18n="plan_premium">Premium</div>
       <div class="pricing-card-price">69 <span>AED/mo</span></div>
@@ -381,7 +385,7 @@
   </div>
 
   <!-- FAQ -->
-  <section class="faq-section">
+  <section class="faq-section reveal">
     <h2 data-i18n="faq_heading">Frequently Asked Questions</h2>
 
     <div class="faq-item open">
