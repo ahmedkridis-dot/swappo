@@ -981,6 +981,23 @@
             </div>
         </div>
 
+        <!-- ========== GENEROUS HEART CARD ========== -->
+        <div id="generous-heart-card" style="display:none;background:white;border:1px solid rgba(9,177,186,0.2);border-radius:var(--radius-lg,16px);padding:24px;margin-bottom:24px;display:none;">
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+                <div style="font-size:40px;">🎁</div>
+                <div style="flex:1;min-width:200px;">
+                    <div style="font-size:18px;font-weight:700;color:var(--navy,#1A1A2E);margin-bottom:4px;" data-i18n="generous_heart_title">Generous Heart</div>
+                    <div style="font-size:14px;color:var(--gray-text,#6B7280);">
+                        <span id="generous-donations-count">0</span> <span data-i18n="generous_items_given">items given</span> &nbsp;·&nbsp;
+                        ~<span id="generous-co2">0</span> kg CO2 <span data-i18n="generous_saved">saved</span> 🌿
+                    </div>
+                </div>
+                <button onclick="shareImpact()" class="btn-pill btn-pill-outline" style="font-size:13px;padding:8px 18px;">
+                    <i class="fas fa-share-alt"></i> <span data-i18n="generous_share">Share my impact</span>
+                </button>
+            </div>
+        </div>
+
         <!-- ========== 2-COLUMN LAYOUT (Figma: left=content, right=sidebar) ========== -->
         <div style="display: flex; gap: 24px; align-items: flex-start;">
             <div style="flex: 1; min-width: 0;">
@@ -1377,6 +1394,18 @@
             var planBadgeEl = document.getElementById('stat-plan-badge');
             if (planBadgeEl) planBadgeEl.textContent = tierInfo.name;
 
+            // ── Generous Heart card ──────────────────────────────────────
+            var generousCard = document.getElementById('generous-heart-card');
+            var totalDonations = donatedCount + (user.swap_count || 0); // count swaps too for demo
+            var giftDonations = donatedCount;
+            if (generousCard) {
+                if (giftDonations >= 1) {
+                    generousCard.style.display = 'block';
+                    document.getElementById('generous-donations-count').textContent = giftDonations;
+                    document.getElementById('generous-co2').textContent = (giftDonations * 25);
+                }
+            }
+
             // ── Subscription sidebar ─────────────────────────────────────
             document.getElementById('sidebar-plan-name').textContent = tierInfo.badge + ' ' + tierInfo.name;
             document.getElementById('sidebar-plan-badge').textContent = planInfo.plan === 'free' ? 'Free plan' : tierInfo.price + ' AED/month';
@@ -1708,8 +1737,22 @@
             // ── Logout ───────────────────────────────────────────────────
             document.getElementById('logout-btn').addEventListener('click', () => {
                 DemoAuth.signOut();
-                window.location.href = '../index.html';
+                window.location.href = 'login.html';
             });
+
+            // ── Share Impact ─────────────────────────────────────────────
+            window.shareImpact = function() {
+                var donations = document.getElementById('generous-donations-count').textContent;
+                var co2 = document.getElementById('generous-co2').textContent;
+                var text = "I've given " + donations + " items on Swappo and saved ~" + co2 + " kg of CO2! 🌿\nJoin the community: swappo.ae #Swappo #CircularEconomy #UAE";
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        DemoNotifications.showToast('Impact copied to clipboard! Share it on social media 📤', 'success');
+                    });
+                } else {
+                    DemoNotifications.showToast('Share: ' + text, 'info');
+                }
+            };
 
             // ── Tab switching ────────────────────────────────────────────
             document.querySelectorAll('.tab-btn').forEach(button => {
