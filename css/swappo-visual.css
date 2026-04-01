@@ -172,6 +172,53 @@
   font-size: 18px;
 }
 
+/* ===== GRAY-TO-COLOR ICON HOVER (global pattern) ===== */
+/* Apply to any card/link: icons start gray, turn teal on hover */
+.icon-gray-hover i,
+.icon-gray-hover .cat-icon i,
+.icon-gray-hover .icon {
+  color: #9CA3AF;
+  transition: color 0.35s ease, transform 0.35s ease;
+}
+.icon-gray-hover:hover i,
+.icon-gray-hover:hover .cat-icon i,
+.icon-gray-hover:hover .icon {
+  color: var(--teal, #09B1BA);
+  transform: scale(1.12);
+}
+
+/* Mega menu icons: gray to teal on hover */
+.mega-menu-item__link i {
+  color: #9CA3AF;
+  transition: color 0.25s ease;
+}
+.mega-menu-item:hover .mega-menu-item__link i,
+.mega-menu-item--active .mega-menu-item__link i {
+  color: var(--teal, #09B1BA);
+}
+/* Keep Gift Corner icon red */
+.mega-menu-item--special .mega-menu-item__link i {
+  color: #FF4B55;
+}
+
+/* Navbar icons: subtle gray to teal */
+.navbar-icon i {
+  transition: color 0.25s ease;
+}
+.navbar-icon:hover i {
+  color: var(--teal, #09B1BA);
+}
+
+/* Footer social icons: gray to teal hover */
+.footer-social a {
+  color: rgba(255,255,255,0.5);
+  transition: all 0.3s ease;
+}
+.footer-social a:hover {
+  color: var(--teal-light, #5EEAD4);
+  transform: translateY(-2px);
+}
+
 /* ===== WAVE DIVIDER ===== */
 .wave-bottom {
   position: relative;
