@@ -1,0 +1,376 @@
+/* ================================================================
+   SWAPPO VISUAL DESIGN SYSTEM
+   Shared across ALL pages for consistent look & feel
+   ================================================================ */
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --teal: #09B1BA;
+  --teal-dark: #067A80;
+  --teal-light: #5EEAD4;
+  --teal-bg: #E6F7F8;
+  --navy: #1A1A2E;
+  --coral: #FF6B6B;
+  --coral-dark: #e55a5a;
+  --gray-bg: #F8F9FA;
+  --gray-text: #6B7280;
+  --gray-border: #E5E7EB;
+  --gray-muted: #9CA3AF;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+  --shadow-teal: 0 8px 32px rgba(9,177,186,0.12);
+  --dur: 0.3s;
+}
+
+/* ===== SCROLL REVEAL ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== HOVER LIFT ===== */
+.card-hover {
+  transition: transform var(--dur) ease, box-shadow var(--dur) ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== SECTION STYLING ===== */
+.section-alt {
+  background: var(--gray-bg);
+}
+.section-padding {
+  padding: 80px 0;
+}
+.section-title-center {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+  margin-bottom: 48px;
+}
+@media (max-width: 768px) {
+  .section-padding { padding: 48px 0; }
+  .section-title-center { font-size: 24px; margin-bottom: 32px; }
+}
+
+/* ===== PILL BUTTONS ===== */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  padding: 12px 32px;
+  font-weight: 600;
+  font-size: 15px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--dur) ease;
+  line-height: 1.4;
+}
+.btn-pill:hover { transform: translateY(-2px); }
+
+.btn-pill-teal {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.btn-pill-teal:hover {
+  background: var(--teal-dark);
+  border-color: var(--teal-dark);
+  box-shadow: var(--shadow-teal);
+}
+
+.btn-pill-outline {
+  background: transparent;
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.btn-pill-outline:hover {
+  background: rgba(9,177,186,0.05);
+}
+
+.btn-pill-coral {
+  background: var(--coral);
+  color: white;
+  border-color: var(--coral);
+}
+.btn-pill-coral:hover {
+  background: var(--coral-dark);
+  border-color: var(--coral-dark);
+}
+
+.btn-pill-white {
+  background: white;
+  color: var(--navy);
+  border-color: white;
+}
+.btn-pill-white:hover {
+  background: #f0f0f0;
+}
+
+/* ===== GLASSMORPHISM CARD ===== */
+.glass-card {
+  background: rgba(9,177,186,0.04);
+  border: 1px solid rgba(9,177,186,0.12);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  transition: all var(--dur) ease;
+}
+.glass-card:hover {
+  background: rgba(9,177,186,0.08);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-teal);
+}
+
+/* ===== STANDARD CARD ===== */
+.swappo-card {
+  background: white;
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: all var(--dur) ease;
+}
+.swappo-card:hover {
+  border-color: var(--teal);
+  box-shadow: 0 4px 20px rgba(9,177,186,0.15);
+  transform: translateY(-2px);
+}
+
+/* ===== ICON CIRCLE ===== */
+.icon-circle {
+  width: 64px;
+  height: 64px;
+  background: var(--teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  margin: 0 auto 16px;
+  flex-shrink: 0;
+}
+.icon-circle-sm {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+
+/* ===== WAVE DIVIDER ===== */
+.wave-bottom {
+  position: relative;
+}
+.wave-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: white;
+  clip-path: ellipse(55% 100% at 50% 100%);
+}
+.wave-bottom-gray::after {
+  background: var(--gray-bg);
+}
+
+/* ===== AVATAR INITIALS ===== */
+.avatar-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: white;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.avatar-initials-lg {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+}
+
+/* ===== BADGE PILLS ===== */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-pill-teal {
+  background: var(--teal-bg);
+  color: var(--teal);
+}
+.badge-pill-coral {
+  background: #FFE5E5;
+  color: var(--coral);
+}
+.badge-pill-gray {
+  background: var(--gray-bg);
+  color: var(--gray-text);
+}
+
+/* ===== DARK SECTION (Impact / CTA) ===== */
+.section-dark-teal {
+  background: linear-gradient(135deg, #0A8F96 0%, #067A80 50%, #055A5E 100%);
+  color: white;
+  text-align: center;
+}
+.section-dark-teal h2 {
+  color: white;
+}
+.section-dark-navy {
+  background: var(--navy);
+  color: white;
+  text-align: center;
+}
+.section-dark-navy h2 {
+  color: white;
+}
+
+/* ===== FORM INPUTS (consistent styling) ===== */
+.input-styled {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color var(--dur) ease, box-shadow var(--dur) ease;
+  outline: none;
+}
+.input-styled:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(9,177,186,0.1);
+}
+.input-styled::placeholder {
+  color: var(--gray-muted);
+}
+
+/* ===== PRODUCT CARD PHOTO ZOOM ===== */
+.product-card {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--gray-border) !important;
+  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease !important;
+}
+.product-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-color: rgba(9,177,186,0.3) !important;
+}
+.product-img {
+  border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+}
+.product-img img {
+  transition: transform 0.45s ease !important;
+}
+.product-card:hover .product-img img {
+  transform: scale(1.06) !important;
+}
+
+/* ===== NAVBAR ENHANCEMENTS ===== */
+.navbar {
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+.navbar-search input {
+  border-radius: var(--radius-pill);
+}
+
+/* ===== FOOTER ENHANCEMENTS ===== */
+.footer {
+  background: var(--navy);
+  color: rgba(255,255,255,0.85);
+}
+.footer a {
+  color: rgba(255,255,255,0.7);
+  transition: color var(--dur) ease;
+}
+.footer a:hover {
+  color: var(--teal-light);
+}
+.footer-social a:hover {
+  background: rgba(9,177,186,0.2);
+  border-radius: 50%;
+}
+
+/* ===== CONDITION BADGES ===== */
+.condition-new { background: #DCFCE7; color: #16A34A; }
+.condition-like-new { background: #DBEAFE; color: #2563EB; }
+.condition-good { background: #FEF3C7; color: #D97706; }
+.condition-fair { background: #FEE2E2; color: #DC2626; }
+
+/* ===== TOGGLE SWITCH (Monthly/Annual) ===== */
+.toggle-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 0 auto 40px;
+  background: #F3F4F6;
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  width: fit-content;
+}
+.toggle-pills button {
+  padding: 8px 24px;
+  border-radius: var(--radius-pill);
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--dur);
+  background: transparent;
+  color: var(--gray-text);
+}
+.toggle-pills button.active {
+  background: var(--teal);
+  color: white;
+}
+
+/* ===== LEGAL PAGES ===== */
+.legal-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+.legal-content h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 24px;
+}
+.legal-content h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+.legal-content p, .legal-content li {
+  color: var(--gray-text);
+  line-height: 1.7;
+  font-size: 15px;
+}
