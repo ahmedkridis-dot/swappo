@@ -143,17 +143,64 @@
       content: ''; flex: 1; height: 1px; background: #EBEBEB;
     }
 
-    /* Social buttons */
-    .auth-social { display: flex; flex-direction: column; gap: 10px; }
+    /* Social buttons — redesigned */
+    .auth-social { display: flex; flex-direction: column; gap: 12px; }
 
     .auth-social-btn {
       display: flex; align-items: center; justify-content: center; gap: 10px;
-      height: 44px; border: 1px solid #EBEBEB; border-radius: 8px;
-      background: #fff; font-size: 0.9rem; font-weight: 500; color: #171717;
-      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+      height: 50px; border: 1px solid var(--gray-border, #E5E7EB); border-radius: var(--radius-md, 12px);
+      background: #fff; font-size: 0.95rem; font-weight: 600; color: #1A1A2E;
+      cursor: pointer; transition: all 0.3s ease;
     }
-    .auth-social-btn:hover { border-color: #09B1BA; background: #F0FBFC; }
-    .auth-social-btn i { font-size: 1rem; }
+    .auth-social-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .auth-social-btn i { font-size: 1.1rem; }
+    .auth-social-btn.google-btn { border-color: #E5E7EB; }
+    .auth-social-btn.google-btn i { color: #EA4335; }
+    .auth-social-btn.apple-btn { background: #000; color: #fff; border-color: #000; }
+    .auth-social-btn.apple-btn:hover { background: #222; }
+    .auth-social-btn.facebook-btn { background: #1877F2; color: #fff; border-color: #1877F2; }
+    .auth-social-btn.facebook-btn:hover { background: #1565C0; }
+    .auth-social-btn.facebook-btn i { color: #fff; }
+
+    /* Email signup button */
+    .auth-email-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      height: 50px; border: 2px solid var(--teal, #09B1BA); border-radius: var(--radius-md, 12px);
+      background: transparent; font-size: 0.95rem; font-weight: 600; color: var(--teal, #09B1BA);
+      cursor: pointer; transition: all 0.3s ease; width: 100%;
+    }
+    .auth-email-btn:hover { background: rgba(9,177,186,0.05); transform: translateY(-1px); }
+
+    /* Signup Modal */
+    .signup-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      z-index: 9000; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .signup-modal-overlay.active { display: flex; }
+    .signup-modal {
+      background: #fff; border-radius: var(--radius-xl, 20px); width: 100%; max-width: 520px;
+      max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+      padding: 32px; position: relative;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .signup-modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 36px; height: 36px; border-radius: 50%; border: none;
+      background: #F3F4F6; cursor: pointer; font-size: 1.2rem; color: #555;
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .signup-modal-close:hover { background: #E5E7EB; }
+    .signup-modal h2 { font-size: 1.3rem; font-weight: 700; color: #1A1A2E; margin: 0 0 24px; }
+
+    /* Auth card header */
+    .auth-header { text-align: center; margin-bottom: 28px; }
+    .auth-header .logo-icon { font-size: 36px; color: var(--teal, #09B1BA); margin-bottom: 12px; }
+    .auth-header h2 { font-size: 1.5rem; font-weight: 700; color: #1A1A2E; margin: 0 0 6px; }
+    .auth-header p { font-size: 0.9rem; color: #6B7280; margin: 0; }
 
     /* Footer link */
     .auth-footer-link {
@@ -301,99 +348,66 @@
   <div class="auth-page">
     <div class="auth-card">
 
-      <!-- Tab Switcher -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" onclick="switchTab('signup', this)" data-i18n="auth_signup">Sign Up</button>
-        <button class="auth-tab" onclick="switchTab('login', this)" data-i18n="auth_login">Log In</button>
-      </div>
-
-      <!-- ========== SIGN UP TAB ========== -->
+      <!-- ========== VIEW: MAIN (Social First) ========== -->
       <div id="signup" class="auth-tab-content active">
-        <form class="auth-form" onsubmit="handleSignup(event)">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="signup-name" data-i18n="auth_full_name">Full Name</label>
-              <input class="form-input" type="text" id="signup-name" name="name" data-i18n-placeholder="auth_name_placeholder" placeholder="Ahmed Mohammed" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="signup-pseudo" data-i18n="auth_username">Username</label>
-              <input class="form-input" type="text" id="signup-pseudo" data-i18n-placeholder="auth_username_placeholder" placeholder="Letters, numbers & underscores (3-20)" pattern="^[a-zA-Z0-9_]{3,20}$" required>
-              <span class="pseudo-feedback" id="pseudo-feedback"></span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="signup-email" data-i18n="auth_email">Email Address</label>
-              <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="signup-phone" data-i18n="auth_phone">Phone Number</label>
-              <div class="phone-input-group">
-                <span class="phone-prefix">+971</span>
-                <input class="form-input" type="tel" id="signup-phone" data-i18n-placeholder="auth_phone_placeholder" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
-              </div>
-              <div class="verification-step" id="phone-verify-step">
-                <input class="form-input code-input" type="text" id="phone-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$">
-                <div>
-                  <button type="button" class="resend-link" id="resend-code" onclick="resendCode()" data-i18n="resend_code">Resend code</button>
-                  <span id="resend-timer"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" data-i18n="auth_choose_avatar">Choose your avatar</label>
-            <button type="button" class="avatar-picker-btn" id="avatar-picker-btn" onclick="openAvatarModal()">
-              <div class="avatar-picker-placeholder" id="avatar-preview"><i class="fas fa-user"></i></div>
-              <span class="avatar-picker-text" data-i18n="auth_tap_choose_avatar">Tap to choose your avatar</span>
-            </button>
-            <input type="hidden" id="signup-avatar" value="">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="signup-password" data-i18n="auth_password">Password</label>
-              <input class="form-input" type="password" id="signup-password" name="password" data-i18n-placeholder="auth_password_placeholder" placeholder="At least 8 characters" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="signup-confirm" data-i18n="auth_confirm_password">Confirm Password</label>
-              <input class="form-input" type="password" id="signup-confirm" name="confirm" data-i18n-placeholder="auth_confirm_placeholder" placeholder="Re-enter password" required>
-            </div>
-          </div>
-
-          <div class="auth-checkbox">
-            <input type="checkbox" id="terms-agree" name="terms" required>
-            <label for="terms-agree" data-i18n="auth_terms_agree">I agree to <a href="terms.html">Terms of use</a> and <a href="privacy.html">Privacy policy</a></label>
-          </div>
-
-          <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_join_free">
-            Join the Swap — It's Free
-          </button>
-        </form>
-
-        <div class="auth-divider" data-i18n="auth_or_continue">or continue with</div>
+        <div class="auth-header">
+          <div class="logo-icon"><i class="fas fa-handshake"></i></div>
+          <h2 data-i18n="auth_social_title">Join the Swap Community</h2>
+          <p data-i18n="auth_social_subtitle">Start swapping for free. No credit card needed.</p>
+        </div>
 
         <div class="auth-social">
-          <button type="button" class="auth-social-btn" onclick="handleSocialSignup('google')">
+          <button type="button" class="auth-social-btn google-btn" onclick="handleSocialSignup('google')">
             <i class="fab fa-google"></i> <span data-i18n="auth_google">Continue with Google</span>
           </button>
-          <button type="button" class="auth-social-btn" onclick="handleSocialSignup('apple')">
+          <button type="button" class="auth-social-btn apple-btn" onclick="handleSocialSignup('apple')">
             <i class="fab fa-apple"></i> <span data-i18n="auth_apple">Continue with Apple</span>
           </button>
-          <button type="button" class="auth-social-btn" onclick="handleSocialSignup('facebook')">
+          <button type="button" class="auth-social-btn facebook-btn" onclick="handleSocialSignup('facebook')">
             <i class="fab fa-facebook-f"></i> <span data-i18n="auth_facebook">Continue with Facebook</span>
           </button>
         </div>
 
+        <div class="auth-divider" data-i18n="auth_or">or</div>
+
+        <button type="button" class="auth-email-btn" onclick="openSignupModal()">
+          <i class="fas fa-envelope"></i> <span data-i18n="auth_signup_email">Sign up with email</span>
+        </button>
+
         <div class="auth-footer-link">
           <span data-i18n="auth_already_account">Already have an account?</span> <a href="#" onclick="switchTab('login'); return false;" data-i18n="auth_login">Log in</a>
         </div>
+
+        <!-- Quick Demo -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--gray-border,#E5E7EB);text-align:center;">
+          <button type="button" onclick="quickDemoLogin()" class="btn-pill btn-pill-teal" style="font-size:0.88rem;padding:10px 24px;">
+            <i class="fas fa-bolt"></i> <span data-i18n="auth_quick_demo">Quick Demo (Premium)</span>
+          </button>
+          <div style="font-size:0.72rem;color:var(--gray-muted,#9CA3AF);margin-top:6px;" data-i18n="auth_demo_hint">demo@swappo.ae / demo123</div>
+        </div>
       </div>
 
-      <!-- ========== LOG IN TAB ========== -->
+      <!-- ========== VIEW: LOGIN ========== -->
       <div id="login" class="auth-tab-content">
+        <div class="auth-header">
+          <div class="logo-icon"><i class="fas fa-handshake"></i></div>
+          <h2 data-i18n="auth_welcome_back">Welcome back</h2>
+        </div>
+
+        <div class="auth-social">
+          <button type="button" class="auth-social-btn google-btn" onclick="handleSocialLogin('google')">
+            <i class="fab fa-google"></i> <span data-i18n="auth_google">Continue with Google</span>
+          </button>
+          <button type="button" class="auth-social-btn apple-btn" onclick="handleSocialLogin('apple')">
+            <i class="fab fa-apple"></i> <span data-i18n="auth_apple">Continue with Apple</span>
+          </button>
+          <button type="button" class="auth-social-btn facebook-btn" onclick="handleSocialLogin('facebook')">
+            <i class="fab fa-facebook-f"></i> <span data-i18n="auth_facebook">Continue with Facebook</span>
+          </button>
+        </div>
+
+        <div class="auth-divider" data-i18n="auth_or">or</div>
+
         <form class="auth-form" onsubmit="handleLogin(event)">
           <div class="form-group">
             <label class="form-label" for="login-email" data-i18n="auth_email">Email Address</label>
@@ -414,38 +428,96 @@
           </button>
         </form>
 
-        <div class="auth-divider" data-i18n="auth_or_continue">or continue with</div>
-
-        <div class="auth-social">
-          <button type="button" class="auth-social-btn" onclick="handleSocialLogin('google')">
-            <i class="fab fa-google"></i> <span data-i18n="auth_google">Continue with Google</span>
-          </button>
-          <button type="button" class="auth-social-btn" onclick="handleSocialLogin('apple')">
-            <i class="fab fa-apple"></i> <span data-i18n="auth_apple">Continue with Apple</span>
-          </button>
-          <button type="button" class="auth-social-btn" onclick="handleSocialLogin('facebook')">
-            <i class="fab fa-facebook-f"></i> <span data-i18n="auth_facebook">Continue with Facebook</span>
-          </button>
-        </div>
-
         <div class="auth-footer-link">
           <span data-i18n="auth_no_account">Don't have an account?</span> <a href="#" onclick="switchTab('signup'); return false;" data-i18n="auth_signup">Sign up</a>
         </div>
 
-        <!-- Quick Demo Access -->
-        <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--border);text-align:center;">
-          <button type="button" onclick="quickDemoLogin()" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;padding:10px 24px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-size:0.9rem;display:inline-flex;align-items:center;gap:8px;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(9,177,186,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <!-- Quick Demo -->
+        <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--gray-border,#E5E7EB);text-align:center;">
+          <button type="button" onclick="quickDemoLogin()" class="btn-pill btn-pill-teal" style="font-size:0.88rem;padding:10px 24px;">
             <i class="fas fa-bolt"></i> <span data-i18n="auth_quick_demo">Quick Demo (Premium)</span>
           </button>
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;" data-i18n="auth_demo_hint">demo@swappo.ae / demo123 — Full access to test everything</div>
+          <div style="font-size:0.72rem;color:var(--gray-muted,#9CA3AF);margin-top:6px;" data-i18n="auth_demo_hint">demo@swappo.ae / demo123</div>
         </div>
         <div style="margin-top:8px;text-align:center;">
-          <button type="button" onclick="resetAndDemo()" style="background:none;border:1px solid var(--border);color:var(--text-secondary);padding:6px 16px;border-radius:var(--radius);font-size:0.78rem;cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='var(--secondary)'" onmouseout="this.style.color='var(--text-secondary)'">
+          <button type="button" onclick="resetAndDemo()" style="background:none;border:1px solid var(--gray-border,#E5E7EB);color:var(--gray-text,#6B7280);padding:6px 16px;border-radius:var(--radius-pill,999px);font-size:0.78rem;cursor:pointer;">
             <i class="fas fa-sync-alt"></i> <span data-i18n="auth_reset_demo">Reset Demo Data</span>
           </button>
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ========== SIGNUP MODAL (opens on "Sign up with email") ========== -->
+  <div class="signup-modal-overlay" id="signup-modal">
+    <div class="signup-modal">
+      <button class="signup-modal-close" onclick="closeSignupModal()">&times;</button>
+      <h2 data-i18n="auth_create_account">Create your account</h2>
+
+      <form class="auth-form" onsubmit="handleSignup(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signup-name" data-i18n="auth_full_name">Full Name</label>
+            <input class="form-input" type="text" id="signup-name" name="name" data-i18n-placeholder="auth_name_placeholder" placeholder="Ahmed Mohammed" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-pseudo" data-i18n="auth_username">Username</label>
+            <input class="form-input" type="text" id="signup-pseudo" data-i18n-placeholder="auth_username_placeholder" placeholder="Letters, numbers & underscores (3-20)" pattern="^[a-zA-Z0-9_]{3,20}$" required>
+            <span class="pseudo-feedback" id="pseudo-feedback"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signup-email" data-i18n="auth_email">Email Address</label>
+            <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-phone" data-i18n="auth_phone">Phone Number</label>
+            <div class="phone-input-group">
+              <span class="phone-prefix">+971</span>
+              <input class="form-input" type="tel" id="signup-phone" data-i18n-placeholder="auth_phone_placeholder" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
+            </div>
+            <div class="verification-step" id="phone-verify-step">
+              <input class="form-input code-input" type="text" id="phone-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$">
+              <div>
+                <button type="button" class="resend-link" id="resend-code" onclick="resendCode()" data-i18n="resend_code">Resend code</button>
+                <span id="resend-timer"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth_choose_avatar">Choose your avatar</label>
+          <button type="button" class="avatar-picker-btn" id="avatar-picker-btn" onclick="openAvatarModal()">
+            <div class="avatar-picker-placeholder" id="avatar-preview"><i class="fas fa-user"></i></div>
+            <span class="avatar-picker-text" data-i18n="auth_tap_choose_avatar">Tap to choose your avatar</span>
+          </button>
+          <input type="hidden" id="signup-avatar" value="">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signup-password" data-i18n="auth_password">Password</label>
+            <input class="form-input" type="password" id="signup-password" name="password" data-i18n-placeholder="auth_password_placeholder" placeholder="At least 8 characters" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-confirm" data-i18n="auth_confirm_password">Confirm Password</label>
+            <input class="form-input" type="password" id="signup-confirm" name="confirm" data-i18n-placeholder="auth_confirm_placeholder" placeholder="Re-enter password" required>
+          </div>
+        </div>
+
+        <div class="auth-checkbox">
+          <input type="checkbox" id="terms-agree" name="terms" required>
+          <label for="terms-agree" data-i18n="auth_terms_agree">I agree to <a href="terms.html">Terms of use</a> and <a href="privacy.html">Privacy policy</a></label>
+        </div>
+
+        <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_join_free">
+          Join the Swap — It's Free
+        </button>
+      </form>
     </div>
   </div>
 
@@ -536,24 +608,36 @@
   <script src="../js/swappo-animations.js"></script>
   <script>
     /* ========================
-       Tab Switching
+       View Switching (signup = social main, login = email form)
        ======================== */
     function switchTab(tabName, element) {
-      document.querySelectorAll('.auth-tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      if (element) {
-        element.classList.add('active');
-      } else {
-        // Find the right tab button
-        document.querySelectorAll('.auth-tab').forEach(t => {
-          if ((tabName === 'signup' && t.textContent.trim().match(/sign\s*up/i)) ||
-              (tabName === 'login' && t.textContent.trim().match(/log\s*in/i))) {
-            t.classList.add('active');
-          }
-        });
-      }
+      document.querySelectorAll('.auth-tab-content').forEach(function(tab) { tab.classList.remove('active'); });
+      var target = document.getElementById(tabName);
+      if (target) target.classList.add('active');
     }
+
+    /* ========================
+       Signup Modal
+       ======================== */
+    function openSignupModal() {
+      document.getElementById('signup-modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSignupModal() {
+      document.getElementById('signup-modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    // Close on overlay click
+    document.getElementById('signup-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeSignupModal();
+    });
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeSignupModal();
+        closeAvatarModal();
+      }
+    });
 
     // ---- Toast notification ----
     function showToast(message, type = 'info') {
@@ -653,10 +737,7 @@
       if (e.target === this) closeAvatarModal();
     });
 
-    // Close modal on Escape
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeAvatarModal();
-    });
+    // (Escape key handled in switchTab section above)
 
     /* ========================
        Signup Handler
