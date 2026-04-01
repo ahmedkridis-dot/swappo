@@ -744,6 +744,7 @@ const translations = {
 
     // Gift Corner Mechanisms
     impact_wall_title: "The Swappo Community",
+    impact_wall_subtitle: "Real people, real swaps, real impact.",
     impact_wall_gifts: "gifts today",
     impact_wall_swapped: "items swapped",
     impact_wall_co2: "kg CO2 saved 🌿",
