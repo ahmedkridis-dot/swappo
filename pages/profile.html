@@ -1389,7 +1389,7 @@
             document.getElementById('stat-saved').textContent = '4.9';
             // Plan card: show used/total swaps
             var swapsUsed = planInfo.swaps_used || swapCount;
-            var swapsTotal = planInfo.plan === 'premium' ? '∞' : (planInfo.plan === 'silver' ? '6' : planInfo.plan === 'bronze' ? '4' : '2');
+            var swapsTotal = '∞'; // v4: swaps are unlimited for all plans
             document.getElementById('stat-plan').textContent = swapsUsed + '/' + swapsTotal;
             var planBadgeEl = document.getElementById('stat-plan-badge');
             if (planBadgeEl) planBadgeEl.textContent = tierInfo.name;

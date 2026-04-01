@@ -95,7 +95,7 @@
           <span class="early-adopter-icon">🚀</span>
           <div class="early-adopter-text">
             <h3 class="early-adopter-title" id="early-adopter-title" data-i18n="early_adopter_title">Join the first 500 Early Adopters</h3>
-            <p class="early-adopter-subtitle" id="early-adopter-subtitle"><strong>Bronze plan FREE 6 months</strong> + Pioneer badge</p>
+            <p class="early-adopter-subtitle" id="early-adopter-subtitle"><strong data-i18n="early_adopter_offer">Swappo Pro FREE for 3 months</strong> + <span data-i18n="early_adopter_badge">Pioneer badge</span></p>
           </div>
         </div>
         <div class="early-adopter-right">
@@ -346,65 +346,39 @@
     </div>
   </section>
 
-  <!-- ========== PRICING PLANS ========== -->
+  <!-- ========== PRICING — Free vs Pro ========== -->
   <section class="pricing-section reveal">
     <div class="container">
-      <h2 class="section-title" data-i18n="choose_plan">Choose Your Plan</h2>
-      <p class="pricing-subtitle" data-i18n="pricing_subtitle">Start free. Upgrade anytime.</p>
-      <div class="pricing-toggle">
-        <button class="active" data-i18n="monthly">Monthly</button>
-        <button data-i18n="annual">Annual <span class="save-badge" data-i18n="save_20">Save 20%</span></button>
-      </div>
-      <div class="plans-grid">
+      <h2 class="section-title" data-i18n="pricing_hero_title">Swap for Free. Upgrade for Power.</h2>
+      <p class="pricing-subtitle" data-i18n="pricing_hero_subtitle">Unlimited swaps for everyone. Go Pro for visibility, analytics & more.</p>
+      <div class="plans-grid" style="grid-template-columns:repeat(2,1fr);max-width:750px;margin:0 auto;">
         <!-- Free -->
         <div class="plan-card card-hover">
           <div class="plan-name" data-i18n="plan_free">Free</div>
-          <div class="plan-price"><span class="currency">AED</span> 0<span class="period" data-i18n="per_month">/mo</span></div>
+          <div class="plan-price" style="font-size:28px;">Free <span class="period">forever</span></div>
           <ul class="plan-features">
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_2_swaps">2 swaps/month</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_1_claim">1 giveaway claim</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_standard_support">Standard support</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_unlimited_swaps">Unlimited swaps</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_unlimited_publish">Unlimited listings</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_gift_1">1 Gift Corner claim/month</span></li>
           </ul>
-          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
+          <a href="pages/login.html" class="plan-cta" data-i18n="cta_free">Get Started Free</a>
         </div>
-        <!-- Bronze -->
-        <div class="plan-card card-hover">
-          <div class="plan-name" data-i18n="plan_bronze">Bronze</div>
-          <div class="plan-price"><span class="currency">AED</span> 19<span class="period" data-i18n="per_month">/mo</span></div>
-          <ul class="plan-features">
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_4_swaps">4 swaps/month</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_2_claims">2 giveaway claims</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_1_boost">1 boost/month</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_reduced_ads">Reduced ads</span></li>
-          </ul>
-          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
-        </div>
-        <!-- Silver -->
-        <div class="plan-card card-hover">
-          <div class="plan-name" data-i18n="plan_silver">Silver</div>
-          <div class="plan-price"><span class="currency">AED</span> 39<span class="period" data-i18n="per_month">/mo</span></div>
-          <ul class="plan-features">
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_6_swaps">6 swaps/month</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_3_claims">3 giveaway claims</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_2_boosts">2 boosts/month</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_no_ads">No ads</span></li>
-          </ul>
-          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
-        </div>
-        <!-- Premium -->
+        <!-- Swappo Pro -->
         <div class="plan-card premium card-hover">
           <div class="most-popular-badge" data-i18n="most_popular">Most Popular</div>
-          <div class="plan-name" data-i18n="plan_premium">Premium</div>
-          <div class="plan-price"><span class="currency">AED</span> 69<span class="period" data-i18n="per_month">/mo</span></div>
+          <div class="plan-name" data-i18n="plan_pro">Swappo Pro</div>
+          <div class="plan-price">29 <span class="currency">AED</span><span class="period">/mo</span></div>
           <ul class="plan-features">
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_unlimited_swaps">Unlimited swaps</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_5_claims">5 giveaway claims</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_4_boosts">4 boosts/month</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_no_ads">No ads</span></li>
-            <li><i class="fas fa-check"></i> <span data-i18n="plan_vip_support">VIP support</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_no_ads">No ads</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_pro_boosts">3 boosts/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_pro_gifts">5 Gift Corner claims/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_pro_analytics">Analytics & insights</span></li>
           </ul>
-          <a href="pages/login.html" class="plan-cta" data-i18n="get_started">Get Started</a>
+          <a href="pages/login.html" class="plan-cta" data-i18n="cta_pro">Go Pro</a>
         </div>
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <a href="pages/pricing.html" style="color:var(--teal,#09B1BA);font-weight:600;font-size:14px;text-decoration:none;">See all features →</a>
       </div>
     </div>
   </section>
@@ -417,7 +391,7 @@
         <div class="testimonial-card card-hover">
           <div class="testimonial-header">
             <div class="testimonial-avatar" style="background:#09B1BA;">LR</div>
-            <div><div class="testimonial-name">Layla R.</div><div class="testimonial-badge badge-silver" data-i18n="badge_silver">Silver Member</div></div>
+            <div><div class="testimonial-name">Layla R.</div><div class="testimonial-badge badge-silver" data-i18n="badge_pro">Pro Member</div></div>
           </div>
           <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
           <p class="testimonial-text" data-i18n="testimonial_1">"I swapped my old PlayStation for a brand new bookshelf. Couldn't believe it!"</p>

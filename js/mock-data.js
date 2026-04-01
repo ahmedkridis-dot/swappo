@@ -5,11 +5,22 @@
  */
 
 // ─── SUBSCRIPTION TIERS ────────────────────────────────────────────────────
+// ─── BUSINESS MODEL v4 ─────────────────────────────────────────────────────
+// Swaps are UNLIMITED and FREE for all users.
+// Revenue: Swappo Pro subscription (29 AED/mo) + individual boosts (5-25 AED)
 const SUBSCRIPTION_TIERS = {
-  free:    { name: 'Free',    price: 0,  badge: '\u{1F331}', swaps: 2, claims: 1, boosts: 0, ads: true,      color: '#999999' },
-  bronze:  { name: 'Bronze',  price: 19, badge: '\u{1F949}', swaps: 4, claims: 2, boosts: 1, ads: 'reduced', color: '#CD7F32' },
-  silver:  { name: 'Silver',  price: 39, badge: '\u{1F948}', swaps: 6, claims: 3, boosts: 2, ads: 'reduced', color: '#C0C0C0' },
-  premium: { name: 'Premium', price: 69, badge: '\u{1F451}', swaps: Infinity, claims: 5, boosts: 4, ads: false, color: '#09B1BA' }
+  free: { name: 'Free', price: 0, badge: '\u{1F331}', swaps: Infinity, claims: 1, boosts: 0, ads: true, color: '#6B7280' },
+  pro:  { name: 'Pro',  price: 29, badge: '\u{1F6E1}', swaps: Infinity, claims: 5, boosts: 3, ads: false, color: '#09B1BA' },
+  // Legacy aliases (for backward compat with existing data)
+  bronze:  { name: 'Pro', price: 29, badge: '\u{1F6E1}', swaps: Infinity, claims: 5, boosts: 3, ads: false, color: '#09B1BA' },
+  silver:  { name: 'Pro', price: 29, badge: '\u{1F6E1}', swaps: Infinity, claims: 5, boosts: 3, ads: false, color: '#09B1BA' },
+  premium: { name: 'Pro', price: 29, badge: '\u{1F6E1}', swaps: Infinity, claims: 5, boosts: 3, ads: false, color: '#09B1BA' }
+};
+
+const BOOST_PRICES = {
+  '24h': { price: 5, duration: 1, label: '24h boost' },
+  '3d':  { price: 10, duration: 3, label: '3-day boost' },
+  '7d':  { price: 25, duration: 7, label: '7-day boost + featured' }
 };
 
 // ─── CLOTHING SUBCATEGORIES ─────────────────────────────────────────────────
@@ -41,14 +52,14 @@ const GAMING_SUBCATEGORIES = {
 
 // ─── MOCK USERS ─────────────────────────────────────────────────────────────
 const MOCK_USERS = [
-  { id: 'user-1', name: 'Ahmed Al-Maktoum', email: 'ahmed@example.com', city: 'Dubai Marina', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 7, plan: 'silver', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#09B1BA', created_at: '2025-11-15', pseudo: 'ahmed_dxb', avatar: 'cool' },
-  { id: 'user-2', name: 'Fatima Al-Hashimi', email: 'fatima@example.com', city: 'JBR', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 3, plan: 'bronze', swaps_used: 2, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#FF4B55', created_at: '2026-01-20', pseudo: 'fatima_h', avatar: 'hijabi' },
-  { id: 'user-3', name: 'John Mitchell', email: 'john@example.com', city: 'Business Bay', badge_tier: 'pro', badge_emoji: '\u{1F48E}', swap_count: 18, plan: 'premium', swaps_used: 5, claims_used: 2, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#FF8C00', created_at: '2025-08-01', pseudo: 'john_m', avatar: 'techie' },
+  { id: 'user-1', name: 'Ahmed Al-Maktoum', email: 'ahmed@example.com', city: 'Dubai Marina', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 7, plan: 'pro', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#09B1BA', created_at: '2025-11-15', pseudo: 'ahmed_dxb', avatar: 'cool' },
+  { id: 'user-2', name: 'Fatima Al-Hashimi', email: 'fatima@example.com', city: 'JBR', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 3, plan: 'free', swaps_used: 2, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#FF4B55', created_at: '2026-01-20', pseudo: 'fatima_h', avatar: 'hijabi' },
+  { id: 'user-3', name: 'John Mitchell', email: 'john@example.com', city: 'Business Bay', badge_tier: 'pro', badge_emoji: '\u{1F48E}', swap_count: 18, plan: 'pro', swaps_used: 5, claims_used: 2, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#FF8C00', created_at: '2025-08-01', pseudo: 'john_m', avatar: 'techie' },
   { id: 'user-4', name: 'Maria Santos', email: 'maria@example.com', city: 'Downtown Dubai', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 2, plan: 'free', swaps_used: 1, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#8B5CF6', created_at: '2026-02-10', pseudo: 'maria_s', avatar: 'sunny' },
-  { id: 'user-5', name: 'Omar Khalid', email: 'omar@example.com', city: 'Sharjah', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 9, plan: 'bronze', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#059669', created_at: '2025-09-05', pseudo: 'omar_k', avatar: 'sporty' },
+  { id: 'user-5', name: 'Omar Khalid', email: 'omar@example.com', city: 'Sharjah', badge_tier: 'active', badge_emoji: '\u{1F525}', swap_count: 9, plan: 'free', swaps_used: 3, claims_used: 1, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#059669', created_at: '2025-09-05', pseudo: 'omar_k', avatar: 'sporty' },
   { id: 'user-6', name: 'Sarah Connor', email: 'sarah@example.com', city: 'Abu Dhabi', badge_tier: 'newcomer', badge_emoji: '\u{1F331}', swap_count: 0, plan: 'free', swaps_used: 0, claims_used: 0, boosts_used: 0, billing_start: '2026-03-01', avatar_color: '#EC4899', created_at: '2026-03-20', pseudo: 'sarah_c', avatar: 'athlete' },
-  { id: 'user-7', name: 'Raj Patel', email: 'raj@example.com', city: 'Al Barsha', badge_tier: 'elite', badge_emoji: '\u{1F3C6}', swap_count: 35, plan: 'premium', swaps_used: 8, claims_used: 3, boosts_used: 2, billing_start: '2026-03-01', avatar_color: '#F59E0B', created_at: '2025-06-01', pseudo: 'raj_pro', avatar: 'royal' },
-  { id: 'user-8', name: 'Layla Nouri', email: 'layla@example.com', city: 'JLT', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 4, plan: 'silver', swaps_used: 2, claims_used: 0, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#6366F1', created_at: '2026-01-05', pseudo: 'layla_n', avatar: 'chic' }
+  { id: 'user-7', name: 'Raj Patel', email: 'raj@example.com', city: 'Al Barsha', badge_tier: 'elite', badge_emoji: '\u{1F3C6}', swap_count: 35, plan: 'pro', swaps_used: 8, claims_used: 3, boosts_used: 2, billing_start: '2026-03-01', avatar_color: '#F59E0B', created_at: '2025-06-01', pseudo: 'raj_pro', avatar: 'royal' },
+  { id: 'user-8', name: 'Layla Nouri', email: 'layla@example.com', city: 'JLT', badge_tier: 'swapper', badge_emoji: '\u{2B50}', swap_count: 4, plan: 'pro', swaps_used: 2, claims_used: 0, boosts_used: 1, billing_start: '2026-03-01', avatar_color: '#6366F1', created_at: '2026-01-05', pseudo: 'layla_n', avatar: 'chic' }
 ];
 
 // ─── DEMO USER ──────────────────────────────────────────────────────────────
@@ -61,8 +72,8 @@ const DEMO_USER = {
   badge_tier: 'pro',
   badge_emoji: '\u{1F48E}',
   swap_count: 18,
-  plan: 'premium',
-  swaps_used: 2,
+  plan: 'pro',
+  isPro: true,
   claims_used: 1,
   boosts_used: 0,
   billing_start: '2026-03-01',
@@ -84,7 +95,7 @@ const DEMO_USER_FREE = {
   badge_emoji: '\u{1F331}',
   swap_count: 1,
   plan: 'free',
-  swaps_used: 1,
+  isPro: false,
   claims_used: 0,
   boosts_used: 0,
   billing_start: '2026-03-15',
