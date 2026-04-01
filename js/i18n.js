@@ -20,6 +20,12 @@ const translations = {
     search_placeholder: "Search items...",
     join_swap: "Join the Swap",
     drop_item: "Drop an Item",
+    list_new_item: "List new item",
+    dashboard_title: "Dashboard",
+    dash_active_listings: "Active listings",
+    dash_active_chats: "Active chats",
+    dash_your_rating: "Your rating",
+    dash_exchanges_month: "Exchanges this month",
 
     // Categories
     all: "All",
@@ -1008,6 +1014,12 @@ const translations = {
     search_placeholder: "Rechercher des articles...",
     join_swap: "Rejoindre l'Échange",
     drop_item: "Déposer un article",
+    list_new_item: "Ajouter un article",
+    dashboard_title: "Tableau de bord",
+    dash_active_listings: "Annonces actives",
+    dash_active_chats: "Discussions actives",
+    dash_your_rating: "Votre note",
+    dash_exchanges_month: "Échanges ce mois",
 
     // Categories
     all: "Tous",
@@ -1996,6 +2008,12 @@ const translations = {
     search_placeholder: "ابحث عن الأشياء...",
     join_swap: "انضم للتبادل",
     drop_item: "أضف منتج",
+    list_new_item: "إضافة منتج جديد",
+    dashboard_title: "لوحة التحكم",
+    dash_active_listings: "إعلانات نشطة",
+    dash_active_chats: "محادثات نشطة",
+    dash_your_rating: "تقييمك",
+    dash_exchanges_month: "التبادلات هذا الشهر",
 
     // Categories
     all: "الكل",
@@ -2987,6 +3005,12 @@ const translations = {
     search_placeholder: "چیزیں تلاش کریں...",
     join_swap: "سواپ میں شامل ہوں",
     drop_item: "آئٹم شامل کریں",
+    list_new_item: "نیا آئٹم شامل کریں",
+    dashboard_title: "ڈیش بورڈ",
+    dash_active_listings: "فعال اشتہارات",
+    dash_active_chats: "فعال چیٹس",
+    dash_your_rating: "آپ کی درجہ بندی",
+    dash_exchanges_month: "اس ماہ کے تبادلے",
 
     // Categories
     all: "سب",
@@ -3978,6 +4002,12 @@ const translations = {
     search_placeholder: "Поиск товаров...",
     join_swap: "Присоединиться",
     drop_item: "Добавить товар",
+    list_new_item: "Добавить товар",
+    dashboard_title: "Панель управления",
+    dash_active_listings: "Активные объявления",
+    dash_active_chats: "Активные чаты",
+    dash_your_rating: "Ваш рейтинг",
+    dash_exchanges_month: "Обмены за месяц",
 
     // Categories
     all: "Все",
