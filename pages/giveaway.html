@@ -772,6 +772,24 @@
                 <a href="publier.html" class="btn-primary-coral">Add a free item</a>
             </div>
         </div>
+        <!-- Adoption Banner -->
+        <div class="adopt-banner reveal" id="adopt" style="max-width:800px;margin:40px auto;">
+            <h3 data-i18n="adopt_title">🐾 Adopt, don't shop</h3>
+            <p data-i18n="adopt_subtitle">While you're giving items a second life, why not give a pet a second chance?</p>
+            <div class="adopt-cards">
+                <div class="adopt-card">
+                    <div style="font-size:28px;margin-bottom:8px;">🐕</div>
+                    <div style="font-weight:600;color:var(--navy,#1A1A2E);margin-bottom:4px;">Animals & Us Dubai</div>
+                    <a href="https://animalsandus.com" target="_blank" style="color:var(--teal,#09B1BA);font-weight:600;font-size:13px;text-decoration:none;" data-i18n="adopt_visit">Visit site →</a>
+                </div>
+                <div class="adopt-card">
+                    <div style="font-size:28px;margin-bottom:8px;">🐈</div>
+                    <div style="font-weight:600;color:var(--navy,#1A1A2E);margin-bottom:4px;">Stray Dogs Center UAE</div>
+                    <a href="https://sdc.ae" target="_blank" style="color:var(--teal,#09B1BA);font-weight:600;font-size:13px;text-decoration:none;" data-i18n="adopt_visit">Visit site →</a>
+                </div>
+            </div>
+            <p style="font-size:12px;color:var(--gray-muted,#9CA3AF);margin:16px 0 0;text-align:center;" data-i18n="adopt_support">Swappo supports local animal welfare ❤️</p>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -1070,6 +1088,37 @@
             container.style.position = 'relative';
             container.appendChild(overlay);
         }
+    // ── Surprise Gift button ──
+    (function() {
+      var btn = document.createElement('button');
+      btn.className = 'surprise-me-btn gift-variant';
+      btn.innerHTML = '<i class="fas fa-gift"></i> Surprise Gift!';
+      btn.onclick = function() {
+        var items = DemoItems.getGiveaways ? DemoItems.getGiveaways() : [];
+        if (!items.length) { DemoNotifications.showToast('No gifts available right now!', 'info'); return; }
+        var item = items[Math.floor(Math.random() * items.length)];
+        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Gift';
+        var photo = (item.photos && item.photos[0]) || '';
+        var overlay = document.createElement('div');
+        overlay.className = 'surprise-overlay';
+        overlay.innerHTML =
+          '<div class="surprise-modal surprise-modal-card">' +
+            '<button class="surprise-close" onclick="this.closest(\'.surprise-overlay\').remove()">&times;</button>' +
+            '<div style="font-size:48px;margin-bottom:12px;">🎁</div>' +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px;">' : '') +
+            '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
+            '<p style="font-size:13px;color:#9CA3AF;margin:0 0 4px;">FREE · ' + (item.category || '') + '</p>' +
+            '<p style="font-size:12px;color:#6B7280;font-style:italic;margin:0 0 20px;">A gift that might make your day!</p>' +
+            '<div style="display:flex;gap:10px;justify-content:center;">' +
+              '<button onclick="this.closest(\'.surprise-overlay\').remove();btn.click();" class="btn-pill btn-pill-outline" style="font-size:13px;padding:10px 20px;"><i class="fas fa-gift"></i> Another</button>' +
+              '<a href="product.html?id=' + item.id + '" class="btn-pill btn-pill-coral" style="font-size:13px;padding:10px 20px;background:#FF6B6B;color:white;border-color:#FF6B6B;">View gift →</a>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+      };
+      document.body.appendChild(btn);
+    })();
     </script>
 </body>
 </html>

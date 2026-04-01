@@ -294,6 +294,18 @@
     </div>
   </div>
 
+  <!-- ========== AI SUGGESTIONS TEASER ========== -->
+  <div class="container" id="ai-teaser-container" style="display:none;margin-bottom:0;">
+    <div id="ai-pro-suggestions" style="display:none;margin:16px 0;">
+      <h3 style="font-size:15px;font-weight:600;color:var(--navy,#1A1A2E);margin:0 0 12px;"><i class="fas fa-magic" style="color:var(--teal,#09B1BA);"></i> AI Suggestions for you</h3>
+      <div id="ai-suggestions-scroll" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;"></div>
+    </div>
+    <div id="ai-free-teaser" style="display:none;background:var(--teal-bg,#E6F7F8);border:1px solid rgba(9,177,186,0.15);border-radius:var(--radius-md,12px);padding:16px 20px;margin:16px 0;display:none;">
+      <span style="font-size:14px;color:var(--navy,#1A1A2E);"><i class="fas fa-magic" style="color:var(--teal,#09B1BA);margin-right:6px;"></i> <strong>Want AI-powered suggestions?</strong> Upgrade to Pro for smart matchmaking!</span>
+      <a href="pricing.html" style="margin-left:12px;color:var(--teal,#09B1BA);font-weight:600;font-size:13px;text-decoration:none;">Go Pro →</a>
+    </div>
+  </div>
+
   <!-- ========== MAIN CONTENT ========== -->
   <div class="container">
     <span class="result-count" id="item-count">Loading...</span>
@@ -778,6 +790,70 @@
       renderCatalogue();
       updateSubcategoryBar();
     });
+    // ── AI Teaser ──
+    (function() {
+      var container = document.getElementById('ai-teaser-container');
+      if (!container) return;
+      var user = window.DemoAuth && DemoAuth.getCurrentUser();
+      if (!user) {
+        // Show free teaser for non-logged-in
+        container.style.display = 'block';
+        document.getElementById('ai-free-teaser').style.display = 'block';
+        return;
+      }
+      container.style.display = 'block';
+      if (user.isPro || user.plan === 'pro') {
+        // Show AI suggestions for Pro
+        var proDiv = document.getElementById('ai-pro-suggestions');
+        proDiv.style.display = 'block';
+        var scroll = document.getElementById('ai-suggestions-scroll');
+        var items = DemoItems.browse({ sortBy: 'popular' }).items.slice(0, 6);
+        scroll.innerHTML = items.map(function(item) {
+          var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Item';
+          var photo = (item.photos && item.photos[0]) || '';
+          var score = Math.floor(75 + Math.random() * 20);
+          return '<a href="product.html?id=' + item.id + '" style="flex-shrink:0;width:140px;text-decoration:none;">' +
+            '<div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:12px;overflow:hidden;transition:all 0.3s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'">' +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:100px;object-fit:cover;">' : '<div style="height:100px;background:#f5f5f5;"></div>') +
+            '<div style="padding:8px;">' +
+            '<div style="font-size:12px;font-weight:600;color:#1A1A2E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + title + '</div>' +
+            '<div style="font-size:11px;color:#09B1BA;font-weight:600;">' + score + '% match</div>' +
+            '</div></div></a>';
+        }).join('');
+      } else {
+        document.getElementById('ai-free-teaser').style.display = 'block';
+      }
+    })();
+
+    // ── Surprise Me button ──
+    (function() {
+      var btn = document.createElement('button');
+      btn.className = 'surprise-me-btn';
+      btn.innerHTML = '<i class="fas fa-dice"></i> Surprise Me!';
+      btn.onclick = function() {
+        var items = DemoItems.browse({ sortBy: 'popular' }).items;
+        if (!items.length) return;
+        var item = items[Math.floor(Math.random() * Math.min(20, items.length))];
+        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Item';
+        var photo = (item.photos && item.photos[0]) || '';
+        var overlay = document.createElement('div');
+        overlay.className = 'surprise-overlay';
+        overlay.innerHTML =
+          '<div class="surprise-modal surprise-modal-card">' +
+            '<button class="surprise-close" onclick="this.closest(\'.surprise-overlay\').remove()">&times;</button>' +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:16px;">' : '') +
+            '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
+            '<p style="font-size:13px;color:#9CA3AF;margin:0 0 20px;">' + (item.category || '') + ' · ' + (item.condition || '') + '</p>' +
+            '<div style="display:flex;gap:10px;justify-content:center;">' +
+              '<button onclick="this.closest(\'.surprise-overlay\').remove();btn.click();" class="btn-pill btn-pill-outline" style="font-size:13px;padding:10px 20px;"><i class="fas fa-dice"></i> Another</button>' +
+              '<a href="product.html?id=' + item.id + '" class="btn-pill btn-pill-teal" style="font-size:13px;padding:10px 20px;">View item →</a>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+      };
+      document.body.appendChild(btn);
+    })();
   </script>
 
 </body>

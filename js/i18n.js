@@ -768,6 +768,24 @@ const translations = {
     gift_thank_skip: "Skip",
     gift_thank_send: "Send thanks 💚",
 
+    // Feature: Surprise Me
+    surprise_me: "Surprise Me!",
+    surprise_gift: "Surprise Gift!",
+    surprise_another: "Another",
+    surprise_view: "View item",
+
+    // Feature: Adoption Banner
+    adopt_title: "Adopt, don't shop",
+    adopt_subtitle: "While you're giving items a second life, why not give a pet a second chance?",
+    adopt_support: "Swappo supports local animal welfare",
+    adopt_visit: "Visit site",
+
+    // Feature: AI Pro
+    ai_suggestions: "AI Suggestions for you",
+    ai_teaser: "Want AI-powered suggestions?",
+    ai_teaser_subtitle: "Upgrade to Pro for smart matchmaking!",
+    ai_go_pro: "Go Pro",
+
     // Impact Page
     impact_hero_title: "Every Swap Makes a <span>Difference</span>",
     impact_hero_subtitle: "Join a community that trades smarter, wastes less, and connects more.",

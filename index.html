@@ -811,6 +811,43 @@
       });
     })();
 
+    // ── Surprise Me ──
+    (function() {
+      // Add floating button
+      var btn = document.createElement('button');
+      btn.className = 'surprise-me-btn';
+      btn.innerHTML = '<i class="fas fa-dice"></i> Surprise Me!';
+      btn.onclick = function() { showSurprise(); };
+      document.body.appendChild(btn);
+
+      window.showSurprise = function() {
+        var items = DemoItems.browse({ sortBy: 'popular' }).items;
+        if (!items.length) return;
+        var item = items[Math.floor(Math.random() * Math.min(20, items.length))];
+        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Item';
+        var photo = (item.photos && item.photos[0]) || '';
+        var cat = item.category || '';
+        var cond = item.condition || '';
+
+        var overlay = document.createElement('div');
+        overlay.className = 'surprise-overlay';
+        overlay.innerHTML =
+          '<div class="surprise-modal surprise-modal-card">' +
+            '<button class="surprise-close" onclick="this.closest(\'.surprise-overlay\').remove()">&times;</button>' +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:16px;" alt="">' : '') +
+            '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
+            '<p style="font-size:13px;color:#9CA3AF;margin:0 0 16px;">' + cat + ' · ' + cond + '</p>' +
+            '<p style="font-size:12px;color:#6B7280;font-style:italic;margin:0 0 20px;">Popular in your area</p>' +
+            '<div style="display:flex;gap:10px;justify-content:center;">' +
+              '<button onclick="this.closest(\'.surprise-overlay\').remove();showSurprise();" class="btn-pill btn-pill-outline" style="font-size:13px;padding:10px 20px;"><i class="fas fa-dice"></i> Another</button>' +
+              '<a href="pages/product.html?id=' + item.id + '" class="btn-pill btn-pill-teal" style="font-size:13px;padding:10px 20px;">View item →</a>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+      };
+    })();
+
     function convertToGift(itemId, btn) {
       if (window.DemoItems && DemoItems.update) {
         DemoItems.update(itemId, { is_giveaway: true });
