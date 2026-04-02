@@ -786,6 +786,49 @@ const translations = {
     ai_teaser_subtitle: "Upgrade to Pro for smart matchmaking!",
     ai_go_pro: "Go Pro",
 
+    // Feature: Photo Safety
+    photo_face_blurred: "face auto-blurred for your privacy",
+    photo_faces_blurred: "faces auto-blurred for your privacy",
+    photo_use_original: "Use original",
+    photo_processing: "Processing...",
+    photo_privacy_shield: "Privacy shield active",
+
+    // Feature: Phone sharing
+    phone_label: "Phone number (optional)",
+    phone_auto_share: "Share my number automatically at match",
+    phone_privacy_note: "Your number is only shared with matched swappers, never publicly visible",
+    phone_share_prompt: "Share your phone number?",
+    phone_share_subtitle: "Makes it easier to coordinate the exchange.",
+    phone_share_btn: "Share my number",
+    phone_no_thanks: "No thanks",
+    phone_call: "Call",
+    phone_whatsapp: "WhatsApp",
+    phone_copy: "Copy",
+    phone_copied: "Copied!",
+
+    // Feature: Item + Cash
+    cash_add_title: "Add cash to sweeten the deal?",
+    cash_add_optional: "optional",
+    cash_prefix: "AED",
+    cash_quick_amounts: "Quick amounts:",
+    cash_fee_note: "5% service fee applies",
+    cash_your_offer: "Your complete offer:",
+    cash_counter_offer: "Counter-offer",
+    cash_counter_send: "Send counter-offer",
+
+    // Feature: Chat Wizard
+    wizard_accepted: "Swap accepted! Let's set up the exchange.",
+    wizard_step: "Step {current} of {total}",
+    wizard_both_agree: "Both of you need to agree",
+    wizard_method_title: "How would you like to exchange?",
+    wizard_meetup: "Meet in person",
+    wizard_shipping: "Ship it",
+    wizard_where_meet: "Where would you like to meet?",
+    wizard_confirm_title: "Confirm your swap",
+    wizard_confirm_btn: "Confirm swap",
+    wizard_free_chat: "Switch to free chat",
+    wizard_completed: "Swap confirmed!",
+
     // Impact Page
     impact_hero_title: "Every Swap Makes a <span>Difference</span>",
     impact_hero_subtitle: "Join a community that trades smarter, wastes less, and connects more.",
