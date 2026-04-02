@@ -48,6 +48,19 @@
     </div>
   </nav>
 
+  <!-- Eco Ticker -->
+  <div class="eco-ticker" id="ecoTicker">
+    <div class="eco-ticker-content">
+      <span class="eco-ticker-item">🌿 <span class="eco-ticker-number" data-target="6430" data-suffix=" kg">0</span> CO2 saved</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🔄 <span class="eco-ticker-number" data-target="1892" data-suffix="">0</span> items swapped</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🎁 <span class="eco-ticker-number" data-target="247" data-suffix="">0</span> gifts today</span>
+      <span class="eco-ticker-live">↑ <span id="ecoTickerLive">+12 in the last hour</span></span>
+    </div>
+    <button class="eco-ticker-close" id="ecoTickerClose" aria-label="Close">×</button>
+  </div>
+
   <!-- ========== MEGA MENU ========== -->
   <div id="mega-menu-mount"></div>
   <script src="js/mega-menu.js"></script>
@@ -70,11 +83,17 @@
         <div class="hero-text">
           <h1 data-i18n="hero_title_v2">Someone needs what you have. <span data-i18n="hero_title_accent">Swap it.</span></h1>
           <p data-i18n="hero_subtitle">The UAE's first barter platform. Trade items with your community. Start free.</p>
-          <a href="pages/login.html" class="btn btn-primary" data-i18n="join_swap">Join the Swap</a>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="pages/catalogue.html" class="btn-pill btn-pill-teal" data-i18n="hero_browse">Browse Items →</a>
+            <a href="pages/login.html" class="btn-pill btn-pill-outline" style="border-color:var(--navy,#1A1A2E);color:var(--navy,#1A1A2E);" data-i18n="hero_start_free">Start Swapping — It's Free</a>
+          </div>
           <div class="hero-trust">
             <span><span class="check">&#10003;</span> <span data-i18n="trust_items">5,000+ items listed</span></span>
             <span><span class="check">&#10003;</span> <span data-i18n="trust_categories">12 categories</span></span>
             <span><span class="check">&#10003;</span> <span data-i18n="trust_anonymous">100% anonymous until you agree</span></span>
+          </div>
+          <div style="margin-top:12px;font-size:13px;color:var(--gray-text,#6B7280);">
+            <a href="pages/login.html" style="color:var(--teal,#09B1BA);font-weight:600;text-decoration:none;" id="early-adopter-inline">🚀 <span data-i18n="early_adopter_offer">Swappo Pro FREE for 3 months</span> — <span data-i18n="early_adopter_claim">Claim your spot</span></a>
           </div>
         </div>
         <div class="hero-floating-area">
@@ -82,30 +101,6 @@
           <div class="hero-floating-item float-bag"><i class="fas fa-shopping-bag"></i><span data-i18n="float_bag">Bag</span></div>
           <div class="hero-floating-item float-plant"><i class="fas fa-leaf"></i><span data-i18n="float_plant">Plant</span></div>
           <div class="hero-floating-item float-console"><i class="fas fa-gamepad"></i><span data-i18n="float_console">Console</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== EARLY ADOPTER BANNER ========== -->
-  <section class="early-adopter-section" id="early-adopter-banner">
-    <div class="container">
-      <div class="early-adopter-strip">
-        <div class="early-adopter-left">
-          <span class="early-adopter-icon">🚀</span>
-          <div class="early-adopter-text">
-            <h3 class="early-adopter-title" id="early-adopter-title" data-i18n="early_adopter_title">Join the first 500 Early Adopters</h3>
-            <p class="early-adopter-subtitle" id="early-adopter-subtitle"><strong data-i18n="early_adopter_offer">Swappo Pro FREE for 3 months</strong> + <span data-i18n="early_adopter_badge">Pioneer badge</span></p>
-          </div>
-        </div>
-        <div class="early-adopter-right">
-          <div class="early-adopter-progress">
-            <div class="early-adopter-bar">
-              <div class="early-adopter-fill" id="early-adopter-fill" style="width: 6%;"></div>
-            </div>
-            <span class="early-adopter-count" id="early-adopter-count"><strong id="ea-remaining">470</strong> / 500</span>
-          </div>
-          <a href="pages/login.html" class="btn btn-primary btn-sm early-adopter-btn" data-i18n="early_adopter_claim">Claim your spot</a>
         </div>
       </div>
     </div>
@@ -161,53 +156,6 @@
     </div>
   </section>
 
-  <!-- ========== IMPACT WALL — The Swappo Community ========== -->
-  <section class="impact-wall-section reveal" style="padding:60px 0;background:linear-gradient(135deg,#F0FDFA 0%,#E6F7F8 50%,#F8FAFC 100%);">
-    <div class="container">
-      <h2 class="section-title" style="margin-bottom:36px;" data-i18n="impact_wall_title">The Swappo Community</h2>
-
-      <!-- 3 stat counters -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:700px;margin:0 auto 36px;text-align:center;">
-        <div>
-          <div style="font-size:40px;font-weight:800;color:var(--teal,#09B1BA);" data-target="247" data-suffix="">0</div>
-          <div style="font-size:14px;color:var(--gray-text,#6B7280);" data-i18n="impact_wall_gifts">gifts today</div>
-        </div>
-        <div>
-          <div style="font-size:40px;font-weight:800;color:var(--teal,#09B1BA);" data-target="1892" data-suffix="">0</div>
-          <div style="font-size:14px;color:var(--gray-text,#6B7280);" data-i18n="impact_wall_swapped">items swapped</div>
-        </div>
-        <div>
-          <div style="font-size:40px;font-weight:800;color:var(--teal,#09B1BA);" data-target="6430" data-suffix="">0</div>
-          <div style="font-size:14px;color:var(--gray-text,#6B7280);" data-i18n="impact_wall_co2">kg CO2 saved 🌿</div>
-        </div>
-      </div>
-
-      <!-- Latest givers -->
-      <div style="max-width:600px;margin:0 auto;background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:20px 24px;">
-        <div style="font-size:14px;font-weight:600;color:var(--navy,#1A1A2E);margin-bottom:14px;" data-i18n="impact_wall_latest">Latest givers:</div>
-        <div style="display:flex;flex-direction:column;gap:10px;" id="latest-givers">
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gray-text,#6B7280);">
-            <span style="font-size:16px;">🎁</span>
-            <span><strong style="color:var(--navy,#1A1A2E);">Sarah</strong> <span data-i18n="impact_wall_gave">gave</span> "Books Collection" — <span>2 min <span data-i18n="impact_wall_ago">ago</span></span></span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gray-text,#6B7280);">
-            <span style="font-size:16px;">🎁</span>
-            <span><strong style="color:var(--navy,#1A1A2E);">Mohammed</strong> <span data-i18n="impact_wall_gave">gave</span> "Baby Stroller" — <span>15 min <span data-i18n="impact_wall_ago">ago</span></span></span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gray-text,#6B7280);">
-            <span style="font-size:16px;">🎁</span>
-            <span><strong style="color:var(--navy,#1A1A2E);">Anna</strong> <span data-i18n="impact_wall_gave">gave</span> "Kitchen Set" — <span>1 hour <span data-i18n="impact_wall_ago">ago</span></span></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA -->
-      <div style="text-align:center;margin-top:28px;">
-        <a href="pages/giveaway.html" class="btn-pill btn-pill-teal" data-i18n="impact_wall_cta">Visit the Gift Corner →</a>
-      </div>
-    </div>
-  </section>
-
   <!-- ========== POPULAR ITEMS ========== -->
   <section class="feed-section">
     <div class="container">
@@ -221,56 +169,23 @@
     </div>
   </section>
 
-  <!-- ========== SUGGESTED FOR YOU ========== -->
-  <section class="feed-section suggestions-section" id="suggestions-section" style="display:none;">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">✨ Suggested swaps for you</h2>
-        <a href="pages/catalogue.html" class="section-link">See all →</a>
+  <!-- ========== GIFT CORNER TEASER ========== -->
+  <section class="reveal" style="padding:60px 0;background:linear-gradient(135deg, #FFF5F5 0%, #f0fdfd 100%);">
+    <div class="container" style="text-align:center;">
+      <h2 class="section-title" style="margin-bottom:12px;" data-i18n="gift_teaser_title">🎁 Free items from generous people</h2>
+      <p style="color:var(--gray-text,#6B7280);font-size:15px;margin-bottom:32px;" data-i18n="gift_teaser_subtitle">Claim items for free in the Gift Corner. One claim per month — give to get more!</p>
+      <div class="products-grid" id="gift-teaser-grid" style="margin-bottom:28px;">
+        <!-- Populated dynamically with 4 gift items -->
       </div>
-      <div class="suggestions-scroll" id="suggestions-grid">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== TEASING VIDEO STRIP ========== -->
-  <div class="teasing-strip" onclick="var v=this.querySelector('video'); v.muted=!v.muted;">
-    <video autoplay muted loop playsinline preload="auto">
-      <source src="video/teasing.mp4" type="video/mp4">
-    </video>
-  </div>
-
-  <!-- ========== RECENTLY ADDED ========== -->
-  <section class="feed-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" data-i18n="recently_added">Recently added</h2>
-        <a href="pages/catalogue.html" class="section-link" data-i18n="see_all">See all →</a>
-      </div>
-      <div class="products-grid" id="recent-grid">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== MORE ITEMS ========== -->
-  <section class="feed-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" data-i18n="explore_items">Explore items</h2>
-        <a href="pages/catalogue.html" class="section-link" data-i18n="see_all">See all →</a>
-      </div>
-      <div class="products-grid" id="explore-grid">
-        <!-- Populated dynamically -->
-      </div>
+      <a href="pages/giveaway.html" class="btn-pill btn-pill-coral" data-i18n="gift_teaser_cta">Visit the Gift Corner →</a>
     </div>
   </section>
 
   <!-- ========== LIVE SWAP FEED ========== -->
   <section class="swap-feed-section reveal">
     <div class="container">
-      <h2 class="section-title" data-i18n="happening_now">Happening Right Now</h2>
+      <h2 class="section-title" data-i18n="community_title">The Swappo Community</h2>
+      <p style="text-align:center;color:var(--gray-text,#6B7280);margin:-32px 0 32px;font-size:15px;" data-i18n="happening_now">Happening Right Now</p>
       <div class="swap-feed-grid">
         <div class="swap-card card-hover">
           <div class="swap-card-header">
@@ -301,53 +216,34 @@
           <div class="swap-items"><span class="swap-item-name">PS5 Controller</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name" data-i18n="swap_chair">Gaming Chair</span></div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- ========== IMPACT WALL — Community Activity ========== -->
-  <section class="section-alt section-padding reveal">
-    <div class="container" style="max-width:900px;">
-      <h2 class="section-title" style="text-align:center;margin-bottom:16px;" data-i18n="impact_wall_title">The Swappo Community</h2>
-      <p style="text-align:center;color:var(--gray-text,#6B7280);margin-bottom:40px;font-size:15px;" data-i18n="impact_wall_subtitle">Real people, real swaps, real impact.</p>
-
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:36px;">
-        <div style="text-align:center;background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:28px 16px;">
-          <div style="font-size:36px;font-weight:800;color:var(--teal,#09B1BA);" data-target="247" data-suffix="">0</div>
-          <div style="font-size:14px;color:var(--gray-text,#6B7280);margin-top:4px;" data-i18n="impact_wall_gifts">gifts today</div>
-        </div>
-        <div style="text-align:center;background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:28px 16px;">
-          <div style="font-size:36px;font-weight:800;color:var(--teal,#09B1BA);" data-target="1892" data-suffix="">0</div>
-          <div style="font-size:14px;color:var(--gray-text,#6B7280);margin-top:4px;" data-i18n="impact_wall_swapped">items swapped</div>
-        </div>
-        <div style="text-align:center;background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:28px 16px;">
-          <div style="font-size:36px;font-weight:800;color:#10B981;" data-target="6430" data-suffix=" kg">0</div>
-          <div style="font-size:14px;color:var(--gray-text,#6B7280);margin-top:4px;" data-i18n="impact_wall_co2">CO&#x2082; saved 🌿</div>
-        </div>
-      </div>
-
-      <div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:24px;">
-        <h3 style="font-size:16px;font-weight:600;color:var(--navy,#1A1A2E);margin:0 0 16px;" data-i18n="impact_wall_latest">Latest givers:</h3>
-        <div style="display:flex;flex-direction:column;gap:12px;" id="latest-givers">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:18px;">🎁</span>
-            <span style="font-size:14px;color:var(--navy,#1A1A2E);"><strong>Sarah</strong> <span data-i18n="impact_wall_gave">gave</span> "Books Collection"</span>
-            <span style="margin-left:auto;font-size:12px;color:var(--gray-muted,#9CA3AF);">2 min <span data-i18n="impact_wall_ago">ago</span></span>
+      <!-- Testimonials (merged) -->
+      <h3 style="text-align:center;font-size:18px;font-weight:600;color:var(--navy,#1A1A2E);margin:40px 0 20px;" data-i18n="community_loves">What our community says</h3>
+      <div class="testimonials-grid" style="max-width:1100px;margin:0 auto;">
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#09B1BA;">LR</div>
+            <div><div class="testimonial-name">Layla R.</div><div class="testimonial-badge badge-silver" data-i18n="badge_pro">Pro Member</div></div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:18px;">🎁</span>
-            <span style="font-size:14px;color:var(--navy,#1A1A2E);"><strong>Mohammed</strong> <span data-i18n="impact_wall_gave">gave</span> "Baby Stroller"</span>
-            <span style="margin-left:auto;font-size:12px;color:var(--gray-muted,#9CA3AF);">15 min <span data-i18n="impact_wall_ago">ago</span></span>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:18px;">🎁</span>
-            <span style="font-size:14px;color:var(--navy,#1A1A2E);"><strong>Anna</strong> <span data-i18n="impact_wall_gave">gave</span> "Kitchen Set"</span>
-            <span style="margin-left:auto;font-size:12px;color:var(--gray-muted,#9CA3AF);">1 hour <span data-i18n="impact_wall_ago">ago</span></span>
-          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_1">"I swapped my old PlayStation for a brand new bookshelf. Couldn't believe it!"</p>
         </div>
-      </div>
-
-      <div style="text-align:center;margin-top:24px;">
-        <a href="pages/giveaway.html" class="btn-pill btn-pill-teal" data-i18n="impact_wall_cta">Visit the Gift Corner →</a>
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#8B5CF6;">MK</div>
+            <div><div class="testimonial-name">Mohammed K.</div><div class="testimonial-badge badge-premium" data-i18n="badge_pro">Pro Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_2">"Swappo changed how I think about stuff I don't use. One person's clutter is another's treasure!"</p>
+        </div>
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#F59E0B;">NA</div>
+            <div><div class="testimonial-name">Noor A.</div><div class="testimonial-badge badge-bronze" data-i18n="badge_pro">Pro Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_3">"The anonymous feature is genius. I felt safe from the very first swap."</p>
+        </div>
       </div>
     </div>
   </section>
@@ -427,39 +323,6 @@
       </div>
       <div style="text-align:center;margin-top:20px;">
         <a href="pages/pricing.html" style="color:var(--teal,#09B1BA);font-weight:600;font-size:14px;text-decoration:none;">See all features →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== TESTIMONIALS ========== -->
-  <section class="testimonials-section reveal">
-    <div class="container">
-      <h2 class="section-title" data-i18n="community_loves">Our Community Loves Swappo</h2>
-      <div class="testimonials-grid">
-        <div class="testimonial-card card-hover">
-          <div class="testimonial-header">
-            <div class="testimonial-avatar" style="background:#09B1BA;">LR</div>
-            <div><div class="testimonial-name">Layla R.</div><div class="testimonial-badge badge-silver" data-i18n="badge_pro">Pro Member</div></div>
-          </div>
-          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text" data-i18n="testimonial_1">"I swapped my old PlayStation for a brand new bookshelf. Couldn't believe it!"</p>
-        </div>
-        <div class="testimonial-card card-hover">
-          <div class="testimonial-header">
-            <div class="testimonial-avatar" style="background:#8B5CF6;">MK</div>
-            <div><div class="testimonial-name">Mohammed K.</div><div class="testimonial-badge badge-premium" data-i18n="badge_premium">Premium Member</div></div>
-          </div>
-          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text" data-i18n="testimonial_2">"Swappo changed how I think about stuff I don't use. One person's clutter is another's treasure!"</p>
-        </div>
-        <div class="testimonial-card card-hover">
-          <div class="testimonial-header">
-            <div class="testimonial-avatar" style="background:#F59E0B;">NA</div>
-            <div><div class="testimonial-name">Noor A.</div><div class="testimonial-badge badge-bronze" data-i18n="badge_bronze">Bronze Member</div></div>
-          </div>
-          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text" data-i18n="testimonial_3">"The anonymous feature is genius. I felt safe from the very first swap."</p>
-        </div>
       </div>
     </div>
   </section>
@@ -563,14 +426,14 @@
       var popular = DemoItems.browse({ sortBy: 'popular' });
       renderGrid(document.getElementById('popular-grid'), popular.items.slice(0, 10));
 
-      // Recently added
-      var recent = DemoItems.browse({ sortBy: 'newest' });
-      renderGrid(document.getElementById('recent-grid'), recent.items.slice(0, 10));
-
-      // Explore: random mix
-      var all = DemoItems.browse({});
-      var shuffled = all.items.sort(function() { return 0.5 - Math.random(); });
-      renderGrid(document.getElementById('explore-grid'), shuffled.slice(0, 10));
+      // Gift Corner teaser (4 gift items)
+      var giftGrid = document.getElementById('gift-teaser-grid');
+      if (giftGrid && DemoItems.getGiveaways) {
+        var gifts = DemoItems.getGiveaways().slice(0, 4);
+        if (gifts.length > 0) {
+          giftGrid.innerHTML = gifts.map(function(item) { return DemoItems.renderCard(item); }).join('');
+        }
+      }
     }
 
     // ── Search dropdown ──
@@ -638,10 +501,7 @@
           link.classList.add('active');
           var popular = DemoItems.browse({ category: cat, sortBy: 'popular', limit: 10 });
           renderGrid(document.getElementById('popular-grid'), popular.items);
-          var recent = DemoItems.browse({ category: cat, sortBy: 'newest', limit: 10 });
-          renderGrid(document.getElementById('recent-grid'), recent.items);
-          var explore = DemoItems.browse({ category: cat, limit: 10 });
-          renderGrid(document.getElementById('explore-grid'), explore.items);
+          // removed: recent-grid and explore-grid no longer exist
         });
       });
     }

@@ -88,5 +88,37 @@
       });
     });
 
+    // ── Eco Ticker ──
+    var ticker = document.getElementById('ecoTicker');
+    if (ticker) {
+      // Close button
+      var closeBtn = document.getElementById('ecoTickerClose');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+          ticker.classList.add('hidden');
+          try { sessionStorage.setItem('ecoTickerClosed', 'true'); } catch(e) {}
+        });
+        try {
+          if (sessionStorage.getItem('ecoTickerClosed') === 'true') {
+            ticker.classList.add('hidden');
+          }
+        } catch(e) {}
+      }
+
+      // Live updates every 30s
+      setInterval(function() {
+        var nums = ticker.querySelectorAll('.eco-ticker-number');
+        nums.forEach(function(el) {
+          var current = parseInt(el.textContent.replace(/[^0-9]/g, '')) || 0;
+          var suffix = el.getAttribute('data-suffix') || '';
+          el.textContent = (current + Math.floor(Math.random() * 3) + 1).toLocaleString() + suffix;
+        });
+        var liveEl = document.getElementById('ecoTickerLive');
+        if (liveEl) {
+          liveEl.textContent = '+' + (Math.floor(Math.random() * 20) + 5) + ' in the last hour';
+        }
+      }, 30000);
+    }
+
   });
 })();

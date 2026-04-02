@@ -769,6 +769,20 @@ const translations = {
     gift_thank_send: "Send thanks 💚",
 
     // Feature: Surprise Me
+    // Eco Ticker
+    eco_co2_saved: "CO2 saved",
+    eco_items_swapped: "items swapped",
+    eco_gifts_today: "gifts today",
+    eco_last_hour: "in the last hour",
+
+    // Landing page refonte
+    hero_browse: "Browse Items →",
+    hero_start_free: "Start Swapping — It's Free",
+    gift_teaser_title: "Free items from generous people",
+    gift_teaser_subtitle: "Claim items for free in the Gift Corner. One claim per month — give to get more!",
+    gift_teaser_cta: "Visit the Gift Corner →",
+    community_title: "The Swappo Community",
+
     surprise_me: "Surprise Me!",
     surprise_gift: "Surprise Gift!",
     surprise_another: "Another",
