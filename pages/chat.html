@@ -470,6 +470,51 @@
 			}
 		});
 
+		// ── Chat Wizard: inject after messages if swap is accepted ──
+		var map = CONV_ITEM_MAP[convId] || {};
+		if (map.status === 'accepted' && !map.wizardDone && window.ChatWizard) {
+			var convs2 = DemoChat.getConversations();
+			var conv2 = convs2.find(function(c) { return c.id === convId; });
+			var o2 = conv2 ? (conv2.other_user || {}) : {};
+			var myItem2 = DemoItems.getById(map.my_item_id);
+			var theirItem2 = DemoItems.getById(map.their_item_id);
+
+			var wizardHTML = ChatWizard.start({
+				otherName: o2.name || 'Swapper',
+				yourItem: myItem2 ? (myItem2.brand + ' ' + myItem2.model) : 'Your item',
+				theirItem: theirItem2 ? (theirItem2.brand + ' ' + theirItem2.model) : (conv2 ? conv2.item_title : 'Their item')
+			});
+			var wizDiv = document.createElement('div');
+			wizDiv.style.cssText = 'background:var(--teal-bg,#E6F7F8);border:1px solid rgba(9,177,186,0.2);border-radius:16px;padding:20px;margin:12px 0;';
+			wizDiv.innerHTML = wizardHTML;
+			area.appendChild(wizDiv);
+
+			// Override ChatWizard.confirm to inject phone prompt
+			var origConfirm = ChatWizard.confirm;
+			ChatWizard.confirm = function() {
+				origConfirm.call(ChatWizard);
+				map.wizardDone = true;
+				// Phone sharing prompt
+				var phoneDiv = document.createElement('div');
+				phoneDiv.style.cssText = 'background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border:1px solid #FFE082;border-radius:12px;padding:16px;margin:12px 0;text-align:center;';
+				phoneDiv.innerHTML = '<p style="font-size:13px;margin-bottom:12px;">📱 <strong>Share your phone number?</strong><br>Optional — to coordinate outside the app</p>' +
+					'<div style="display:flex;gap:8px;justify-content:center;">' +
+					'<button onclick="DemoNotifications.showToast(\'Phone shared: +971 5X XXX XXXX\', \'success\');this.closest(\'div[style*=FFF8E1]\').innerHTML=\'<p style=text-align:center;color:#10B981;font-weight:600;>✅ Phone number shared!</p>\';" class="btn btn-primary btn-sm"><i class="fas fa-phone"></i> Share My Number</button>' +
+					'<button onclick="this.closest(\'div[style*=FFF8E1]\').innerHTML=\'<p style=text-align:center;color:#9CA3AF;font-size:13px;>No phone shared — continuing in-app chat</p>\';" class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);">No Thanks</button>' +
+					'</div>';
+				area.appendChild(phoneDiv);
+				area.scrollTop = area.scrollHeight;
+			};
+
+			// Override skipToChat
+			ChatWizard.skipToChat = function() {
+				map.wizardDone = true;
+				var steps = document.querySelectorAll('.wizard-step');
+				steps.forEach(function(s) { s.closest('div[style*=teal-bg]') ? s.closest('div[style*=teal-bg]').remove() : s.remove(); });
+				DemoNotifications.showToast('Switched to free chat', 'info');
+			};
+		}
+
 		requestAnimationFrame(() => { area.scrollTop = area.scrollHeight; });
 	}
 

@@ -673,6 +673,22 @@
     var isFav = DemoItems.isFavorited(item.id);
     var actionsHTML = '';
 
+    // Item + Cash section (only for swap items, not giveaways)
+    if (!item.is_giveaway && !isGuest) {
+      actionsHTML += '<div id="cash-section" style="background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border-radius:12px;padding:16px;border:1px solid #FFE082;margin-bottom:12px;">';
+      actionsHTML += '<div style="font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">💰 Add cash to sweeten the deal</div>';
+      actionsHTML += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="cash-chips">';
+      [0, 25, 100, 200, 500].forEach(function(amt) {
+        var label = amt === 0 ? 'No cash' : '+' + amt + ' AED';
+        actionsHTML += '<button class="' + (amt === 0 ? 'cash-chip-active' : '') + '" onclick="selectCashAmount(' + amt + ',this)" style="padding:6px 14px;border-radius:999px;border:2px solid ' + (amt === 0 ? 'var(--primary)' : '#E5E7EB') + ';background:' + (amt === 0 ? 'var(--primary)' : 'white') + ';color:' + (amt === 0 ? 'white' : '#333') + ';font-weight:600;font-size:12px;cursor:pointer;transition:all 0.2s;">' + label + '</button>';
+      });
+      actionsHTML += '</div>';
+      actionsHTML += '<input type="range" min="0" max="1000" step="5" value="0" id="cash-slider" style="width:100%;accent-color:var(--primary);margin:4px 0;" oninput="updateCashFromSlider(this.value)">';
+      actionsHTML += '<div style="text-align:center;"><span id="cash-display" style="font-size:20px;font-weight:800;color:var(--primary);">0 AED</span>';
+      actionsHTML += '<div id="cash-fee" style="font-size:11px;color:var(--text-muted);margin-top:2px;">No fee</div></div>';
+      actionsHTML += '</div>';
+    }
+
     if (item.is_giveaway) {
       // Giveaway: Claim button
       if (isGuest) {
@@ -821,6 +837,41 @@
     }
   }
 
+  // ============ ITEM + CASH ============
+  var selectedCashAmount = 0;
+  function selectCashAmount(amount, btn) {
+    selectedCashAmount = amount;
+    var slider = document.getElementById('cash-slider');
+    if (slider) slider.value = amount;
+    updateCashDisplay(amount);
+    var chips = document.querySelectorAll('#cash-chips button');
+    chips.forEach(function(c) {
+      c.style.borderColor = '#E5E7EB';
+      c.style.background = 'white';
+      c.style.color = '#333';
+    });
+    if (btn) {
+      btn.style.borderColor = 'var(--primary)';
+      btn.style.background = 'var(--primary)';
+      btn.style.color = 'white';
+    }
+  }
+  function updateCashFromSlider(val) {
+    selectedCashAmount = parseInt(val);
+    updateCashDisplay(selectedCashAmount);
+    var chips = document.querySelectorAll('#cash-chips button');
+    chips.forEach(function(c) { c.style.borderColor = '#E5E7EB'; c.style.background = 'white'; c.style.color = '#333'; });
+  }
+  function updateCashDisplay(amount) {
+    var el = document.getElementById('cash-display');
+    if (el) el.textContent = amount + ' AED';
+    var fee = amount > 0 ? Math.ceil(amount * 0.05) : 0;
+    var feeEl = document.getElementById('cash-fee');
+    if (feeEl) feeEl.textContent = fee > 0 ? 'Swappo fee: ' + fee + ' AED (5%)' : 'No fee';
+  }
+  window.selectCashAmount = selectCashAmount;
+  window.updateCashFromSlider = updateCashFromSlider;
+
   // ============ SWAP MODAL ============
   function openSwapModal() {
     if (!currentUser) {
@@ -911,7 +962,8 @@
     var result = DemoSwaps.propose(selectedSwapItemId, currentItem.id);
     if (result.success) {
       closeSwapModal();
-      showToast('Swap proposal sent! \u2705');
+      var cashText = selectedCashAmount > 0 ? ' + ' + selectedCashAmount + ' AED cash' : '';
+      showToast('Swap proposal sent' + cashText + '! \u2705');
       updateNavbarForDemo();
     } else {
       showToast(result.error || 'Could not send proposal');
