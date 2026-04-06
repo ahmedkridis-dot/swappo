@@ -439,6 +439,12 @@
       </a>
     </div>
 
+    <!-- Swap recap (shown when cash is added) -->
+    <div id="swap-recap" style="display:none;background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;padding:14px;margin-top:14px;">
+      <div style="font-size:13px;font-weight:700;color:#1A1A2E;margin-bottom:4px;" id="swap-recap-line">You give: Item + 0 AED in cash</div>
+      <div style="font-size:11px;color:#6B7280;font-style:italic;">💵 Cash payment in person — not processed by Swappo</div>
+    </div>
+
     <div class="modal-actions" style="padding-top:16px;">
       <button class="btn-primary" onclick="confirmSwap()" id="confirm-swap-btn" style="width:100%;padding:18px 32px;font-size:17px;font-weight:700;border-radius:14px;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:10px;opacity:0.5;cursor:not-allowed;" disabled>
         <i class="fas fa-exchange-alt"></i> Confirm Swap
@@ -676,13 +682,17 @@
     var actionsHTML = '';
 
     // Item + Cash section — NEGOTIATION TOOL ONLY
-    // Cash is exchanged hand-to-hand on swap day. Swappo NEVER touches the money,
-    // takes NO commission, and processes NO payment for this. It's purely a way
-    // for users to balance unequal swaps. Stripe is only used for Pro / Boosts / Delivery.
+    // Cash top-up is a pure negotiation feature. Swappo NEVER processes this payment,
+    // takes NO commission, and the money is exchanged hand-to-hand at meetup.
+    // Stripe is reserved for Pro subscriptions, Boosts, and Delivery service fees.
     if (!item.is_giveaway && !isGuest) {
+      var tooltipText = "This helps balance unequal swaps. The cash is exchanged hand-to-hand at meetup. For card payment via the platform, choose Swappo Delivery (coming soon).";
       actionsHTML += '<div id="cash-section" style="background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border-radius:12px;padding:16px;border:1px solid #FFE082;margin-bottom:12px;">';
-      actionsHTML += '<div style="font-size:14px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">💰 Add cash to sweeten the deal <span title="This helps balance unequal swaps. The cash is exchanged directly between users at meetup — Swappo doesn\'t process any payment." style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#E5E7EB;color:#6B7280;font-size:10px;cursor:help;font-weight:700;">i</span></div>';
-      actionsHTML += '<div style="font-size:11px;color:#6B7280;margin-bottom:10px;line-height:1.4;">🤝 Cash exchanged hand-to-hand on swap day. Swappo never touches the money.</div>';
+      actionsHTML += '<div style="font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">💰 Add cash to sweeten the deal <span title="' + tooltipText + '" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#FBBF24;color:white;font-size:11px;cursor:help;font-weight:800;font-style:italic;">i</span></div>';
+      actionsHTML += '<div style="background:rgba(9,177,186,0.08);border-left:3px solid #09B1BA;padding:8px 12px;border-radius:6px;margin-bottom:12px;">';
+      actionsHTML += '<div style="font-size:12px;color:#1A1A2E;font-weight:600;">🤝 Cash to be exchanged in person at swap meetup</div>';
+      actionsHTML += '<div style="font-size:10px;color:#6B7280;margin-top:2px;">Swappo never handles this payment — it\'s directly between you and the other swapper.</div>';
+      actionsHTML += '</div>';
       actionsHTML += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="cash-chips">';
       [0, 25, 100, 200, 500].forEach(function(amt) {
         var label = amt === 0 ? 'No cash' : '+' + amt + ' AED';
@@ -690,8 +700,8 @@
       });
       actionsHTML += '</div>';
       actionsHTML += '<input type="range" min="0" max="1000" step="5" value="0" id="cash-slider" style="width:100%;accent-color:var(--primary);margin:4px 0;" oninput="updateCashFromSlider(this.value)">';
-      actionsHTML += '<div style="text-align:center;"><span id="cash-display" style="font-size:22px;font-weight:800;color:var(--primary);">0 AED</span>';
-      actionsHTML += '<div id="cash-fee" style="font-size:11px;color:#6B7280;margin-top:4px;font-style:italic;">💵 Paid in person</div></div>';
+      actionsHTML += '<div style="text-align:center;margin-top:4px;"><span id="cash-display" style="font-size:24px;font-weight:800;color:var(--primary);">0 AED</span>';
+      actionsHTML += '<div id="cash-fee" style="font-size:11px;color:#6B7280;margin-top:4px;font-style:italic;">💵 Paid in person — not processed by Swappo</div></div>';
       actionsHTML += '</div>';
     }
 
@@ -870,11 +880,22 @@
   }
   function updateCashDisplay(amount) {
     // Cash top-up is a negotiation tool only — Swappo does NOT process this payment.
-    // No fee, no commission. Cash is exchanged in person on swap day.
+    // No fee, no commission. Cash is exchanged hand-to-hand at swap meetup.
     var el = document.getElementById('cash-display');
     if (el) el.textContent = amount + ' AED';
     var feeEl = document.getElementById('cash-fee');
-    if (feeEl) feeEl.textContent = amount > 0 ? '💵 Paid in person on swap day' : '💵 Paid in person';
+    if (feeEl) feeEl.textContent = amount > 0 ? '💵 Paid in person at meetup — not processed by Swappo' : '💵 Paid in person — not processed by Swappo';
+    // Update modal recap if visible
+    var recap = document.getElementById('swap-recap');
+    var recapLine = document.getElementById('swap-recap-line');
+    if (recap && recapLine) {
+      if (amount > 0) {
+        recap.style.display = 'block';
+        recapLine.textContent = 'You give: Your item + ' + amount + ' AED in cash';
+      } else {
+        recap.style.display = 'none';
+      }
+    }
   }
   window.selectCashAmount = selectCashAmount;
   window.updateCashFromSlider = updateCashFromSlider;
@@ -894,6 +915,8 @@
     document.getElementById('swapModal').classList.add('open');
     // Refresh items
     loadMyItemsInModal();
+    // Refresh recap to show current cash amount
+    updateCashDisplay(selectedCashAmount || 0);
   }
 
   function closeSwapModal() {

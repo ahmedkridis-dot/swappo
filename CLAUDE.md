@@ -168,6 +168,25 @@ After exchange: both rate 1-5 stars. Public on profile. 3 reports → auto-suspe
 - **No SVF license needed** — subscription model is standard SaaS
 - **Legal pages**: Terms & Conditions, Privacy Policy, Cookie Policy (already created, need update to subscription model)
 
+## Payment Policy (decided 2026-04-07)
+
+Swappo processes payments via Stripe for ONLY these services:
+- Pro subscriptions (29 AED/month or 249 AED/year)
+- Boosts (5/10/25 AED per item promotion)
+- Delivery service fees (Phase 2, ~20 AED per delivery)
+
+Swappo NEVER processes:
+- Cash top-ups between users (negotiation tool only, exchanged in person)
+- Direct user-to-user payments (would require PSP license)
+
+For swaps with cash top-up + delivery (Phase 2), the courier collects
+cash via COD (Cash on Delivery) service. Swappo only charges the
+delivery + COD service fees, never touches the user-to-user cash.
+
+The cash top-up component on `pages/product.html` is purely a negotiation
+tool — no fees, no Stripe calls, no commission. Users settle the cash
+hand-to-hand at the swap meetup.
+
 ## What To Do Next
 Priority tasks for backend connection:
 1. Set up Supabase project (auth, database schema, storage buckets)

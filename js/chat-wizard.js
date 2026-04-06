@@ -26,8 +26,13 @@ var ChatWizard = (function() {
     extra: { weight: '15+ kg', price: 60 }
   };
 
-  /** Render the wizard step 1 (method) as HTML */
+  /** Render the wizard step 1 (method) as HTML
+   * Options: Meet in person | Swappo Delivery (PHASE 2 placeholder, disabled)
+   * TODO Phase 2: Integrate Porter/Careem Express API. Card payment ONLY for delivery
+   * service fees. Cash top-up handled via courier COD service, never touched by Swappo.
+   */
   function renderMethodStep(otherName) {
+    var deliveryTooltip = "Soon you'll be able to send your swap via our delivery partners (Porter, Careem). Card payment for delivery fees only — cash top-ups will be collected by the courier (COD).";
     return '<div class="wizard-step" data-step="method">' +
       '<div style="font-size:14px;font-weight:600;color:var(--teal,#09B1BA);margin-bottom:4px;">Step 1 of 3</div>' +
       '<div style="height:4px;background:#E5E7EB;border-radius:2px;margin-bottom:16px;">' +
@@ -35,15 +40,18 @@ var ChatWizard = (function() {
       '</div>' +
       '<h3 style="font-size:16px;font-weight:600;color:#1A1A2E;margin:0 0 16px;">How would you like to exchange?</h3>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+        // Option 1: Meet in person (active)
         '<button onclick="ChatWizard.selectMethod(\'meetup\')" style="background:white;border:2px solid #E5E7EB;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'#E5E7EB\'">' +
           '<div style="font-size:28px;margin-bottom:8px;">\uD83E\uDD1D</div>' +
           '<div style="font-weight:600;color:#1A1A2E;">Meet in person</div>' +
           '<div style="font-size:12px;color:#6B7280;margin-top:4px;">Meet at a public place</div>' +
         '</button>' +
-        '<button onclick="ChatWizard.selectMethod(\'shipping\')" style="background:white;border:2px solid #E5E7EB;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'#E5E7EB\'">' +
-          '<div style="font-size:28px;margin-bottom:8px;">\uD83D\uDCE6</div>' +
-          '<div style="font-weight:600;color:#1A1A2E;">Ship it</div>' +
-          '<div style="font-size:12px;color:#6B7280;margin-top:4px;">Use a delivery service</div>' +
+        // Option 2: Swappo Delivery (disabled placeholder, Phase 2)
+        '<button title="' + deliveryTooltip + '" onclick="alert(\'' + deliveryTooltip.replace(/'/g, "\\'") + '\')" style="background:linear-gradient(135deg,#F9FAFB,#F3F4F6);border:2px dashed #D1D5DB;border-radius:12px;padding:20px;text-align:center;cursor:help;transition:all 0.3s;position:relative;opacity:0.85;" onmouseover="this.style.borderColor=\'#FF6B6B\';this.style.opacity=\'1\'" onmouseout="this.style.borderColor=\'#D1D5DB\';this.style.opacity=\'0.85\'">' +
+          '<span style="position:absolute;top:8px;right:8px;background:#FF6B6B;color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;text-transform:uppercase;letter-spacing:0.5px;">Soon</span>' +
+          '<div style="font-size:28px;margin-bottom:8px;opacity:0.7;">\uD83D\uDE9A</div>' +
+          '<div style="font-weight:600;color:#6B7280;">Swappo Delivery</div>' +
+          '<div style="font-size:12px;color:#9CA3AF;margin-top:4px;">Coming soon — Porter/Careem</div>' +
         '</button>' +
       '</div>' +
       '<div style="margin-top:12px;font-size:12px;color:#9CA3AF;">Both of you need to agree \u2713</div>' +
