@@ -5,8 +5,8 @@
  */
 
 const CACHE_NAME = 'swappo-v17';
-const ASSET_CACHE = 'swappo-assets-v13';
-const API_CACHE = 'swappo-api-v13';
+const ASSET_CACHE = 'swappo-assets-v14';
+const API_CACHE = 'swappo-api-v14';
 
 // Files to pre-cache during install
 const PRECACHE_URLS = [
