@@ -825,7 +825,7 @@ const translations = {
     cash_add_optional: "optional",
     cash_prefix: "AED",
     cash_quick_amounts: "Quick amounts:",
-    cash_fee_note: "5% service fee applies",
+    cash_fee_note: "Cash exchanged in person on swap day. Swappo never touches the money.",
     cash_your_offer: "Your complete offer:",
     cash_counter_offer: "Counter-offer",
     cash_counter_send: "Send counter-offer",
