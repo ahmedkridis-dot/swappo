@@ -730,18 +730,18 @@
       <div class="counters-grid">
         <div class="recycle-counter-card" data-animate>
           <div class="counter-icon">🗑️</div>
-          <div class="counter-value" id="counter-waste">0</div>
-          <div class="counter-label" data-i18n="recycle_counter_waste">tonnes of waste generated yearly in UAE</div>
+          <div class="counter-value" data-target="2700000" data-format="M" id="counter-waste">2.7M</div>
+          <div class="counter-label" data-i18n="recycle_counter_waste">Waste generated in UAE per year</div>
         </div>
         <div class="recycle-counter-card" data-animate>
           <div class="counter-icon">🎯</div>
-          <div class="counter-value" id="counter-target">0<span style="font-size:1.8rem;">%</span></div>
-          <div class="counter-label" data-i18n="recycle_counter_target">UAE's recycling target by 2030</div>
+          <div class="counter-value" data-target="35" data-format="percent" id="counter-target">35%</div>
+          <div class="counter-label" data-i18n="recycle_counter_target">UAE recycling target by 2030</div>
         </div>
         <div class="recycle-counter-card" data-animate>
           <div class="counter-icon">💚</div>
-          <div class="counter-value" id="counter-free">0<span style="font-size:1.8rem;">%</span></div>
-          <div class="counter-label" data-i18n="recycle_counter_free">free for Swappo users — always</div>
+          <div class="counter-value" data-target="100" data-format="percent" id="counter-free">100%</div>
+          <div class="counter-label" data-i18n="recycle_counter_free">Free for Swappo users</div>
         </div>
       </div>
     </div>
@@ -841,7 +841,7 @@
 
       <div class="uae-impact-wrap">
         <div>
-          <div class="uae-impact-number" id="uae-impact-number">0</div>
+          <div class="uae-impact-number" data-target="2700000" data-format="M" data-suffix=" tonnes" id="uae-impact-number">2.7M tonnes</div>
           <div class="uae-impact-label" data-i18n="recycle_uae_label">of waste the UAE generates yearly across all sectors.</div>
           <div class="uae-impact-source" data-i18n="recycle_uae_source">Source: MOCCAE — UAE Ministry of Climate Change &amp; Environment</div>
         </div>
@@ -1132,70 +1132,9 @@
       });
 
       // ---------- ANIMATED COUNTERS ----------
-      function animateValue(el, target, opts) {
-        opts = opts || {};
-        var prefix = opts.prefix || '';
-        var suffix = opts.suffix || '';
-        var formatter = opts.formatter || function(n) { return Math.round(n).toLocaleString(); };
-        var duration = opts.duration || 1800;
-        var startTime = null;
-
-        function step(ts) {
-          if (!startTime) startTime = ts;
-          var progress = Math.min((ts - startTime) / duration, 1);
-          var eased = 1 - Math.pow(1 - progress, 3);
-          el.textContent = prefix + formatter(eased * target) + suffix;
-          if (progress < 1) requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
-      }
-
-      function runCounters() {
-        var waste = document.getElementById('counter-waste');
-        if (waste) {
-          animateValue(waste, 2.7, {
-            formatter: function(n) { return n.toFixed(1) + 'M'; }
-          });
-        }
-        var target = document.getElementById('counter-target');
-        if (target) {
-          animateValue(target, 35, {
-            formatter: function(n) { return Math.round(n) + '<span style="font-size:1.8rem;">%</span>'; }
-          });
-          // overwrite with innerHTML
-          var dur = 1800; var t0 = null; var tgt = 35;
-          (function loop(ts) {
-            if (!t0) t0 = ts;
-            var p = Math.min((ts - t0) / dur, 1);
-            var e = 1 - Math.pow(1 - p, 3);
-            target.innerHTML = Math.round(e * tgt) + '<span style="font-size:1.8rem;">%</span>';
-            if (p < 1) requestAnimationFrame(loop);
-          })(performance.now());
-        }
-        var free = document.getElementById('counter-free');
-        if (free) {
-          var dur2 = 1800; var t0b = null; var tgt2 = 100;
-          (function loop2(ts) {
-            if (!t0b) t0b = ts;
-            var p = Math.min((ts - t0b) / dur2, 1);
-            var e = 1 - Math.pow(1 - p, 3);
-            free.innerHTML = Math.round(e * tgt2) + '<span style="font-size:1.8rem;">%</span>';
-            if (p < 1) requestAnimationFrame(loop2);
-          })(performance.now());
-        }
-
-        var uaeBig = document.getElementById('uae-impact-number');
-        if (uaeBig) {
-          var dur3 = 2200; var t0c = null; var tgt3 = 2.7;
-          (function loop3(ts) {
-            if (!t0c) t0c = ts;
-            var p = Math.min((ts - t0c) / dur3, 1);
-            var e = 1 - Math.pow(1 - p, 3);
-            uaeBig.textContent = (e * tgt3).toFixed(1) + 'M tonnes';
-            if (p < 1) requestAnimationFrame(loop3);
-          })(performance.now());
-        }
-      }
+      // The 3 hero counters and the big UAE number all use [data-target] +
+      // [data-format] which are picked up by the global counter system in
+      // js/swappo-animations.js — no per-page logic needed.
 
       // ---------- UAE PROGRESS BAR ----------
       function runProgressBar() {
@@ -1226,23 +1165,6 @@
         els.forEach(function(el) { obs.observe(el); });
       }
 
-      // ---------- COUNTER OBSERVER (run once on scroll into view) ----------
-      function wireCounterObserver() {
-        var section = document.querySelector('.recycle-counters');
-        if (!section || !('IntersectionObserver' in window)) { runCounters(); return; }
-        var triggered = false;
-        var obs = new IntersectionObserver(function(entries) {
-          entries.forEach(function(e) {
-            if (e.isIntersecting && !triggered) {
-              triggered = true;
-              runCounters();
-              obs.disconnect();
-            }
-          });
-        }, { threshold: 0.3 });
-        obs.observe(section);
-      }
-
       // ---------- PROGRESS BAR OBSERVER ----------
       function wireProgressObserver() {
         var section = document.querySelector('.uae-progress-card');
@@ -1264,8 +1186,8 @@
       document.addEventListener('DOMContentLoaded', function() {
         renderPartnersGrid();
         wireReveal();
-        wireCounterObserver();
         wireProgressObserver();
+        // Counters are handled by the global system in swappo-animations.js
       });
     })();
   </script>

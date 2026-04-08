@@ -40,40 +40,110 @@
     }
 
     // ── Animated Counters ──
+    // Supports: data-target (number), data-suffix, data-prefix
+    //           data-format="M" → 2700000 → "2.7M"
+    //           data-format="percent" → renders <span> for % suffix
+    function formatCounter(value, format, prefix, suffix) {
+      if (format === 'M') {
+        // Format as "2.7M" — divide by 1M, 1 decimal
+        var m = value / 1000000;
+        return prefix + (m >= 10 ? Math.round(m) : m.toFixed(1)) + 'M' + suffix;
+      }
+      if (format === 'percent') {
+        return prefix + Math.round(value) + '<span style="font-size:0.7em;">%</span>' + suffix;
+      }
+      return prefix + Math.floor(value).toLocaleString() + suffix;
+    }
+
+    function animateCounter(el) {
+      if (el.dataset.counterDone === 'true') return;
+      el.dataset.counterDone = 'true';
+
+      var target = parseFloat(el.getAttribute('data-target'));
+      var suffix = el.getAttribute('data-suffix') || '';
+      var prefix = el.getAttribute('data-prefix') || '';
+      var format = el.getAttribute('data-format') || '';
+      if (isNaN(target)) return;
+
+      var duration = 1800;
+      var startTime = null;
+      var completed = false;
+
+      function setValue(value) {
+        if (format) {
+          el.innerHTML = formatCounter(value, format, prefix, suffix);
+        } else {
+          el.textContent = formatCounter(value, format, prefix, suffix);
+        }
+      }
+
+      function finish() {
+        if (completed) return;
+        completed = true;
+        setValue(target);
+        el.dataset.counterValue = target;
+      }
+
+      function step(ts) {
+        if (completed) return;
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        var current = eased * target;
+        setValue(current);
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          finish();
+        }
+      }
+      requestAnimationFrame(step);
+
+      // Hard fallback: if requestAnimationFrame is throttled (e.g. background
+      // tab, headless browser, mobile background), force the final value
+      // after 2.2s so the counter never gets stuck mid-animation.
+      setTimeout(finish, 2200);
+    }
+
     var counters = document.querySelectorAll('[data-target]');
-    if (counters.length > 0 && 'IntersectionObserver' in window) {
-      var counterObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            var el = entry.target;
-            var target = parseInt(el.getAttribute('data-target'));
-            var suffix = el.getAttribute('data-suffix') || '';
-            var prefix = el.getAttribute('data-prefix') || '';
-            if (isNaN(target)) return;
-
-            var current = 0;
-            var duration = 1500; // ms
-            var steps = 60;
-            var increment = target / steps;
-            var stepTime = duration / steps;
-
-            var timer = setInterval(function() {
-              current += increment;
-              if (current >= target) {
-                current = target;
-                clearInterval(timer);
-              }
-              el.textContent = prefix + Math.floor(current).toLocaleString() + suffix;
-            }, stepTime);
-
-            counterObserver.unobserve(el);
-          }
-        });
-      }, { threshold: 0.3 });
-
+    if (counters.length > 0) {
+      // Pass 1: Immediately animate counters that are in the navbar/sticky
+      // areas (eco ticker) — they are always visible at page load.
+      // We classify them as "always visible" if they're inside an
+      // element with class "eco-ticker", or if they're near the top of
+      // the page (< 200px from top).
       counters.forEach(function(c) {
-        counterObserver.observe(c);
+        var inEcoTicker = !!c.closest('.eco-ticker');
+        var rect = c.getBoundingClientRect();
+        var nearTop = rect.top < 200;
+        if (inEcoTicker || nearTop) {
+          animateCounter(c);
+        }
       });
+
+      // Pass 2: For all other counters, use IntersectionObserver to
+      // animate them when they scroll into view.
+      if ('IntersectionObserver' in window) {
+        var counterObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              animateCounter(entry.target);
+              counterObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+
+        counters.forEach(function(c) {
+          if (c.dataset.counterDone !== 'true') counterObserver.observe(c);
+        });
+      }
+
+      // Final safety: animate all counters after 2.5s no matter what
+      setTimeout(function() {
+        counters.forEach(function(c) {
+          if (c.dataset.counterDone !== 'true') animateCounter(c);
+        });
+      }, 2500);
     }
 
     // ── Toggle Pills (Monthly/Annual) ──
@@ -105,13 +175,20 @@
         } catch(e) {}
       }
 
-      // Live updates every 30s
+      // Live updates every 30s — preserves the data-target baseline
+      // and only ADDS to it (never resets to 0).
       setInterval(function() {
         var nums = ticker.querySelectorAll('.eco-ticker-number');
         nums.forEach(function(el) {
-          var current = parseInt(el.textContent.replace(/[^0-9]/g, '')) || 0;
+          // Use the running counter value if available (counterValue), else
+          // start from data-target so we never restart from 0.
+          var base = parseFloat(el.dataset.counterValue);
+          if (isNaN(base) || base === 0) base = parseFloat(el.getAttribute('data-target')) || 0;
+          var increment = Math.floor(Math.random() * 3) + 1;
+          var newVal = base + increment;
+          el.dataset.counterValue = newVal;
           var suffix = el.getAttribute('data-suffix') || '';
-          el.textContent = (current + Math.floor(Math.random() * 3) + 1).toLocaleString() + suffix;
+          el.textContent = Math.floor(newVal).toLocaleString() + suffix;
         });
         var liveEl = document.getElementById('ecoTickerLive');
         if (liveEl) {
