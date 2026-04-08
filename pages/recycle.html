@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="recycle_page_title">Recycle Hub — Swappo</title>
+  <meta name="description" data-i18n-attr="content:recycle_page_description" content="Can't swap it? Recycle it. Swappo connects you with the UAE's best recycling partners — zero waste, zero hassle.">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/svg+xml" href="../img/icon-192.svg">
+  <meta name="theme-color" content="#09B1BA">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/swappo-visual.css">
+  <link rel="stylesheet" href="../css/swappo-modern-2026.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ========== RECYCLE HUB PAGE STYLES ========== */
+
+    /* Hero */
+    .recycle-hero {
+      position: relative;
+      padding: 80px 0 60px;
+      background: linear-gradient(135deg, #E6F7F8 0%, #F0FBFC 40%, #FFFFFF 100%);
+      overflow: hidden;
+      text-align: center;
+    }
+    .recycle-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 60'%3E%3Cpath fill='%23ffffff' d='M0,30 C360,60 720,0 1080,30 C1260,45 1380,40 1440,35 L1440,60 L0,60 Z'/%3E%3C/svg%3E") no-repeat center bottom;
+      background-size: cover;
+    }
+    .recycle-hero .hero-badges {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .recycle-hero .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(9, 177, 186, 0.1);
+      color: var(--primary-dark, #078A91);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid rgba(9, 177, 186, 0.18);
+    }
+    .recycle-hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+      line-height: 1.12;
+    }
+    .recycle-hero h1 span {
+      background: linear-gradient(135deg, #09B1BA, #10B981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .recycle-hero p {
+      font-size: 1.12rem;
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+    .recycle-hero .hero-ctas {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .recycle-hero .hero-ctas .btn {
+      padding: 14px 28px;
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    /* Floating recycle icons in hero bg */
+    .recycle-hero .float-icon {
+      position: absolute;
+      font-size: 2rem;
+      color: var(--primary);
+      opacity: 0.10;
+      pointer-events: none;
+      animation: floatGentle 8s ease-in-out infinite;
+    }
+    .recycle-hero .float-1 { top: 12%; left: 8%; animation-delay: 0s; }
+    .recycle-hero .float-2 { top: 20%; right: 12%; animation-delay: 2s; font-size: 2.4rem; }
+    .recycle-hero .float-3 { bottom: 30%; left: 15%; animation-delay: 4s; font-size: 1.8rem; }
+    .recycle-hero .float-4 { bottom: 25%; right: 8%; animation-delay: 6s; font-size: 2.2rem; }
+    .recycle-hero .float-5 { top: 50%; left: 45%; animation-delay: 3s; font-size: 1.6rem; opacity: 0.07; }
+    @keyframes floatGentle {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+    }
+
+    /* Decorative blobs (same as impact) */
+    .recycle-hero .blob {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--primary);
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .recycle-hero .blob-1 { width: 320px; height: 320px; top: -80px; right: -60px; }
+    .recycle-hero .blob-2 { width: 220px; height: 220px; bottom: 20px; left: -40px; }
+    .recycle-hero .blob-3 { width: 140px; height: 140px; top: 40px; left: 15%; }
+
+    /* Counters */
+    .recycle-counters {
+      padding: 60px 0;
+      background: #fff;
+    }
+    .recycle-counters .counters-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .recycle-counter-card {
+      text-align: center;
+      padding: 36px 24px;
+      border-radius: var(--radius-lg, 16px);
+      background: #F6FCFC;
+      border: 1px solid rgba(9, 177, 186, 0.12);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .recycle-counter-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(9, 177, 186, 0.12);
+    }
+    .recycle-counter-card .counter-icon {
+      font-size: 2.4rem;
+      margin-bottom: 14px;
+    }
+    .recycle-counter-card .counter-value {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .recycle-counter-card .counter-label {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* Section common */
+    .recycle-section {
+      padding: 72px 0;
+    }
+    .recycle-section--alt {
+      background: #F6FCFC;
+    }
+    .recycle-section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .recycle-section-subtitle {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    /* How it works — vertical timeline */
+    .recycle-timeline {
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .recycle-timeline::before {
+      content: '';
+      position: absolute;
+      left: 32px;
+      top: 16px;
+      bottom: 16px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-light, #E6F7F8));
+    }
+    [dir="rtl"] .recycle-timeline::before {
+      left: auto;
+      right: 32px;
+    }
+    .recycle-timeline-step {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 36px;
+      opacity: 0;
+      transform: translateX(-20px);
+      position: relative;
+    }
+    [dir="rtl"] .recycle-timeline-step {
+      transform: translateX(20px);
+    }
+    .recycle-timeline-step.visible {
+      opacity: 1;
+      transform: translateX(0);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .recycle-timeline-step:last-child { margin-bottom: 0; }
+    .recycle-timeline-dot {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark, #078A91));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 6px 20px rgba(9, 177, 186, 0.35);
+      position: relative;
+      z-index: 1;
+    }
+    .recycle-timeline-content {
+      flex: 1;
+      padding-top: 10px;
+    }
+    .recycle-timeline-step-num {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .recycle-timeline-content h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 6px;
+    }
+    .recycle-timeline-content p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Categorizer grid */
+    .recycle-categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .recycle-cat-btn {
+      background: #fff;
+      border: 2px solid var(--border, #E5E7EB);
+      border-radius: var(--radius-lg, 16px);
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    .recycle-cat-btn:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(9, 177, 186, 0.12);
+    }
+    .recycle-cat-btn.active {
+      border-color: var(--primary);
+      background: rgba(9, 177, 186, 0.06);
+      box-shadow: 0 12px 28px rgba(9, 177, 186, 0.18);
+    }
+    .recycle-cat-btn .cat-emoji {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .recycle-cat-btn .cat-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    /* Recommended centers results panel */
+    .recycle-results {
+      max-width: 960px;
+      margin: 40px auto 0;
+      padding: 32px;
+      background: #fff;
+      border: 1px solid rgba(9, 177, 186, 0.15);
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: 0 12px 40px rgba(9, 177, 186, 0.08);
+      display: none;
+    }
+    .recycle-results.visible {
+      display: block;
+      animation: fadeInUp 0.5s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .recycle-results-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .recycle-results-sub {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .recycle-centers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .recycle-center-card {
+      background: #F6FCFC;
+      border: 1px solid rgba(9, 177, 186, 0.15);
+      border-radius: 14px;
+      padding: 18px;
+      transition: all 0.3s ease;
+    }
+    .recycle-center-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .recycle-center-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark, #078A91));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .recycle-center-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .recycle-center-city {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .recycle-center-city i { color: var(--primary); margin-inline-end: 4px; }
+    .recycle-center-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .recycle-center-link:hover { text-decoration: underline; }
+
+    /* Partners */
+    .partners-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .partner-card {
+      background: #fff;
+      border: 1px solid var(--border, #E5E7EB);
+      border-radius: var(--radius-lg, 16px);
+      padding: 22px;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .partner-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .partner-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(9, 177, 186, 0.10);
+    }
+    .partner-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .partner-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark, #078A91));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .partner-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+    .partner-city {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .partner-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .partner-tag {
+      background: #E6F7F8;
+      color: var(--primary-dark, #078A91);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .partner-status {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border, #E5E7EB);
+      padding-top: 10px;
+    }
+    .partner-status i { color: #10B981; margin-inline-end: 4px; }
+    .partners-footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+    }
+    .partners-footer a { color: var(--primary); font-weight: 600; }
+
+    /* UAE Impact Visual (2-col) */
+    .uae-impact-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 1040px;
+      margin: 0 auto;
+      align-items: center;
+    }
+    .uae-impact-number {
+      font-size: 4.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+    .uae-impact-label {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .uae-impact-source {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .uae-progress-card {
+      background: #fff;
+      border-radius: var(--radius-lg, 16px);
+      padding: 28px;
+      border: 1px solid var(--border, #E5E7EB);
+      box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.04));
+    }
+    .uae-progress-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 16px;
+    }
+    .uae-progress-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .uae-progress-row strong { color: var(--text); }
+    .uae-progress-bar {
+      height: 12px;
+      background: var(--border, #E5E7EB);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .uae-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #10B981);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .uae-progress-target {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--text);
+      left: 35%;
+    }
+    .uae-progress-target::after {
+      content: '35%';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .uae-progress-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+
+    /* Partnership CTA (dark teal) */
+    .recycle-cta-dark {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark, #078A91) 100%);
+      color: #fff;
+      padding: 72px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .recycle-cta-dark::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='30' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E") repeat;
+      pointer-events: none;
+    }
+    .recycle-cta-dark h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+      position: relative;
+    }
+    .recycle-cta-dark p {
+      font-size: 1.05rem;
+      opacity: 0.92;
+      max-width: 660px;
+      margin: 0 auto 28px;
+      line-height: 1.7;
+      position: relative;
+    }
+    .recycle-cta-dark .btn {
+      background: #fff;
+      color: var(--primary);
+      border-color: #fff;
+      padding: 14px 32px;
+      font-weight: 700;
+      position: relative;
+    }
+    .recycle-cta-dark .btn:hover {
+      background: #F6FCFC;
+    }
+    .recycle-cta-badges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .recycle-cta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(6px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .recycle-hero { padding: 56px 0 40px; }
+      .recycle-hero h1 { font-size: 1.9rem; }
+      .recycle-hero p { font-size: 1rem; }
+      .recycle-hero .hero-ctas { flex-direction: column; align-items: stretch; }
+      .recycle-counters .counters-grid { grid-template-columns: 1fr; gap: 16px; }
+      .recycle-counter-card .counter-value { font-size: 2.1rem; }
+      .recycle-section { padding: 48px 0; }
+      .recycle-section-title { font-size: 1.5rem; }
+      .recycle-categories { grid-template-columns: repeat(2, 1fr); }
+      .uae-impact-wrap { grid-template-columns: 1fr; gap: 28px; }
+      .uae-impact-number { font-size: 3rem; }
+      .recycle-cta-dark h2 { font-size: 1.5rem; }
+      .recycle-timeline::before { left: 22px; }
+      [dir="rtl"] .recycle-timeline::before { left: auto; right: 22px; }
+      .recycle-timeline-dot { width: 48px; height: 48px; font-size: 1.1rem; }
+    }
+    @media (max-width: 480px) {
+      .recycle-hero h1 { font-size: 1.5rem; }
+      .recycle-counter-card { padding: 24px 16px; }
+      .recycle-categories { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .recycle-cat-btn { padding: 18px 10px; }
+      .recycle-cat-btn .cat-emoji { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        </div>
+        <div class="navbar-actions">
+          <a href="chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>
+          <a href="profile.html" class="navbar-icon" title="My Swaps"><i class="fas fa-user-circle"></i></a>
+          <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Eco Ticker -->
+  <div class="eco-ticker" id="ecoTicker">
+    <div class="eco-ticker-content">
+      <span class="eco-ticker-item">🌿 <span class="eco-ticker-number" data-target="6430" data-suffix=" kg">0</span> CO2 saved</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🔄 <span class="eco-ticker-number" data-target="1892" data-suffix="">0</span> items swapped</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🎁 <span class="eco-ticker-number" data-target="247" data-suffix="">0</span> gifts today</span>
+      <span class="eco-ticker-live">↑ <span id="ecoTickerLive">+12 in the last hour</span></span>
+    </div>
+    <button class="eco-ticker-close" id="ecoTickerClose" aria-label="Close">×</button>
+  </div>
+
+  <!-- ========== MEGA MENU ========== -->
+  <div id="mega-menu-mount"></div>
+  <script src="../js/mega-menu.js"></script>
+  <script>
+    (function(){
+      var mount = document.getElementById('mega-menu-mount');
+      if (mount && typeof renderMegaMenuBar === 'function') {
+        mount.innerHTML = renderMegaMenuBar(true);
+        if (typeof initMegaMenu === 'function') initMegaMenu();
+      }
+    })();
+  </script>
+
+  <!-- ========== HERO ========== -->
+  <section class="recycle-hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <i class="fas fa-recycle float-icon float-1"></i>
+    <i class="fas fa-leaf float-icon float-2"></i>
+    <i class="fas fa-seedling float-icon float-3"></i>
+    <i class="fas fa-recycle float-icon float-4"></i>
+    <i class="fas fa-earth-americas float-icon float-5"></i>
+
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="hero-badges">
+        <span class="hero-badge">🌱 <span data-i18n="recycle_badge_circular">Circular Economy</span></span>
+        <span class="hero-badge">🇦🇪 <span data-i18n="recycle_badge_uae">Born in UAE</span></span>
+        <span class="hero-badge">♻️ <span data-i18n="recycle_badge_zero_waste">Zero Waste UAE Goal</span></span>
+      </div>
+      <h1 data-i18n-html="recycle_hero_title">Can't swap it? <span>Recycle it.</span></h1>
+      <p data-i18n="recycle_hero_subtitle">When an item can't find a new home through swapping, Swappo helps you give it a second life through the UAE's best recycling partners. Zero waste, zero hassle.</p>
+      <div class="hero-ctas">
+        <a href="#categorizer" class="btn btn-primary btn-lg" data-i18n="recycle_hero_cta_find"><i class="fas fa-map-marker-alt"></i> Find a recycling center</a>
+        <a href="#partnership" class="btn btn-outline btn-lg" data-i18n="recycle_hero_cta_partner"><i class="fas fa-handshake"></i> Partner with us</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== IMPACT COUNTERS ========== -->
+  <section class="recycle-counters">
+    <div class="container">
+      <div class="counters-grid">
+        <div class="recycle-counter-card" data-animate>
+          <div class="counter-icon">🗑️</div>
+          <div class="counter-value" id="counter-waste">0</div>
+          <div class="counter-label" data-i18n="recycle_counter_waste">tonnes of waste generated yearly in UAE</div>
+        </div>
+        <div class="recycle-counter-card" data-animate>
+          <div class="counter-icon">🎯</div>
+          <div class="counter-value" id="counter-target">0<span style="font-size:1.8rem;">%</span></div>
+          <div class="counter-label" data-i18n="recycle_counter_target">UAE's recycling target by 2030</div>
+        </div>
+        <div class="recycle-counter-card" data-animate>
+          <div class="counter-icon">💚</div>
+          <div class="counter-value" id="counter-free">0<span style="font-size:1.8rem;">%</span></div>
+          <div class="counter-label" data-i18n="recycle_counter_free">free for Swappo users — always</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section class="recycle-section recycle-section--alt">
+    <div class="container">
+      <h2 class="recycle-section-title" data-i18n="recycle_hiw_title">How it works</h2>
+      <p class="recycle-section-subtitle" data-i18n="recycle_hiw_subtitle">From a listing that didn't sell to a responsibly recycled item — in four simple steps.</p>
+
+      <div class="recycle-timeline">
+        <div class="recycle-timeline-step" data-animate>
+          <div class="recycle-timeline-dot"><i class="fas fa-repeat"></i></div>
+          <div class="recycle-timeline-content">
+            <div class="recycle-timeline-step-num" data-i18n="recycle_step">Step 1</div>
+            <h4 data-i18n="recycle_step1_title">Try to swap first</h4>
+            <p data-i18n="recycle_step1_desc">Post your item on Swappo. Most things find a new owner in days.</p>
+          </div>
+        </div>
+        <div class="recycle-timeline-step" data-animate>
+          <div class="recycle-timeline-dot"><i class="fas fa-magnifying-glass"></i></div>
+          <div class="recycle-timeline-content">
+            <div class="recycle-timeline-step-num" data-i18n="recycle_step2">Step 2</div>
+            <h4 data-i18n="recycle_step2_title">Can't swap? No problem</h4>
+            <p data-i18n="recycle_step2_desc">If your item is too worn or specialized, head to our Recycle Hub.</p>
+          </div>
+        </div>
+        <div class="recycle-timeline-step" data-animate>
+          <div class="recycle-timeline-dot"><i class="fas fa-map-pin"></i></div>
+          <div class="recycle-timeline-content">
+            <div class="recycle-timeline-step-num" data-i18n="recycle_step3">Step 3</div>
+            <h4 data-i18n="recycle_step3_title">Find the right partner</h4>
+            <p data-i18n="recycle_step3_desc">We match your item type with the best recycling center in your emirate.</p>
+          </div>
+        </div>
+        <div class="recycle-timeline-step" data-animate>
+          <div class="recycle-timeline-dot"><i class="fas fa-truck"></i></div>
+          <div class="recycle-timeline-content">
+            <div class="recycle-timeline-step-num" data-i18n="recycle_step4">Step 4</div>
+            <h4 data-i18n="recycle_step4_title">Drop off or schedule pickup</h4>
+            <p data-i18n="recycle_step4_desc">Visit the center or book a free pickup with our partners. Done.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== INTERACTIVE CATEGORIZER ========== -->
+  <section class="recycle-section" id="categorizer">
+    <div class="container">
+      <h2 class="recycle-section-title" data-i18n="recycle_cat_title">What do you want to recycle?</h2>
+      <p class="recycle-section-subtitle" data-i18n="recycle_cat_subtitle">Tap a category to instantly see the best UAE recycling centers that take it.</p>
+
+      <div class="recycle-categories" id="recycle-categories">
+        <button class="recycle-cat-btn" data-cat="electronics"><span class="cat-emoji">📱</span><div class="cat-label" data-i18n="recycle_cat_electronics">Electronics</div></button>
+        <button class="recycle-cat-btn" data-cat="clothing"><span class="cat-emoji">👔</span><div class="cat-label" data-i18n="recycle_cat_clothing">Clothing &amp; Textiles</div></button>
+        <button class="recycle-cat-btn" data-cat="paper"><span class="cat-emoji">📚</span><div class="cat-label" data-i18n="recycle_cat_paper">Books &amp; Paper</div></button>
+        <button class="recycle-cat-btn" data-cat="furniture"><span class="cat-emoji">🪑</span><div class="cat-label" data-i18n="recycle_cat_furniture">Furniture</div></button>
+        <button class="recycle-cat-btn" data-cat="batteries"><span class="cat-emoji">🔋</span><div class="cat-label" data-i18n="recycle_cat_batteries">Batteries</div></button>
+        <button class="recycle-cat-btn" data-cat="bulbs"><span class="cat-emoji">💡</span><div class="cat-label" data-i18n="recycle_cat_bulbs">Light Bulbs</div></button>
+        <button class="recycle-cat-btn" data-cat="appliances"><span class="cat-emoji">🍳</span><div class="cat-label" data-i18n="recycle_cat_appliances">Kitchen &amp; Appliances</div></button>
+        <button class="recycle-cat-btn" data-cat="plastic"><span class="cat-emoji">🧴</span><div class="cat-label" data-i18n="recycle_cat_plastic">Plastic &amp; Bottles</div></button>
+        <button class="recycle-cat-btn" data-cat="glass"><span class="cat-emoji">🍶</span><div class="cat-label" data-i18n="recycle_cat_glass">Glass</div></button>
+        <button class="recycle-cat-btn" data-cat="metal"><span class="cat-emoji">🛢️</span><div class="cat-label" data-i18n="recycle_cat_metal">Metal</div></button>
+        <button class="recycle-cat-btn" data-cat="organic"><span class="cat-emoji">🌿</span><div class="cat-label" data-i18n="recycle_cat_organic">Organic / Garden</div></button>
+        <button class="recycle-cat-btn" data-cat="tires"><span class="cat-emoji">🚗</span><div class="cat-label" data-i18n="recycle_cat_tires">Tires &amp; Auto Parts</div></button>
+      </div>
+
+      <div class="recycle-results" id="recycle-results">
+        <div class="recycle-results-title" id="results-title"></div>
+        <div class="recycle-results-sub" data-i18n="recycle_results_sub">Recommended centers across the UAE that accept this material.</div>
+        <div class="recycle-centers-grid" id="centers-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PARTNERS ========== -->
+  <section class="recycle-section recycle-section--alt">
+    <div class="container">
+      <h2 class="recycle-section-title" data-i18n="recycle_partners_title">Trusted recycling partners across the UAE</h2>
+      <p class="recycle-section-subtitle" data-i18n="recycle_partners_subtitle">We're building relationships with the UAE's leading waste management companies to give every item a second life.</p>
+
+      <div class="partners-grid" id="partners-grid"></div>
+
+      <div class="partners-footer">
+        <span data-i18n="recycle_partners_footer">Partnerships in development. Want to join our network?</span> <a href="mailto:ahmed.kridis@gmail.com?subject=Recycle%20Hub%20Partnership" data-i18n="recycle_partners_contact">Contact us →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== UAE IMPACT VISUAL ========== -->
+  <section class="recycle-section">
+    <div class="container">
+      <h2 class="recycle-section-title" data-i18n="recycle_uae_title">The UAE's circular economy challenge</h2>
+      <p class="recycle-section-subtitle" data-i18n="recycle_uae_subtitle">Every year, millions of tonnes of waste are generated in the UAE. Swappo's mission is to close the loop — first by swapping, then by recycling.</p>
+
+      <div class="uae-impact-wrap">
+        <div>
+          <div class="uae-impact-number" id="uae-impact-number">0</div>
+          <div class="uae-impact-label" data-i18n="recycle_uae_label">of waste the UAE generates yearly across all sectors.</div>
+          <div class="uae-impact-source" data-i18n="recycle_uae_source">Source: MOCCAE — UAE Ministry of Climate Change &amp; Environment</div>
+        </div>
+        <div class="uae-progress-card">
+          <h4 data-i18n="recycle_progress_title">National recycling rate progression</h4>
+          <div class="uae-progress-row"><span data-i18n="recycle_progress_current">Current rate</span><strong>25%</strong></div>
+          <div class="uae-progress-bar">
+            <div class="uae-progress-target"></div>
+            <div class="uae-progress-fill" id="uae-progress-fill"></div>
+          </div>
+          <div class="uae-progress-row"><span data-i18n="recycle_progress_target">Target 2030</span><strong>35%</strong></div>
+          <div class="uae-progress-hint" data-i18n="recycle_progress_hint">Swappo helps close the gap — one swap, one recycled item at a time.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PARTNERSHIP CTA (DARK) ========== -->
+  <section class="recycle-cta-dark" id="partnership">
+    <div class="container">
+      <h2 data-i18n="recycle_cta_title">Build a greener UAE with us</h2>
+      <p data-i18n="recycle_cta_subtitle">Government programs, recycling companies, ESG teams and climate investors — Swappo is the bridge between citizens and the UAE's circular economy infrastructure.</p>
+      <a href="mailto:ahmed.kridis@gmail.com?subject=Swappo%20Partnership" class="btn btn-lg"><i class="fas fa-handshake"></i> <span data-i18n="recycle_cta_btn">Become a partner</span></a>
+      <div class="recycle-cta-badges">
+        <span class="recycle-cta-badge">🏛️ <span data-i18n="recycle_cta_badge_moccae">MOCCAE-aligned</span></span>
+        <span class="recycle-cta-badge">🌍 <span data-i18n="recycle_cta_badge_cop28">COP28 legacy</span></span>
+        <span class="recycle-cta-badge">🇦🇪 <span data-i18n="recycle_cta_badge_vision">UAE Vision 2031</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+          <p data-i18n="footer_tagline">The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_platform">Platform</h4>
+          <ul>
+            <li><a href="catalogue.html" data-i18n="footer_browse_items">Browse items</a></li>
+            <li><a href="giveaway.html" data-i18n="footer_free_giveaways">Free giveaways</a></li>
+            <li><a href="publier.html" data-i18n="footer_list_item">List an item</a></li>
+            <li><a href="pricing.html" data-i18n="footer_pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_company">Company</h4>
+          <ul>
+            <li><a href="#" data-i18n="footer_about">About</a></li>
+            <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
+            <li><a href="recycle.html" data-i18n="recycle_nav">Recycle Hub</a></li>
+            <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_legal">Legal</h4>
+          <ul>
+            <li><a href="terms.html" data-i18n="footer_terms">Terms of use</a></li>
+            <li><a href="privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+            <li><a href="cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Swappo. All rights reserved. UAE</span>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/demo-engine.js"></script>
+  <script src="../js/animations.js"></script>
+  <script src="../js/cookie-consent.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/swappo-animations.js"></script>
+  <script src="../js/swappo-modern-2026.js"></script>
+  <script>
+    // ==========================================================
+    //                 RECYCLE HUB — PAGE LOGIC
+    // ==========================================================
+    (function() {
+
+      // ---------- PARTNERS DATABASE ----------
+      // Realistic UAE recycling partners (placeholders for real contacts to come).
+      var PARTNERS = [
+        {
+          id: 'beeah',
+          name: "Bee'ah",
+          city: 'Sharjah',
+          emirate: 'Sharjah',
+          tags: ['general', 'organic', 'plastic', 'glass', 'metal', 'paper', 'electronics', 'tires'],
+          status: 'recommended'
+        },
+        {
+          id: 'tadweer',
+          name: 'Tadweer',
+          city: 'Abu Dhabi',
+          emirate: 'Abu Dhabi',
+          tags: ['general', 'plastic', 'glass', 'metal', 'paper', 'organic'],
+          status: 'recommended'
+        },
+        {
+          id: 'dulsco',
+          name: 'Dulsco',
+          city: 'Dubai',
+          emirate: 'Dubai',
+          tags: ['general', 'plastic', 'paper', 'metal', 'furniture'],
+          status: 'working'
+        },
+        {
+          id: 'enviroserve',
+          name: 'Enviroserve',
+          city: 'Dubai',
+          emirate: 'Dubai',
+          tags: ['electronics', 'batteries', 'bulbs', 'appliances'],
+          status: 'working'
+        },
+        {
+          id: 'eeg',
+          name: 'EEG — Emirates Environmental Group',
+          city: 'Dubai',
+          emirate: 'Dubai',
+          tags: ['paper', 'plastic', 'metal', 'glass', 'batteries'],
+          status: 'recommended'
+        },
+        {
+          id: 'reloop',
+          name: 'Reloop',
+          city: 'Dubai',
+          emirate: 'Dubai',
+          tags: ['clothing'],
+          status: 'working'
+        },
+        {
+          id: 'terraloop',
+          name: 'TerraLoop',
+          city: 'UAE-wide',
+          emirate: 'UAE',
+          tags: ['clothing', 'furniture', 'appliances'],
+          status: 'recommended'
+        },
+        {
+          id: 'averda',
+          name: 'Averda',
+          city: 'Dubai',
+          emirate: 'Dubai',
+          tags: ['general', 'organic', 'tires', 'metal'],
+          status: 'working'
+        }
+      ];
+
+      // ---------- CATEGORY → TAGS MAP ----------
+      var CAT_MAP = {
+        electronics: ['electronics'],
+        clothing:    ['clothing'],
+        paper:       ['paper'],
+        furniture:   ['furniture'],
+        batteries:   ['batteries'],
+        bulbs:       ['bulbs'],
+        appliances:  ['appliances', 'electronics'],
+        plastic:     ['plastic'],
+        glass:       ['glass'],
+        metal:       ['metal'],
+        organic:     ['organic'],
+        tires:       ['tires']
+      };
+
+      var CAT_LABELS = {
+        electronics: 'Electronics',
+        clothing:    'Clothing & Textiles',
+        paper:       'Books & Paper',
+        furniture:   'Furniture',
+        batteries:   'Batteries',
+        bulbs:       'Light Bulbs',
+        appliances:  'Kitchen & Appliances',
+        plastic:     'Plastic & Bottles',
+        glass:       'Glass',
+        metal:       'Metal',
+        organic:     'Organic / Garden',
+        tires:       'Tires & Auto Parts'
+      };
+
+      // ---------- BUILD INITIALS LOGO ----------
+      function initials(name) {
+        return name
+          .replace(/[^A-Za-z' ]/g, '')
+          .split(' ')
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(function(w) { return (w[0] || '').toUpperCase(); })
+          .join('') || '?';
+      }
+
+      function mapsLink(partner) {
+        var q = encodeURIComponent(partner.name + ' ' + partner.city + ' UAE');
+        return 'https://www.google.com/maps/search/?api=1&query=' + q;
+      }
+
+      // ---------- RENDER PARTNERS GRID ----------
+      function renderPartnersGrid() {
+        var grid = document.getElementById('partners-grid');
+        if (!grid) return;
+        grid.innerHTML = PARTNERS.map(function(p) {
+          var tagHTML = p.tags.slice(0, 4).map(function(t) {
+            return '<span class="partner-tag">' + (CAT_LABELS[t] || t) + '</span>';
+          }).join('');
+          var statusLabel = p.status === 'recommended' ? 'Recommended partner' : 'In partnership discussions';
+          return '<div class="partner-card" data-animate>' +
+              '<div class="partner-header">' +
+                '<div class="partner-logo">' + initials(p.name) + '</div>' +
+                '<div>' +
+                  '<div class="partner-name">' + p.name + '</div>' +
+                  '<div class="partner-city"><i class="fas fa-map-marker-alt"></i> ' + p.city + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="partner-tags">' + tagHTML + '</div>' +
+              '<div class="partner-status"><i class="fas fa-check-circle"></i> ' + statusLabel + '</div>' +
+            '</div>';
+        }).join('');
+      }
+
+      // ---------- SHOW RECOMMENDED CENTERS ----------
+      function showCenters(catKey, btn) {
+        var tags = CAT_MAP[catKey] || [];
+        var matching = PARTNERS.filter(function(p) {
+          return p.tags.some(function(t) { return tags.indexOf(t) >= 0; });
+        });
+
+        // Highlight active button
+        document.querySelectorAll('.recycle-cat-btn').forEach(function(b) { b.classList.remove('active'); });
+        if (btn) btn.classList.add('active');
+
+        // Fill results
+        var titleEl = document.getElementById('results-title');
+        if (titleEl) titleEl.textContent = 'Where to recycle: ' + (CAT_LABELS[catKey] || catKey);
+
+        var grid = document.getElementById('centers-grid');
+        if (!grid) return;
+        if (matching.length === 0) {
+          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);">No partner yet for this category — we\'re actively looking!</p>';
+        } else {
+          grid.innerHTML = matching.map(function(p) {
+            return '<div class="recycle-center-card">' +
+                '<div class="recycle-center-logo">' + initials(p.name) + '</div>' +
+                '<div class="recycle-center-name">' + p.name + '</div>' +
+                '<div class="recycle-center-city"><i class="fas fa-map-marker-alt"></i>' + p.city + '</div>' +
+                '<a class="recycle-center-link" href="' + mapsLink(p) + '" target="_blank" rel="noopener"><i class="fas fa-map"></i> View on map</a>' +
+              '</div>';
+          }).join('');
+        }
+
+        var results = document.getElementById('recycle-results');
+        if (results) {
+          results.classList.add('visible');
+          setTimeout(function() {
+            results.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 60);
+        }
+      }
+
+      // ---------- WIRE CATEGORIZER ----------
+      document.querySelectorAll('.recycle-cat-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          showCenters(btn.getAttribute('data-cat'), btn);
+        });
+      });
+
+      // ---------- ANIMATED COUNTERS ----------
+      function animateValue(el, target, opts) {
+        opts = opts || {};
+        var prefix = opts.prefix || '';
+        var suffix = opts.suffix || '';
+        var formatter = opts.formatter || function(n) { return Math.round(n).toLocaleString(); };
+        var duration = opts.duration || 1800;
+        var startTime = null;
+
+        function step(ts) {
+          if (!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = prefix + formatter(eased * target) + suffix;
+          if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      function runCounters() {
+        var waste = document.getElementById('counter-waste');
+        if (waste) {
+          animateValue(waste, 2.7, {
+            formatter: function(n) { return n.toFixed(1) + 'M'; }
+          });
+        }
+        var target = document.getElementById('counter-target');
+        if (target) {
+          animateValue(target, 35, {
+            formatter: function(n) { return Math.round(n) + '<span style="font-size:1.8rem;">%</span>'; }
+          });
+          // overwrite with innerHTML
+          var dur = 1800; var t0 = null; var tgt = 35;
+          (function loop(ts) {
+            if (!t0) t0 = ts;
+            var p = Math.min((ts - t0) / dur, 1);
+            var e = 1 - Math.pow(1 - p, 3);
+            target.innerHTML = Math.round(e * tgt) + '<span style="font-size:1.8rem;">%</span>';
+            if (p < 1) requestAnimationFrame(loop);
+          })(performance.now());
+        }
+        var free = document.getElementById('counter-free');
+        if (free) {
+          var dur2 = 1800; var t0b = null; var tgt2 = 100;
+          (function loop2(ts) {
+            if (!t0b) t0b = ts;
+            var p = Math.min((ts - t0b) / dur2, 1);
+            var e = 1 - Math.pow(1 - p, 3);
+            free.innerHTML = Math.round(e * tgt2) + '<span style="font-size:1.8rem;">%</span>';
+            if (p < 1) requestAnimationFrame(loop2);
+          })(performance.now());
+        }
+
+        var uaeBig = document.getElementById('uae-impact-number');
+        if (uaeBig) {
+          var dur3 = 2200; var t0c = null; var tgt3 = 2.7;
+          (function loop3(ts) {
+            if (!t0c) t0c = ts;
+            var p = Math.min((ts - t0c) / dur3, 1);
+            var e = 1 - Math.pow(1 - p, 3);
+            uaeBig.textContent = (e * tgt3).toFixed(1) + 'M tonnes';
+            if (p < 1) requestAnimationFrame(loop3);
+          })(performance.now());
+        }
+      }
+
+      // ---------- UAE PROGRESS BAR ----------
+      function runProgressBar() {
+        var fill = document.getElementById('uae-progress-fill');
+        if (fill) {
+          setTimeout(function() { fill.style.width = '25%'; }, 200);
+        }
+      }
+
+      // ---------- SCROLL REVEAL ----------
+      function wireReveal() {
+        var els = document.querySelectorAll('[data-animate]');
+        if (!('IntersectionObserver' in window)) {
+          els.forEach(function(el) { el.classList.add('visible'); });
+          return;
+        }
+        var obs = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              var siblings = Array.from(entry.target.parentElement.children)
+                .filter(function(c) { return c.hasAttribute('data-animate'); });
+              var idx = siblings.indexOf(entry.target);
+              setTimeout(function() { entry.target.classList.add('visible'); }, idx * 150);
+              obs.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15 });
+        els.forEach(function(el) { obs.observe(el); });
+      }
+
+      // ---------- COUNTER OBSERVER (run once on scroll into view) ----------
+      function wireCounterObserver() {
+        var section = document.querySelector('.recycle-counters');
+        if (!section || !('IntersectionObserver' in window)) { runCounters(); return; }
+        var triggered = false;
+        var obs = new IntersectionObserver(function(entries) {
+          entries.forEach(function(e) {
+            if (e.isIntersecting && !triggered) {
+              triggered = true;
+              runCounters();
+              obs.disconnect();
+            }
+          });
+        }, { threshold: 0.3 });
+        obs.observe(section);
+      }
+
+      // ---------- PROGRESS BAR OBSERVER ----------
+      function wireProgressObserver() {
+        var section = document.querySelector('.uae-progress-card');
+        if (!section || !('IntersectionObserver' in window)) { runProgressBar(); return; }
+        var triggered = false;
+        var obs = new IntersectionObserver(function(entries) {
+          entries.forEach(function(e) {
+            if (e.isIntersecting && !triggered) {
+              triggered = true;
+              runProgressBar();
+              obs.disconnect();
+            }
+          });
+        }, { threshold: 0.4 });
+        obs.observe(section);
+      }
+
+      // ---------- INIT ----------
+      document.addEventListener('DOMContentLoaded', function() {
+        renderPartnersGrid();
+        wireReveal();
+        wireCounterObserver();
+        wireProgressObserver();
+      });
+    })();
+  </script>
+</body>
+</html>
