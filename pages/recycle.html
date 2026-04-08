@@ -730,13 +730,15 @@
       <div class="counters-grid">
         <div class="recycle-counter-card" data-animate>
           <div class="counter-icon">🗑️</div>
-          <div class="counter-value" data-target="2700000" data-format="M" id="counter-waste">2.7M</div>
-          <div class="counter-label" data-i18n="recycle_counter_waste">Waste generated in UAE per year</div>
+          <div class="counter-value" data-target="5600000" data-format="M" id="counter-waste">5.6M</div>
+          <div class="counter-label" data-i18n="recycle_counter_waste">tonnes of municipal solid waste generated yearly in the UAE</div>
+          <div class="counter-source" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin-top:6px;" data-i18n="recycle_counter_source">Source: UAE MOCCAE / FCSC</div>
         </div>
         <div class="recycle-counter-card" data-animate>
           <div class="counter-icon">🎯</div>
-          <div class="counter-value" data-target="35" data-format="percent" id="counter-target">35%</div>
-          <div class="counter-label" data-i18n="recycle_counter_target">UAE recycling target by 2030</div>
+          <div class="counter-value" style="font-size:1.45rem;line-height:1.15;letter-spacing:-0.01em;" data-i18n="recycle_framework_title">UAE Circular Economy Policy</div>
+          <div class="counter-label" data-i18n="recycle_framework_years">2021 → 2031</div>
+          <div class="counter-source" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin-top:6px;" data-i18n="recycle_framework_source">National framework we support</div>
         </div>
         <div class="recycle-counter-card" data-animate>
           <div class="counter-icon">💚</div>
@@ -841,19 +843,20 @@
 
       <div class="uae-impact-wrap">
         <div>
-          <div class="uae-impact-number" data-target="2700000" data-format="M" data-suffix=" tonnes" id="uae-impact-number">2.7M tonnes</div>
-          <div class="uae-impact-label" data-i18n="recycle_uae_label">of waste the UAE generates yearly across all sectors.</div>
-          <div class="uae-impact-source" data-i18n="recycle_uae_source">Source: MOCCAE — UAE Ministry of Climate Change &amp; Environment</div>
+          <div class="uae-impact-number" data-target="5600000" data-format="M" data-suffix=" tonnes" id="uae-impact-number">5.6M tonnes</div>
+          <div class="uae-impact-label" data-i18n="recycle_uae_label">of municipal solid waste the UAE generates yearly.</div>
+          <div class="uae-impact-source" data-i18n="recycle_uae_source">Source: UAE MOCCAE / FCSC</div>
         </div>
         <div class="uae-progress-card">
-          <h4 data-i18n="recycle_progress_title">National recycling rate progression</h4>
-          <div class="uae-progress-row"><span data-i18n="recycle_progress_current">Current rate</span><strong>25%</strong></div>
-          <div class="uae-progress-bar">
-            <div class="uae-progress-target"></div>
-            <div class="uae-progress-fill" id="uae-progress-fill"></div>
-          </div>
-          <div class="uae-progress-row"><span data-i18n="recycle_progress_target">Target 2030</span><strong>35%</strong></div>
-          <div class="uae-progress-hint" data-i18n="recycle_progress_hint">Swappo helps close the gap — one swap, one recycled item at a time.</div>
+          <h4 data-i18n="recycle_pillars_title">UAE Circular Economy Policy 2021 → 2031</h4>
+          <p style="font-size:13px;color:var(--text-secondary,#4B5563);margin:0 0 14px;" data-i18n="recycle_pillars_intro">Four national priority sectors:</p>
+          <ul style="list-style:none;padding:0;margin:0 0 10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text,#1A1A2E);"><span style="font-size:18px;">🏭</span> <span data-i18n="recycle_pillar_manufacturing">Manufacturing</span></li>
+            <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text,#1A1A2E);"><span style="font-size:18px;">🍎</span> <span data-i18n="recycle_pillar_food">Food</span></li>
+            <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text,#1A1A2E);"><span style="font-size:18px;">🏗️</span> <span data-i18n="recycle_pillar_infrastructure">Infrastructure</span></li>
+            <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text,#1A1A2E);"><span style="font-size:18px;">🚗</span> <span data-i18n="recycle_pillar_transport">Transport</span></li>
+          </ul>
+          <div class="uae-progress-hint" style="margin-top:14px;" data-i18n="recycle_pillars_hint">Swappo supports the manufacturing pillar — extending product lifecycles through swap, gift and recycle.</div>
         </div>
       </div>
     </div>
@@ -879,7 +882,7 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
-          <p data-i18n="footer_tagline">The UAE's first barter platform. Swap, give, earn — without spending a single dirham.</p>
+          <p data-i18n="footer_tagline">The UAE's first dedicated barter, gift & recycle platform. Swap, give, earn — without spending a single dirham.</p>
         </div>
         <div class="footer-col">
           <h4 data-i18n="footer_platform">Platform</h4>
@@ -987,7 +990,7 @@
           city: 'Dubai',
           emirate: 'Dubai',
           tags: ['paper', 'plastic', 'metal', 'glass', 'batteries'],
-          status: 'recommended'
+          status: 'working'
         },
         {
           id: 'reloop',
@@ -1003,7 +1006,7 @@
           city: 'UAE-wide',
           emirate: 'UAE',
           tags: ['clothing', 'furniture', 'appliances'],
-          status: 'recommended'
+          status: 'working'
         },
         {
           id: 'averda',
