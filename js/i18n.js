@@ -39,6 +39,14 @@ const translations = {
     plants: "Plants",
     gift_corner: "Gift Corner",
 
+    // Gift Corner Rules (business model v4)
+    gift_rules_title: "📋 Gift Corner Rules",
+    gift_rules_item1: "Claims limited by your plan — <strong>Free: 1/month</strong>, <strong>Swappo Pro: 5/month</strong>",
+    gift_rules_item2: "Claiming an item locks that category for 30 days (anti-reseller protection)",
+    gift_rules_item3: "Give-to-Unlock: complete 1 swap OR publish 1 gift before claiming",
+    gift_rules_item4: "Items must be physical goods in good condition",
+    gift_rules_item5: "Cash or card payments are never involved — Gift Corner items are 100% free",
+
     // Clothing subcategories
     clothing_gender_filter: "Filter by",
     clothing_men: "Men",
@@ -1235,6 +1243,14 @@ const translations = {
     plants: "Plantes",
     gift_corner: "Coin Cadeaux",
 
+    // Gift Corner Rules (business model v4)
+    gift_rules_title: "📋 Règles du Coin Cadeaux",
+    gift_rules_item1: "Réclamations limitées par votre forfait — <strong>Gratuit : 1/mois</strong>, <strong>Swappo Pro : 5/mois</strong>",
+    gift_rules_item2: "Réclamer un objet verrouille cette catégorie pendant 30 jours (protection anti-revente)",
+    gift_rules_item3: "Give-to-Unlock : complétez 1 échange OU publiez 1 cadeau avant de pouvoir réclamer",
+    gift_rules_item4: "Les objets doivent être physiques et en bon état",
+    gift_rules_item5: "Aucun paiement en espèces ou par carte — les objets du Coin Cadeaux sont 100% gratuits",
+
     // Clothing subcategories
     clothing_gender_filter: "Filtrer par",
     clothing_men: "Homme",
@@ -2292,6 +2308,14 @@ const translations = {
     kids: "أطفال وأطفال رضع",
     plants: "نباتات",
     gift_corner: "ركن الهدايا",
+
+    // Gift Corner Rules (business model v4)
+    gift_rules_title: "📋 قواعد ركن الهدايا",
+    gift_rules_item1: "عدد المطالبات محدود حسب خطتك — <strong>مجاني: 1/شهر</strong>، <strong>Swappo Pro: 5/شهر</strong>",
+    gift_rules_item2: "المطالبة بغرض تقفل تلك الفئة لمدة 30 يوماً (حماية من إعادة البيع)",
+    gift_rules_item3: "اربح أولاً: أكمل تبادلاً واحداً أو انشر هدية واحدة قبل المطالبة",
+    gift_rules_item4: "يجب أن تكون الأغراض مادية وبحالة جيدة",
+    gift_rules_item5: "لا توجد مدفوعات نقدية أو ببطاقة — أغراض ركن الهدايا مجانية 100%",
 
     // Clothing subcategories
     clothing_gender_filter: "تصفية حسب",
@@ -3354,6 +3378,14 @@ const translations = {
     plants: "پودے",
     gift_corner: "تحائف کونا",
 
+    // Gift Corner Rules (business model v4)
+    gift_rules_title: "📋 تحائف کونا کے اصول",
+    gift_rules_item1: "دعوے آپ کے پلان کے مطابق محدود — <strong>مفت: 1/ماہ</strong>، <strong>Swappo Pro: 5/ماہ</strong>",
+    gift_rules_item2: "کسی شے کا دعویٰ اس زمرے کو 30 دن کے لیے لاک کر دیتا ہے (دوبارہ فروخت کے خلاف تحفظ)",
+    gift_rules_item3: "Give-to-Unlock: دعویٰ کرنے سے پہلے 1 سواپ مکمل کریں یا 1 تحفہ شائع کریں",
+    gift_rules_item4: "اشیاء جسمانی اور اچھی حالت میں ہونی چاہئیں",
+    gift_rules_item5: "نقدی یا کارڈ کی ادائیگی کبھی شامل نہیں — تحائف کونا کی اشیاء 100% مفت ہیں",
+
     // Clothing subcategories
     clothing_gender_filter: "فلٹر",
     clothing_men: "مرد",
@@ -4413,6 +4445,14 @@ const translations = {
     kids: "Дети и малыши",
     plants: "Растения",
     gift_corner: "Уголок подарков",
+
+    // Gift Corner Rules (business model v4)
+    gift_rules_title: "📋 Правила Уголка подарков",
+    gift_rules_item1: "Заявки ограничены вашим тарифом — <strong>Бесплатно: 1/мес</strong>, <strong>Swappo Pro: 5/мес</strong>",
+    gift_rules_item2: "Получение предмета блокирует эту категорию на 30 дней (защита от перепродажи)",
+    gift_rules_item3: "Give-to-Unlock: совершите 1 обмен ИЛИ опубликуйте 1 подарок перед получением",
+    gift_rules_item4: "Предметы должны быть физическими товарами в хорошем состоянии",
+    gift_rules_item5: "Никаких оплат наличными или картой — предметы Уголка подарков 100% бесплатны",
 
     // Clothing subcategories
     clothing_gender_filter: "Фильтр по",
