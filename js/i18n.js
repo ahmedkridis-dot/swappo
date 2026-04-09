@@ -824,9 +824,11 @@ const translations = {
     surprise_another: "Another",
     surprise_view: "View item",
 
-    // Feature: Adoption Banner
-    adopt_title: "Adopt, don't shop",
-    adopt_subtitle: "While you're giving items a second life, why not give a pet a second chance?",
+    // Feature: Adoption Banner (Coming Soon)
+    adopt_badge: "Coming Soon",
+    adopt_title: "Adopt, don't shop.",
+    adopt_subtitle: "We're teaming up with UAE shelters to help beautiful souls find a new home. Launching soon.",
+    adopt_cta: "Stay tuned →",
     adopt_support: "Swappo supports local animal welfare",
     adopt_visit: "Visit site",
 
@@ -1265,6 +1267,11 @@ const translations = {
   },
 
   fr: {
+    // Adoption Banner (Coming Soon)
+    adopt_badge: "Bientôt",
+    adopt_title: "Adoptez, n'achetez pas.",
+    adopt_subtitle: "Nous nous associons aux refuges des Émirats pour aider ces belles âmes à trouver un nouveau foyer. Lancement imminent.",
+    adopt_cta: "Restez connectés →",
     // Navbar
     search_placeholder: "Rechercher des articles...",
     join_swap: "Rejoindre l'Échange",
@@ -2376,6 +2383,11 @@ const translations = {
   },
 
   ar: {
+    // Adoption Banner (Coming Soon)
+    adopt_badge: "قريبًا",
+    adopt_title: "تبنَّ، لا تشترِ.",
+    adopt_subtitle: "نتعاون مع ملاجئ الإمارات لمساعدة هذه الأرواح الجميلة على إيجاد منزل جديد. الإطلاق قريبًا.",
+    adopt_cta: "ترقبوا المزيد →",
     // Navbar
     search_placeholder: "ابحث عن الأشياء...",
     join_swap: "انضم للتبادل",
@@ -3490,6 +3502,11 @@ const translations = {
   },
 
   ur: {
+    // Adoption Banner (Coming Soon)
+    adopt_badge: "جلد آ رہا ہے",
+    adopt_title: "گود لیں، خریدیں نہیں۔",
+    adopt_subtitle: "ہم یو اے ای کے جانوروں کے پناہ گاہوں کے ساتھ شراکت کر رہے ہیں تاکہ ان خوبصورت روحوں کو نیا گھر مل سکے۔ جلد لانچ ہو رہا ہے۔",
+    adopt_cta: "منتظر رہیں →",
     // Navbar
     search_placeholder: "چیزیں تلاش کریں...",
     join_swap: "سواپ میں شامل ہوں",

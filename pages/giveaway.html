@@ -636,27 +636,27 @@
             margin: 0 auto;
         }
 
-        /* ═══ Adopt Hero — modern 2026 ═══ */
+        /* ═══ Adopt Hero — warm Coming Soon ═══ */
         .adopt-hero {
-            max-width: 980px;
+            max-width: 820px;
             margin: 60px auto 20px;
             padding: 0 16px;
         }
         .adopt-hero-inner {
             position: relative;
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 55%, #0B3B3E 100%);
-            border-radius: 28px;
-            padding: 48px 44px;
+            background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 50%, #FEF3C7 100%);
+            border-radius: 24px;
+            padding: 56px 44px 52px;
             overflow: hidden;
-            box-shadow: 0 30px 80px -30px rgba(9,177,186,0.35), 0 10px 40px rgba(15,23,42,0.25);
-            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 50px -20px rgba(251,146,60,0.25), 0 4px 16px rgba(120,53,15,0.08);
+            border: 1px solid rgba(251,146,60,0.18);
         }
         .adopt-hero-glow {
             position: absolute;
-            top: -120px; right: -120px;
-            width: 360px; height: 360px;
-            background: radial-gradient(circle, rgba(9,177,186,0.35), transparent 70%);
-            filter: blur(40px);
+            top: -100px; right: -100px;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(251,146,60,0.28), transparent 70%);
+            filter: blur(50px);
             pointer-events: none;
         }
         .adopt-hero-inner::before {
@@ -664,110 +664,68 @@
             position: absolute;
             bottom: -80px; left: -80px;
             width: 280px; height: 280px;
-            background: radial-gradient(circle, rgba(255,140,0,0.22), transparent 70%);
-            filter: blur(50px);
+            background: radial-gradient(circle, rgba(244,114,182,0.18), transparent 70%);
+            filter: blur(60px);
             pointer-events: none;
+        }
+        .adopt-hero-soon {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 2;
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #92400E;
+            background: #FEF3C7;
+            border: 1px solid rgba(146,64,14,0.18);
+            padding: 6px 12px;
+            border-radius: 999px;
         }
         .adopt-hero-head {
             position: relative;
             text-align: center;
-            margin-bottom: 32px;
         }
-        .adopt-hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #09B1BA;
-            background: rgba(9,177,186,0.14);
-            border: 1px solid rgba(9,177,186,0.35);
-            padding: 6px 14px;
-            border-radius: 999px;
-            margin-bottom: 16px;
+        .adopt-hero-paws {
+            font-size: 44px;
+            margin-bottom: 14px;
+            filter: drop-shadow(0 4px 10px rgba(146,64,14,0.15));
         }
         .adopt-hero-title {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
-            color: #fff;
-            margin: 0 0 10px;
+            color: #78350F;
+            margin: 0 0 14px;
             letter-spacing: -0.025em;
-            background: linear-gradient(135deg, #fff 0%, #A7F3F6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            line-height: 1.15;
         }
         .adopt-hero-sub {
             font-size: 15px;
-            line-height: 1.6;
-            color: rgba(255,255,255,0.72);
-            margin: 0;
+            line-height: 1.65;
+            color: #92400E;
+            margin: 0 auto 24px;
             max-width: 520px;
-            margin-inline: auto;
+            opacity: 0.85;
         }
-        .adopt-hero-grid {
-            position: relative;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
+        .adopt-hero-cta-disabled {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #78350F;
+            opacity: 0.55;
+            cursor: default;
+            padding: 10px 20px;
+            border: 1px dashed rgba(120,53,15,0.3);
+            border-radius: 999px;
+            user-select: none;
         }
-        .adopt-hero-card {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            padding: 22px 24px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-        }
-        .adopt-hero-card:hover {
-            background: rgba(9,177,186,0.12);
-            border-color: rgba(9,177,186,0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -20px rgba(9,177,186,0.5);
-        }
-        .adopt-hero-emoji {
-            font-size: 40px;
-            flex-shrink: 0;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
-        }
-        .adopt-hero-meta { flex: 1; min-width: 0; }
-        .adopt-hero-name {
-            font-size: 15px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-        .adopt-hero-loc {
-            font-size: 12px;
-            color: rgba(255,255,255,0.55);
-        }
-        .adopt-hero-cta {
-            font-size: 13px;
-            font-weight: 700;
-            color: #09B1BA;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .adopt-hero-card:hover .adopt-hero-cta { color: #67E8F0; }
-        .adopt-hero-footline {
-            position: relative;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin: 24px 0 0;
-        }
+        [dir="rtl"] .adopt-hero-soon { left: 18px; right: auto; }
         @media (max-width: 640px) {
-            .adopt-hero-inner { padding: 36px 24px; border-radius: 22px; }
-            .adopt-hero-title { font-size: 28px; }
-            .adopt-hero-grid { grid-template-columns: 1fr; }
-            .adopt-hero-card { padding: 18px 20px; }
+            .adopt-hero-inner { padding: 50px 24px 44px; border-radius: 20px; }
+            .adopt-hero-title { font-size: 26px; }
+            .adopt-hero-soon { top: 14px; right: 14px; font-size: 9px; padding: 5px 10px; }
         }
     </style>
 </head>
@@ -933,34 +891,17 @@
                 <a href="publier.html" class="btn-primary-coral">Add a free item</a>
             </div>
         </div>
-        <!-- Adoption Banner — modern 2026 -->
+        <!-- Adoption Banner — Coming Soon -->
         <section class="adopt-hero reveal" id="adopt">
           <div class="adopt-hero-inner">
+            <span class="adopt-hero-soon" data-i18n="adopt_badge">Coming Soon</span>
             <div class="adopt-hero-glow"></div>
             <div class="adopt-hero-head">
-              <span class="adopt-hero-badge"><i class="fas fa-paw"></i> <span data-i18n="adopt_badge">UAE animal welfare</span></span>
-              <h2 class="adopt-hero-title" data-i18n="adopt_title">Adopt, don't shop</h2>
-              <p class="adopt-hero-sub" data-i18n="adopt_subtitle">While you're giving items a second life, why not give a pet a second chance?</p>
+              <div class="adopt-hero-paws">🐾</div>
+              <h2 class="adopt-hero-title" data-i18n="adopt_title">Adopt, don't shop.</h2>
+              <p class="adopt-hero-sub" data-i18n="adopt_subtitle">We're teaming up with UAE shelters to help beautiful souls find a new home. Launching soon.</p>
+              <span class="adopt-hero-cta-disabled" data-i18n="adopt_cta">Stay tuned →</span>
             </div>
-            <div class="adopt-hero-grid">
-              <a href="https://animalsandus.com" target="_blank" rel="noopener" class="adopt-hero-card">
-                <div class="adopt-hero-emoji">🐕</div>
-                <div class="adopt-hero-meta">
-                  <div class="adopt-hero-name">Animals &amp; Us Dubai</div>
-                  <div class="adopt-hero-loc">Dubai, UAE</div>
-                </div>
-                <span class="adopt-hero-cta" data-i18n="adopt_visit">Visit site →</span>
-              </a>
-              <a href="https://sdc.ae" target="_blank" rel="noopener" class="adopt-hero-card">
-                <div class="adopt-hero-emoji">🐈</div>
-                <div class="adopt-hero-meta">
-                  <div class="adopt-hero-name">Stray Dogs Center UAE</div>
-                  <div class="adopt-hero-loc">Umm Al Quwain, UAE</div>
-                </div>
-                <span class="adopt-hero-cta" data-i18n="adopt_visit">Visit site →</span>
-              </a>
-            </div>
-            <p class="adopt-hero-footline" data-i18n="adopt_support">❤️ Swappo supports local animal welfare</p>
           </div>
         </section>
     </main>
