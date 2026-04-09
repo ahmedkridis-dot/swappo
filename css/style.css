@@ -296,20 +296,22 @@ input, select, textarea { font-family: var(--font); }
 }
 
 /* Site logo — text-only, brand mark reserved for favicon/empty-states/loaders */
+a.site-logo,
 .site-logo {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-weight: 900;
-  font-size: 1.5rem;
-  color: var(--primary, #09B1BA);
-  letter-spacing: -0.02em;
-  text-decoration: none;
-  line-height: 1;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 1.5rem !important;
+  color: #09B1BA !important;
+  letter-spacing: -0.02em !important;
+  text-decoration: none !important;
+  line-height: 1 !important;
 }
-.site-logo:hover { color: var(--primary-dark, #078A91); }
+a.site-logo:hover { color: #078A91 !important; }
 .footer .site-logo,
-.site-logo.footer-brand-text { color: #ffffff; }
+.site-logo.footer-brand-text { color: #ffffff !important; }
 @media (max-width: 640px) {
-  .site-logo { font-size: 1.25rem; }
+  a.site-logo,
+  .site-logo { font-size: 1.25rem !important; }
 }
 
 /* Mega menu hidden site-wide — structure kept for future use */
