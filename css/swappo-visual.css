@@ -408,6 +408,47 @@
   background: linear-gradient(135deg, #FF6B6B 0%, #FF8C00 100%);
   box-shadow: 0 4px 15px rgba(255,107,107,0.4);
 }
+
+/* Recycle Hub floating button — mirror of Surprise Me on the left */
+.recycle-hub-btn {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 55%, #09B1BA 100%);
+  color: #fff;
+  border: none;
+  padding: 14px 22px;
+  border-radius: 50px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  animation: surprisePulse 10s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.recycle-hub-btn i { font-size: 16px; }
+.recycle-hub-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(16,185,129,0.6);
+  color: #fff;
+}
+[dir="rtl"] .recycle-hub-btn { left: auto; right: 20px; }
+[dir="rtl"] .surprise-me-btn { right: auto; left: 20px; }
+@media (max-width: 640px) {
+  .recycle-hub-btn { padding: 12px 16px; font-size: 13px; bottom: 20px; left: 12px; }
+  .recycle-hub-btn-label { display: none; }
+  .recycle-hub-btn i { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .recycle-hub-btn { animation: none; }
+}
+
 @keyframes surprisePulse {
   0%, 90%, 100% { transform: translateY(0); }
   93% { transform: translateY(-5px); }
