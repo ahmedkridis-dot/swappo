@@ -121,6 +121,7 @@ const translations = {
 
     // Homepage
     hero_title: "Someone needs what you have.\nSwap it.",
+    hero_badge: "UAE's first barter community",
     hero_subtitle: "The UAE's first dedicated barter, gift & recycle platform. Trade items with your community. Start free.",
     how_it_works: "How it works",
     step1_title: "List your item",
@@ -1385,6 +1386,7 @@ const translations = {
 
     // Homepage
     hero_title: "Quelqu'un a besoin de ce que vous avez.\nÉchangez-le.",
+    hero_badge: "La première communauté de troc des Émirats",
     hero_subtitle: "La première plateforme dédiée au troc, au don et au recyclage aux EAU. Échangez avec votre communauté. Commencez gratuitement.",
     how_it_works: "Comment ça marche",
     step1_title: "Listez votre article",
@@ -2505,6 +2507,7 @@ const translations = {
 
     // Homepage
     hero_title: "شخص ما يحتاج ما لديك.\nبادله.",
+    hero_badge: "أول مجتمع مقايضة في الإمارات",
     hero_subtitle: "أول منصة مخصصة للمقايضة والإهداء وإعادة التدوير في الإمارات. تبادل مع مجتمعك. ابدأ مجاناً.",
     how_it_works: "كيف يعمل",
     step1_title: "ضع قائمة بعنصرك",
@@ -3628,6 +3631,7 @@ const translations = {
 
     // Homepage
     hero_title: "کسی کو آپ کی چیز کی ضرورت ہے۔\nاسے تبدیل کریں۔",
+    hero_badge: "یو اے ای کی پہلی بارٹر کمیونٹی",
     hero_subtitle: "امارات کا پہلا وقف شدہ بارٹر، تحفہ اور ری سائیکل پلیٹ فارم۔ اپنی کمیونٹی کے ساتھ تبادلہ کریں۔ مفت شروع کریں۔",
     how_it_works: "یہ کیسے کام کرتا ہے",
     step1_title: "اپنی چیز کی فہرست بنائیں",
@@ -4745,6 +4749,7 @@ const translations = {
 
     // Homepage
     hero_title: "Кому-то нужно то, что есть у вас.\nОбменяйте.",
+    hero_badge: "Первое сообщество бартера в ОАЭ",
     hero_subtitle: "Первая специализированная платформа обмена, дарения и переработки в ОАЭ. Обменивайтесь в своём сообществе. Начните бесплатно.",
     how_it_works: "Как это работает",
     step1_title: "Разместите свой товар",
