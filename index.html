@@ -63,9 +63,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Homepage-specific styles (non-hero) */
-    .teasing-strip { margin: 0; overflow: hidden; max-height: 200px; }
-    .teasing-strip video { width: 100%; display: block; object-fit: cover; max-height: 200px; cursor: pointer; }
+    /* Homepage-specific styles */
     .feed-section + .feed-section { padding-top: 0; }
   </style>
 </head>
@@ -120,51 +118,42 @@
     })();
   </script>
 
-  <!-- ========== HERO BANNER (UPGRADED) ========== -->
-  <section class="hero-landing">
-    <div class="container hero-grid">
+  <!-- ═══════════ HERO — Video Primary + Copy Overlay ═══════════ -->
+  <section class="hero-video-section">
+    <!-- Full-width background video -->
+    <div class="hero-video-bg">
+      <video autoplay muted loop playsinline preload="auto" aria-label="Swappo teaser">
+        <source src="video/teasing.mp4" type="video/mp4">
+      </video>
+      <div class="hero-video-overlay"></div>
+    </div>
+    <!-- Hero content floating over video -->
+    <div class="container hero-video-content">
       <div class="hero-copy reveal reveal-up">
         <span class="hero-badge" data-i18n="hero_badge">UAE's first barter community</span>
         <h1 data-i18n-html="hero_title_v2">Someone needs what you have. <span class="gradient-text" data-i18n="hero_title_accent">Swap it.</span></h1>
-        <p data-i18n="hero_subtitle">Give your unused items a second life. Get what you actually need. No cash, no waste — just smart exchanges.</p>
+        <p class="hero-subtitle-text" data-i18n="hero_subtitle">Give your unused items a second life. Get what you actually need. No cash, no waste — just smart exchanges.</p>
         <div class="hero-cta">
-          <a href="pages/login.html" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start swapping</a>
-          <a href="#how-it-works" class="btn-pill btn-pill-outline" style="border-color:var(--navy,#1A1A2E);color:var(--navy,#1A1A2E);" data-i18n="how_it_works">How it works</a>
+          <a href="pages/login.html" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start swapping — it's free</a>
+          <a href="#how-it-works" class="btn-pill btn-pill-outline hero-outline-btn" data-i18n="how_it_works">How it works</a>
         </div>
         <div class="hero-trust">
           <span><span class="check">&#10003;</span> <span data-i18n="trust_items">5,000+ items listed</span></span>
           <span><span class="check">&#10003;</span> <span data-i18n="trust_categories">12 categories</span></span>
           <span><span class="check">&#10003;</span> <span data-i18n="trust_anonymous">100% anonymous until you agree</span></span>
         </div>
-        <div style="margin-top:16px;font-size:13px;color:var(--gray-text,#6B7280);">
-          <a href="pages/login.html" style="color:var(--teal,#09B1BA);font-weight:600;text-decoration:none;" id="early-adopter-inline">🚀 <span data-i18n="early_adopter_offer">Swappo Pro FREE for 3 months</span> — <span data-i18n="early_adopter_claim">Claim your spot</span></a>
-        </div>
-      </div>
-      <div class="hero-visual reveal reveal-scale">
-        <picture>
-          <source media="(max-width: 768px)" srcset="assets/brand/hero/hero-cluster-mobile.jpg">
-          <img
-            src="assets/brand/hero/hero-cluster.jpg"
-            alt="Swap anything — furniture, electronics, bikes, books and more"
-            class="hero-cluster-img"
-            loading="eager"
-            fetchpriority="high"
-            width="2000"
-            height="1116">
-        </picture>
-        <div class="float-dot float-dot-1"></div>
-        <div class="float-dot float-dot-2"></div>
-        <div class="float-dot float-dot-3"></div>
       </div>
     </div>
+    <!-- Cluster image as secondary floating element (desktop only) -->
+    <picture class="hero-cluster-float">
+      <source media="(max-width: 768px)" srcset="assets/brand/hero/hero-cluster-mobile.jpg">
+      <img src="assets/brand/hero/hero-cluster.jpg" alt="Swap anything — furniture, electronics, bikes, books and more" loading="eager" fetchpriority="high" width="2000" height="1116">
+    </picture>
+    <!-- Sound toggle -->
+    <button class="hero-sound-toggle" onclick="var v=document.querySelector('.hero-video-bg video');v.muted=!v.muted;this.innerHTML=v.muted?'<i class=\'fas fa-volume-mute\'></i>':'<i class=\'fas fa-volume-up\'></i>'" aria-label="Toggle sound">
+      <i class="fas fa-volume-mute"></i>
+    </button>
   </section>
-
-  <!-- ========== TEASER VIDEO STRIP ========== -->
-  <div class="teasing-strip reveal" onclick="var v=this.querySelector('video'); v.muted=!v.muted;" title="Click to unmute">
-    <video autoplay muted loop playsinline preload="metadata" aria-label="Swappo teaser">
-      <source src="video/teasing.mp4" type="video/mp4">
-    </video>
-  </div>
 
   <!-- ========== HOW IT WORKS ========== -->
   <section class="how-it-works reveal" id="how-it-works">
@@ -220,26 +209,7 @@
     </div>
   </section>
 
-  <!-- ========== FEATURED CATEGORIES (moved below gift teaser) ========== -->
-  <section class="categories-section reveal">
-    <div class="container">
-      <h2 class="section-title" data-i18n="featured_categories">Featured Categories</h2>
-      <div class="category-icon-grid" id="category-grid">
-        <a href="pages/catalogue.html?category=clothing" class="category-icon-card"><div class="cat-icon"><i class="fas fa-tshirt"></i></div><div class="cat-name" data-i18n="clothing">Clothing</div><div class="cat-count">1245 items</div></a>
-        <a href="pages/catalogue.html?category=electronics" class="category-icon-card"><div class="cat-icon"><i class="fas fa-mobile-alt"></i></div><div class="cat-name" data-i18n="electronics">Electronics</div><div class="cat-count">892 items</div></a>
-        <a href="pages/catalogue.html?category=furniture" class="category-icon-card"><div class="cat-icon"><i class="fas fa-couch"></i></div><div class="cat-name" data-i18n="furniture">Furniture</div><div class="cat-count">534 items</div></a>
-        <a href="pages/catalogue.html?category=kids" class="category-icon-card"><div class="cat-icon"><i class="fas fa-baby"></i></div><div class="cat-name" data-i18n="kids">Kids & Baby</div><div class="cat-count">678 items</div></a>
-        <a href="pages/catalogue.html?category=vehicles" class="category-icon-card"><div class="cat-icon"><i class="fas fa-car"></i></div><div class="cat-name" data-i18n="vehicles">Vehicles</div><div class="cat-count">234 items</div></a>
-        <a href="pages/catalogue.html?category=sports" class="category-icon-card"><div class="cat-icon"><i class="fas fa-futbol"></i></div><div class="cat-name" data-i18n="sports">Sports</div><div class="cat-count">456 items</div></a>
-        <a href="pages/catalogue.html?category=books" class="category-icon-card"><div class="cat-icon"><i class="fas fa-book"></i></div><div class="cat-name" data-i18n="books">Books</div><div class="cat-count">789 items</div></a>
-        <a href="pages/catalogue.html?category=gaming" class="category-icon-card"><div class="cat-icon"><i class="fas fa-gamepad"></i></div><div class="cat-name" data-i18n="gaming">Gaming</div><div class="cat-count">567 items</div></a>
-        <a href="pages/catalogue.html?category=bags_accessories" class="category-icon-card"><div class="cat-icon"><i class="fas fa-shopping-bag"></i></div><div class="cat-name" data-i18n="bags_accessories">Bags & Accessories</div><div class="cat-count">891 items</div></a>
-        <a href="pages/giveaway.html" class="category-icon-card"><div class="cat-icon"><i class="fas fa-gift"></i></div><div class="cat-name" data-i18n="gift_corner">Gift Corner</div><div class="cat-count">345 items</div></a>
-        <a href="pages/catalogue.html?category=plants" class="category-icon-card"><div class="cat-icon"><i class="fas fa-leaf"></i></div><div class="cat-name" data-i18n="plants">Plants</div><div class="cat-count">267 items</div></a>
-        <a href="pages/catalogue.html" class="category-icon-card"><div class="cat-icon"><i class="fas fa-th"></i></div><div class="cat-name" data-i18n="all">All</div><div class="cat-count">5898 items</div></a>
-      </div>
-    </div>
-  </section>
+  <!-- Featured Categories removed from homepage — accessible via mega-menu + catalogue -->
 
   <!-- ========== LIVE SWAP FEED ========== -->
   <section class="swap-feed-section reveal">
