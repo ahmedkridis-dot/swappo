@@ -197,16 +197,13 @@
       }, 30000);
     }
 
-    // ── Floating Recycle Hub button (bottom-left, symmetrical to Surprise Me) ──
+    // ── Floating Recycle Hub button — DISABLED for now (kept in code for reactivation) ──
+    /*
     (function() {
-      // Don't show on the recycle hub page itself or inside auth forms
       var path = location.pathname || '';
       if (path.indexOf('recycle.html') !== -1 || path.indexOf('login.html') !== -1) return;
       if (document.querySelector('.recycle-hub-btn')) return;
-
-      // Compute prefix (root vs pages/)
       var href = path.indexOf('/pages/') !== -1 ? 'recycle.html' : 'pages/recycle.html';
-
       var btn = document.createElement('a');
       btn.className = 'recycle-hub-btn';
       btn.href = href;
@@ -214,6 +211,7 @@
       btn.innerHTML = '<i class="fas fa-recycle"></i> <span class="recycle-hub-btn-label">Recycle Hub</span>';
       document.body.appendChild(btn);
     })();
+    */
 
   });
 })();
