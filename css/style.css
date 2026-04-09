@@ -314,10 +314,6 @@ a.site-logo:hover { color: #078A91 !important; }
   .site-logo { font-size: 1.25rem !important; }
 }
 
-/* Mega menu hidden site-wide — structure kept for future use */
-#mega-menu-mount,
-.mega-menu-bar { display: none !important; }
-
 /* Legacy lockup (kept for compatibility with older templates) */
 .logo-lockup {
   display: inline-flex;
