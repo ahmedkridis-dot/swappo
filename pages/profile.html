@@ -1429,17 +1429,15 @@
             document.getElementById('sidebar-plan-name').textContent = tierInfo.badge + ' ' + tierInfo.name;
             document.getElementById('sidebar-plan-badge').textContent = planInfo.plan === 'free' ? 'Free plan' : tierInfo.price + ' AED/month';
 
-            // Quota bars
+            // Stats + quota bars (v4: swaps unlimited → show completed count, no bar)
             const quotasContainer = document.getElementById('sidebar-quotas');
-            const swapsLimit = planInfo.swaps_limit === Infinity ? '\u221E' : planInfo.swaps_limit;
-            const swapsPct = planInfo.swaps_limit === Infinity ? Math.min(100, planInfo.swaps_used * 10) : Math.round((planInfo.swaps_used / planInfo.swaps_limit) * 100);
+            const swapsCompleted = planInfo.swaps_used || 0;
             const claimsPct = planInfo.claims_limit > 0 ? Math.round((planInfo.claims_used / planInfo.claims_limit) * 100) : 0;
             const boostsPct = planInfo.boosts_limit > 0 ? Math.round((planInfo.boosts_used / planInfo.boosts_limit) * 100) : 0;
 
             quotasContainer.innerHTML =
                 '<div class="sub-quota-item">' +
-                    '<div class="sub-quota-label"><span><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;"></i>Swaps</span><span>' + planInfo.swaps_used + '/' + swapsLimit + ' used</span></div>' +
-                    '<div class="sub-quota-bar"><div class="sub-quota-fill swaps" style="width:' + Math.min(100, swapsPct) + '%"></div></div>' +
+                    '<div class="sub-quota-label"><span><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;"></i>Swaps completed</span><span><strong style="color:var(--primary);font-size:15px;">' + swapsCompleted + '</strong></span></div>' +
                 '</div>' +
                 '<div class="sub-quota-item">' +
                     '<div class="sub-quota-label"><span><i class="fas fa-gift" style="color:var(--accent);margin-right:6px;"></i>Claims</span><span>' + planInfo.claims_used + '/' + planInfo.claims_limit + ' used</span></div>' +
@@ -1460,7 +1458,7 @@
             document.getElementById('settings-sub-title').textContent = tierInfo.badge + ' ' + tierInfo.name + ' Plan';
             document.getElementById('settings-sub-price').innerHTML = planInfo.plan === 'free' ? 'Free' : tierInfo.price + ' AED<span style="font-size:12px;color:var(--text-secondary);">/month</span>';
             document.getElementById('settings-sub-quotas').innerHTML =
-                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;width:16px;"></i>' + planInfo.swaps_used + '/' + swapsLimit + ' swaps used this month</div>' +
+                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;width:16px;"></i>' + swapsCompleted + ' swap' + (swapsCompleted === 1 ? '' : 's') + ' completed</div>' +
                 '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-gift" style="color:var(--accent);margin-right:6px;width:16px;"></i>' + planInfo.claims_used + '/' + planInfo.claims_limit + ' claims used</div>' +
                 '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-rocket" style="color:#FFB800;margin-right:6px;width:16px;"></i>' + planInfo.boosts_used + '/' + planInfo.boosts_limit + ' boosts used</div>';
             document.getElementById('settings-sub-renewal').innerHTML = '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
