@@ -295,20 +295,21 @@ input, select, textarea { font-family: var(--font); }
   color: var(--primary-dark);
 }
 
-/* Wordmark (Swappo.ae) — integrated S logo + wordmark as one unit */
+/* Site logo — text-only, brand mark reserved for favicon/empty-states/loaders */
 .site-logo {
-  display: inline-flex;
-  align-items: center;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--primary, #09B1BA);
+  letter-spacing: -0.02em;
   text-decoration: none;
-  line-height: 0;
+  line-height: 1;
 }
-.site-logo img {
-  height: 44px;
-  width: auto;
-  display: block;
-}
+.site-logo:hover { color: var(--primary-dark, #078A91); }
+.footer .site-logo,
+.site-logo.footer-brand-text { color: #ffffff; }
 @media (max-width: 640px) {
-  .site-logo img { height: 36px; }
+  .site-logo { font-size: 1.25rem; }
 }
 
 /* Mega menu hidden site-wide — structure kept for future use */
