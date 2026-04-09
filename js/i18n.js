@@ -222,7 +222,7 @@ const translations = {
     auth_password_placeholder: "At least 8 characters",
     auth_confirm_password: "Confirm Password",
     auth_confirm_placeholder: "Re-enter password",
-    auth_terms_agree: "I agree to Terms of use and Privacy policy",
+    auth_terms_agree: "I agree to <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">Terms of use</a> and <a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">Privacy policy</a>",
     auth_join_free: "Join the Swap — It's Free",
     auth_or_continue: "or continue with",
     auth_google: "Continue with Google",
@@ -1479,7 +1479,7 @@ const translations = {
     auth_password_placeholder: "Au moins 8 caractères",
     auth_confirm_password: "Confirmer le mot de passe",
     auth_confirm_placeholder: "Retapez le mot de passe",
-    auth_terms_agree: "J'accepte les Conditions d'utilisation et la Politique de confidentialité",
+    auth_terms_agree: "J'accepte les <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">Conditions d'utilisation</a> et la <a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">Politique de confidentialité</a>",
     auth_join_free: "Rejoindre le Swap — C'est gratuit",
     auth_or_continue: "ou continuer avec",
     auth_google: "Continuer avec Google",
@@ -2595,7 +2595,7 @@ const translations = {
     auth_password_placeholder: "8 أحرف على الأقل",
     auth_confirm_password: "تأكيد كلمة المرور",
     auth_confirm_placeholder: "أعد إدخال كلمة المرور",
-    auth_terms_agree: "أوافق على شروط الاستخدام وسياسة الخصوصية",
+    auth_terms_agree: "أوافق على <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">شروط الاستخدام</a> و<a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">سياسة الخصوصية</a>",
     auth_join_free: "انضم للتبادل — مجاناً",
     auth_or_continue: "أو تابع مع",
     auth_google: "متابعة مع Google",
@@ -3713,7 +3713,7 @@ const translations = {
     auth_password_placeholder: "کم از کم 8 حروف",
     auth_confirm_password: "پاس ورڈ کی تصدیق",
     auth_confirm_placeholder: "پاس ورڈ دوبارہ درج کریں",
-    auth_terms_agree: "میں استعمال کی شرائط اور رازداری کی پالیسی سے اتفاق کرتا ہوں",
+    auth_terms_agree: "میں <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">استعمال کی شرائط</a> اور <a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">رازداری کی پالیسی</a> سے اتفاق کرتا ہوں",
     auth_join_free: "سواپ میں شامل ہوں — مفت ہے",
     auth_or_continue: "یا جاری رکھیں",
     auth_google: "Google سے جاری رکھیں",
@@ -4826,7 +4826,7 @@ const translations = {
     auth_password_placeholder: "Минимум 8 символов",
     auth_confirm_password: "Подтвердите пароль",
     auth_confirm_placeholder: "Введите пароль ещё раз",
-    auth_terms_agree: "Я принимаю Условия использования и Политику конфиденциальности",
+    auth_terms_agree: "Я принимаю <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">Условия использования</a> и <a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">Политику конфиденциальности</a>",
     auth_join_free: "Присоединиться — Бесплатно",
     auth_or_continue: "или продолжить с",
     auth_google: "Продолжить с Google",
@@ -5803,6 +5803,15 @@ function applyTranslations() {
     const key = el.getAttribute('data-i18n');
     if (key) {
       el.textContent = t(key);
+    }
+  });
+
+  // HTML content (allows <a>, <strong>, etc. in translations)
+  const i18nHtmlElements = document.querySelectorAll('[data-i18n-html]');
+  i18nHtmlElements.forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    if (key) {
+      el.innerHTML = t(key);
     }
   });
 

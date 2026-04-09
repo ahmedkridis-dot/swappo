@@ -123,8 +123,8 @@
     }
 
     .auth-checkbox label { cursor: pointer; line-height: 1.5; }
-    .auth-checkbox a { color: #09B1BA; text-decoration: none; }
-    .auth-checkbox a:hover { text-decoration: underline; }
+    .auth-checkbox a { color: #09B1BA; text-decoration: underline; font-weight: 600; }
+    .auth-checkbox a:hover { color: #078A91; }
 
     /* Primary button */
     .auth-btn {
@@ -537,7 +537,7 @@
 
         <div class="auth-checkbox">
           <input type="checkbox" id="terms-agree" name="terms" required>
-          <label for="terms-agree" data-i18n="auth_terms_agree">I agree to <a href="terms.html">Terms of use</a> and <a href="privacy.html">Privacy policy</a></label>
+          <label for="terms-agree" data-i18n-html="auth_terms_agree">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms of use</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></label>
         </div>
 
         <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_join_free">
