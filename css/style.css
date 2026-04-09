@@ -295,7 +295,27 @@ input, select, textarea { font-family: var(--font); }
   color: var(--primary-dark);
 }
 
-/* Logo lockup — new brand mark (2026) */
+/* Wordmark (Swappo.ae) — integrated S logo + wordmark as one unit */
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 0;
+}
+.site-logo img {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+@media (max-width: 640px) {
+  .site-logo img { height: 36px; }
+}
+
+/* Mega menu hidden site-wide — structure kept for future use */
+#mega-menu-mount,
+.mega-menu-bar { display: none !important; }
+
+/* Legacy lockup (kept for compatibility with older templates) */
 .logo-lockup {
   display: inline-flex;
   align-items: center;
