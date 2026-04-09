@@ -258,6 +258,8 @@ const translations = {
     footer_terms: "Terms of use",
     footer_privacy: "Privacy policy",
     footer_cookies: "Cookie policy",
+    footer_tdra: "TDRA-approved e-activity • NOL-26-100000206",
+    footer_tdra_badge: "TDRA Approved",
 
     // Mega Menu
     mega_gift_corner: "Gift Corner",
@@ -1481,6 +1483,8 @@ const translations = {
     footer_terms: "Conditions d'utilisation",
     footer_privacy: "Politique de confidentialité",
     footer_cookies: "Politique de cookies",
+    footer_tdra: "Activité électronique agréée par la TDRA • NOL-26-100000206",
+    footer_tdra_badge: "Agréé TDRA",
 
     // Mega Menu
     mega_gift_corner: "Coin Cadeaux",
@@ -2565,6 +2569,8 @@ const translations = {
     footer_terms: "شروط الاستخدام",
     footer_privacy: "سياسة الخصوصية",
     footer_cookies: "سياسة ملفات تعريف الارتباط",
+    footer_tdra: "نشاط إلكتروني معتمد من TDRA • NOL-26-100000206",
+    footer_tdra_badge: "معتمد من TDRA",
 
     // Mega Menu
     mega_gift_corner: "ركن الهدايا",
@@ -3651,6 +3657,8 @@ const translations = {
     footer_terms: "استعمال کی شرائط",
     footer_privacy: "رازداری کی پالیسی",
     footer_cookies: "کوکی پالیسی",
+    footer_tdra: "TDRA سے منظور شدہ ای ایکٹیویٹی • NOL-26-100000206",
+    footer_tdra_badge: "TDRA منظور شدہ",
 
     // Mega Menu
     mega_gift_corner: "تحائف کونا",
@@ -4737,6 +4745,8 @@ const translations = {
     footer_terms: "Условия использования",
     footer_privacy: "Политика конфиденциальности",
     footer_cookies: "Политика cookie",
+    footer_tdra: "Электронная деятельность одобрена TDRA • NOL-26-100000206",
+    footer_tdra_badge: "Одобрено TDRA",
 
     // Mega Menu
     mega_gift_corner: "Уголок подарков",
