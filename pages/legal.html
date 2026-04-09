@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regulatory Status — Swappo</title>
+  <meta name="description" content="Swappo regulatory status — TDRA-approved e-activity, licence details, VAT compliance.">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" type="image/svg+xml" href="../img/icon-192.svg">
+  <meta name="theme-color" content="#09B1BA">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/swappo-visual.css">
+  <link rel="stylesheet" href="../css/swappo-modern-2026.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .legal-page { padding: 40px 0 60px; }
+    .legal-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 48px 40px;
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
+      border: 1px solid var(--border, #E5E7EB);
+    }
+    .legal-container h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text, #1A1A2E);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .legal-container .last-updated {
+      font-size: 0.85rem;
+      color: var(--text-muted, #9CA3AF);
+      margin-bottom: 36px;
+    }
+    .legal-container h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text, #1A1A2E);
+      margin: 36px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .legal-container p, .legal-container li {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: var(--text-secondary, #4B5563);
+      margin-bottom: 12px;
+    }
+    .legal-container ul { padding-left: 22px; margin-bottom: 16px; }
+    .legal-container a { color: var(--teal, #09B1BA); text-decoration: none; font-weight: 600; }
+    .legal-container a:hover { text-decoration: underline; }
+    .legal-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--teal, #09B1BA);
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+    .legal-back:hover { text-decoration: underline; }
+
+    .regulatory-card {
+      background: linear-gradient(135deg, rgba(9,177,186,0.06), rgba(9,177,186,0.02));
+      border: 1px solid rgba(9,177,186,0.22);
+      border-radius: var(--radius-lg, 16px);
+      padding: 28px;
+      margin: 28px 0;
+    }
+    .regulatory-card .reg-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .regulatory-card .reg-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--teal, #09B1BA), var(--teal-dark, #078A91));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .regulatory-card .reg-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text, #1A1A2E);
+      margin: 0;
+    }
+    .regulatory-card .reg-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted, #6B7280);
+      margin: 2px 0 0;
+    }
+    .regulatory-card .reg-detail {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 10px 16px;
+      font-size: 0.92rem;
+    }
+    .regulatory-card .reg-detail dt {
+      color: var(--text-muted, #6B7280);
+      font-weight: 600;
+    }
+    .regulatory-card .reg-detail dd {
+      color: var(--text, #1A1A2E);
+      margin: 0;
+      font-weight: 600;
+    }
+    @media (max-width: 560px) {
+      .legal-container { padding: 28px 20px; }
+      .regulatory-card .reg-detail { grid-template-columns: 1fr; gap: 4px 0; }
+      .regulatory-card .reg-detail dt { margin-top: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="../index.html" class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</a>
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        </div>
+        <div class="navbar-actions">
+          <a href="chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>
+          <a href="profile.html" class="navbar-icon" title="My Swaps"><i class="fas fa-user-circle"></i></a>
+          <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Eco Ticker -->
+  <div class="eco-ticker" id="ecoTicker">
+    <div class="eco-ticker-content">
+      <span class="eco-ticker-item">🌿 <span class="eco-ticker-number" data-target="6430" data-suffix=" kg">0</span> CO2 saved</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🔄 <span class="eco-ticker-number" data-target="1892" data-suffix="">0</span> items swapped</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🎁 <span class="eco-ticker-number" data-target="247" data-suffix="">0</span> gifts today</span>
+      <span class="eco-ticker-live">↑ <span id="ecoTickerLive">+12 in the last hour</span></span>
+    </div>
+    <button class="eco-ticker-close" id="ecoTickerClose" aria-label="Close">×</button>
+  </div>
+
+  <!-- ========== MEGA MENU ========== -->
+  <div id="mega-menu-mount"></div>
+  <script src="../js/mega-menu.js"></script>
+  <script>
+    (function(){
+      var mount = document.getElementById('mega-menu-mount');
+      if (mount && typeof renderMegaMenuBar === 'function') {
+        mount.innerHTML = renderMegaMenuBar(true);
+        if (typeof initMegaMenu === 'function') initMegaMenu();
+      }
+    })();
+  </script>
+
+  <!-- ========== LEGAL CONTENT ========== -->
+  <section class="legal-page">
+    <div class="container">
+      <div class="legal-container">
+        <a href="../index.html" class="legal-back" data-i18n="legal_back">← Back to home</a>
+
+        <h1 data-i18n="legal_title">Regulatory Status</h1>
+        <p class="last-updated" data-i18n="legal_last_updated">Last updated: April 9, 2026</p>
+
+        <p data-i18n="legal_intro">Swappo operates under full UAE regulatory compliance. This page consolidates the platform's legal and regulatory information for partners, regulators, and curious users.</p>
+
+        <!-- TDRA Regulatory Card -->
+        <div class="regulatory-card">
+          <div class="reg-header">
+            <div class="reg-icon"><i class="fas fa-shield-alt"></i></div>
+            <div>
+              <h3 class="reg-title" data-i18n="legal_tdra_title">TDRA-approved e-activity</h3>
+              <p class="reg-sub" data-i18n="legal_tdra_sub">UAE Telecommunications &amp; Digital Government Regulatory Authority</p>
+            </div>
+          </div>
+          <dl class="reg-detail">
+            <dt data-i18n="legal_tdra_reference">Reference</dt>
+            <dd>NOL-26-100000206</dd>
+
+            <dt data-i18n="legal_tdra_granted">Granted on</dt>
+            <dd data-i18n="legal_tdra_granted_date">09 April 2026</dd>
+
+            <dt data-i18n="legal_tdra_valid">Valid until</dt>
+            <dd data-i18n="legal_tdra_valid_date">09 April 2027</dd>
+
+            <dt data-i18n="legal_tdra_status">Status</dt>
+            <dd data-i18n="legal_tdra_status_val">GRANTED</dd>
+
+            <dt data-i18n="legal_tdra_authority">Issuing authority</dt>
+            <dd><a href="https://tdra.gov.ae" target="_blank" rel="noopener">tdra.gov.ae</a></dd>
+          </dl>
+        </div>
+
+        <h2 data-i18n="legal_entity_title">Operating entity</h2>
+        <p data-i18n="legal_entity_body">Swappo is operated by <strong>Hannibal General Trading L.L.C - S.P.C</strong> (Abu Dhabi, UAE), Registry No. 6158841, Economic Licence No. CN-5592284, Activity 4791018 — E-Commerce Through Websites, licensed by the Abu Dhabi Department of Economic Development.</p>
+
+        <h2 data-i18n="legal_vat_title">VAT compliance</h2>
+        <p data-i18n="legal_vat_body">VAT on qualifying swap transactions is handled per Federal Tax Authority <strong>Clarification VATP042</strong> (April 2025), which establishes that barter transactions are treated at market value for VAT purposes when one party is a registered taxable person.</p>
+
+        <h2 data-i18n="legal_frameworks_title">Aligned with UAE national frameworks</h2>
+        <ul>
+          <li data-i18n="legal_framework_1">MOCCAE × Tadweer Waste to Zero coalition (COP28 legacy)</li>
+          <li data-i18n="legal_framework_2">UAE Circular Economy Policy 2021–2031</li>
+          <li data-i18n="legal_framework_3">UAE Vision 2031</li>
+          <li data-i18n="legal_framework_4">Federal Decree-Law No. 14 of 2023 (E-Commerce)</li>
+          <li data-i18n="legal_framework_5">Federal Decree-Law No. 45 of 2021 — Personal Data Protection (PDPL)</li>
+        </ul>
+
+        <h2 data-i18n="legal_other_title">Other legal documents</h2>
+        <ul>
+          <li><a href="terms.html" data-i18n="footer_terms">Terms of use</a></li>
+          <li><a href="privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+          <li><a href="cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+          <p data-i18n="footer_tagline">The UAE's first dedicated barter, gift &amp; recycle platform. Swap, give, recycle — without spending a single dirham.</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_platform">Platform</h4>
+          <ul>
+            <li><a href="catalogue.html" data-i18n="footer_browse_items">Browse items</a></li>
+            <li><a href="giveaway.html" data-i18n="footer_free_giveaways">Free giveaways</a></li>
+            <li><a href="publier.html" data-i18n="footer_list_item">List an item</a></li>
+            <li><a href="pricing.html" data-i18n="footer_pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_company">Company</h4>
+          <ul>
+            <li><a href="#" data-i18n="footer_about">About</a></li>
+            <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
+            <li><a href="recycle.html" data-i18n="recycle_nav">Recycle Hub</a></li>
+            <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_legal">Legal</h4>
+          <ul>
+            <li><a href="legal.html" data-i18n="legal_nav">Regulatory status</a></li>
+            <li><a href="terms.html" data-i18n="footer_terms">Terms of use</a></li>
+            <li><a href="privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+            <li><a href="cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Swappo. All rights reserved. UAE</span><p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:8px 0 0;line-height:1.5;" data-i18n="footer_legal_entity">Hannibal General Trading L.L.C - S.P.C · Abu Dhabi, UAE · TDRA e-activity licence NOL-26-100000206</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/demo-engine.js"></script>
+  <script src="../js/animations.js"></script>
+  <script src="../js/cookie-consent.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/swappo-animations.js"></script>
+  <script src="../js/swappo-modern-2026.js"></script>
+</body>
+</html>
