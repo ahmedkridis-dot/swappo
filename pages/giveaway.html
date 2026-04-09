@@ -635,6 +635,140 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+
+        /* ═══ Adopt Hero — modern 2026 ═══ */
+        .adopt-hero {
+            max-width: 980px;
+            margin: 60px auto 20px;
+            padding: 0 16px;
+        }
+        .adopt-hero-inner {
+            position: relative;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 55%, #0B3B3E 100%);
+            border-radius: 28px;
+            padding: 48px 44px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px -30px rgba(9,177,186,0.35), 0 10px 40px rgba(15,23,42,0.25);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .adopt-hero-glow {
+            position: absolute;
+            top: -120px; right: -120px;
+            width: 360px; height: 360px;
+            background: radial-gradient(circle, rgba(9,177,186,0.35), transparent 70%);
+            filter: blur(40px);
+            pointer-events: none;
+        }
+        .adopt-hero-inner::before {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(255,140,0,0.22), transparent 70%);
+            filter: blur(50px);
+            pointer-events: none;
+        }
+        .adopt-hero-head {
+            position: relative;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .adopt-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #09B1BA;
+            background: rgba(9,177,186,0.14);
+            border: 1px solid rgba(9,177,186,0.35);
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 16px;
+        }
+        .adopt-hero-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 10px;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #fff 0%, #A7F3F6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .adopt-hero-sub {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.72);
+            margin: 0;
+            max-width: 520px;
+            margin-inline: auto;
+        }
+        .adopt-hero-grid {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .adopt-hero-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 22px 24px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .adopt-hero-card:hover {
+            background: rgba(9,177,186,0.12);
+            border-color: rgba(9,177,186,0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -20px rgba(9,177,186,0.5);
+        }
+        .adopt-hero-emoji {
+            font-size: 40px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
+        }
+        .adopt-hero-meta { flex: 1; min-width: 0; }
+        .adopt-hero-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .adopt-hero-loc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.55);
+        }
+        .adopt-hero-cta {
+            font-size: 13px;
+            font-weight: 700;
+            color: #09B1BA;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .adopt-hero-card:hover .adopt-hero-cta { color: #67E8F0; }
+        .adopt-hero-footline {
+            position: relative;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin: 24px 0 0;
+        }
+        @media (max-width: 640px) {
+            .adopt-hero-inner { padding: 36px 24px; border-radius: 22px; }
+            .adopt-hero-title { font-size: 28px; }
+            .adopt-hero-grid { grid-template-columns: 1fr; }
+            .adopt-hero-card { padding: 18px 20px; }
+        }
     </style>
 </head>
 <body>
@@ -799,57 +933,85 @@
                 <a href="publier.html" class="btn-primary-coral">Add a free item</a>
             </div>
         </div>
-        <!-- Adoption Banner -->
-        <div class="adopt-banner reveal" id="adopt" style="max-width:800px;margin:40px auto;">
-            <h3 data-i18n="adopt_title">🐾 Adopt, don't shop</h3>
-            <p data-i18n="adopt_subtitle">While you're giving items a second life, why not give a pet a second chance?</p>
-            <div class="adopt-cards">
-                <div class="adopt-card">
-                    <div style="font-size:28px;margin-bottom:8px;">🐕</div>
-                    <div style="font-weight:600;color:var(--navy,#1A1A2E);margin-bottom:4px;">Animals & Us Dubai</div>
-                    <a href="https://animalsandus.com" target="_blank" style="color:var(--teal,#09B1BA);font-weight:600;font-size:13px;text-decoration:none;" data-i18n="adopt_visit">Visit site →</a>
-                </div>
-                <div class="adopt-card">
-                    <div style="font-size:28px;margin-bottom:8px;">🐈</div>
-                    <div style="font-weight:600;color:var(--navy,#1A1A2E);margin-bottom:4px;">Stray Dogs Center UAE</div>
-                    <a href="https://sdc.ae" target="_blank" style="color:var(--teal,#09B1BA);font-weight:600;font-size:13px;text-decoration:none;" data-i18n="adopt_visit">Visit site →</a>
-                </div>
+        <!-- Adoption Banner — modern 2026 -->
+        <section class="adopt-hero reveal" id="adopt">
+          <div class="adopt-hero-inner">
+            <div class="adopt-hero-glow"></div>
+            <div class="adopt-hero-head">
+              <span class="adopt-hero-badge"><i class="fas fa-paw"></i> <span data-i18n="adopt_badge">UAE animal welfare</span></span>
+              <h2 class="adopt-hero-title" data-i18n="adopt_title">Adopt, don't shop</h2>
+              <p class="adopt-hero-sub" data-i18n="adopt_subtitle">While you're giving items a second life, why not give a pet a second chance?</p>
             </div>
-            <p style="font-size:12px;color:var(--gray-muted,#9CA3AF);margin:16px 0 0;text-align:center;" data-i18n="adopt_support">Swappo supports local animal welfare ❤️</p>
-        </div>
+            <div class="adopt-hero-grid">
+              <a href="https://animalsandus.com" target="_blank" rel="noopener" class="adopt-hero-card">
+                <div class="adopt-hero-emoji">🐕</div>
+                <div class="adopt-hero-meta">
+                  <div class="adopt-hero-name">Animals &amp; Us Dubai</div>
+                  <div class="adopt-hero-loc">Dubai, UAE</div>
+                </div>
+                <span class="adopt-hero-cta" data-i18n="adopt_visit">Visit site →</span>
+              </a>
+              <a href="https://sdc.ae" target="_blank" rel="noopener" class="adopt-hero-card">
+                <div class="adopt-hero-emoji">🐈</div>
+                <div class="adopt-hero-meta">
+                  <div class="adopt-hero-name">Stray Dogs Center UAE</div>
+                  <div class="adopt-hero-loc">Umm Al Quwain, UAE</div>
+                </div>
+                <span class="adopt-hero-cta" data-i18n="adopt_visit">Visit site →</span>
+              </a>
+            </div>
+            <p class="adopt-hero-footline" data-i18n="adopt_support">❤️ Swappo supports local animal welfare</p>
+          </div>
+        </section>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>About Swappo</h4>
-                <p data-i18n="footer_tagline">The barter platform for the UAE community. Exchange items, donate freely, and connect with neighbors.</p>
-            </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="../index.html">Home</a></li>
-                    <li><a href="giveaway.html" data-i18n="footer_free_giveaways">Gift Corner</a></li>
-                    <li><a href="publier.html" data-i18n="footer_list_item">Donate</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Support</h4>
-                <ul>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
-                    <li><a href="#" data-i18n="footer_terms">Terms & Privacy</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Connect</h4>
-                <p>Follow us on social media for updates and community stories.</p>
-            </div>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="navbar-logo"><i class="fas fa-handshake"></i> Swappo</div>
+            <p data-i18n="footer_tagline">The UAE's first dedicated barter, gift &amp; recycle platform. Swap, give, recycle — without spending a single dirham.</p>
+          </div>
+          <div class="footer-col">
+            <h4 data-i18n="footer_platform">Platform</h4>
+            <ul>
+              <li><a href="catalogue.html" data-i18n="footer_browse_items">Browse items</a></li>
+              <li><a href="giveaway.html" data-i18n="footer_free_giveaways">Free giveaways</a></li>
+              <li><a href="publier.html" data-i18n="footer_list_item">List an item</a></li>
+              <li><a href="pricing.html" data-i18n="footer_pricing">Pricing</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4 data-i18n="footer_company">Company</h4>
+            <ul>
+              <li><a href="#" data-i18n="footer_about">About</a></li>
+              <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
+              <li><a href="recycle.html" data-i18n="recycle_nav">Recycle Hub</a></li>
+              <li><a href="#" data-i18n="footer_blog">Blog</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4 data-i18n="footer_legal">Legal</h4>
+            <ul>
+              <li><a href="legal.html" data-i18n="legal_nav">Regulatory status</a></li>
+              <li><a href="terms.html" data-i18n="footer_terms">Terms of use</a></li>
+              <li><a href="privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+              <li><a href="cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
+            </ul>
+          </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Swappo. All rights reserved.</p><p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:8px 0 0;line-height:1.5;" data-i18n="footer_legal_entity">Hannibal General Trading L.L.C - S.P.C · Abu Dhabi, UAE · TDRA e-activity licence NOL-26-100000206</p>
+          <span>&copy; 2026 Swappo. All rights reserved. UAE</span>
+          <p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:8px 0 0;line-height:1.5;" data-i18n="footer_legal_entity">Hannibal General Trading L.L.C - S.P.C · Abu Dhabi, UAE · TDRA e-activity licence NOL-26-100000206</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+          </div>
         </div>
+      </div>
     </footer>
 
     <!-- Cookie Consent Banner -->
@@ -982,41 +1144,42 @@
             '</div>';
         }
 
-        /** Handle claiming a giveaway item */
+        /** Handle claiming a giveaway item — 5-step UX flow */
         function handleClaim(itemId, btnEl) {
             var user = DemoAuth.getCurrentUser();
 
-            // Not logged in — redirect
+            // STEP 1 — Not logged in → sign up popup
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Attempt claim via DemoGiveaway
+            // Attempt claim via DemoGiveaway (backend has all the rules)
             var result = DemoGiveaway.claim(itemId);
 
             if (!result.success) {
-                // Determine toast type based on error
-                var errorMsg = result.error || 'Claim failed.';
-                var toastType = 'error';
-
-                if (errorMsg.indexOf('badge') >= 0 || errorMsg.indexOf('Swapper') >= 0 || errorMsg.indexOf('swap') >= 0) {
-                    toastType = 'warning';
-                } else if (errorMsg.indexOf('claims') >= 0 || errorMsg.indexOf('limit') >= 0 || errorMsg.indexOf('maximum') >= 0) {
-                    DemoNotifications.showToast('No claims left this month. Upgrade your plan!', 'warning');
-                    setTimeout(function() {
-                        window.location.href = 'pricing.html';
-                    }, 600);
+                // STEP 2 — User has never listed anything → pedagogical modal
+                if (result.code === 'needs_listing') {
+                    showNeedsListingModal();
                     return;
-                } else if (errorMsg.indexOf('category') >= 0 || errorMsg.indexOf('locked') >= 0) {
-                    toastType = 'info';
                 }
 
-                DemoNotifications.showToast(errorMsg, toastType);
+                // STEP 4 & 5 — Quota reached
+                if (result.code === 'quota_reached') {
+                    if (result.plan === 'pro') {
+                        showProQuotaInfoModal(result.limit);
+                    } else {
+                        showFreeQuotaSoftPaywall();
+                    }
+                    return;
+                }
+
+                // Other errors (category lock, not found, etc.) → gentle toast
+                DemoNotifications.showToast(result.error || 'Claim failed.', 'info');
                 return;
             }
 
-            // Success
+            // STEP 3 — Success: celebrate, no upsell
             claimedItems.add(itemId);
 
             // Update button to show claimed state
@@ -1031,8 +1194,8 @@
             // Update navbar
             if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
 
-            // Karma boost notification
-            DemoNotifications.showToast('🌱 +15 Karma! You claimed an item.', 'success');
+            // Celebratory confirmation toast
+            DemoNotifications.showToast('🎁 Gift claimed! The giver will contact you soon.', 'success');
 
             // Update karma bar
             var user2 = DemoAuth.getCurrentUser();
@@ -1040,6 +1203,54 @@
 
             // Show thank-you modal
             showThankYouModal(itemId);
+        }
+
+        /** Generic centered modal helper */
+        function _buildModal(innerHTML) {
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.25s ease;';
+            overlay.innerHTML = '<div style="background:white;border-radius:var(--radius-xl,20px);padding:36px 32px;max-width:460px;width:100%;text-align:center;animation:slideUp 0.3s ease;box-shadow:0 20px 60px rgba(0,0,0,0.25);">' + innerHTML + '</div>';
+            overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+            document.body.appendChild(overlay);
+            return overlay;
+        }
+
+        /** STEP 2 — User has never listed an item */
+        function showNeedsListingModal() {
+            var html =
+                '<div style="font-size:52px;margin-bottom:14px;">🎁</div>' +
+                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">Almost there!</h3>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 8px;">To claim a free gift, you need to share something first.</p>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">That\'s the heart of Swappo — <strong style="color:var(--teal,#09B1BA);">everyone gives, everyone gets</strong>. Start by listing at least one item (to swap or to give away), and your first claim will unlock instantly.</p>' +
+                '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+                    '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--gray-bg,#F8F9FA);border:none;padding:12px 22px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">Maybe later</button>' +
+                    '<button onclick="window.location.href=\'publier.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 26px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">Drop an item now →</button>' +
+                '</div>';
+            _buildModal(html);
+        }
+
+        /** STEP 4 — Free user has used their monthly claim */
+        function showFreeQuotaSoftPaywall() {
+            var html =
+                '<div style="font-size:52px;margin-bottom:14px;">🎉</div>' +
+                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">You\'ve claimed your free gift this month</h3>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">Come back next month for another free claim, or upgrade to <strong style="color:var(--teal,#09B1BA);">Swappo Pro</strong> to claim up to 5 gifts per month, plus no ads, analytics, and Pro boosts included.</p>' +
+                '<div style="display:flex;flex-direction:column;gap:10px;align-items:center;">' +
+                    '<button onclick="window.location.href=\'pricing.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:13px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">Upgrade to Pro — 29 AED/mo</button>' +
+                    '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:transparent;border:none;padding:10px 22px;font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">I\'ll come back next month</button>' +
+                    '<a href="pricing.html" style="font-size:13px;color:var(--teal,#09B1BA);text-decoration:none;font-weight:600;margin-top:4px;">See all Pro benefits →</a>' +
+                '</div>';
+            _buildModal(html);
+        }
+
+        /** STEP 5 — Pro user used all 5 claims */
+        function showProQuotaInfoModal(limit) {
+            var html =
+                '<div style="font-size:52px;margin-bottom:14px;">👑</div>' +
+                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">All Pro claims used</h3>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">You\'ve used all ' + (limit || 5) + ' Pro claims this month. Come back next month for ' + (limit || 5) + ' more!</p>' +
+                '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;">Got it</button>';
+            _buildModal(html);
         }
 
         /** Show thank-you modal after claiming */

@@ -638,16 +638,17 @@
       swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-gift"></i></div>' +
         '<div class="swap-info-text"><strong>' + t('free_item') + '</strong><br>' + t('use_1_claim') + '</div>';
     } else if (user) {
-      var planInfo = DemoSubscription.getPlan(user.id);
-      var remaining = planInfo.swaps_limit === Infinity ? '∞' : (planInfo.swaps_limit - planInfo.swaps_used);
-      swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-sync-alt"></i></div>' +
-        '<div class="swap-info-text"><strong>' + remaining + ' ' + t('swaps_remaining') + '</strong><br>' + t('uses_1_swap') + ' ' + planInfo.tier.name + ' ' + t('plan_word') + '</div>';
+      // Swaps illimités/gratuits — pas de compteur
+      swapInfoHTML = '';
     } else {
       swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-sync-alt"></i></div>' +
         '<div class="swap-info-text"><strong>' + t('swap_this_item') + '</strong><br>' + t('sign_up_to_swap') + '</div>';
     }
     var swapInfoEl = document.getElementById('swap-info');
-    if (swapInfoEl) swapInfoEl.innerHTML = swapInfoHTML;
+    if (swapInfoEl) {
+      swapInfoEl.innerHTML = swapInfoHTML;
+      swapInfoEl.style.display = swapInfoHTML ? '' : 'none';
+    }
 
     // ── Item details card ──
     var details = [
@@ -835,23 +836,75 @@
     }
   }
 
-  // ============ GIVEAWAY CLAIM ============
+  // ============ GIVEAWAY CLAIM — 5-step UX flow ============
+  function _productBuildModal(innerHTML) {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML = '<div style="background:white;border-radius:20px;padding:36px 32px;max-width:460px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);">' + innerHTML + '</div>';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+  }
+
   function claimGiveaway() {
-    if (!currentItem || !currentUser) return;
+    if (!currentItem) return;
+    // STEP 1 — Not logged in
+    if (!currentUser) { window.location.href = 'login.html'; return; }
+
     var result = DemoGiveaway.claim(currentItem.id);
-    if (result.success) {
-      showToast('Item claimed successfully! \u2705');
-      var btn = document.getElementById('claim-btn');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-check"></i> Claimed';
-        btn.style.opacity = '0.6';
-        btn.style.cursor = 'not-allowed';
+
+    if (!result.success) {
+      // STEP 2 — Needs to list an item first
+      if (result.code === 'needs_listing') {
+        _productBuildModal(
+          '<div style="font-size:52px;margin-bottom:14px;">🎁</div>' +
+          '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">Almost there!</h3>' +
+          '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 8px;">To claim a free gift, you need to share something first.</p>' +
+          '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">That\'s the heart of Swappo — <strong style="color:#09B1BA;">everyone gives, everyone gets</strong>. Start by listing at least one item, and your first claim will unlock instantly.</p>' +
+          '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+            '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:#F8F9FA;border:none;padding:12px 22px;border-radius:999px;font-weight:600;cursor:pointer;color:#6B7280;font-size:14px;">Maybe later</button>' +
+            '<button onclick="window.location.href=\'publier.html\'" style="background:#09B1BA;color:white;border:none;padding:12px 26px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">Drop an item now →</button>' +
+          '</div>'
+        );
+        return;
       }
-      updateNavbarForDemo();
-    } else {
+      // STEP 4 & 5 — Quota reached
+      if (result.code === 'quota_reached') {
+        if (result.plan === 'pro') {
+          _productBuildModal(
+            '<div style="font-size:52px;margin-bottom:14px;">👑</div>' +
+            '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">All Pro claims used</h3>' +
+            '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">You\'ve used all ' + (result.limit || 5) + ' Pro claims this month. Come back next month for ' + (result.limit || 5) + ' more!</p>' +
+            '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:#09B1BA;color:white;border:none;padding:12px 28px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;">Got it</button>'
+          );
+        } else {
+          _productBuildModal(
+            '<div style="font-size:52px;margin-bottom:14px;">🎉</div>' +
+            '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">You\'ve claimed your free gift this month</h3>' +
+            '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">Come back next month for another free claim, or upgrade to <strong style="color:#09B1BA;">Swappo Pro</strong> to claim up to 5 gifts per month, plus no ads, analytics, and Pro boosts included.</p>' +
+            '<div style="display:flex;flex-direction:column;gap:10px;align-items:center;">' +
+              '<button onclick="window.location.href=\'pricing.html\'" style="background:#09B1BA;color:white;border:none;padding:13px 28px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">Upgrade to Pro — 29 AED/mo</button>' +
+              '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:transparent;border:none;padding:10px 22px;font-weight:600;cursor:pointer;color:#6B7280;font-size:14px;">I\'ll come back next month</button>' +
+              '<a href="pricing.html" style="font-size:13px;color:#09B1BA;text-decoration:none;font-weight:600;">See all Pro benefits →</a>' +
+            '</div>'
+          );
+        }
+        return;
+      }
+      // Other (category lock, etc.)
       showToast(result.error || 'Could not claim item');
+      return;
     }
+
+    // STEP 3 — Success
+    showToast('🎁 Gift claimed! The giver will contact you soon.');
+    var btn = document.getElementById('claim-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-check"></i> Claimed';
+      btn.style.opacity = '0.6';
+      btn.style.cursor = 'not-allowed';
+    }
+    updateNavbarForDemo();
   }
 
   // ============ ITEM + CASH ============

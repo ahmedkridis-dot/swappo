@@ -1123,16 +1123,16 @@ const DemoGiveaway = {
     const user = DemoAuth.getCurrentUser();
     if (!user) return { success: false, error: 'Must be logged in.' };
 
-    // Must have badge >= swapper (at least 1 swap)
-    const swapCount = user.swap_count || 0;
-    if (swapCount < 1) {
-      return { success: false, error: 'You need at least 1 completed swap (Swapper badge) to claim giveaways.' };
+    // Give-to-get: must have listed at least 1 item (swap or gift)
+    const listedCount = DemoItems.getByUser(user.id).length;
+    if (listedCount < 1) {
+      return { success: false, error: 'NEEDS_LISTING', code: 'needs_listing' };
     }
 
     // Check subscription claim quota
     if (!DemoSubscription.canClaim(user.id)) {
       const plan = DemoSubscription.getPlan(user.id);
-      return { success: false, error: 'You have used all ' + plan.claims_limit + ' giveaway claims this month. Upgrade your plan for more!' };
+      return { success: false, error: 'QUOTA_REACHED', code: 'quota_reached', plan: plan.plan, limit: plan.claims_limit };
     }
 
     // Get item
