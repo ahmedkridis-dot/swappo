@@ -1228,21 +1228,18 @@ function updateNavbarForDemo() {
     btn.style.display = user ? 'none' : '';
   });
 
-  // ── Avatar / user area ────────────────────────────────────────────────
+  // ── Dashboard pill (avatar + name + explicit "My dashboard" label) ─────
   let avatarArea = document.getElementById('nav-avatar-area');
   if (!avatarArea) {
-    // Try to find the navbar action area to inject avatar
     const navbar = document.querySelector('.nav-actions, .navbar-actions, nav .actions');
     if (navbar && user) {
-      avatarArea = document.createElement('div');
+      avatarArea = document.createElement('a');
       avatarArea.id = 'nav-avatar-area';
-      avatarArea.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;';
+      avatarArea.className = 'nav-dashboard-pill';
       const profilePath = _inPagesDir() ? 'profile.html' : 'pages/profile.html';
-      avatarArea.onclick = function(e) {
-        // Don't navigate to profile if logout button was clicked
-        if (e.target.closest('.nav-logout-btn')) return;
-        window.location.href = profilePath;
-      };
+      avatarArea.href = profilePath;
+      avatarArea.title = 'Go to my dashboard';
+      avatarArea.setAttribute('aria-label', 'My dashboard');
       navbar.appendChild(avatarArea);
     }
   }
@@ -1252,11 +1249,34 @@ function updateNavbarForDemo() {
       const initial = (user.name || 'U')[0].toUpperCase();
       const color = user.avatar_color || '#09B1BA';
       const loginPath = _inPagesDir() ? 'login.html' : 'pages/login.html';
+      const firstName = (user.name || 'User').split(' ')[0];
       avatarArea.innerHTML =
-        '<div style="width:32px;height:32px;border-radius:50%;background:' + color + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">' + initial + '</div>' +
-        '<span style="font-size:13px;font-weight:600;color:var(--text,#171717);">' + user.name + '</span>' +
-        '<button class="nav-logout-btn" onclick="event.stopPropagation();event.preventDefault();DemoAuth.signOut();window.location.href=\'' + loginPath + '\';" style="background:none;border:1px solid var(--gray-border,#E5E7EB);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-text,#6B7280);font-size:12px;margin-left:4px;transition:all 0.2s;" onmouseover="this.style.borderColor=\'#FF4B55\';this.style.color=\'#FF4B55\'" onmouseout="this.style.borderColor=\'\';this.style.color=\'\'"><i class="fas fa-sign-out-alt"></i></button>';
-      avatarArea.style.display = 'flex';
+        '<div class="nav-dashboard-avatar" style="background:' + color + ';">' + initial + '</div>' +
+        '<div class="nav-dashboard-meta">' +
+          '<span class="nav-dashboard-hello">' + firstName + '</span>' +
+          '<span class="nav-dashboard-label"><i class="fas fa-th-large"></i> My dashboard</span>' +
+        '</div>' +
+        '<button class="nav-logout-btn" onclick="event.stopPropagation();event.preventDefault();DemoAuth.signOut();window.location.href=\'' + loginPath + '\';" title="Sign out" aria-label="Sign out"><i class="fas fa-sign-out-alt"></i></button>';
+      avatarArea.style.display = 'inline-flex';
+
+      // Inject styles once
+      if (!document.getElementById('nav-dashboard-pill-styles')) {
+        var s = document.createElement('style');
+        s.id = 'nav-dashboard-pill-styles';
+        s.textContent =
+          '.nav-dashboard-pill{display:inline-flex;align-items:center;gap:10px;padding:6px 10px 6px 6px;border:1px solid var(--gray-border,#E5E7EB);border-radius:999px;text-decoration:none!important;cursor:pointer;transition:all .2s;background:#fff;}' +
+          '.nav-dashboard-pill:hover{border-color:#09B1BA;background:#F0FBFC;box-shadow:0 4px 12px rgba(9,177,186,.12);transform:translateY(-1px);}' +
+          '.nav-dashboard-avatar{width:32px;height:32px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}' +
+          '.nav-dashboard-meta{display:flex;flex-direction:column;line-height:1.15;text-align:left;}' +
+          '.nav-dashboard-hello{font-size:12px;font-weight:600;color:var(--text,#171717);}' +
+          '.nav-dashboard-label{font-size:11px;font-weight:600;color:#09B1BA;display:flex;align-items:center;gap:4px;}' +
+          '.nav-dashboard-label i{font-size:10px;}' +
+          '.nav-dashboard-pill:hover .nav-dashboard-label{color:#078A91;}' +
+          '.nav-logout-btn{background:none;border:1px solid var(--gray-border,#E5E7EB);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-text,#6B7280);font-size:11px;margin-left:4px;transition:all .2s;}' +
+          '.nav-logout-btn:hover{border-color:#FF4B55!important;color:#FF4B55!important;}' +
+          '@media (max-width:640px){.nav-dashboard-meta{display:none;}.nav-dashboard-pill{padding:4px;}}';
+        document.head.appendChild(s);
+      }
     } else {
       avatarArea.style.display = 'none';
     }
