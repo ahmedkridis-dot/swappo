@@ -4,9 +4,9 @@
  * Cache-first for assets, Network-first for HTML and API calls
  */
 
-const CACHE_NAME = 'swappo-v20';
-const ASSET_CACHE = 'swappo-assets-v17';
-const API_CACHE = 'swappo-api-v17';
+const CACHE_NAME = 'swappo-v21';
+const ASSET_CACHE = 'swappo-assets-v18';
+const API_CACHE = 'swappo-api-v18';
 
 // Files to pre-cache during install
 const PRECACHE_URLS = [
@@ -214,8 +214,8 @@ self.addEventListener('push', (event) => {
   let notificationData = {
     title: 'Swappo',
     body: 'You have a new update',
-    icon: '/img/icon-192.png',
-    badge: '/img/icon-192.png',
+    icon: '/assets/brand/swappo-logo-192.png',
+    badge: '/assets/brand/swappo-logo-192.png',
     tag: 'swappo-notification',
     requireInteraction: false
   };

@@ -223,7 +223,7 @@ function openMobileMenu(prefix, pagesPrefix) {
       <button class="mobile-menu-close" aria-label="Close menu">&times;</button>
       <div class="mobile-menu-logo">
         <a href="${prefix}index.html">
-          <i class="fas fa-handshake"></i> Swappo
+          <img src="assets/brand/swappo-logo-teal.png" alt="Swappo" width="32" height="32" style="vertical-align:middle;margin-right:6px;"> Swappo
         </a>
       </div>
       <ul class="mobile-menu-nav">

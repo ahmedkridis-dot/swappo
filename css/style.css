@@ -295,6 +295,36 @@ input, select, textarea { font-family: var(--font); }
   color: var(--primary-dark);
 }
 
+/* Logo lockup — new brand mark (2026) */
+.logo-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-lockup .logo-mark {
+  height: 40px;
+  width: 40px;
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.logo-lockup .logo-wordmark {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--primary, #09B1BA);
+  line-height: 1;
+}
+.logo-lockup:hover .logo-wordmark {
+  color: var(--primary-dark, #078A91);
+}
+@media (max-width: 640px) {
+  .logo-lockup .logo-mark { height: 32px; width: 32px; }
+  .logo-lockup .logo-wordmark { font-size: 18px; }
+}
+
 /* Search bar — centered, large */
 .navbar-search {
   flex: 1;
