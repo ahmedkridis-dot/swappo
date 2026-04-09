@@ -826,6 +826,10 @@ const translations = {
 
     // Feature: Adoption Banner (Coming Soon)
     adopt_badge: "Coming Soon",
+    contact_phone_label: "Phone",
+    contact_phone_value: "+971 54 312 5559",
+    contact_whatsapp_label: "WhatsApp",
+    contact_phone_line: "<i class=\"fas fa-phone\" style=\"width:16px;opacity:0.7;\"></i> +971 54 312 5559",
     adopt_title: "Adopt, don't shop.",
     adopt_subtitle: "We're teaming up with UAE shelters to help beautiful souls find a new home. Launching soon.",
     adopt_cta: "Stay tuned →",
@@ -1269,6 +1273,10 @@ const translations = {
   fr: {
     // Adoption Banner (Coming Soon)
     adopt_badge: "Bientôt",
+    contact_phone_label: "Téléphone",
+    contact_phone_value: "+971 54 312 5559",
+    contact_whatsapp_label: "WhatsApp",
+    contact_phone_line: "<i class=\"fas fa-phone\" style=\"width:16px;opacity:0.7;\"></i> +971 54 312 5559",
     adopt_title: "Adoptez, n'achetez pas.",
     adopt_subtitle: "Nous nous associons aux refuges des Émirats pour aider ces belles âmes à trouver un nouveau foyer. Lancement imminent.",
     adopt_cta: "Restez connectés →",
@@ -2385,6 +2393,10 @@ const translations = {
   ar: {
     // Adoption Banner (Coming Soon)
     adopt_badge: "قريبًا",
+    contact_phone_label: "هاتف",
+    contact_phone_value: "+٩٧١ ٥٤ ٣١٢ ٥٥٥٩",
+    contact_whatsapp_label: "واتساب",
+    contact_phone_line: "<i class=\"fas fa-phone\" style=\"width:16px;opacity:0.7;\"></i> +٩٧١ ٥٤ ٣١٢ ٥٥٥٩",
     adopt_title: "تبنَّ، لا تشترِ.",
     adopt_subtitle: "نتعاون مع ملاجئ الإمارات لمساعدة هذه الأرواح الجميلة على إيجاد منزل جديد. الإطلاق قريبًا.",
     adopt_cta: "ترقبوا المزيد →",
@@ -3504,6 +3516,10 @@ const translations = {
   ur: {
     // Adoption Banner (Coming Soon)
     adopt_badge: "جلد آ رہا ہے",
+    contact_phone_label: "فون",
+    contact_phone_value: "+971 54 312 5559",
+    contact_whatsapp_label: "واٹس ایپ",
+    contact_phone_line: "<i class=\"fas fa-phone\" style=\"width:16px;opacity:0.7;\"></i> +971 54 312 5559",
     adopt_title: "گود لیں، خریدیں نہیں۔",
     adopt_subtitle: "ہم یو اے ای کے جانوروں کے پناہ گاہوں کے ساتھ شراکت کر رہے ہیں تاکہ ان خوبصورت روحوں کو نیا گھر مل سکے۔ جلد لانچ ہو رہا ہے۔",
     adopt_cta: "منتظر رہیں →",
@@ -4620,6 +4636,10 @@ const translations = {
   },
 
   ru: {
+    contact_phone_label: "Телефон",
+    contact_phone_value: "+971 54 312 5559",
+    contact_whatsapp_label: "WhatsApp",
+    contact_phone_line: "<i class=\"fas fa-phone\" style=\"width:16px;opacity:0.7;\"></i> +971 54 312 5559",
     // Navbar
     search_placeholder: "Поиск товаров...",
     join_swap: "Присоединиться",
