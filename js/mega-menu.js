@@ -756,7 +756,7 @@
 
     // Bar
     css += '.mega-menu-bar{background:#fff;border-bottom:1px solid #e0e0e0;position:relative;z-index:1001;overflow-x:auto;-webkit-overflow-scrolling:touch;}';
-    css += '.mega-menu-bar__inner{display:flex;align-items:center;max-width:1200px;margin:0 auto;padding:0 8px;gap:0;}';
+    css += '.mega-menu-bar__inner{display:flex;align-items:center;justify-content:center;max-width:1200px;margin:0 auto;padding:0 8px;gap:0;}';
     css += '.mega-menu-item{position:relative;flex-shrink:0;}';
     css += '.mega-menu-item__link{display:flex;align-items:center;gap:6px;padding:10px 14px;font-size:13px;color:#333;text-decoration:none;white-space:nowrap;transition:background 150ms,color 150ms;}';
     css += '.mega-menu-item__link:hover,.mega-menu-item--active .mega-menu-item__link{background:#f5f5f5;color:#09B1BA;}';
