@@ -1799,24 +1799,6 @@
             }
         });
 
-        // ── Global helpers ───────────────────────────────────────────────
-        // ── Tab switching (runs immediately, uses event delegation — bulletproof) ──
-        (function() {
-            var nav = document.querySelector('.tabs-nav');
-            if (nav) {
-                nav.addEventListener('click', function(e) {
-                    var btn = e.target.closest('.tab-btn');
-                    if (!btn) return;
-                    var tabId = btn.getAttribute('data-tab');
-                    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-                    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-                    btn.classList.add('active');
-                    var el = document.getElementById(tabId);
-                    if (el) el.classList.add('active');
-                });
-            }
-        })();
-
         function showBoostPicker(itemId) {
             var o = document.createElement('div');
             o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -1853,5 +1835,23 @@
             location.reload();
         }
     </script>
+<script>
+/* Tab switching — separate script block, guaranteed to run */
+(function(){
+  var nav = document.querySelector('.tabs-nav');
+  if (!nav) return;
+  nav.addEventListener('click', function(e) {
+    var btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    var tabId = btn.getAttribute('data-tab');
+    if (!tabId) return;
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+    btn.classList.add('active');
+    var el = document.getElementById(tabId);
+    if (el) el.classList.add('active');
+  });
+})();
+</script>
 </body>
 </html>
