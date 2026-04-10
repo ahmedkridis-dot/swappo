@@ -140,7 +140,6 @@ const translations = {
     // Homepage
     hero_title: "Someone needs what you have.\nSwap it.",
     hero_badge: "UAE's first barter community",
-    hero_subtitle: "The UAE's first dedicated barter, gift & recycle platform. Trade items with your community. Start free.",
     how_it_works: "How it works",
     step1_title: "List your item",
     step1_desc: "Upload photos and details about what you want to swap.",
@@ -832,7 +831,6 @@ const translations = {
 
     // Landing page refonte
     hero_browse: "Browse Items →",
-    hero_start_free: "Start Swapping — It's Free",
     gift_teaser_title: "Free items from generous people",
     gift_teaser_subtitle: "Claim items for free in the Gift Corner. One claim per month — give to get more!",
     gift_teaser_cta: "Visit the Gift Corner →",
@@ -1423,7 +1421,6 @@ const translations = {
     // Homepage
     hero_title: "Quelqu'un a besoin de ce que vous avez.\nÉchangez-le.",
     hero_badge: "La première communauté de troc des Émirats",
-    hero_subtitle: "La première plateforme dédiée au troc, au don et au recyclage aux EAU. Échangez avec votre communauté. Commencez gratuitement.",
     how_it_works: "Comment ça marche",
     step1_title: "Listez votre article",
     step1_desc: "Téléchargez des photos et les détails de ce que vous voulez échanger.",
@@ -2562,7 +2559,6 @@ const translations = {
     // Homepage
     hero_title: "شخص ما يحتاج ما لديك.\nبادله.",
     hero_badge: "أول مجتمع مقايضة في الإمارات",
-    hero_subtitle: "أول منصة مخصصة للمقايضة والإهداء وإعادة التدوير في الإمارات. تبادل مع مجتمعك. ابدأ مجاناً.",
     how_it_works: "كيف يعمل",
     step1_title: "ضع قائمة بعنصرك",
     step1_desc: "حمّل الصور والتفاصيل حول ما تريد تبديله.",
@@ -3704,7 +3700,6 @@ const translations = {
     // Homepage
     hero_title: "کسی کو آپ کی چیز کی ضرورت ہے۔\nاسے تبدیل کریں۔",
     hero_badge: "یو اے ای کی پہلی بارٹر کمیونٹی",
-    hero_subtitle: "امارات کا پہلا وقف شدہ بارٹر، تحفہ اور ری سائیکل پلیٹ فارم۔ اپنی کمیونٹی کے ساتھ تبادلہ کریں۔ مفت شروع کریں۔",
     how_it_works: "یہ کیسے کام کرتا ہے",
     step1_title: "اپنی چیز کی فہرست بنائیں",
     step1_desc: "تصاویر اور اپ لوڈ کریں جو آپ تبدیل کرنا چاہتے ہیں۔",
