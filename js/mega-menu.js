@@ -760,7 +760,10 @@
     css += '.mega-menu-item{position:relative;flex-shrink:0;}';
     css += '.mega-menu-item__link{display:flex;align-items:center;gap:6px;padding:10px 14px;font-size:13px;color:#333;text-decoration:none;white-space:nowrap;transition:background 150ms,color 150ms;}';
     css += '.mega-menu-item__link:hover,.mega-menu-item--active .mega-menu-item__link{background:#f5f5f5;color:#09B1BA;}';
-    css += '.mega-menu-item--special .mega-menu-item__link{color:#FF4B55;font-weight:600;}';
+    css += '.mega-menu-item--special .mega-menu-item__link{color:#fff;font-weight:700;background:linear-gradient(135deg,#FF6B6B,#FF8C00);border-radius:999px;padding:8px 18px;margin:4px 6px;font-size:12px;letter-spacing:0.02em;box-shadow:0 2px 10px rgba(255,107,107,0.3);animation:giftPulse 3s ease-in-out infinite;}';
+    css += '.mega-menu-item--special .mega-menu-item__link:hover{transform:scale(1.06);box-shadow:0 4px 16px rgba(255,107,107,0.45);}';
+    css += '.mega-menu-item--special .mega-menu-caret{color:rgba(255,255,255,0.7);}';
+    css += '@keyframes giftPulse{0%,100%{box-shadow:0 2px 10px rgba(255,107,107,0.3);}50%{box-shadow:0 4px 20px rgba(255,107,107,0.5);}}';
     css += '.mega-menu-caret{font-size:10px;opacity:0.5;}';
 
     // Dropdown
