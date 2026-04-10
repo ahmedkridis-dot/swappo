@@ -16,6 +16,12 @@
 
 const translations = {
   en: {
+    pricing_hero_title: "List for free. Go Pro to save more.",
+    pricing_hero_subtitle: "Everyone can buy, sell, swap & gift. Pro members pay 0% service fee on purchases.",
+    feat_free_fee: "5% service fee on delivery",
+    feat_pro_zero_fee: "0% service fee on purchases",
+    feat_pro_badge: "Verified Pro badge",
+    pro_roi_hint: "2 purchases/month and your Pro pays for itself",
     // v5 Marketplace
     hero_subtitle: "The UAE's first marketplace for buying, selling, swapping, and gifting. Trade items with your community.",
     hero_start_free: "Start Now — It's Free",
@@ -786,8 +792,6 @@ const translations = {
     boost_3d: "3-day boost",
     boost_7d: "7-day boost + featured",
     boost_pro_note: "Pro members get 3 free boosts every month",
-    pricing_hero_title: "Swap for Free. Upgrade for Power.",
-    pricing_hero_subtitle: "Unlimited swaps for everyone. Go Pro for visibility, analytics & more.",
     early_adopter_offer: "Swappo Pro FREE for 3 months",
     early_adopter_badge: "Pioneer badge",
     badge_pro: "Pro Member",
@@ -1288,6 +1292,12 @@ const translations = {
   },
 
   fr: {
+    pricing_hero_title: "Publiez gratuitement. Passez Pro pour économiser.",
+    pricing_hero_subtitle: "Tout le monde peut acheter, vendre, échanger et donner. Les membres Pro paient 0% de frais de service.",
+    feat_free_fee: "Frais de service 5% sur la livraison",
+    feat_pro_zero_fee: "0% de frais de service sur les achats",
+    feat_pro_badge: "Badge Pro vérifié",
+    pro_roi_hint: "2 achats/mois et votre Pro est rentabilisé",
     // v5 Marketplace
     hero_subtitle: "La première marketplace des Émirats pour acheter, vendre, échanger et donner. Échangez avec votre communauté.",
     hero_start_free: "Commencer — C'est gratuit",
@@ -2426,6 +2436,12 @@ const translations = {
   },
 
   ar: {
+    pricing_hero_title: "انشر مجاناً. اشترك بـ Pro لتوفير أكثر.",
+    pricing_hero_subtitle: "الجميع يمكنهم الشراء والبيع والمقايضة والإهداء. أعضاء Pro يدفعون 0% رسوم خدمة.",
+    feat_free_fee: "رسوم خدمة 5% على التوصيل",
+    feat_pro_zero_fee: "0% رسوم خدمة على المشتريات",
+    feat_pro_badge: "شارة Pro موثقة",
+    pro_roi_hint: "عمليتا شراء/شهر وسيدفع Pro عن نفسه",
     // v5 Marketplace
     hero_subtitle: "أول سوق في الإمارات للشراء والبيع والمقايضة والإهداء. تبادل مع مجتمعك.",
     hero_start_free: "ابدأ الآن — مجاناً",
@@ -3567,6 +3583,12 @@ const translations = {
   },
 
   ur: {
+    pricing_hero_title: "مفت شائع کریں۔ Pro لیں اور بچائیں۔",
+    pricing_hero_subtitle: "ہر کوئی خرید، فروخت، تبادلہ اور تحفہ دے سکتا ہے۔ Pro ممبرز 0% سروس فیس ادا کرتے ہیں۔",
+    feat_free_fee: "ڈیلیوری پر 5% سروس فیس",
+    feat_pro_zero_fee: "خریداری پر 0% سروس فیس",
+    feat_pro_badge: "تصدیق شدہ Pro بیج",
+    pro_roi_hint: "ماہانہ 2 خریداری اور آپ کا Pro خود ادا ہو جائے گا",
     // v5 Marketplace
     hero_subtitle: "یو اے ای کا پہلا مارکیٹ پلیس خرید، فروخت، تبادلے اور تحفے کے لیے۔ اپنی کمیونٹی سے تبادلہ کریں۔",
     hero_start_free: "ابھی شروع کریں — مفت ہے",
