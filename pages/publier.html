@@ -677,6 +677,16 @@
               <!-- Details will be populated by JavaScript based on category -->
             </div>
 
+            <!-- Price field (v5 marketplace) -->
+            <div class="form-group" style="margin-top:24px;">
+              <label for="item-price" style="font-weight:600;font-size:14px;color:#1A1A2E;margin-bottom:6px;display:block;" data-i18n="publish_price_label">Price / Estimated Value (AED) *</label>
+              <div style="position:relative;max-width:200px;">
+                <input type="number" id="item-price" name="price" min="1" step="1" required placeholder="e.g. 500" style="width:100%;padding:12px 16px 12px 52px;border:1px solid #E5E7EB;border-radius:12px;font-size:16px;font-weight:600;color:#1A1A2E;font-family:inherit;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='#09B1BA'" onblur="this.style.borderColor='#E5E7EB'">
+                <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:600;color:#9CA3AF;">AED</span>
+              </div>
+              <p style="font-size:12px;color:#6B7280;margin:8px 0 0;line-height:1.4;" data-i18n="publish_price_hint">This price is visible to everyone. Buyers can offer cash, a swap, or both.</p>
+            </div>
+
             <div class="step-actions">
               <button type="button" class="btn-back" onclick="prevStep()">
                 <i class="fas fa-arrow-left"></i> <span data-i18n="publish_back">Back</span>
@@ -751,10 +761,22 @@
               <div class="review-divider"></div>
             </div>
 
+            <!-- Price review -->
+            <div class="review-section" id="reviewPrice" style="margin-top:12px;">
+              <div class="review-label" data-i18n="publish_price_label_short">Price</div>
+              <div class="review-value" id="reviewPriceValue" style="font-size:20px;font-weight:800;color:#09B1BA;">— AED</div>
+            </div>
+
             <!-- Giveaway Option -->
             <div class="giveaway-option" id="giveawayOption" onclick="toggleGiveaway()">
               <input type="checkbox" id="giveawayCheckbox">
               <label for="giveawayCheckbox"><i class="fas fa-gift"></i> <span data-i18n="publish_giveaway_option">Offer as Giveaway (FREE)</span></label>
+            </div>
+
+            <!-- The Swappo Promise -->
+            <div class="swappo-promise" style="background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:8px;padding:16px 20px;margin:24px 0;">
+              <h4 style="color:#92400E;margin:0 0 8px;font-size:0.95rem;" data-i18n="promise_title">The Swappo Promise</h4>
+              <p style="color:#78350F;font-size:0.85rem;margin:0;line-height:1.5;" data-i18n="promise_text">Every item you list should be something you'd happily receive yourself. Clean it, test it, photograph it honestly. Our community trusts you.</p>
             </div>
 
             <div class="step-actions">

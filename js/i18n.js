@@ -16,6 +16,24 @@
 
 const translations = {
   en: {
+    // v5 Marketplace
+    hero_subtitle: "The UAE's first marketplace for buying, selling, swapping, and gifting. Trade items with your community.",
+    hero_start_free: "Start Now — It's Free",
+    step1_title_v5: "List your item",
+    step1_desc_v5: "Set your price and add photos. Done in seconds.",
+    step2_title_v5: "Get offers",
+    step2_desc_v5: "Cash, swap, or both — you choose what to accept.",
+    step3_title_v5: "Exchange",
+    step3_desc_v5: "Meet in person or use Swappo Delivery.",
+    step4_title_v5: "Done!",
+    step4_desc_v5: "Rate each other and build your reputation.",
+    publish_price_label: "Price / Estimated Value (AED) *",
+    publish_price_hint: "This price is visible to everyone. Buyers can offer cash, a swap, or both.",
+    publish_price_label_short: "Price",
+    promise_title: "The Swappo Promise",
+    promise_text: "Every item you list should be something you'd happily receive yourself. Clean it, test it, photograph it honestly. Our community trusts you.",
+    footer_delivery_fee: "Service fee 5% on deliveries only. In-person trades are always free.",
+    hero_watch_teaser: "Watch teaser",
     // Navbar
     search_placeholder: "Search items...",
     join_swap: "Join the Swap",
@@ -1272,6 +1290,24 @@ const translations = {
   },
 
   fr: {
+    // v5 Marketplace
+    hero_subtitle: "La première marketplace des Émirats pour acheter, vendre, échanger et donner. Échangez avec votre communauté.",
+    hero_start_free: "Commencer — C'est gratuit",
+    step1_title_v5: "Publiez votre article",
+    step1_desc_v5: "Fixez votre prix et ajoutez des photos. En quelques secondes.",
+    step2_title_v5: "Recevez des offres",
+    step2_desc_v5: "Cash, échange, ou les deux — c'est vous qui choisissez.",
+    step3_title_v5: "Échangez",
+    step3_desc_v5: "En personne ou via Swappo Delivery.",
+    step4_title_v5: "C'est fait !",
+    step4_desc_v5: "Notez-vous mutuellement et construisez votre réputation.",
+    publish_price_label: "Prix / Valeur estimée (AED) *",
+    publish_price_hint: "Ce prix est visible par tous. Les acheteurs peuvent proposer du cash, un échange, ou les deux.",
+    publish_price_label_short: "Prix",
+    promise_title: "La promesse Swappo",
+    promise_text: "Chaque article listé doit être quelque chose que vous seriez heureux de recevoir. Nettoyez-le, testez-le, photographiez-le honnêtement. Notre communauté vous fait confiance.",
+    footer_delivery_fee: "Frais de service 5% sur les livraisons uniquement. Les échanges en personne sont toujours gratuits.",
+    hero_watch_teaser: "Voir le teaser",
     // Adoption Banner (Coming Soon)
     adopt_badge: "Bientôt",
     contact_phone_label: "Téléphone",
@@ -2393,6 +2429,24 @@ const translations = {
   },
 
   ar: {
+    // v5 Marketplace
+    hero_subtitle: "أول سوق في الإمارات للشراء والبيع والمقايضة والإهداء. تبادل مع مجتمعك.",
+    hero_start_free: "ابدأ الآن — مجاناً",
+    step1_title_v5: "انشر منتجك",
+    step1_desc_v5: "حدد السعر وأضف الصور. في ثوانٍ.",
+    step2_title_v5: "استقبل العروض",
+    step2_desc_v5: "نقداً أو مقايضة أو كلاهما — أنت تختار.",
+    step3_title_v5: "بادل",
+    step3_desc_v5: "قابل شخصياً أو استخدم توصيل Swappo.",
+    step4_title_v5: "تم!",
+    step4_desc_v5: "قيّموا بعضكم وابنوا سمعتكم.",
+    publish_price_label: "السعر / القيمة التقديرية (درهم) *",
+    publish_price_hint: "هذا السعر مرئي للجميع. يمكن للمشترين عرض نقد أو مقايضة أو كلاهما.",
+    publish_price_label_short: "السعر",
+    promise_title: "وعد Swappo",
+    promise_text: "كل منتج تنشره يجب أن يكون شيئاً ترغب في استلامه بنفسك. نظّفه، اختبره، صوّره بصدق. مجتمعنا يثق بك.",
+    footer_delivery_fee: "رسوم خدمة 5% على التوصيل فقط. التبادل الشخصي مجاني دائماً.",
+    hero_watch_teaser: "شاهد الفيديو",
     // Adoption Banner (Coming Soon)
     adopt_badge: "قريبًا",
     contact_phone_label: "هاتف",
@@ -3517,6 +3571,24 @@ const translations = {
   },
 
   ur: {
+    // v5 Marketplace
+    hero_subtitle: "یو اے ای کا پہلا مارکیٹ پلیس خرید، فروخت، تبادلے اور تحفے کے لیے۔ اپنی کمیونٹی سے تبادلہ کریں۔",
+    hero_start_free: "ابھی شروع کریں — مفت ہے",
+    step1_title_v5: "اپنا آئٹم شائع کریں",
+    step1_desc_v5: "قیمت مقرر کریں اور تصاویر شامل کریں۔ چند سیکنڈوں میں۔",
+    step2_title_v5: "آفرز حاصل کریں",
+    step2_desc_v5: "نقد، تبادلہ، یا دونوں — آپ کا فیصلہ۔",
+    step3_title_v5: "تبادلہ کریں",
+    step3_desc_v5: "ذاتی طور پر ملیں یا Swappo ڈیلیوری استعمال کریں۔",
+    step4_title_v5: "ہو گیا!",
+    step4_desc_v5: "ایک دوسرے کو ریٹ کریں اور اپنی ساکھ بنائیں۔",
+    publish_price_label: "قیمت / تخمینی مالیت (درہم) *",
+    publish_price_hint: "یہ قیمت سب کو نظر آتی ہے۔ خریدار نقد، تبادلہ، یا دونوں پیش کر سکتے ہیں۔",
+    publish_price_label_short: "قیمت",
+    promise_title: "Swappo کا وعدہ",
+    promise_text: "ہر آئٹم جو آپ شائع کریں وہ ایسا ہونا چاہیے جو آپ خوشی سے وصول کریں۔ صاف کریں، ٹیسٹ کریں، ایمانداری سے تصویر لگائیں۔",
+    footer_delivery_fee: "سروس فیس صرف ڈیلیوری پر 5%۔ ذاتی تبادلے ہمیشہ مفت ہیں۔",
+    hero_watch_teaser: "ٹیزر دیکھیں",
     // Adoption Banner (Coming Soon)
     adopt_badge: "جلد آ رہا ہے",
     contact_phone_label: "فون",

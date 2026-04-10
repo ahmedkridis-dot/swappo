@@ -655,11 +655,17 @@ const DemoItems = {
     const conditionStr = item.condition ? _conditionLabel(item.condition) : '';
     const catMeta = _categoryMeta(item.category);
 
-    let tagHTML = '';
+    // Price + mode badges (v5 marketplace)
+    let priceHTML = '';
+    let modesHTML = '';
     if (item.is_giveaway) {
-      tagHTML = '<div class="product-tag" style="color:var(--secondary); font-weight:700;">FREE</div>';
+      priceHTML = '<div class="product-price" style="color:var(--secondary);font-weight:800;font-size:15px;">FREE</div>';
+      modesHTML = '<span class="mode-badge mode-gift" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#ECFDF5;color:#065F46;">Gift</span>';
     } else {
-      tagHTML = '<div class="product-tag" style="font-weight:600; font-size:11px; color:var(--text-muted,#999); background:var(--bg-light,#F7F7F7); display:inline-block; padding:2px 8px; border-radius:4px;">' + catMeta.icon + ' ' + catMeta.label + '</div>';
+      const price = item.price || 0;
+      priceHTML = '<div class="product-price" style="font-weight:800;font-size:15px;color:#1A1A2E;">' + price.toLocaleString() + ' <span style="font-size:11px;font-weight:600;color:#6B7280;">AED</span></div>';
+      modesHTML = '<span class="mode-badge mode-buy" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>' +
+        '<span class="mode-badge mode-swap" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>';
     }
 
     return '<div class="product-card" onclick="window.location.href=\'' + href + '\'" style="cursor:pointer">' +
@@ -672,7 +678,8 @@ const DemoItems = {
       '<div class="product-info">' +
         '<div class="product-brand">' + title + '</div>' +
         (conditionStr ? '<div class="product-details">' + conditionStr + '</div>' : '') +
-        tagHTML +
+        priceHTML +
+        '<div style="display:flex;gap:4px;margin-top:4px;">' + modesHTML + '</div>' +
       '</div>' +
     '</div>';
   }

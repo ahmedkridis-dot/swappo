@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swappo — Swap your stuff. No cash needed.</title>
-  <meta name="description" content="Swappo is the UAE's first dedicated barter, gift & recycle platform. Swap items, give away what you don't need. No cash needed.">
+  <title>Swappo — Sell it, swap it, or give it away.</title>
+  <meta name="description" content="Swappo is the UAE's first marketplace for buying, selling, swapping, and gifting. Trade items with your community. Start free.">
 
   <!-- Open Graph / Social -->
   <meta property="og:type" content="website">
@@ -100,6 +100,8 @@
       <span class="eco-ticker-item">🔄 <span class="eco-ticker-number" data-target="1892" data-suffix="">0</span> items swapped</span>
       <span class="eco-ticker-separator">·</span>
       <span class="eco-ticker-item">🎁 <span class="eco-ticker-number" data-target="247" data-suffix="">0</span> gifts today</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">💰 <span class="eco-ticker-number" data-target="89" data-suffix="">0</span> items sold today</span>
       <span class="eco-ticker-live">↑ <span id="ecoTickerLive">+12 in the last hour</span></span>
     </div>
     <button class="eco-ticker-close" id="ecoTickerClose" aria-label="Close">×</button>
@@ -133,9 +135,9 @@
       <div class="hero-copy reveal reveal-up">
         <span class="hero-badge" data-i18n="hero_badge">UAE's first barter community</span>
         <h1 data-i18n-html="hero_title_v2">Someone needs what you have. <span class="gradient-text" data-i18n="hero_title_accent">Swap it.</span></h1>
-        <p class="hero-subtitle-text" data-i18n="hero_subtitle">Give your unused items a second life. Get what you actually need. No cash, no waste — just smart exchanges.</p>
+        <p class="hero-subtitle-text" data-i18n="hero_subtitle">The UAE's first marketplace for buying, selling, swapping, and gifting. Trade items with your community.</p>
         <div class="hero-cta">
-          <a href="pages/login.html" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start swapping — it's free</a>
+          <a href="pages/login.html" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start Now — It's Free</a>
           <a href="#how-it-works" class="btn-pill btn-pill-outline hero-outline-btn" data-i18n="how_it_works">How it works</a>
         </div>
         <div class="hero-trust">
@@ -163,24 +165,30 @@
       <div class="section-header" style="justify-content:center;">
         <h2 class="section-title" data-i18n="how_it_works">How it works</h2>
       </div>
-      <div class="steps-grid">
+      <div class="steps-grid steps-grid-4">
         <div class="step-card card-hover">
           <div class="step-number">1</div>
           <div class="step-icon-circle"><i class="fas fa-camera"></i></div>
-          <h3 data-i18n="step1_title_v2">Drop an Item</h3>
-          <p data-i18n="step1_desc_v2">Snap a photo, fill the details, and list it in seconds.</p>
+          <h3 data-i18n="step1_title_v5">List your item</h3>
+          <p data-i18n="step1_desc_v5">Set your price and add photos. Done in seconds.</p>
         </div>
         <div class="step-card card-hover">
           <div class="step-number">2</div>
-          <div class="step-icon-circle"><i class="fas fa-exchange-alt"></i></div>
-          <h3 data-i18n="step2_title_v2">Find a Match</h3>
-          <p data-i18n="step2_desc_v2">Browse thousands of items. Propose a swap.</p>
+          <div class="step-icon-circle"><i class="fas fa-comments-dollar"></i></div>
+          <h3 data-i18n="step2_title_v5">Get offers</h3>
+          <p data-i18n="step2_desc_v5">Cash, swap, or both — you choose what to accept.</p>
         </div>
         <div class="step-card card-hover">
           <div class="step-number">3</div>
           <div class="step-icon-circle"><i class="fas fa-people-arrows"></i></div>
-          <h3 data-i18n="step3_title_v2">Swap & Meet</h3>
-          <p data-i18n="step3_desc_v2">Both agree? Identities revealed. Meet up and swap!</p>
+          <h3 data-i18n="step3_title_v5">Exchange</h3>
+          <p data-i18n="step3_desc_v5">Meet in person or use Swappo Delivery.</p>
+        </div>
+        <div class="step-card card-hover">
+          <div class="step-number">4</div>
+          <div class="step-icon-circle"><i class="fas fa-star"></i></div>
+          <h3 data-i18n="step4_title_v5">Done!</h3>
+          <p data-i18n="step4_desc_v5">Rate each other and build your reputation.</p>
         </div>
       </div>
     </div>
@@ -413,7 +421,9 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 Swappo. All rights reserved. UAE</span><p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:8px 0 0;line-height:1.5;" data-i18n="footer_legal_entity">Hannibal General Trading L.L.C - S.P.C · Abu Dhabi, UAE · TDRA e-activity licence NOL-26-100000206</p>
+        <span>© 2026 Swappo. All rights reserved. UAE</span>
+        <p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:8px 0 0;line-height:1.5;" data-i18n="footer_delivery_fee">Service fee 5% on deliveries only. In-person trades are always free.</p>
+        <p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:4px 0 0;line-height:1.5;" data-i18n="footer_legal_entity">Hannibal General Trading L.L.C - S.P.C · Abu Dhabi, UAE · TDRA e-activity licence NOL-26-100000206</p>
         <div class="footer-social">
           <a href="#"><i class="fab fa-instagram"></i></a>
           <a href="#"><i class="fab fa-twitter"></i></a>

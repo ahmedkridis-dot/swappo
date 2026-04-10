@@ -640,23 +640,26 @@
     }
     document.getElementById('product-meta').innerHTML = metaHTML;
 
-    // ── Swap info ──
+    // ── Price display + swap info (v5 marketplace) ──
     var swapInfoHTML = '';
     var user = DemoAuth.getCurrentUser();
     if (item.is_giveaway) {
       swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-gift"></i></div>' +
         '<div class="swap-info-text"><strong>' + t('free_item') + '</strong><br>' + t('use_1_claim') + '</div>';
-    } else if (user) {
-      // Swaps illimités/gratuits — pas de compteur
-      swapInfoHTML = '';
     } else {
-      swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-sync-alt"></i></div>' +
-        '<div class="swap-info-text"><strong>' + t('swap_this_item') + '</strong><br>' + t('sign_up_to_swap') + '</div>';
+      var priceVal = item.price || 0;
+      swapInfoHTML = '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">' +
+        '<span style="font-size:32px;font-weight:800;color:#1A1A2E;">' + priceVal.toLocaleString() + ' AED</span>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+          '<span class="mode-badge mode-buy" style="font-size:0.75rem;padding:3px 10px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>' +
+          '<span class="mode-badge mode-swap" style="font-size:0.75rem;padding:3px 10px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>' +
+        '</div>';
     }
     var swapInfoEl = document.getElementById('swap-info');
     if (swapInfoEl) {
       swapInfoEl.innerHTML = swapInfoHTML;
-      swapInfoEl.style.display = swapInfoHTML ? '' : 'none';
+      swapInfoEl.style.display = '';
     }
 
     // ── Item details card ──
@@ -726,13 +729,22 @@
           '<i class="fas fa-gift"></i> ' + t('claim_item') + '</button>';
       }
     } else {
-      // Swap: Propose button
+      // v5 Marketplace: Buy / Swap / Offer buttons
+      var itemPrice = (currentItem && currentItem.price) || 0;
       if (isGuest) {
         actionsHTML += '<button class="btn-primary" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
-          '<i class="fas fa-exchange-alt"></i> ' + t('join_to_propose') + '</button>';
+          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
+        actionsHTML += '<button class="btn-primary" style="background:#078A91;" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+          '<i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
+        actionsHTML += '<button class="btn-primary" style="background:var(--navy,#1A1A2E);" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+          '<i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
       } else {
-        actionsHTML += '<button class="btn-primary" onclick="openSwapModal()">' +
-          '<i class="fas fa-exchange-alt"></i> ' + t('propose_swap') + '</button>';
+        actionsHTML += '<button class="btn-primary" onclick="startBuy()" style="font-size:16px;">' +
+          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
+        actionsHTML += '<button class="btn-primary" style="background:#078A91;" onclick="openSwapModal()">' +
+          '<i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
+        actionsHTML += '<button class="btn-primary" style="background:var(--navy,#1A1A2E);" onclick="openOfferModal()">' +
+          '<i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
       }
     }
 
@@ -962,6 +974,61 @@
   }
   window.selectCashAmount = selectCashAmount;
   window.updateCashFromSlider = updateCashFromSlider;
+
+  // ============ BUY (v5) — opens chat with pre-filled message ============
+  function startBuy() {
+    if (!currentItem || !currentUser) return;
+    var price = currentItem.price || 0;
+    var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
+    // Create a chat message and redirect
+    if (window.DemoChat && DemoChat.send) {
+      var ownerId = currentItem.user_id;
+      DemoChat.send(currentUser.id, ownerId, 'Hi! I want to buy "' + title + '" for ' + price.toLocaleString() + ' AED. Is it still available?');
+    }
+    DemoNotifications.showToast('Opening chat with seller...', 'info');
+    setTimeout(function() {
+      window.location.href = 'chat.html?user=' + (currentItem.user_id || '');
+    }, 600);
+  }
+  window.startBuy = startBuy;
+
+  // ============ OFFER MODAL (v5) — cash + optional item ============
+  function openOfferModal() {
+    if (!currentItem || !currentUser) return;
+    var price = currentItem.price || 0;
+    var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML =
+      '<div style="background:#fff;border-radius:20px;padding:32px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.25);">' +
+        '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">Make an offer</h3>' +
+        '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">for "' + title + '" (listed at ' + price.toLocaleString() + ' AED)</p>' +
+        '<label style="font-size:13px;font-weight:600;color:#1A1A2E;display:block;margin-bottom:6px;">Your cash offer (AED)</label>' +
+        '<input type="number" id="offer-amount" min="1" value="' + price + '" style="width:100%;padding:12px 16px;border:1px solid #E5E7EB;border-radius:12px;font-size:18px;font-weight:700;font-family:inherit;outline:none;margin-bottom:16px;" onfocus="this.style.borderColor=\'#09B1BA\'" onblur="this.style.borderColor=\'#E5E7EB\'">' +
+        '<p style="font-size:12px;color:#9CA3AF;margin:0 0 20px;">You can also propose a swap from your items via "Propose a Swap".</p>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="flex:1;padding:12px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;font-weight:600;cursor:pointer;color:#6B7280;">Cancel</button>' +
+          '<button onclick="submitOffer()" style="flex:1;padding:12px;border:none;border-radius:12px;background:#09B1BA;color:#fff;font-weight:700;cursor:pointer;">Send offer</button>' +
+        '</div>' +
+      '</div>';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+    setTimeout(function() { document.getElementById('offer-amount').focus(); }, 100);
+  }
+  window.openOfferModal = openOfferModal;
+
+  function submitOffer() {
+    var amount = parseInt(document.getElementById('offer-amount').value) || 0;
+    if (amount < 1) { DemoNotifications.showToast('Please enter a valid amount.', 'warning'); return; }
+    var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
+    if (window.DemoChat && DemoChat.send) {
+      DemoChat.send(currentUser.id, currentItem.user_id, 'I\'d like to offer ' + amount.toLocaleString() + ' AED for "' + title + '". Let me know!');
+    }
+    document.querySelector('div[style*="fixed"]').remove();
+    DemoNotifications.showToast('Offer sent! The seller will respond in chat.', 'success');
+    setTimeout(function() { window.location.href = 'chat.html?user=' + (currentItem.user_id || ''); }, 800);
+  }
+  window.submitOffer = submitOffer;
 
   // ============ SWAP MODAL ============
   function openSwapModal() {

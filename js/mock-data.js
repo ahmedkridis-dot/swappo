@@ -130,6 +130,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 55,
     is_boosted: true,
     boost_expires_at: '2026-04-10T23:59:59',
     status: 'active',
@@ -161,6 +162,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1548126032-079a0fb0099d?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 235,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -192,6 +194,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 110,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -223,6 +226,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -254,6 +258,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1614975059251-992f11792b9f?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 295,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -285,6 +290,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 185,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -316,6 +322,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 3360,
     is_boosted: true,
     boost_expires_at: '2026-04-05T23:59:59',
     status: 'active',
@@ -345,6 +352,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 3490,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -374,6 +382,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1617096200347-cb04ae810b1d?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 1300,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -403,6 +412,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1590658268037-6bf12f032f55?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 2490,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -432,6 +442,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 1440,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -463,6 +474,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 1660,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -492,6 +504,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1567016432779-094069958ea5?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -521,6 +534,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1592078615290-033ee584e267?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 345,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -550,6 +564,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 995,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -581,6 +596,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 41925,
     is_boosted: true,
     boost_expires_at: '2026-04-15T23:59:59',
     status: 'active',
@@ -610,6 +626,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 25165,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -639,6 +656,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 15490,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -670,6 +688,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 665,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -699,6 +718,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -728,6 +748,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 195,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -757,6 +778,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 75,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -788,6 +810,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 60,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -817,6 +840,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -846,6 +870,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1598153346810-860daa814c4b?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 75,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -875,6 +900,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1611371805429-8b5c1b2c34ba?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 100,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -906,6 +932,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 220,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -935,6 +962,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 335,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -964,6 +992,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1604467707321-70d009801bf0?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -995,6 +1024,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1598880940080-ff9a29891b85?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 80,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1024,6 +1054,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1572969176547-f0c230757221?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1053,6 +1084,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1597055181300-b7e3c6707cd4?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1082,6 +1114,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1114,6 +1147,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 100,
     is_boosted: true,
     boost_expires_at: '2026-04-12T23:59:59',
     status: 'active',
@@ -1144,6 +1178,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1491637639811-60e2756cc1c7?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1174,6 +1209,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 545,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1204,6 +1240,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1612817159949-195b6eb9e31a?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 500,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1234,6 +1271,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1559563458-527698bf5295?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1267,6 +1305,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1617096200347-cb04ae810b1d?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 345,
     is_boosted: true,
     boost_expires_at: '2026-04-02T00:00:00',
     status: 'active',
@@ -1297,6 +1336,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 385,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1327,6 +1367,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 595,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1357,6 +1398,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&h=530&fit=crop'
     ],
     is_giveaway: true,
+    price: 0,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1387,6 +1429,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 910,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1417,6 +1460,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1625225233840-695456021cde?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 705,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1447,6 +1491,7 @@ const MOCK_ITEMS = [
       'https://images.unsplash.com/photo-1563299796-17596ed6b017?w=400&h=530&fit=crop'
     ],
     is_giveaway: false,
+    price: 380,
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
@@ -1478,6 +1523,7 @@ const MOCK_ITEMS = [
     ],
     is_boosted: true,
     is_giveaway: false,
+    price: 1495,
     created_at: '2026-03-10',
     lat: 25.0800,
     lng: 55.1380,
@@ -1504,6 +1550,7 @@ const MOCK_ITEMS = [
     ],
     is_boosted: false,
     is_giveaway: false,
+    price: 220,
     created_at: '2026-03-15',
     lat: 25.0800,
     lng: 55.1380,
@@ -1527,6 +1574,7 @@ const MOCK_ITEMS = [
     ],
     is_boosted: false,
     is_giveaway: true,
+    price: 0,
     created_at: '2026-03-20',
     lat: 25.0800,
     lng: 55.1380,
@@ -1552,6 +1600,7 @@ const MOCK_ITEMS = [
     ],
     is_boosted: false,
     is_giveaway: false,
+    price: 1635,
     created_at: '2026-03-25',
     lat: 25.0800,
     lng: 55.1380,
@@ -1576,6 +1625,7 @@ const MOCK_ITEMS = [
     ],
     is_boosted: false,
     is_giveaway: false,
+    price: 490,
     created_at: '2026-03-28',
     lat: 25.0800,
     lng: 55.1380,
@@ -1602,6 +1652,7 @@ const MOCK_ITEMS = [
     ],
     is_boosted: false,
     is_giveaway: false,
+    price: 135,
     created_at: '2026-03-20',
     lat: 24.4539,
     lng: 54.3773,
@@ -1625,6 +1676,7 @@ const MOCK_ITEMS = [
     ],
     is_boosted: false,
     is_giveaway: true,
+    price: 0,
     created_at: '2026-03-22',
     lat: 24.4539,
     lng: 54.3773,
