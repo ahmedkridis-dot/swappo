@@ -23,8 +23,8 @@ const translations = {
     feat_pro_badge: "Verified Pro badge",
     pro_roi_hint: "2 purchases/month and your Pro pays for itself",
     // v5 Marketplace
-    hero_subtitle: "The UAE's first marketplace for buying, selling, swapping, and gifting. Trade items with your community.",
-    hero_start_free: "Start Now — It's Free",
+    hero_subtitle: "The UAE's first marketplace for swapping, buying, selling, and gifting. Trade items with your community.",
+    hero_start_free: "Start Swapping — It's Free",
     step1_title_v5: "List your item",
     step1_desc_v5: "Set your price and add photos. Done in seconds.",
     step2_title_v5: "Get offers",
@@ -1299,8 +1299,8 @@ const translations = {
     feat_pro_badge: "Badge Pro vérifié",
     pro_roi_hint: "2 achats/mois et votre Pro est rentabilisé",
     // v5 Marketplace
-    hero_subtitle: "La première marketplace des Émirats pour acheter, vendre, échanger et donner. Échangez avec votre communauté.",
-    hero_start_free: "Commencer — C'est gratuit",
+    hero_subtitle: "La première marketplace des Émirats pour échanger, acheter, vendre et donner. Échangez avec votre communauté.",
+    hero_start_free: "Commencer à échanger — C'est gratuit",
     step1_title_v5: "Publiez votre article",
     step1_desc_v5: "Fixez votre prix et ajoutez des photos. En quelques secondes.",
     step2_title_v5: "Recevez des offres",
@@ -2443,8 +2443,8 @@ const translations = {
     feat_pro_badge: "شارة Pro موثقة",
     pro_roi_hint: "عمليتا شراء/شهر وسيدفع Pro عن نفسه",
     // v5 Marketplace
-    hero_subtitle: "أول سوق في الإمارات للشراء والبيع والمقايضة والإهداء. تبادل مع مجتمعك.",
-    hero_start_free: "ابدأ الآن — مجاناً",
+    hero_subtitle: "أول سوق في الإمارات للمقايضة والشراء والبيع والإهداء. تبادل مع مجتمعك.",
+    hero_start_free: "ابدأ المقايضة — مجاناً",
     step1_title_v5: "انشر منتجك",
     step1_desc_v5: "حدد السعر وأضف الصور. في ثوانٍ.",
     step2_title_v5: "استقبل العروض",
@@ -3590,8 +3590,8 @@ const translations = {
     feat_pro_badge: "تصدیق شدہ Pro بیج",
     pro_roi_hint: "ماہانہ 2 خریداری اور آپ کا Pro خود ادا ہو جائے گا",
     // v5 Marketplace
-    hero_subtitle: "یو اے ای کا پہلا مارکیٹ پلیس خرید، فروخت، تبادلے اور تحفے کے لیے۔ اپنی کمیونٹی سے تبادلہ کریں۔",
-    hero_start_free: "ابھی شروع کریں — مفت ہے",
+    hero_subtitle: "یو اے ای کا پہلا مارکیٹ پلیس تبادلے، خرید، فروخت اور تحفے کے لیے۔ اپنی کمیونٹی سے تبادلہ کریں۔",
+    hero_start_free: "تبادلہ شروع کریں — مفت ہے",
     step1_title_v5: "اپنا آئٹم شائع کریں",
     step1_desc_v5: "قیمت مقرر کریں اور تصاویر شامل کریں۔ چند سیکنڈوں میں۔",
     step2_title_v5: "آفرز حاصل کریں",
