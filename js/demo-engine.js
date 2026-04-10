@@ -1563,6 +1563,254 @@ function resetDemoData() {
   DemoNotifications.showToast('Demo data reset! All fresh.', 'success', 3000);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIMULATED PAYMENT FLOW (Pro subscription + Boosts + Delivery)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const DemoPayment = {
+  /** Show a simulated payment modal */
+  show(opts) {
+    // opts: { title, amount, currency, description, onSuccess }
+    const amount = opts.amount || 0;
+    const currency = opts.currency || 'AED';
+    const title = opts.title || 'Payment';
+    const desc = opts.description || '';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'payment-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML =
+      '<div style="background:#fff;border-radius:24px;padding:36px 32px;max-width:420px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,0.3);">' +
+        '<div style="text-align:center;margin-bottom:20px;">' +
+          '<div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#09B1BA,#078A91);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-lock" style="color:#fff;font-size:20px;"></i></div>' +
+          '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
+          '<p style="font-size:14px;color:#6B7280;margin:0;">' + desc + '</p>' +
+        '</div>' +
+        '<div style="font-size:32px;font-weight:800;text-align:center;color:#1A1A2E;margin:0 0 24px;">' + amount + ' <span style="font-size:16px;font-weight:600;color:#6B7280;">' + currency + '</span></div>' +
+        '<div style="background:#F9FAFB;border-radius:12px;padding:16px;margin-bottom:20px;">' +
+          '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
+            '<input type="text" value="4111 1111 1111 1111" readonly style="flex:1;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:14px;font-family:monospace;background:#fff;color:#1A1A2E;">' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<input type="text" value="12/28" readonly style="width:80px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:14px;font-family:monospace;background:#fff;">' +
+            '<input type="text" value="123" readonly style="width:60px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:14px;font-family:monospace;background:#fff;">' +
+            '<div style="flex:1;display:flex;align-items:center;gap:6px;color:#9CA3AF;font-size:11px;"><i class="fas fa-shield-alt"></i>Test mode</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button onclick="document.getElementById(\'payment-overlay\').remove();" style="flex:1;padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;font-weight:600;cursor:pointer;color:#6B7280;font-size:14px;">Cancel</button>' +
+          '<button id="pay-now-btn" style="flex:1;padding:14px;border:none;border-radius:12px;background:#09B1BA;color:#fff;font-weight:700;cursor:pointer;font-size:14px;transition:all .2s;">Pay ' + amount + ' ' + currency + '</button>' +
+        '</div>' +
+        '<p style="text-align:center;font-size:11px;color:#9CA3AF;margin:12px 0 0;"><i class="fas fa-lock" style="margin-right:4px;"></i>Secured by Tap Payments (test mode)</p>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+
+    document.getElementById('pay-now-btn').addEventListener('click', function() {
+      var btn = this;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      setTimeout(function() {
+        overlay.remove();
+        // Show success toast
+        DemoNotifications.showToast('Payment successful! ✅', 'success');
+        // Call success callback
+        if (opts.onSuccess) opts.onSuccess();
+      }, 2000);
+    });
+  },
+
+  /** Shortcut: Subscribe to Pro */
+  subscribePro(period) {
+    var amount = period === 'yearly' ? 249 : 29;
+    var desc = period === 'yearly' ? 'Swappo Pro — Annual' : 'Swappo Pro — Monthly';
+    this.show({
+      title: 'Upgrade to Swappo Pro',
+      amount: amount,
+      description: desc,
+      onSuccess: function() {
+        var user = DemoAuth.getCurrentUser();
+        if (user) {
+          DemoSubscription.upgrade(user.id, 'pro');
+          DemoNotifications.showToast('Welcome to Swappo Pro! 🎉 All benefits are now active.', 'success');
+          if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
+          setTimeout(function() { location.reload(); }, 1200);
+        }
+      }
+    });
+  },
+
+  /** Shortcut: Buy a boost */
+  buyBoost(itemId, tier) {
+    var tiers = { '24h': { amount: 5, label: '24h Boost' }, '3d': { amount: 10, label: '3-day Boost' }, '7d': { amount: 25, label: '7-day Featured Boost' } };
+    var t = tiers[tier] || tiers['24h'];
+    this.show({
+      title: 'Boost your item',
+      amount: t.amount,
+      description: t.label,
+      onSuccess: function() {
+        var user = DemoAuth.getCurrentUser();
+        if (user && itemId) {
+          DemoItems.update(itemId, { is_boosted: true, boost_expires_at: new Date(Date.now() + (tier === '7d' ? 7 : tier === '3d' ? 3 : 1) * 86400000).toISOString() });
+          DemoNotifications.showToast('Item boosted! 🚀 It will appear at the top of search results.', 'success');
+        }
+      }
+    });
+  }
+};
+
+window.DemoPayment = DemoPayment;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GIVE & EARN — Milestone rewards for gifting
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const DemoGiveEarn = {
+  MILESTONES: [
+    { target: 3,  reward: '1 boost (24h)', icon: '🎁' },
+    { target: 5,  reward: '1 boost (3 days)', icon: '⭐' },
+    { target: 10, reward: '1 boost (7d featured) + 1 month Pro', icon: '🔥' },
+    { target: 25, reward: '3 months Pro + 3 boosts (7d)', icon: '💎' },
+    { target: 50, reward: '6 months Pro + Legend badge + featured profile', icon: '👑' }
+  ],
+
+  getGiftCount() {
+    var user = DemoAuth.getCurrentUser();
+    if (!user) return 0;
+    return DemoGiveaway.getConfirmedGiftsCount ? DemoGiveaway.getConfirmedGiftsCount() : (user.gifts_given || 0);
+  },
+
+  getProgress() {
+    var count = this.getGiftCount();
+    var milestones = this.MILESTONES.map(function(m) {
+      return { target: m.target, reward: m.reward, icon: m.icon, reached: count >= m.target, progress: Math.min(100, Math.round((count / m.target) * 100)) };
+    });
+    var nextMilestone = milestones.find(function(m) { return !m.reached; });
+    return { count: count, milestones: milestones, next: nextMilestone || null };
+  },
+
+  renderWidget() {
+    var p = this.getProgress();
+    var html = '<div style="background:linear-gradient(135deg,#ECFDF5,#F0FDFA);border-radius:16px;padding:20px;border:1px solid rgba(16,185,129,0.2);">';
+    html += '<h4 style="font-size:15px;font-weight:700;color:#065F46;margin:0 0 4px;">🎁 Give & Earn</h4>';
+    html += '<p style="font-size:12px;color:#6B7280;margin:0 0 16px;">Give gifts, earn rewards. ' + p.count + ' gift' + (p.count !== 1 ? 's' : '') + ' confirmed.</p>';
+    p.milestones.forEach(function(m) {
+      var barColor = m.reached ? '#10B981' : '#E5E7EB';
+      var textColor = m.reached ? '#065F46' : '#9CA3AF';
+      html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
+      html += '<span style="font-size:18px;filter:' + (m.reached ? 'none' : 'grayscale(1) opacity(0.5)') + ';">' + m.icon + '</span>';
+      html += '<div style="flex:1;">';
+      html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:' + textColor + ';font-weight:600;margin-bottom:3px;"><span>' + m.target + ' gifts</span><span>' + m.reward + '</span></div>';
+      html += '<div style="height:6px;background:#E5E7EB;border-radius:3px;overflow:hidden;"><div style="height:100%;width:' + m.progress + '%;background:' + barColor + ';border-radius:3px;transition:width .5s;"></div></div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+};
+
+window.DemoGiveEarn = DemoGiveEarn;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   QR CONFIRMATION — In-person exchange verification + rating
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const DemoQR = {
+  /** Generate a QR confirmation modal (simulated) */
+  showConfirmation(swapId) {
+    var code = 'SWP-' + Math.random().toString(36).slice(2,8).toUpperCase();
+    var expiry = 10; // seconds
+    var overlay = document.createElement('div');
+    overlay.id = 'qr-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:9600;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML =
+      '<div style="background:#fff;border-radius:24px;padding:36px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);">' +
+        '<div style="font-size:48px;margin-bottom:12px;">📱</div>' +
+        '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 8px;">Confirm Exchange</h3>' +
+        '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">Show this code to the other party or scan theirs</p>' +
+        '<div style="background:#F9FAFB;border:2px dashed #09B1BA;border-radius:16px;padding:24px;margin-bottom:16px;">' +
+          '<div style="font-family:monospace;font-size:32px;font-weight:800;letter-spacing:0.15em;color:#09B1BA;" id="qr-code-display">' + code + '</div>' +
+          '<div style="font-size:12px;color:#9CA3AF;margin-top:8px;" id="qr-timer">Expires in <strong>' + expiry + 's</strong></div>' +
+        '</div>' +
+        '<button id="qr-confirm-btn" onclick="DemoQR.confirm(\'' + swapId + '\')" style="width:100%;padding:14px;border:none;border-radius:12px;background:#10B981;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;">✓ Confirm — Both present</button>' +
+        '<button onclick="document.getElementById(\'qr-overlay\').remove();" style="width:100%;padding:10px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;margin-top:8px;">Cancel</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    // Countdown timer
+    var remaining = expiry;
+    var timer = setInterval(function() {
+      remaining--;
+      var timerEl = document.getElementById('qr-timer');
+      if (timerEl) timerEl.innerHTML = remaining > 0 ? 'Expires in <strong>' + remaining + 's</strong>' : '<strong style="color:#FF4B55;">Expired — tap to refresh</strong>';
+      if (remaining <= 0) {
+        clearInterval(timer);
+        var codeEl = document.getElementById('qr-code-display');
+        if (codeEl) { codeEl.style.opacity = '0.3'; codeEl.style.textDecoration = 'line-through'; }
+      }
+    }, 1000);
+  },
+
+  confirm(swapId) {
+    var overlay = document.getElementById('qr-overlay');
+    if (overlay) overlay.remove();
+    DemoNotifications.showToast('Exchange confirmed! 🎉', 'success');
+    // Show rating prompt after short delay
+    setTimeout(function() { DemoQR.showRating(swapId); }, 800);
+  },
+
+  showRating(swapId) {
+    var overlay = document.createElement('div');
+    overlay.id = 'rating-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:9600;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML =
+      '<div style="background:#fff;border-radius:24px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);">' +
+        '<div style="font-size:48px;margin-bottom:12px;">⭐</div>' +
+        '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 8px;">Rate this exchange</h3>' +
+        '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">How was your experience?</p>' +
+        '<div id="rating-stars" style="font-size:36px;cursor:pointer;margin-bottom:16px;letter-spacing:8px;">' +
+          '<span onclick="DemoQR.setStars(1)" data-star="1">☆</span>' +
+          '<span onclick="DemoQR.setStars(2)" data-star="2">☆</span>' +
+          '<span onclick="DemoQR.setStars(3)" data-star="3">☆</span>' +
+          '<span onclick="DemoQR.setStars(4)" data-star="4">☆</span>' +
+          '<span onclick="DemoQR.setStars(5)" data-star="5">☆</span>' +
+        '</div>' +
+        '<textarea id="rating-comment" maxlength="200" placeholder="Optional comment..." style="width:100%;height:60px;border:1px solid #E5E7EB;border-radius:12px;padding:12px;font-family:inherit;font-size:13px;resize:none;margin-bottom:16px;"></textarea>' +
+        '<button id="submit-rating-btn" onclick="DemoQR.submitRating(\'' + swapId + '\')" style="width:100%;padding:14px;border:none;border-radius:12px;background:#09B1BA;color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Submit Rating</button>' +
+        '<button onclick="document.getElementById(\'rating-overlay\').remove();" style="width:100%;padding:10px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;margin-top:4px;">Skip</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+    DemoQR._selectedStars = 0;
+  },
+
+  _selectedStars: 0,
+
+  setStars(n) {
+    DemoQR._selectedStars = n;
+    var container = document.getElementById('rating-stars');
+    if (!container) return;
+    container.querySelectorAll('span').forEach(function(s) {
+      var val = parseInt(s.getAttribute('data-star'));
+      s.textContent = val <= n ? '★' : '☆';
+      s.style.color = val <= n ? '#F59E0B' : '#D1D5DB';
+    });
+  },
+
+  submitRating(swapId) {
+    var stars = DemoQR._selectedStars || 5;
+    var comment = (document.getElementById('rating-comment') || {}).value || '';
+    // Save rating
+    if (swapId && DemoSwaps.rate) DemoSwaps.rate(swapId, stars);
+    var overlay = document.getElementById('rating-overlay');
+    if (overlay) overlay.remove();
+    DemoNotifications.showToast('Thanks for your feedback! (' + stars + '★)', 'success');
+  }
+};
+
+window.DemoQR = DemoQR;
+
 window.DemoAuth = DemoAuth;
 window.DemoSubscription = DemoSubscription;
 window.DemoItems = DemoItems;

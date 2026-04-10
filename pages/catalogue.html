@@ -286,9 +286,24 @@
         <option value="fair" data-i18n="condition_fair">Fair</option>
       </select>
 
+      <select id="filter-mode">
+        <option value="" data-i18n="all_modes">All modes</option>
+        <option value="buy" data-i18n="mode_buy">Buy</option>
+        <option value="swap" data-i18n="mode_swap">Swap</option>
+        <option value="gift" data-i18n="mode_gift">Gift</option>
+      </select>
+
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="number" id="filter-price-min" min="0" placeholder="Min AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;">
+        <span style="color:#9CA3AF;">–</span>
+        <input type="number" id="filter-price-max" min="0" placeholder="Max AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;">
+      </div>
+
       <select id="filter-sort">
         <option value="newest" data-i18n="newest_first">Newest first</option>
         <option value="popular" data-i18n="most_popular">Most popular</option>
+        <option value="price_asc">Price ↑</option>
+        <option value="price_desc">Price ↓</option>
         <option value="closest" data-i18n="nearest_first">Nearest first</option>
       </select>
 
@@ -418,7 +433,10 @@
         category: preCategory || '',
         condition: '',
         search: '',
-        sortBy: 'newest'
+        sortBy: 'newest',
+        mode: '',
+        priceMin: 0,
+        priceMax: 0
       };
 
       const PAGE_SIZE = 20;
@@ -464,24 +482,42 @@
         // Apply subcategory filters
         let items = result.items;
         if (currentSubFilters.gender) {
-          items = items.filter(function(item) {
-            return item.clothing_gender === currentSubFilters.gender;
-          });
+          items = items.filter(function(item) { return item.clothing_gender === currentSubFilters.gender; });
         }
         if (currentSubFilters.subcategory) {
-          items = items.filter(function(item) {
-            return item.subcategory === currentSubFilters.subcategory;
-          });
+          items = items.filter(function(item) { return item.subcategory === currentSubFilters.subcategory; });
         }
         if (currentSubFilters.zone) {
-          items = items.filter(function(item) {
-            return item.zone === currentSubFilters.zone;
-          });
+          items = items.filter(function(item) { return item.zone === currentSubFilters.zone; });
         }
         if (currentSubFilters.ageRange) {
+          items = items.filter(function(item) { return item.age_range === currentSubFilters.ageRange; });
+        }
+
+        // v5: Mode filter (buy = non-giveaway, swap = non-giveaway, gift = giveaway)
+        if (currentFilters.mode === 'gift') {
+          items = items.filter(function(item) { return item.is_giveaway === true; });
+        } else if (currentFilters.mode === 'buy' || currentFilters.mode === 'swap') {
+          items = items.filter(function(item) { return !item.is_giveaway; });
+        }
+
+        // v5: Price range filter
+        var priceMin = currentFilters.priceMin;
+        var priceMax = currentFilters.priceMax;
+        if (priceMin > 0 || priceMax > 0) {
           items = items.filter(function(item) {
-            return item.age_range === currentSubFilters.ageRange;
+            var p = item.price || 0;
+            if (priceMin > 0 && p < priceMin) return false;
+            if (priceMax > 0 && p > priceMax) return false;
+            return true;
           });
+        }
+
+        // v5: Sort by price
+        if (currentFilters.sortBy === 'price_asc') {
+          items.sort(function(a, b) { return (a.price || 0) - (b.price || 0); });
+        } else if (currentFilters.sortBy === 'price_desc') {
+          items.sort(function(a, b) { return (b.price || 0) - (a.price || 0); });
         }
 
         const grid = document.getElementById('catalogue-grid');
@@ -534,6 +570,32 @@
         });
       }
 
+      // v5: Mode filter
+      const modeSelect = document.getElementById('filter-mode');
+      if (modeSelect) {
+        modeSelect.addEventListener('change', () => {
+          currentFilters.mode = modeSelect.value;
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        });
+      }
+
+      // v5: Price range filter
+      const priceMinInput = document.getElementById('filter-price-min');
+      const priceMaxInput = document.getElementById('filter-price-max');
+      let priceTimeout;
+      function onPriceChange() {
+        clearTimeout(priceTimeout);
+        priceTimeout = setTimeout(() => {
+          currentFilters.priceMin = parseInt(priceMinInput.value) || 0;
+          currentFilters.priceMax = parseInt(priceMaxInput.value) || 0;
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        }, 400);
+      }
+      if (priceMinInput) priceMinInput.addEventListener('input', onPriceChange);
+      if (priceMaxInput) priceMaxInput.addEventListener('input', onPriceChange);
+
       // Search input — real-time filtering
       let searchTimeout;
       if (searchInput) {
@@ -563,7 +625,10 @@
       // Clear all filters
       if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-          currentFilters = { category: '', condition: '', search: '', sortBy: 'newest' };
+          currentFilters = { category: '', condition: '', search: '', sortBy: 'newest', mode: '', priceMin: 0, priceMax: 0 };
+          if (document.getElementById('filter-mode')) document.getElementById('filter-mode').value = '';
+          if (document.getElementById('filter-price-min')) document.getElementById('filter-price-min').value = '';
+          if (document.getElementById('filter-price-max')) document.getElementById('filter-price-max').value = '';
           if (catSelect) catSelect.value = '';
           if (condSelect) condSelect.value = '';
           if (sortSelect) sortSelect.value = 'newest';

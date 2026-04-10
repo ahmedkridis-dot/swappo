@@ -370,8 +370,10 @@
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_analytics">Analytics & insights</span></li>
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_priority">Priority in search results</span></li>
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_support">Priority support</span></li>
+        <li><i class="fas fa-check" style="color:#10B981;"></i> <strong style="color:#065F46;" data-i18n="feat_pro_zero_fee">0% service fee on delivery purchases</strong></li>
       </ul>
-      <a href="login.html" class="btn btn-primary pricing-cta" data-i18n="cta_pro">Go Pro — 29 AED/mo</a>
+      <button onclick="if(window.DemoPayment){DemoPayment.subscribePro('monthly')}else{window.location.href='login.html'}" class="btn btn-primary pricing-cta" data-i18n="cta_pro">Go Pro — 29 AED/mo</button>
+      <button onclick="if(window.DemoPayment){DemoPayment.subscribePro('yearly')}else{window.location.href='login.html'}" class="btn btn-outline pricing-cta" style="margin-top:8px;font-size:13px;padding:10px 20px;border:1px solid var(--teal);color:var(--teal);background:transparent;border-radius:var(--radius-pill,999px);cursor:pointer;" data-i18n="cta_pro_yearly">Or 249 AED/year (save 28%)</button>
     </div>
 
   </div>

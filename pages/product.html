@@ -732,17 +732,17 @@
       // v5 Marketplace: Buy / Swap / Offer buttons
       var itemPrice = (currentItem && currentItem.price) || 0;
       if (isGuest) {
-        actionsHTML += '<button class="btn-primary" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
-          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
-        actionsHTML += '<button class="btn-primary" style="background:#078A91;" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+        actionsHTML += '<button class="btn-primary" style="font-size:16px;" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
           '<i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
+        actionsHTML += '<button class="btn-primary" style="background:#D97706;" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
         actionsHTML += '<button class="btn-primary" style="background:var(--navy,#1A1A2E);" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
           '<i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
       } else {
-        actionsHTML += '<button class="btn-primary" onclick="startBuy()" style="font-size:16px;">' +
-          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
-        actionsHTML += '<button class="btn-primary" style="background:#078A91;" onclick="openSwapModal()">' +
+        actionsHTML += '<button class="btn-primary" style="font-size:16px;" onclick="openSwapModal()">' +
           '<i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
+        actionsHTML += '<button class="btn-primary" style="background:#D97706;" onclick="startBuy()">' +
+          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
         actionsHTML += '<button class="btn-primary" style="background:var(--navy,#1A1A2E);" onclick="openOfferModal()">' +
           '<i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
       }
@@ -756,6 +756,20 @@
     actionsHTML += '<button class="btn-secondary" onclick="reportItem()" style="color:var(--secondary);border-color:var(--secondary);">' +
       '<i class="fas fa-flag"></i> ' + t('report') + '</button>';
     actionsHTML += '</div>';
+
+    // v5: Delivery option card
+    if (!item.is_giveaway) {
+      var isPro = user && DemoSubscription.getPlan(user.id).plan === 'pro';
+      var feeText = isPro ? '<span style="text-decoration:line-through;color:#9CA3AF;">5%</span> <span style="color:#10B981;font-weight:700;">0% (Pro)</span>' : '5%';
+      actionsHTML += '<div style="background:linear-gradient(135deg,#F0FDFA,#F0F9FF);border:1px solid rgba(9,177,186,0.15);border-radius:16px;padding:18px 20px;margin-top:16px;">';
+      actionsHTML += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
+      actionsHTML += '<i class="fas fa-truck" style="color:#09B1BA;font-size:18px;"></i>';
+      actionsHTML += '<div><div style="font-size:14px;font-weight:700;color:#1A1A2E;">Swappo Delivery</div>';
+      actionsHTML += '<div style="font-size:11px;color:#6B7280;">~25-40 AED same city · Service fee: ' + feeText + '</div></div>';
+      actionsHTML += '</div>';
+      actionsHTML += '<button disabled style="width:100%;padding:12px;border:1px dashed #09B1BA;border-radius:12px;background:rgba(9,177,186,0.05);color:#078A91;font-weight:600;font-size:13px;cursor:not-allowed;opacity:0.7;"><i class="fas fa-clock"></i> Coming Soon — Finalizing delivery partnerships</button>';
+      actionsHTML += '</div>';
+    }
 
     document.getElementById('action-buttons').innerHTML = actionsHTML;
 

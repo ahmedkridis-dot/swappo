@@ -1237,6 +1237,9 @@
                     <a href="pricing.html" class="sub-upgrade-btn">
                         <i class="fas fa-arrow-up"></i> Upgrade Plan
                     </a>
+
+                    <!-- Give & Earn Widget -->
+                    <div id="give-earn-widget" style="margin-top:20px;"></div>
                 </div>
             </aside>
         </div>
@@ -1452,6 +1455,12 @@
             const renewalDate = new Date(planInfo.next_renewal);
             document.getElementById('sidebar-renewal').innerHTML = '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
+            // ── Give & Earn widget ───────────────────────────────
+            var geWidget = document.getElementById('give-earn-widget');
+            if (geWidget && window.DemoGiveEarn) {
+              geWidget.innerHTML = DemoGiveEarn.renderWidget();
+            }
+
             // ── Settings subscription card ───────────────────────────────
             const settingsSubCard = document.getElementById('settings-subscription-card');
             if (planInfo.plan === 'premium') settingsSubCard.classList.add('premium');
@@ -1480,8 +1489,10 @@
                     '<div class="product-info">' +
                         '<div class="product-title">' + title + '</div>' +
                         '<div class="product-category">' + (item.category || '') + '</div>' +
-                        '<div class="product-actions">' +
+                        (item.price ? '<div class="product-price" style="font-size:15px;font-weight:700;color:var(--primary,#09B1BA);margin-bottom:6px;">' + item.price.toLocaleString() + ' AED</div>' : '') +
+                    '<div class="product-actions">' +
                             '<button class="product-action-btn" onclick="window.location.href=\'product.html?id=' + item.id + '\'"><i class="fas fa-eye"></i> View</button>' +
+                            '<button class="product-action-btn" style="color:#F59E0B;border-color:#F59E0B;" onclick="showBoostPicker(\'' + item.id + '\')"><i class="fas fa-rocket"></i> Boost</button>' +
                             '<button class="product-action-btn" onclick="deleteItem(\'' + item.id + '\')"><i class="fas fa-trash"></i> Delete</button>' +
                         '</div>' +
                     '</div>' +
@@ -1795,6 +1806,25 @@
         });
 
         // ── Global helpers ───────────────────────────────────────────────
+        function showBoostPicker(itemId) {
+            var o = document.createElement('div');
+            o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            o.innerHTML =
+              '<div style="background:#fff;border-radius:20px;padding:32px;max-width:380px;width:100%;text-align:center;">' +
+                '<div style="font-size:36px;margin-bottom:10px;">🚀</div>' +
+                '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">Boost your item</h3>' +
+                '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">Get more visibility in search results</p>' +
+                '<div style="display:flex;flex-direction:column;gap:10px;">' +
+                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'24h\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition:all .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>24h Boost</strong></span><span style="font-weight:700;color:#09B1BA;">5 AED</span></button>' +
+                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'3d\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition:all .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>3-day Boost</strong></span><span style="font-weight:700;color:#09B1BA;">10 AED</span></button>' +
+                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'7d\')" style="padding:14px;border:2px solid #09B1BA;border-radius:12px;background:#F0FBFC;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;"><span><strong>7-day Featured</strong> <span style="font-size:11px;color:#6B7280;">⭐ Best value</span></span><span style="font-weight:700;color:#09B1BA;">25 AED</span></button>' +
+                '</div>' +
+                '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="margin-top:12px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;">Cancel</button>' +
+              '</div>';
+            document.body.appendChild(o);
+            o.addEventListener('click', function(e) { if (e.target === o) o.remove(); });
+        }
+
         function deleteItem(itemId) {
             if (!confirm('Delete this item?')) return;
             // Remove from user items in localStorage
