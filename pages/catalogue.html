@@ -288,9 +288,20 @@
 
       <select id="filter-mode">
         <option value="" data-i18n="all_modes">All modes</option>
-        <option value="buy" data-i18n="mode_buy">Buy</option>
         <option value="swap" data-i18n="mode_swap">Swap</option>
+        <option value="buy" data-i18n="mode_buy">Buy</option>
         <option value="gift" data-i18n="mode_gift">Gift</option>
+      </select>
+
+      <select id="filter-emirate">
+        <option value="">All UAE</option>
+        <option value="Dubai">Dubai</option>
+        <option value="Abu Dhabi">Abu Dhabi</option>
+        <option value="Sharjah">Sharjah</option>
+        <option value="Ajman">Ajman</option>
+        <option value="RAK">Ras Al Khaimah</option>
+        <option value="Fujairah">Fujairah</option>
+        <option value="UAQ">Umm Al Quwain</option>
       </select>
 
       <div style="display:flex;align-items:center;gap:6px;">
@@ -436,7 +447,8 @@
         sortBy: 'newest',
         mode: '',
         priceMin: 0,
-        priceMax: 0
+        priceMax: 0,
+        emirate: ''
       };
 
       const PAGE_SIZE = 20;
@@ -513,11 +525,28 @@
           });
         }
 
+        // v5: Emirate filter
+        if (currentFilters.emirate) {
+          items = items.filter(function(item) { return item.emirate === currentFilters.emirate; });
+        }
+
         // v5: Sort by price
         if (currentFilters.sortBy === 'price_asc') {
           items.sort(function(a, b) { return (a.price || 0) - (b.price || 0); });
         } else if (currentFilters.sortBy === 'price_desc') {
           items.sort(function(a, b) { return (b.price || 0) - (a.price || 0); });
+        }
+
+        // v5: Default sort priority — boosted first, then Pro users, then rest
+        if (currentFilters.sortBy === 'newest' || currentFilters.sortBy === 'popular') {
+          items.sort(function(a, b) {
+            var aBoost = a.is_boosted ? 2 : 0;
+            var bBoost = b.is_boosted ? 2 : 0;
+            var aPro = (a.user_id === 'user-demo' || a.is_pro_user) ? 1 : 0;
+            var bPro = (b.user_id === 'user-demo' || b.is_pro_user) ? 1 : 0;
+            var priority = (bBoost + bPro) - (aBoost + aPro);
+            return priority !== 0 ? priority : 0; // keep original sub-order
+          });
         }
 
         const grid = document.getElementById('catalogue-grid');
@@ -596,6 +625,16 @@
       if (priceMinInput) priceMinInput.addEventListener('input', onPriceChange);
       if (priceMaxInput) priceMaxInput.addEventListener('input', onPriceChange);
 
+      // v5: Emirate filter
+      const emirateSelect = document.getElementById('filter-emirate');
+      if (emirateSelect) {
+        emirateSelect.addEventListener('change', () => {
+          currentFilters.emirate = emirateSelect.value;
+          visibleCount = PAGE_SIZE;
+          renderCatalogue();
+        });
+      }
+
       // Search input — real-time filtering
       let searchTimeout;
       if (searchInput) {
@@ -625,10 +664,11 @@
       // Clear all filters
       if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-          currentFilters = { category: '', condition: '', search: '', sortBy: 'newest', mode: '', priceMin: 0, priceMax: 0 };
+          currentFilters = { category: '', condition: '', search: '', sortBy: 'newest', mode: '', priceMin: 0, priceMax: 0, emirate: '' };
           if (document.getElementById('filter-mode')) document.getElementById('filter-mode').value = '';
           if (document.getElementById('filter-price-min')) document.getElementById('filter-price-min').value = '';
           if (document.getElementById('filter-price-max')) document.getElementById('filter-price-max').value = '';
+          if (document.getElementById('filter-emirate')) document.getElementById('filter-emirate').value = '';
           if (catSelect) catSelect.value = '';
           if (condSelect) condSelect.value = '';
           if (sortSelect) sortSelect.value = 'newest';

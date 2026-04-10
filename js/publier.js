@@ -476,6 +476,8 @@ window.publishItem = function(e) {
     color: formState.details.color || null,
     photos: selectedPhotos,
     is_giveaway: formState.isGiveaway,
+    price: parseInt(document.getElementById('item-price').value) || 0,
+    emirate: (document.getElementById('item-emirate') || {}).value || 'Dubai',
     is_boosted: false,
     status: 'active',
     city: user.city || 'Dubai',

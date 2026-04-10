@@ -113,6 +113,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-1',
     user_id: 'user-1',
+    emirate: 'Dubai',
     category: 'clothing',
     subcategory: 'Men Shoes',
     clothing_gender: 'male',
@@ -145,6 +146,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-2',
     user_id: 'user-2',
+    emirate: 'Abu Dhabi',
     category: 'clothing',
     subcategory: 'Jackets & Coats',
     clothing_gender: 'female',
@@ -177,6 +179,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-3',
     user_id: 'user-4',
+    emirate: 'Sharjah',
     category: 'clothing',
     subcategory: 'Men Shoes',
     clothing_gender: 'male',
@@ -209,6 +212,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-4',
     user_id: 'user-5',
+    emirate: 'Dubai',
     category: 'clothing',
     subcategory: 'Dresses',
     clothing_gender: 'female',
@@ -241,6 +245,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-5',
     user_id: 'user-8',
+    emirate: 'Ajman',
     category: 'clothing',
     subcategory: 'Sweaters & Hoodies',
     clothing_gender: 'male',
@@ -262,6 +267,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
+    is_boosted: true,
     created_at: '2026-03-12',
     lat: 25.0740,
     lng: 55.1420,
@@ -273,6 +279,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-6',
     user_id: 'user-demo',
+    emirate: 'Dubai',
     category: 'clothing',
     subcategory: 'Shirts',
     clothing_gender: 'male',
@@ -307,6 +314,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-7',
     user_id: 'user-3',
+    emirate: 'Abu Dhabi',
     category: 'electronics',
     type: 'Smartphone',
     brand: 'Samsung',
@@ -337,6 +345,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-8',
     user_id: 'user-7',
+    emirate: 'Sharjah',
     category: 'electronics',
     type: 'Laptop',
     brand: 'Apple',
@@ -367,6 +376,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-9',
     user_id: 'user-1',
+    emirate: 'Dubai',
     category: 'electronics',
     type: 'Gaming Console',
     brand: 'Sony',
@@ -397,6 +407,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-10',
     user_id: 'user-5',
+    emirate: 'RAK',
     category: 'electronics',
     type: 'Wireless Earbuds',
     brand: 'Apple',
@@ -416,6 +427,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     boost_expires_at: null,
     status: 'active',
+    is_boosted: true,
     created_at: '2026-03-25',
     lat: 25.3380,
     lng: 55.4120,
@@ -427,6 +439,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-11',
     user_id: 'user-demo',
+    emirate: 'Dubai',
     category: 'electronics',
     type: 'Tablet',
     brand: 'Apple',
@@ -459,6 +472,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-12',
     user_id: 'user-3',
+    emirate: 'Abu Dhabi',
     category: 'furniture',
     type: 'Standing Desk',
     brand: 'IKEA',
@@ -489,6 +503,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-13',
     user_id: 'user-7',
+    emirate: 'Sharjah',
     category: 'furniture',
     type: 'Sofa',
     brand: 'IKEA',
@@ -519,6 +534,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-14',
     user_id: 'user-2',
+    emirate: 'Dubai',
     category: 'furniture',
     type: 'Office Chair',
     brand: 'Herman Miller',
@@ -549,6 +565,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-15',
     user_id: 'user-6',
+    emirate: 'Ajman',
     category: 'furniture',
     type: 'Bookshelf',
     brand: 'IKEA',
@@ -581,6 +598,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-16',
     user_id: 'user-7',
+    emirate: 'Dubai',
     category: 'vehicles',
     type: 'Sedan',
     brand: 'Toyota',
@@ -611,6 +629,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-17',
     user_id: 'user-3',
+    emirate: 'Abu Dhabi',
     category: 'vehicles',
     type: 'SUV',
     brand: 'BMW',
@@ -641,6 +660,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-18',
     user_id: 'user-5',
+    emirate: 'Sharjah',
     category: 'vehicles',
     type: 'Motorcycle',
     brand: 'Honda',
@@ -673,6 +693,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-19',
     user_id: 'user-1',
+    emirate: 'Dubai',
     category: 'sports',
     type: 'Mountain Bike',
     brand: 'Trek',
@@ -703,6 +724,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-20',
     user_id: 'user-4',
+    emirate: 'RAK',
     category: 'sports',
     type: 'Yoga Mat & Kit',
     brand: 'Lululemon',
@@ -733,6 +755,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-21',
     user_id: 'user-8',
+    emirate: 'Dubai',
     category: 'sports',
     type: 'Dumbbell Set',
     brand: 'Bowflex',
@@ -763,6 +786,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-22',
     user_id: 'user-demo',
+    emirate: 'Abu Dhabi',
     category: 'sports',
     type: 'Tennis Racket',
     brand: 'Wilson',
@@ -795,6 +819,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-23',
     user_id: 'user-4',
+    emirate: 'Sharjah',
     category: 'books',
     type: 'Book Collection',
     brand: 'Various',
@@ -825,6 +850,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-24',
     user_id: 'user-6',
+    emirate: 'Dubai',
     category: 'books',
     type: 'Vinyl Records',
     brand: 'Various Artists',
@@ -855,6 +881,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-25',
     user_id: 'user-2',
+    emirate: 'Ajman',
     category: 'books',
     type: 'Manga Collection',
     brand: 'Viz Media',
@@ -885,6 +912,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-26',
     user_id: 'user-8',
+    emirate: 'Dubai',
     category: 'books',
     type: 'Board Games',
     brand: 'Various',
@@ -917,6 +945,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-27',
     user_id: 'user-5',
+    emirate: 'Abu Dhabi',
     category: 'kids',
     type: 'Stroller',
     brand: 'Bugaboo',
@@ -947,6 +976,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-28',
     user_id: 'user-2',
+    emirate: 'Sharjah',
     category: 'kids',
     type: 'LEGO Set',
     brand: 'LEGO',
@@ -977,6 +1007,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-29',
     user_id: 'user-6',
+    emirate: 'Dubai',
     category: 'kids',
     type: 'Baby Clothes Bundle',
     brand: 'Mixed',
@@ -1476,6 +1507,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-30',
     user_id: 'user-1',
+    emirate: 'RAK',
     category: 'other',
     type: 'Camping Tent',
     brand: 'Coleman',
