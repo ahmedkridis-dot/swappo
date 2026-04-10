@@ -118,16 +118,17 @@
     })();
   </script>
 
-  <!-- ═══════════ HERO — Video Primary + Copy Overlay ═══════════ -->
+  <!-- ═══════════ HERO — Cluster BG + Floating Video ═══════════ -->
   <section class="hero-video-section">
-    <!-- Full-width background video -->
+    <!-- Full-width background image (cluster) -->
     <div class="hero-video-bg">
-      <video autoplay muted loop playsinline preload="auto" aria-label="Swappo teaser">
-        <source src="video/teasing.mp4" type="video/mp4">
-      </video>
+      <picture>
+        <source media="(max-width: 768px)" srcset="assets/brand/hero/hero-cluster-mobile.jpg">
+        <img src="assets/brand/hero/hero-cluster.jpg" alt="" class="hero-bg-img" loading="eager" fetchpriority="high">
+      </picture>
       <div class="hero-video-overlay"></div>
     </div>
-    <!-- Hero content floating over video -->
+    <!-- Hero content floating over image -->
     <div class="container hero-video-content">
       <div class="hero-copy reveal reveal-up">
         <span class="hero-badge" data-i18n="hero_badge">UAE's first barter community</span>
@@ -144,15 +145,16 @@
         </div>
       </div>
     </div>
-    <!-- Cluster image as secondary floating element (desktop only) -->
-    <picture class="hero-cluster-float">
-      <source media="(max-width: 768px)" srcset="assets/brand/hero/hero-cluster-mobile.jpg">
-      <img src="assets/brand/hero/hero-cluster.jpg" alt="Swap anything — furniture, electronics, bikes, books and more" loading="eager" fetchpriority="high" width="2000" height="1116">
-    </picture>
-    <!-- Sound toggle -->
-    <button class="hero-sound-toggle" onclick="var v=document.querySelector('.hero-video-bg video');v.muted=!v.muted;this.innerHTML=v.muted?'<i class=\'fas fa-volume-mute\'></i>':'<i class=\'fas fa-volume-up\'></i>'" aria-label="Toggle sound">
-      <i class="fas fa-volume-mute"></i>
-    </button>
+    <!-- Floating video card (desktop right side) -->
+    <div class="hero-video-float reveal reveal-scale" onclick="var v=this.querySelector('video');v.muted=!v.muted;">
+      <video autoplay muted loop playsinline preload="auto" aria-label="Swappo teaser">
+        <source src="video/teasing.mp4" type="video/mp4">
+      </video>
+      <div class="hero-video-float-badge"><i class="fas fa-play"></i> <span data-i18n="hero_watch_teaser">Watch teaser</span></div>
+      <button class="hero-sound-toggle" onclick="event.stopPropagation();var v=this.parentElement.querySelector('video');v.muted=!v.muted;this.innerHTML=v.muted?'<i class=\'fas fa-volume-mute\'></i>':'<i class=\'fas fa-volume-up\'></i>'" aria-label="Toggle sound">
+        <i class="fas fa-volume-mute"></i>
+      </button>
+    </div>
   </section>
 
   <!-- ========== HOW IT WORKS ========== -->

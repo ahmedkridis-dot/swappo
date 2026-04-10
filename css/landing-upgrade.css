@@ -956,7 +956,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   HERO VIDEO — Full-width video background + overlay copy
+   HERO — Cluster image BG + floating video card
    ═══════════════════════════════════════════════════════════ */
 .hero-video-section {
   position: relative;
@@ -966,27 +966,32 @@
   overflow: hidden;
   background: #0B3B3E;
 }
+
+/* BG image (cluster) */
 .hero-video-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
-.hero-video-bg video {
+.hero-video-bg .hero-bg-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center right;
 }
 .hero-video-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(11,59,62,0.82) 0%, rgba(26,26,46,0.65) 50%, rgba(9,177,186,0.18) 100%);
+  background: linear-gradient(135deg, rgba(11,59,62,0.88) 0%, rgba(26,26,46,0.72) 45%, rgba(9,177,186,0.22) 100%);
   z-index: 1;
 }
+
+/* Copy */
 .hero-video-content {
   position: relative;
   z-index: 3;
   padding: 120px 0 100px;
-  max-width: 680px;
+  max-width: 620px;
 }
 .hero-video-section .hero-copy h1 {
   font-size: clamp(2.5rem, 5.5vw, 4.5rem);
@@ -1070,48 +1075,80 @@
   margin-right: 4px;
 }
 
-/* Cluster floating image (desktop right side) */
-.hero-cluster-float {
+/* ═══ Floating video card (right side) ═══ */
+.hero-video-float {
   position: absolute;
-  right: -40px;
-  bottom: -20px;
-  z-index: 2;
-  width: 45%;
-  max-width: 660px;
-  opacity: 0.6;
-  pointer-events: none;
-  filter: drop-shadow(0 20px 60px rgba(0,0,0,0.4));
-  animation: heroFloat 6s ease-in-out infinite;
+  right: 5%;
+  bottom: 12%;
+  z-index: 4;
+  width: 38%;
+  max-width: 520px;
+  min-width: 280px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow:
+    0 30px 80px -20px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(255,255,255,0.1),
+    0 0 60px rgba(9,177,186,0.2);
+  animation: heroFloat 5s ease-in-out infinite;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
-.hero-cluster-float img {
+.hero-video-float:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 40px 100px -20px rgba(0,0,0,0.6),
+    0 0 0 2px rgba(9,177,186,0.5),
+    0 0 80px rgba(9,177,186,0.35);
+}
+.hero-video-float video {
   width: 100%;
   height: auto;
   display: block;
   border-radius: 20px;
 }
-
-/* Sound toggle */
-.hero-sound-toggle {
+.hero-video-float-badge {
   position: absolute;
-  bottom: 28px;
-  right: 28px;
-  z-index: 5;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.3);
-  background: rgba(0,0,0,0.35);
+  top: 14px;
+  left: 14px;
+  background: rgba(0,0,0,0.5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #fff;
-  font-size: 16px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  pointer-events: none;
+}
+.hero-video-float-badge i { font-size: 10px; color: #5EEAD4; }
+
+/* Sound toggle inside floating video */
+.hero-video-float .hero-sound-toggle {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
 }
-.hero-sound-toggle:hover {
+.hero-video-float .hero-sound-toggle:hover {
   background: rgba(9,177,186,0.6);
   border-color: #09B1BA;
 }
@@ -1120,14 +1157,20 @@
 @media (max-width: 900px) {
   .hero-video-section { min-height: 80vh; }
   .hero-video-content { padding: 90px 0 70px; }
-  .hero-cluster-float { display: none; }
+  .hero-video-float {
+    position: relative;
+    right: auto; bottom: auto;
+    width: 90%;
+    max-width: 400px;
+    margin: -40px auto 30px;
+    z-index: 4;
+    animation: none;
+  }
   .hero-video-section .hero-copy { text-align: center; }
   .hero-video-section .hero-subtitle-text { margin-left: auto; margin-right: auto; }
   .hero-video-section .hero-cta,
   .hero-video-section .hero-trust { justify-content: center; }
-  .hero-sound-toggle { bottom: 16px; right: 16px; width: 38px; height: 38px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-cluster-float { animation: none; }
-  .hero-video-bg video { display: none; }
+  .hero-video-float { animation: none; }
 }
