@@ -275,7 +275,7 @@ const translations = {
     avatar_modal_confirm: "Confirm",
 
     // Footer
-    footer_tagline: "The UAE's first dedicated barter, gift & recycle platform. Swap, give, recycle — without spending a single dirham.",
+    footer_tagline: "The UAE's first dedicated barter, gift & recycle platform.",
     footer_platform: "Platform",
     footer_company: "Company",
     footer_legal: "Legal",
@@ -1565,7 +1565,7 @@ const translations = {
     avatar_modal_confirm: "Confirmer",
 
     // Footer
-    footer_tagline: "La première plateforme dédiée au troc, au don et au recyclage aux EAU. Échangez, donnez, recyclez — sans dépenser un seul dirham.",
+    footer_tagline: "La première plateforme dédiée au troc, au don et au recyclage aux EAU.",
     footer_platform: "Plateforme",
     footer_company: "Entreprise",
     footer_legal: "Légal",
@@ -2713,7 +2713,7 @@ const translations = {
     avatar_modal_confirm: "تأكيد",
 
     // Footer
-    footer_tagline: "أول منصة مخصصة للمقايضة والإهداء وإعادة التدوير في الإمارات. بادل، أعط، أعد التدوير — بدون إنفاق درهم واحد.",
+    footer_tagline: "أول منصة مخصصة للمقايضة والإهداء وإعادة التدوير في الإمارات.",
     footer_platform: "المنصة",
     footer_company: "الشركة",
     footer_legal: "قانوني",
@@ -3863,7 +3863,7 @@ const translations = {
     avatar_modal_confirm: "تصدیق",
 
     // Footer
-    footer_tagline: "یو اے ای کا پہلا وقف شدہ بارٹر، تحفہ اور ری سائیکل پلیٹ فارم۔ تبادلہ کریں، دیں، ری سائیکل کریں — ایک درہم بھی خرچ کیے بغیر۔",
+    footer_tagline: "یو اے ای کا پہلا وقف شدہ بارٹر، تحفہ اور ری سائیکل پلیٹ فارم۔",
     footer_platform: "پلیٹ فارم",
     footer_company: "کمپنی",
     footer_legal: "قانونی",
@@ -4985,7 +4985,7 @@ const translations = {
     avatar_modal_confirm: "Подтвердить",
 
     // Footer
-    footer_tagline: "Первая специализированная платформа обмена, дарения и переработки в ОАЭ. Обменивайте, дарите, перерабатывайте — не потратив ни дирхама.",
+    footer_tagline: "Первая специализированная платформа обмена, дарения и переработки в ОАЭ.",
     footer_platform: "Платформа",
     footer_company: "Компания",
     footer_legal: "Юридическое",

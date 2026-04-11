@@ -664,8 +664,8 @@ const DemoItems = {
     } else {
       const price = item.price || 0;
       priceHTML = '<div class="product-price" style="font-weight:800;font-size:15px;color:#1A1A2E;">' + price.toLocaleString() + ' <span style="font-size:11px;font-weight:600;color:#6B7280;">AED</span></div>';
-      modesHTML = '<span class="mode-badge mode-buy" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>' +
-        '<span class="mode-badge mode-swap" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>';
+      modesHTML = '<span class="mode-badge mode-swap" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>' +
+        '<span class="mode-badge mode-buy" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>';
     }
 
     return '<div class="product-card" onclick="window.location.href=\'' + href + '\'" style="cursor:pointer">' +
