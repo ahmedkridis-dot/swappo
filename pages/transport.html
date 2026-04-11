@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/swappo-visual.css">
   <link rel="stylesheet" href="../css/swappo-modern-2026.css">
+  <link rel="stylesheet" href="../css/landing-upgrade.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -21,7 +22,7 @@
     .transport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; padding: 48px 0; }
     .transporter-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 20px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; }
     .transporter-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(9,177,186,0.15); border-color: #09B1BA; }
-    .transporter-card-img { height: 180px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+    .transporter-card-img { height: 180px; background: linear-gradient(135deg, #E6F7F8, #F3F4F6); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
     .transporter-card-img img { width: 100%; height: 100%; object-fit: cover; }
     .transporter-card-img .vehicle-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; }
     .transporter-card-body { padding: 20px; }
@@ -93,19 +94,39 @@
   </style>
 </head>
 <body>
-  <!-- Navbar injected by mega-menu.js -->
-  <nav class="navbar" id="main-navbar">
-    <div class="container navbar-container">
-      <a href="../index.html" class="site-logo">Swappo</a>
-      <div class="navbar-search"><input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder"></div>
-      <div class="nav-actions">
-        <div class="lang-selector" id="lang-selector"></div>
-        <a href="chat.html" class="nav-icon" title="Messages"><i class="fas fa-comment-dots"></i></a>
-        <a href="#" class="nav-icon" title="Account"><i class="fas fa-user"></i></a>
-        <a href="publier.html" class="btn-pill btn-pill-teal nav-cta" data-i18n="drop_item">Drop an Item</a>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="../index.html" class="site-logo">Swappo</a>
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        </div>
+        <div class="navbar-actions">
+          <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </nav>
+
+  <!-- Eco Ticker -->
+  <div class="eco-ticker" id="ecoTicker">
+    <div class="eco-ticker-content">
+      <span class="eco-ticker-item">🌿 <span class="eco-ticker-number" data-target="6430" data-suffix=" kg">0</span> CO2 saved</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🔄 <span class="eco-ticker-number" data-target="1892" data-suffix="">0</span> items swapped</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🎁 <span class="eco-ticker-number" data-target="247" data-suffix="">0</span> gifts today</span>
+      <span class="eco-ticker-live">↑ <span id="ecoTickerLive">+12 in the last hour</span></span>
+    </div>
+    <button class="eco-ticker-close" id="ecoTickerClose" aria-label="Close">×</button>
+  </div>
+
+  <!-- Mega Menu -->
+  <div id="mega-menu-mount"></div>
 
   <!-- ========== HERO ========== -->
   <section class="transport-hero">
@@ -231,7 +252,7 @@
   const TRANSPORTERS = [
     {
       id: 't-1', name: "Ahmed's Movers", vehicle: 'Pickup', vehicleModel: 'Toyota Hilux',
-      photo: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop',
+      photo: 'https://images.unsplash.com/photo-1591768793355-74d04bb6608f?w=600&h=400&fit=crop',
       capacity: 800, zones: ['Dubai','Sharjah','Ajman'], interEmirate: true,
       priceBase: 80, priceInter: 150, rating: 4.8, deliveries: 12,
       equipment: ['Protective cover','Straps','1-person loading help'],
@@ -246,7 +267,7 @@
     },
     {
       id: 't-2', name: 'Gulf Express Transport', vehicle: 'Van', vehicleModel: 'Nissan Urvan',
-      photo: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=400&fit=crop',
+      photo: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&h=400&fit=crop',
       capacity: 1200, zones: ['Dubai','Abu Dhabi','Sharjah'], interEmirate: true,
       priceBase: 120, priceInter: 250, rating: 4.6, deliveries: 28,
       equipment: ['Protective cover','Straps','Dolly cart','2-person loading help','Loading ramp'],
@@ -261,7 +282,7 @@
     },
     {
       id: 't-3', name: 'Heavy Haul UAE', vehicle: 'Small Truck', vehicleModel: 'Mitsubishi Canter 3.5t',
-      photo: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&h=400&fit=crop',
+      photo: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=600&h=400&fit=crop',
       capacity: 2500, zones: ['Dubai','Abu Dhabi','Sharjah','Ajman','RAK','Fujairah','UAQ'], interEmirate: true,
       priceBase: 200, priceInter: 400, rating: 4.9, deliveries: 45,
       equipment: ['Protective cover','Straps','Dolly cart','2-person loading help','Loading ramp'],
@@ -277,7 +298,7 @@
     },
     {
       id: 't-4', name: 'Quick Pickup', vehicle: 'Pickup', vehicleModel: 'Nissan Navara',
-      photo: 'https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=600&h=400&fit=crop',
+      photo: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0220?w=600&h=400&fit=crop',
       capacity: 600, zones: ['RAK','Fujairah','UAQ','Ajman'], interEmirate: true,
       priceBase: 60, priceInter: 100, rating: 4.3, deliveries: 8,
       equipment: ['Protective cover','Straps'],
@@ -291,7 +312,7 @@
     },
     {
       id: 't-5', name: 'Abu Dhabi Movers', vehicle: 'Van', vehicleModel: 'Mercedes Sprinter',
-      photo: 'https://images.unsplash.com/photo-1586864387789-628af9feed72?w=600&h=400&fit=crop',
+      photo: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=600&h=400&fit=crop',
       capacity: 1500, zones: ['Abu Dhabi','Al Ain','Dubai'], interEmirate: true,
       priceBase: 100, priceInter: 200, rating: 4.5, deliveries: 18,
       equipment: ['Protective cover','Straps','Dolly cart','1-person loading help'],
@@ -338,7 +359,7 @@
 
       return '<div class="transporter-card" data-id="' + t.id + '">' +
         '<div class="transporter-card-img">' +
-          '<img src="' + t.photo + '" alt="' + t.name + '" loading="lazy">' +
+          '<img src="' + t.photo + '" alt="' + t.name + '" loading="lazy" onerror="this.style.display=\'none\'">' +
           '<span class="vehicle-badge"><i class="fas fa-truck"></i> ' + t.vehicleModel + '</span>' +
         '</div>' +
         '<div class="transporter-card-body">' +
@@ -490,16 +511,18 @@
 
   // ═══ INIT ═══
   renderTransporters();
-  if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
-  if (typeof renderMegaMenuBar === 'function') {
+
+  // Mega menu + navbar
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
     var mount = document.getElementById('mega-menu-mount');
-    if (!mount) {
-      mount = document.createElement('div');
-      mount.id = 'mega-menu-mount';
-      document.querySelector('.navbar').after(mount);
+    if (mount && typeof renderMegaMenuBar === 'function') {
+      mount.innerHTML = renderMegaMenuBar(true);
     }
-    mount.innerHTML = renderMegaMenuBar(true);
-  }
+    // Eco ticker close
+    var closeBtn = document.getElementById('ecoTickerClose');
+    if (closeBtn) closeBtn.addEventListener('click', function() { document.getElementById('ecoTicker').style.display = 'none'; });
+  });
   </script>
 </body>
 </html>
