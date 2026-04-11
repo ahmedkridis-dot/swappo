@@ -3,6 +3,13 @@
    Clean, flat, minimal
    ============================================ */
 
+/* OVERRIDE: disable scroll-reveal animations — sections must be visible immediately */
+.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-up {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
 /* --- DESIGN TOKENS --- */
 :root {
   /* Colors — Primary (teal) */
