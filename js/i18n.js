@@ -6447,7 +6447,7 @@ function initI18n() {
     console.warn('Could not read from localStorage', e);
   }
 
-  const initialLang = savedLang || detectBrowserLanguage();
+  const initialLang = savedLang || 'en'; // Default to EN, not browser language
 
   // Set initial language
   setLanguage(initialLang);

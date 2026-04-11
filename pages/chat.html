@@ -292,9 +292,10 @@
 
 	// ── Map conversations to real items ──
 	const CONV_ITEM_MAP = {
-		'conv-1': { their_item_id: 'item-5',  my_item_id: 'item-6',  status: 'accepted' },
-		'conv-2': { their_item_id: 'item-14', my_item_id: 'item-23', status: 'accepted' },
-		'conv-3': { their_item_id: 'item-21', my_item_id: 'item-6',  status: 'pending' }
+		// Scenario E: Khalid ↔ Sara (accepted swap)
+		'conv-e': { their_item_id: 'item-5', my_item_id: 'item-1', status: 'accepted', their_item_title: 'Samsung Galaxy S24', my_item_title: 'iPhone 14 Pro Max' },
+		// Scenario F: Fatima ↔ Youssef (accepted sale)
+		'conv-f': { their_item_id: null, my_item_id: 'item-18', status: 'accepted', their_item_title: 'Cash purchase', my_item_title: 'Gucci Marmont Bag' }
 	};
 
 	// ── Helpers ──
@@ -356,15 +357,17 @@
 		const card = document.querySelector(`[onclick="openConv('${convId}')"]`);
 		if (card) { card.classList.add('active'); const b = card.querySelector('.conv-unread'); if (b) b.remove(); }
 
-		// Show panels
-		document.getElementById('chatEmpty').style.display = 'none';
-		['swapDeal','userBar','msgArea','inputBar'].forEach(id => document.getElementById(id).style.display = '');
-
 		// ── Render SWAP DEAL CARD ──
 		const map = CONV_ITEM_MAP[convId] || {};
+		const convData = DemoChat.getConversations().find(c => c.id === convId);
 		const theirItem = DemoItems.getById(map.their_item_id);
 		const myItem = DemoItems.getById(map.my_item_id);
-		const status = map.status || 'pending';
+		const status = convData?.status || map.status || 'accepted'; // default accepted for existing convos
+
+		// Show panels — inputBar ONLY if accepted
+		document.getElementById('chatEmpty').style.display = 'none';
+		['swapDeal','userBar','msgArea'].forEach(id => document.getElementById(id).style.display = '');
+		document.getElementById('inputBar').style.display = (status === 'pending') ? 'none' : '';
 
 		const statusLabels = { pending: '⏳ Pending', accepted: '✅ Accepted', completed: '🎉 Completed' };
 		const statusClass = status;
