@@ -173,7 +173,7 @@ const translations = {
     items_listed: "Items Listed",
     swaps_completed: "Swaps Done",
     ready_to_swap: "Ready to swap?",
-    create_account: "Create my account — It's free",
+    create_account: "Create my account",
     items: "items",
 
     // Login & Auth
@@ -1308,7 +1308,7 @@ const translations = {
     mode_gift: "Cadeau",
     // v5 Marketplace
     hero_subtitle: "La première marketplace des Émirats pour échanger, acheter, vendre et donner. Échangez avec votre communauté.",
-    hero_start_free: "Commencer à échanger — C'est gratuit",
+    hero_start_free: "Commencer à échanger",
     step1_title_v5: "Publiez votre article",
     step1_desc_v5: "Fixez votre prix et ajoutez des photos. En quelques secondes.",
     step2_title_v5: "Recevez des offres",
@@ -1463,7 +1463,7 @@ const translations = {
     items_listed: "Articles listés",
     swaps_completed: "Échanges réalisés",
     ready_to_swap: "Prêt à échanger?",
-    create_account: "Créer mon compte — C'est gratuit",
+    create_account: "Créer mon compte",
     items: "articles",
 
     // Login & Auth
@@ -1541,7 +1541,7 @@ const translations = {
     auth_confirm_password: "Confirmer le mot de passe",
     auth_confirm_placeholder: "Retapez le mot de passe",
     auth_terms_agree: "J'accepte les <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">Conditions d'utilisation</a> et la <a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">Politique de confidentialité</a>",
-    auth_join_free: "Rejoindre le Swap — C'est gratuit",
+    auth_join_free: "Rejoindre le Swap",
     auth_or_continue: "ou continuer avec",
     auth_google: "Continuer avec Google",
     auth_apple: "Continuer avec Apple",
@@ -2099,7 +2099,7 @@ const translations = {
     impact_badge_vision_2031: "UAE Vision 2031",
     impact_cta_title: "Prêt à faire la différence ?",
     impact_cta_subtitle: "Quelqu'un a besoin de ce que tu as. Échange-le.",
-    impact_cta_btn: "Rejoindre Swappo — C'est gratuit",
+    impact_cta_btn: "Rejoindre Swappo",
     impact_cta_join: "Rejoins",
     impact_cta_others: "autres swappeurs qui font déjà la différence",
     impact_nav: "Notre Impact",
@@ -2456,7 +2456,7 @@ const translations = {
     mode_gift: "هدية",
     // v5 Marketplace
     hero_subtitle: "أول سوق في الإمارات للمقايضة والشراء والبيع والإهداء. تبادل مع مجتمعك.",
-    hero_start_free: "ابدأ المقايضة — مجاناً",
+    hero_start_free: "ابدأ المقايضة",
     step1_title_v5: "انشر منتجك",
     step1_desc_v5: "حدد السعر وأضف الصور. في ثوانٍ.",
     step2_title_v5: "استقبل العروض",
@@ -2611,7 +2611,7 @@ const translations = {
     items_listed: "عناصر مدرجة",
     swaps_completed: "تبادلات مكتملة",
     ready_to_swap: "هل أنت مستعد للتبديل؟",
-    create_account: "إنشاء حسابي — مجاني",
+    create_account: "إنشاء حسابي",
     items: "عناصر",
 
     // Login & Auth
@@ -2689,7 +2689,7 @@ const translations = {
     auth_confirm_password: "تأكيد كلمة المرور",
     auth_confirm_placeholder: "أعد إدخال كلمة المرور",
     auth_terms_agree: "أوافق على <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">شروط الاستخدام</a> و<a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">سياسة الخصوصية</a>",
-    auth_join_free: "انضم للتبادل — مجاناً",
+    auth_join_free: "انضم للتبادل",
     auth_or_continue: "أو تابع مع",
     auth_google: "متابعة مع Google",
     auth_apple: "متابعة مع Apple",
@@ -3247,7 +3247,7 @@ const translations = {
     impact_badge_vision_2031: "رؤية الإمارات 2031",
     impact_cta_title: "مستعد لصنع فرق؟",
     impact_cta_subtitle: "شخص ما يحتاج ما لديك. بادله.",
-    impact_cta_btn: "انضم لسوابو — مجاناً",
+    impact_cta_btn: "انضم لسوابو",
     impact_cta_join: "انضم إلى",
     impact_cta_others: "متبادلين آخرين يصنعون فرقاً بالفعل",
     impact_nav: "تأثيرنا",
@@ -3607,7 +3607,7 @@ const translations = {
     mode_gift: "تحفہ",
     // v5 Marketplace
     hero_subtitle: "یو اے ای کا پہلا مارکیٹ پلیس تبادلے، خرید، فروخت اور تحفے کے لیے۔ اپنی کمیونٹی سے تبادلہ کریں۔",
-    hero_start_free: "تبادلہ شروع کریں — مفت ہے",
+    hero_start_free: "تبادلہ شروع کریں",
     step1_title_v5: "اپنا آئٹم شائع کریں",
     step1_desc_v5: "قیمت مقرر کریں اور تصاویر شامل کریں۔ چند سیکنڈوں میں۔",
     step2_title_v5: "آفرز حاصل کریں",
@@ -3761,7 +3761,7 @@ const translations = {
     items_listed: "درج شدہ آئٹمز",
     swaps_completed: "مکمل ایکسچینجز",
     ready_to_swap: "تبدیل کرنے کے لیے تیار ہیں؟",
-    create_account: "میرا اکاؤنٹ بنائیں — یہ مفت ہے",
+    create_account: "میرا اکاؤنٹ بنائیں",
     items: "چیزیں",
 
     // Login & Auth
@@ -3839,7 +3839,7 @@ const translations = {
     auth_confirm_password: "پاس ورڈ کی تصدیق",
     auth_confirm_placeholder: "پاس ورڈ دوبارہ درج کریں",
     auth_terms_agree: "میں <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">استعمال کی شرائط</a> اور <a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">رازداری کی پالیسی</a> سے اتفاق کرتا ہوں",
-    auth_join_free: "سواپ میں شامل ہوں — مفت ہے",
+    auth_join_free: "سواپ میں شامل ہوں",
     auth_or_continue: "یا جاری رکھیں",
     auth_google: "Google سے جاری رکھیں",
     auth_apple: "Apple سے جاری رکھیں",
@@ -4397,7 +4397,7 @@ const translations = {
     impact_badge_vision_2031: "UAE Vision 2031",
     impact_cta_title: "فرق ڈالنے کے لیے تیار؟",
     impact_cta_subtitle: "کسی کو آپ کی چیز کی ضرورت ہے۔ تبادلہ کریں۔",
-    impact_cta_btn: "سوابو میں شامل ہوں — مفت ہے",
+    impact_cta_btn: "سوابو میں شامل ہوں",
     impact_cta_join: "شامل ہوں",
     impact_cta_others: "اور تبادلہ کرنے والے پہلے سے فرق ڈال رہے ہیں",
     impact_nav: "ہمارا اثر",
@@ -4883,7 +4883,7 @@ const translations = {
     items_listed: "Товаров размещено",
     swaps_completed: "Обменов выполнено",
     ready_to_swap: "Готовы к обмену?",
-    create_account: "Создать аккаунт — Бесплатно",
+    create_account: "Создать аккаунт",
     items: "товаров",
 
     // Login & Auth
@@ -4961,7 +4961,7 @@ const translations = {
     auth_confirm_password: "Подтвердите пароль",
     auth_confirm_placeholder: "Введите пароль ещё раз",
     auth_terms_agree: "Я принимаю <a href=\"terms.html\" target=\"_blank\" rel=\"noopener\">Условия использования</a> и <a href=\"privacy.html\" target=\"_blank\" rel=\"noopener\">Политику конфиденциальности</a>",
-    auth_join_free: "Присоединиться — Бесплатно",
+    auth_join_free: "Присоединиться",
     auth_or_continue: "или продолжить с",
     auth_google: "Продолжить с Google",
     auth_apple: "Продолжить с Apple",
@@ -5519,7 +5519,7 @@ const translations = {
     impact_badge_vision_2031: "ОАЭ Видение 2031",
     impact_cta_title: "Готовы изменить мир?",
     impact_cta_subtitle: "Кому-то нужно то, что есть у вас. Обменяйте.",
-    impact_cta_btn: "Присоединиться к Swappo — Бесплатно",
+    impact_cta_btn: "Присоединиться к Swappo",
     impact_cta_join: "Присоединяйтесь к",
     impact_cta_others: "другим обменщикам, уже делающим разницу",
     impact_nav: "Наш вклад",

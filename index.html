@@ -686,8 +686,9 @@
       }
     })();
 
-    // ── Mechanism 6: Swap→Gift 30-day suggestion ──
+    // ── Mechanism 6: Swap→Gift 30-day suggestion — DISABLED for clean demo ──
     (function() {
+      return; // disabled: popup blocks homepage on every load
       if (!window.DemoAuth || !DemoAuth.isLoggedIn()) return;
       if (!window.DemoItems) return;
       var user = DemoAuth.getCurrentUser();
