@@ -22,6 +22,10 @@ const translations = {
     feat_pro_zero_fee: "0% service fee on purchases",
     feat_pro_badge: "Verified Pro badge",
     pro_roi_hint: "2 purchases/month and your Pro pays for itself",
+    all_modes: "All modes",
+    mode_buy: "Buy",
+    mode_swap: "Swap",
+    mode_gift: "Gift",
     // v5 Marketplace
     hero_subtitle: "The UAE's first marketplace for swapping, buying, selling, and gifting. Trade items with your community.",
     hero_start_free: "Start Swapping — It's Free",
@@ -1298,6 +1302,10 @@ const translations = {
     feat_pro_zero_fee: "0% de frais de service sur les achats",
     feat_pro_badge: "Badge Pro vérifié",
     pro_roi_hint: "2 achats/mois et votre Pro est rentabilisé",
+    all_modes: "Tous les modes",
+    mode_buy: "Acheter",
+    mode_swap: "Échanger",
+    mode_gift: "Cadeau",
     // v5 Marketplace
     hero_subtitle: "La première marketplace des Émirats pour échanger, acheter, vendre et donner. Échangez avec votre communauté.",
     hero_start_free: "Commencer à échanger — C'est gratuit",
@@ -2442,6 +2450,10 @@ const translations = {
     feat_pro_zero_fee: "0% رسوم خدمة على المشتريات",
     feat_pro_badge: "شارة Pro موثقة",
     pro_roi_hint: "عمليتا شراء/شهر وسيدفع Pro عن نفسه",
+    all_modes: "كل الأوضاع",
+    mode_buy: "شراء",
+    mode_swap: "مقايضة",
+    mode_gift: "هدية",
     // v5 Marketplace
     hero_subtitle: "أول سوق في الإمارات للمقايضة والشراء والبيع والإهداء. تبادل مع مجتمعك.",
     hero_start_free: "ابدأ المقايضة — مجاناً",
@@ -3589,6 +3601,10 @@ const translations = {
     feat_pro_zero_fee: "خریداری پر 0% سروس فیس",
     feat_pro_badge: "تصدیق شدہ Pro بیج",
     pro_roi_hint: "ماہانہ 2 خریداری اور آپ کا Pro خود ادا ہو جائے گا",
+    all_modes: "تمام طریقے",
+    mode_buy: "خریدیں",
+    mode_swap: "تبادلہ",
+    mode_gift: "تحفہ",
     // v5 Marketplace
     hero_subtitle: "یو اے ای کا پہلا مارکیٹ پلیس تبادلے، خرید، فروخت اور تحفے کے لیے۔ اپنی کمیونٹی سے تبادلہ کریں۔",
     hero_start_free: "تبادلہ شروع کریں — مفت ہے",
@@ -4729,6 +4745,10 @@ const translations = {
   },
 
   ru: {
+    all_modes: "Все режимы",
+    mode_buy: "Купить",
+    mode_swap: "Обмен",
+    mode_gift: "Подарок",
     contact_phone_label: "Телефон",
     contact_phone_value: "+971 54 312 5559",
     contact_whatsapp_label: "WhatsApp",

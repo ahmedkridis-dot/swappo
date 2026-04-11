@@ -213,5 +213,15 @@
     })();
     */
 
+
+    // ── Reveal safety net — force-show all .reveal after 1.5s ──
+    setTimeout(function() {
+      document.querySelectorAll('.reveal').forEach(function(el) {
+        if (!el.classList.contains('visible')) {
+          el.classList.add('visible');
+        }
+      });
+    }, 1500);
+
   });
 })();
