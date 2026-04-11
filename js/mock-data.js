@@ -1827,46 +1827,38 @@ const MOCK_SWAPS = [
 
 // ─── MOCK CONVERSATIONS ─────────────────────────────────────────────────────
 const MOCK_CONVERSATIONS = [
+  // Scenario E — Khalid ↔ Sara: accepted swap (iPhone vs Samsung), chat active
   {
-    id: 'conv-1',
-    swap_id: 'swap-1',
-    other_user: MOCK_USERS[0], // Ahmed Al-Maktoum
-    item_title: 'Sony PlayStation 5',
-    last_message: 'When can we meet?',
-    unread_count: 2,
-    messages: [
-      { id: 'msg-1', sender_id: 'user-1', content: "Hi! I'm interested in your Polo Shirt. Is it still available?", created_at: '2026-03-20T10:00:00', is_system: false },
-      { id: 'msg-2', sender_id: 'user-demo', content: "Yes, it's in perfect condition! Barely worn.", created_at: '2026-03-20T10:05:00', is_system: false },
-      { id: 'msg-3', sender_id: 'user-1', content: "Great! I'd like to swap my PS5 for it.", created_at: '2026-03-20T10:08:00', is_system: false },
-      { id: 'msg-4', sender_id: 'user-demo', content: 'Sounds good to me! Where should we meet?', created_at: '2026-03-20T10:12:00', is_system: false },
-      { id: 'msg-5', sender_id: 'user-1', content: 'When can we meet?', created_at: '2026-03-20T10:15:00', is_system: false }
-    ]
-  },
-  {
-    id: 'conv-2',
-    swap_id: 'swap-3',
-    other_user: MOCK_USERS[1], // Fatima Al-Hashimi
-    item_title: 'Herman Miller Aeron Chair',
-    last_message: 'I can meet at Dubai Mall this weekend.',
-    unread_count: 0,
-    messages: [
-      { id: 'msg-6', sender_id: 'user-demo', content: 'Hi Fatima! Love your Herman Miller chair. Would you swap it for my Tennis Racket?', created_at: '2026-03-21T14:00:00', is_system: false },
-      { id: 'msg-7', sender_id: 'user-2', content: "Hi! That's a great racket. Let me think about it.", created_at: '2026-03-21T14:30:00', is_system: false },
-      { id: 'msg-8', sender_id: 'user-2', content: "OK, I'm in! Where should we do the swap?", created_at: '2026-03-21T16:00:00', is_system: false },
-      { id: 'msg-9', sender_id: 'user-demo', content: 'I can meet at Dubai Mall this weekend.', created_at: '2026-03-21T16:15:00', is_system: false }
-    ]
-  },
-  {
-    id: 'conv-3',
-    swap_id: 'swap-4',
-    other_user: MOCK_USERS[7], // Layla Nouri
-    item_title: 'Board Games Bundle',
-    last_message: 'Swap request sent! Waiting for your response.',
+    id: 'conv-e',
+    swap_id: 'swap-e',
+    other_user: MOCK_USERS[1], // Sara Al Maktoum
+    for_user: 'user-demo-free', // Khalid
+    item_title: 'iPhone 14 Pro Max ↔ Samsung Galaxy S24',
+    status: 'accepted',
+    last_message: 'Perfect! See you at the main entrance.',
     unread_count: 1,
     messages: [
-      { id: 'msg-10', sender_id: 'user-8', content: "Hey! I'd love to swap my board games for your Polo Shirt.", created_at: '2026-03-25T09:00:00', is_system: false },
-      { id: 'msg-11', sender_id: 'user-8', content: 'All three games are in great condition, played only a few times.', created_at: '2026-03-25T09:02:00', is_system: false },
-      { id: 'msg-12', sender_id: 'user-demo', content: 'Swap request sent! Waiting for your response.', created_at: '2026-03-25T09:05:00', is_system: true }
+      { id: 'msg-e1', sender_id: 'system', content: '\u{1F91D} Swap accepted! You can now chat. Meet in a safe public place.', created_at: '2026-04-09T10:00:00', is_system: true },
+      { id: 'msg-e2', sender_id: 'user-2', content: "Great! When and where works for you?", created_at: '2026-04-09T10:05:00', is_system: false },
+      { id: 'msg-e3', sender_id: 'user-demo-free', content: "How about Dubai Mall, tomorrow at 5pm?", created_at: '2026-04-09T10:12:00', is_system: false },
+      { id: 'msg-e4', sender_id: 'user-2', content: "Perfect! See you at the main entrance.", created_at: '2026-04-09T10:20:00', is_system: false }
+    ]
+  },
+  // Scenario F — Fatima ↔ Youssef: accepted sale, chat active (ready for QR)
+  {
+    id: 'conv-f',
+    swap_id: 'swap-f',
+    other_user: MOCK_USERS[4], // Youssef Hamdan
+    for_user: 'user-demo', // Fatima
+    item_title: 'Gucci Marmont Bag — 2,500 AED',
+    status: 'accepted',
+    last_message: "I'm at the location!",
+    unread_count: 1,
+    messages: [
+      { id: 'msg-f1', sender_id: 'system', content: '\u{1F91D} Purchase accepted! You can now chat. Meet in a safe public place.', created_at: '2026-04-10T15:00:00', is_system: true },
+      { id: 'msg-f2', sender_id: 'user-demo', content: "Hi Youssef! Shall we meet at Yas Mall tomorrow?", created_at: '2026-04-10T15:05:00', is_system: false },
+      { id: 'msg-f3', sender_id: 'user-5', content: "Yes! 2pm works for me.", created_at: '2026-04-10T15:15:00', is_system: false },
+      { id: 'msg-f4', sender_id: 'user-5', content: "I'm at the location!", created_at: '2026-04-11T13:55:00', is_system: false }
     ]
   }
 ];
@@ -1946,6 +1938,66 @@ function getMockItemsSorted(sortBy = 'newest') {
 // ─── EXPOSE GLOBALLY ────────────────────────────────────────────────────────
 window.SUBSCRIPTION_TIERS = SUBSCRIPTION_TIERS;
 window.MOCK_USERS = MOCK_USERS;
+// ─── MOCK OFFERS (pre-loaded scenarios for demo testing) ────────────────────
+const MOCK_OFFERS = [
+  // Scenario A — Swap pure: Raj wants Khalid's iPhone for his PS5
+  {
+    id: 'offer-a', type: 'swap', status: 'pending',
+    from_user_id: 'user-3', to_user_id: 'user-demo-free',
+    from_item: { id: 'raj-ps5', brand: 'Sony', model: 'PlayStation 5 Console', price: 1800, condition: 'good', category: 'gaming', photos: ['https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=400&fit=crop'] },
+    to_item: { id: 'khalid-iphone', brand: 'Apple', model: 'iPhone 14 Pro Max', price: 2800, condition: 'like_new', category: 'electronics', photos: ['https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=400&h=400&fit=crop'] },
+    cash_amount: 0,
+    from_badge: '\u{2B50} Swapper', from_rating: 4.0,
+    message: 'Someone wants to swap their PS5 Console (1,800 AED) for your iPhone 14 Pro Max (2,800 AED)',
+    created_at: '2026-04-10T14:30:00'
+  },
+  // Scenario B — Swap + Cash: Omar wants Khalid's Nike for Skateboard + 200 AED
+  {
+    id: 'offer-b', type: 'swap_cash', status: 'pending',
+    from_user_id: 'user-1', to_user_id: 'user-demo-free',
+    from_item: { id: 'omar-skate', brand: 'Element', model: 'Skateboard Pro', price: 200, condition: 'good', category: 'sports', photos: ['https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=400&h=400&fit=crop'] },
+    to_item: { id: 'khalid-nike', brand: 'Nike', model: 'Air Jordan 1', price: 450, condition: 'good', category: 'clothing', photos: ['https://images.unsplash.com/photo-1556906781-9a412961c28c?w=400&h=400&fit=crop'] },
+    cash_amount: 200,
+    from_badge: '\u{1F525} Active', from_rating: 4.5,
+    message: 'Someone offers their Skateboard (200 AED) + 200 AED cash for your Nike Air Jordan 1 (450 AED)',
+    created_at: '2026-04-10T16:00:00'
+  },
+  // Scenario C — Cash buy: Sara wants Fatima's Drone for 800 AED
+  {
+    id: 'offer-c', type: 'buy', status: 'pending',
+    from_user_id: 'user-2', to_user_id: 'user-demo',
+    from_item: null,
+    to_item: { id: 'fatima-drone', brand: 'DJI', model: 'Mini 3 Drone', price: 800, condition: 'good', category: 'electronics', photos: ['https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400&h=400&fit=crop'] },
+    cash_amount: 800,
+    from_badge: '\u{1F331} Newcomer', from_rating: 0,
+    message: 'Someone wants to buy your DJI Mini 3 Drone for 800 AED',
+    created_at: '2026-04-11T09:15:00'
+  },
+  // Scenario D — Negotiated buy: Aisha wants Fatima's Dyson for 900 AED (listed 1200)
+  {
+    id: 'offer-d', type: 'buy', status: 'pending',
+    from_user_id: 'user-4', to_user_id: 'user-demo',
+    from_item: null,
+    to_item: { id: 'fatima-dyson', brand: 'Dyson', model: 'V15 Vacuum', price: 1200, condition: 'good', category: 'furniture', photos: ['https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop'] },
+    cash_amount: 900,
+    from_badge: '\u{2B50} Swapper', from_rating: 4.6,
+    message: 'Someone offers 900 AED for your Dyson V15 Vacuum (listed at 1,200 AED)',
+    created_at: '2026-04-11T10:30:00'
+  },
+  // Scenario H — Fatima's sent offer: her Frame for Omar's Rug + 3000 AED cash
+  {
+    id: 'offer-h', type: 'swap_cash', status: 'pending',
+    from_user_id: 'user-demo', to_user_id: 'user-1',
+    from_item: { id: 'fatima-frame', brand: 'Handmade', model: 'Arabic Calligraphy Art Frame', price: 350, condition: 'new', category: 'furniture', photos: ['https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&h=400&fit=crop'] },
+    to_item: { id: 'omar-rug', brand: 'Persian', model: 'Silk Rug', price: 3500, condition: 'good', category: 'furniture', photos: ['https://images.unsplash.com/photo-1600166898405-da9535204843?w=400&h=400&fit=crop'] },
+    cash_amount: 3000,
+    from_badge: '\u{1F525} Active', from_rating: 4.8,
+    message: 'You offered your Arabic Calligraphy Frame (350 AED) + 3,000 AED cash for their Persian Rug (3,500 AED)',
+    created_at: '2026-04-09T11:00:00'
+  }
+];
+
+window.MOCK_OFFERS = MOCK_OFFERS;
 window.DEMO_USER = DEMO_USER;
 window.MOCK_ITEMS = MOCK_ITEMS;
 window.MOCK_SWAPS = MOCK_SWAPS;

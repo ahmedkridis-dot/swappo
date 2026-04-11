@@ -924,11 +924,13 @@ const DemoChat = {
     if (!user) return [];
 
     const localConvs = _getArray(STORAGE_KEYS.CONVERSATIONS);
-    // Merge with mock conversations (for demo user)
+    // Merge with mock conversations matching this user
     let convs = [];
-    if (user.id === 'user-demo') {
-      convs = [...(MOCK_CONVERSATIONS || [])];
-    }
+    (MOCK_CONVERSATIONS || []).forEach(c => {
+      if (c.for_user === user.id || (!c.for_user && user.id === 'user-demo')) {
+        convs.push(c);
+      }
+    });
 
     // Add local conversations involving this user
     localConvs.forEach(c => {
