@@ -662,6 +662,25 @@
       swapInfoEl.style.display = '';
     }
 
+    // ── Price display (prominent) ──
+    var priceDisplayEl = document.getElementById('price-display');
+    if (!priceDisplayEl) {
+      priceDisplayEl = document.createElement('div');
+      priceDisplayEl.id = 'price-display';
+      var detailsCard = document.getElementById('details-card');
+      if (detailsCard) detailsCard.parentNode.insertBefore(priceDisplayEl, detailsCard);
+    }
+    if (item.is_giveaway) {
+      priceDisplayEl.innerHTML = '<div style="background:linear-gradient(135deg,#ECFDF5,#F0FDF4);border:1px solid rgba(16,185,129,0.2);border-radius:16px;padding:20px 24px;margin-bottom:16px;text-align:center;">' +
+        '<div style="font-size:32px;font-weight:800;color:#065F46;">FREE</div>' +
+        '<div style="font-size:13px;color:#6B7280;margin-top:4px;">Estimated value: ' + ((item.price || 0).toLocaleString()) + ' AED</div></div>';
+    } else {
+      var p = item.price || 0;
+      priceDisplayEl.innerHTML = '<div style="background:linear-gradient(135deg,#F0FBFC,#E6F7F8);border:1px solid rgba(9,177,186,0.15);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:baseline;justify-content:center;gap:8px;">' +
+        '<span style="font-size:36px;font-weight:800;color:#1A1A2E;">' + p.toLocaleString() + '</span>' +
+        '<span style="font-size:16px;font-weight:600;color:#6B7280;">AED</span></div>';
+    }
+
     // ── Item details card ──
     var details = [
       { label: t('detail_type'), value: item.type },
