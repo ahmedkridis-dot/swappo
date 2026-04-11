@@ -863,7 +863,7 @@
        ======================== */
     document.querySelector('.auth-forgot a').addEventListener('click', (e) => {
       e.preventDefault();
-      showToast('Password reset is not available in demo mode. Use demo@swappo.ae / demo123', 'info');
+      showToast('Password reset is not available in demo mode. Use pro@swappo.ae / pro123', 'info');
     });
 
     /* ========================
@@ -876,9 +876,9 @@
       // Re-seed
       if (window.initDemoMode) initDemoMode();
       // Sign in as Pro
-      var result = DemoAuth.signIn('demo@swappo.ae', 'demo123');
+      var result = DemoAuth.signIn('pro@swappo.ae', 'pro123');
       if (result.success) {
-        showToast('Fresh Pro account loaded! All v5 features active. 👑', 'success');
+        showToast('Welcome Fatima! Pro account loaded. 💎', 'success');
         setTimeout(function() {
           var params = new URLSearchParams(window.location.search);
           window.location.href = params.get('redirect') || '../index.html';
@@ -895,7 +895,7 @@
       // Sign in as Free
       var result = DemoAuth.signIn('free@swappo.ae', 'free123');
       if (result.success) {
-        showToast('Fresh Free account loaded! Unlimited swaps, 1 claim/month. 🌱', 'success');
+        showToast('Welcome Khalid! Free plan loaded. 🌱', 'success');
         setTimeout(function() {
           var params = new URLSearchParams(window.location.search);
           window.location.href = params.get('redirect') || '../index.html';

@@ -1013,15 +1013,14 @@
     if (!currentItem || !currentUser) return;
     var price = currentItem.price || 0;
     var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
-    // Create a chat message and redirect
-    if (window.DemoChat && DemoChat.send) {
-      var ownerId = currentItem.user_id;
-      DemoChat.send(currentUser.id, ownerId, 'Hi! I want to buy "' + title + '" for ' + price.toLocaleString() + ' AED. Is it still available?');
+    // v5: Create a buy offer (notification to seller, NO chat yet)
+    if (window.DemoSwaps && DemoSwaps.propose) {
+      DemoSwaps.propose(null, currentItem.id, { type: 'buy', amount: price });
     }
-    DemoNotifications.showToast('Opening chat with seller...', 'info');
+    DemoNotifications.showToast('Purchase offer sent for ' + price.toLocaleString() + ' AED! The seller will review it. ✅', 'success');
     setTimeout(function() {
-      window.location.href = 'chat.html?user=' + (currentItem.user_id || '');
-    }, 600);
+      window.location.href = 'profile.html';
+    }, 1200);
   }
   window.startBuy = startBuy;
 
@@ -1053,13 +1052,13 @@
   function submitOffer() {
     var amount = parseInt(document.getElementById('offer-amount').value) || 0;
     if (amount < 1) { DemoNotifications.showToast('Please enter a valid amount.', 'warning'); return; }
-    var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
-    if (window.DemoChat && DemoChat.send) {
-      DemoChat.send(currentUser.id, currentItem.user_id, 'I\'d like to offer ' + amount.toLocaleString() + ' AED for "' + title + '". Let me know!');
+    // v5: Send offer as notification (no chat before acceptance)
+    if (window.DemoSwaps && DemoSwaps.propose) {
+      DemoSwaps.propose(null, currentItem.id, { type: 'offer', amount: amount });
     }
     document.querySelector('div[style*="fixed"]').remove();
-    DemoNotifications.showToast('Offer sent! The seller will respond in chat.', 'success');
-    setTimeout(function() { window.location.href = 'chat.html?user=' + (currentItem.user_id || ''); }, 800);
+    DemoNotifications.showToast('Offer of ' + amount.toLocaleString() + ' AED sent! The seller will review it. ✅', 'success');
+    setTimeout(function() { window.location.href = 'profile.html'; }, 1000);
   }
   window.submitOffer = submitOffer;
 
@@ -1161,18 +1160,14 @@
       var cashText = selectedCashAmount > 0 ? ' + ' + selectedCashAmount + ' AED cash top-up' : '';
       var msg = 'Hi! I\'d like to swap my "' + myTitle + '" for your "' + theirTitle + '"' + cashText + '. What do you think?';
 
-      // Create chat conversation
-      if (window.DemoChat && DemoChat.send) {
-        DemoChat.send(currentUser.id, currentItem.user_id, msg);
-      }
-
-      DemoNotifications.showToast('Swap proposed! Opening chat...', 'success');
+      // v5: NO chat before acceptance — send notification only
+      DemoNotifications.showToast('Swap proposal sent! The seller will review your offer. ✅', 'success');
       updateNavbarForDemo();
 
-      // Redirect to chat
+      // Redirect to dashboard offers tab (not chat)
       setTimeout(function() {
-        window.location.href = 'chat.html?user=' + (currentItem.user_id || '');
-      }, 800);
+        window.location.href = 'profile.html';
+      }, 1200);
     } else {
       showToast(result.error || 'Could not send proposal');
     }
