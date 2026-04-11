@@ -932,7 +932,10 @@ const DemoChat = {
 
     // Add local conversations involving this user
     localConvs.forEach(c => {
-      if (!convs.find(existing => existing.id === c.id)) {
+      if (convs.find(existing => existing.id === c.id)) return;
+      // Check if this user is part of this conversation
+      var uids = [c.user1_id, c.user2_id, (c.other_user && c.other_user.id)].filter(Boolean);
+      if (uids.includes(user.id) || c.user1_id === user.id || c.user2_id === user.id) {
         convs.push(c);
       }
     });
@@ -1021,6 +1024,68 @@ const DemoChat = {
     text = text.replace(/www\.[^\s]+/gi, '***');
 
     return text;
+  },
+
+  /** Send a message to another user (creates conversation if needed) */
+  send(fromUserId, toUserId, content) {
+    if (!fromUserId || !toUserId || !content) return { success: false };
+
+    const filtered = this.filterContactInfo(content);
+    const localConvs = _getArray(STORAGE_KEYS.CONVERSATIONS);
+
+    // Find existing conversation between these 2 users
+    let conv = localConvs.find(c => {
+      var uids = [c.user1_id, c.user2_id, (c.other_user && c.other_user.id)].filter(Boolean);
+      return uids.includes(fromUserId) && uids.includes(toUserId);
+    });
+
+    // Also check mock conversations
+    if (!conv && (fromUserId === 'user-demo' || toUserId === 'user-demo')) {
+      conv = (MOCK_CONVERSATIONS || []).find(c => {
+        return c.other_user && (c.other_user.id === toUserId || c.other_user.id === fromUserId);
+      });
+      if (conv) {
+        // Add message to mock conversation directly
+        conv.messages.push({
+          id: 'msg_' + Date.now(),
+          sender_id: fromUserId,
+          content: filtered,
+          created_at: new Date().toISOString(),
+          is_system: false
+        });
+        conv.last_message = filtered;
+        conv.unread_count = (conv.unread_count || 0) + 1;
+        return { success: true, conversationId: conv.id };
+      }
+    }
+
+    if (!conv) {
+      // Create new conversation
+      var otherUser = MOCK_USERS.find(u => u.id === toUserId) || { id: toUserId, name: 'User', pseudo: 'user', avatar_color: '#6B7280' };
+      conv = {
+        id: 'conv_' + Date.now(),
+        user1_id: fromUserId,
+        user2_id: toUserId,
+        other_user: otherUser,
+        item_title: '',
+        last_message: filtered,
+        unread_count: 0,
+        messages: []
+      };
+      localConvs.push(conv);
+    }
+
+    conv.messages.push({
+      id: 'msg_' + Date.now(),
+      sender_id: fromUserId,
+      content: filtered,
+      created_at: new Date().toISOString(),
+      is_system: false
+    });
+    conv.last_message = filtered;
+
+    _set(STORAGE_KEYS.CONVERSATIONS, localConvs);
+    return { success: true, conversationId: conv.id };
   },
 
   /** Get unread count */

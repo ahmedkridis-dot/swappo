@@ -599,9 +599,22 @@
 		// Navbar is updated by updateNavbarForDemo() below
 		renderSidebar();
 
-		// Auto-open first conversation
+		// Auto-open conversation (from ?user= param or first available)
 		const convs = DemoChat.getConversations();
-		if (convs.length > 0) openConv(convs[0].id);
+		const params = new URLSearchParams(window.location.search);
+		const targetUser = params.get('user');
+		let opened = false;
+
+		if (targetUser && convs.length > 0) {
+			// Find conversation with this user
+			const match = convs.find(c => {
+				return (c.other_user && c.other_user.id === targetUser) ||
+				       c.user1_id === targetUser || c.user2_id === targetUser;
+			});
+			if (match) { openConv(match.id); opened = true; }
+		}
+
+		if (!opened && convs.length > 0) openConv(convs[0].id);
 
 		// Wire input
 		document.getElementById('sendBtn').addEventListener('click', sendMsg);

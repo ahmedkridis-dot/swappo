@@ -1155,9 +1155,24 @@
     var result = DemoSwaps.propose(selectedSwapItemId, currentItem.id);
     if (result.success) {
       closeSwapModal();
-      var cashText = selectedCashAmount > 0 ? ' + ' + selectedCashAmount + ' AED (paid in person)' : '';
-      showToast('Swap proposal sent' + cashText + '! \u2705');
+      var myItem = DemoItems.getById(selectedSwapItemId);
+      var myTitle = myItem ? ((myItem.brand || '') + ' ' + (myItem.model || '')).trim() : 'my item';
+      var theirTitle = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'your item';
+      var cashText = selectedCashAmount > 0 ? ' + ' + selectedCashAmount + ' AED cash top-up' : '';
+      var msg = 'Hi! I\'d like to swap my "' + myTitle + '" for your "' + theirTitle + '"' + cashText + '. What do you think?';
+
+      // Create chat conversation
+      if (window.DemoChat && DemoChat.send) {
+        DemoChat.send(currentUser.id, currentItem.user_id, msg);
+      }
+
+      DemoNotifications.showToast('Swap proposed! Opening chat...', 'success');
       updateNavbarForDemo();
+
+      // Redirect to chat
+      setTimeout(function() {
+        window.location.href = 'chat.html?user=' + (currentItem.user_id || '');
+      }, 800);
     } else {
       showToast(result.error || 'Could not send proposal');
     }
