@@ -252,7 +252,7 @@
   const TRANSPORTERS = [
     {
       id: 't-1', name: "Ahmed's Movers", vehicle: 'Pickup', vehicleModel: 'Toyota Hilux',
-      photo: 'https://images.unsplash.com/photo-1591768793355-74d04bb6608f?w=600&h=400&fit=crop',
+      photo: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&h=400&fit=crop',
       capacity: 800, zones: ['Dubai','Sharjah','Ajman'], interEmirate: true,
       priceBase: 80, priceInter: 150, rating: 4.8, deliveries: 12,
       equipment: ['Protective cover','Straps','1-person loading help'],
@@ -518,6 +518,8 @@
     var mount = document.getElementById('mega-menu-mount');
     if (mount && typeof renderMegaMenuBar === 'function') {
       mount.innerHTML = renderMegaMenuBar(true);
+      // Trigger mega menu CSS injection + event binding
+      if (typeof initMegaMenu === 'function') initMegaMenu();
     }
     // Eco ticker close
     var closeBtn = document.getElementById('ecoTickerClose');
