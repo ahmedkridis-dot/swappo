@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/swappo-logo-32.png">
+  <title>Swappo Transport — Move big items with ease</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/swappo-visual.css">
+  <link rel="stylesheet" href="../css/swappo-modern-2026.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .transport-hero { background: linear-gradient(135deg, #0B3B3E 0%, #09B1BA 100%); color: #fff; padding: 64px 0 48px; text-align: center; }
+    .transport-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .transport-hero p { font-size: 1.1rem; opacity: 0.85; margin: 0 0 32px; max-width: 600px; margin-inline: auto; }
+    .transport-filters { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 700px; margin: 0 auto; }
+    .transport-filters select { padding: 10px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; background: rgba(255,255,255,0.12); color: #fff; font-size: 14px; font-family: inherit; cursor: pointer; backdrop-filter: blur(8px); min-width: 140px; }
+    .transport-filters select option { color: #1A1A2E; background: #fff; }
+    .transport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; padding: 48px 0; }
+    .transporter-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 20px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; }
+    .transporter-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(9,177,186,0.15); border-color: #09B1BA; }
+    .transporter-card-img { height: 180px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+    .transporter-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .transporter-card-img .vehicle-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .transporter-card-body { padding: 20px; }
+    .transporter-name { font-size: 18px; font-weight: 700; color: #1A1A2E; margin: 0 0 6px; }
+    .transporter-rating { font-size: 13px; color: #F59E0B; margin-bottom: 10px; }
+    .transporter-rating span { color: #6B7280; }
+    .transporter-zones { font-size: 12px; color: #6B7280; margin-bottom: 12px; }
+    .transporter-zones i { color: #09B1BA; margin-right: 4px; }
+    .transporter-specs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .transporter-spec { font-size: 11px; padding: 4px 10px; border-radius: 999px; font-weight: 600; }
+    .spec-vehicle { background: #E6F7F8; color: #078A91; }
+    .spec-capacity { background: #FEF3C7; color: #92400E; }
+    .spec-verified { background: #ECFDF5; color: #065F46; }
+    .spec-top { background: #FEF3C7; color: #92400E; }
+    .transporter-price { font-size: 15px; font-weight: 700; color: #1A1A2E; margin-bottom: 14px; }
+    .transporter-price small { font-size: 12px; font-weight: 500; color: #6B7280; }
+    .transporter-actions { display: flex; gap: 8px; }
+    .transporter-actions button { flex: 1; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn-view { background: #F3F4F6; border: 1px solid #E5E7EB; color: #1A1A2E; }
+    .btn-view:hover { border-color: #09B1BA; color: #09B1BA; }
+    .btn-quote { background: #09B1BA; border: none; color: #fff; }
+    .btn-quote:hover { background: #078A91; transform: translateY(-1px); }
+
+    /* Profile Modal */
+    .transport-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 9500; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .transport-modal { background: #fff; border-radius: 24px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 80px rgba(0,0,0,0.3); }
+    .transport-modal-header { position: relative; }
+    .transport-modal-header img { width: 100%; height: 220px; object-fit: cover; border-radius: 24px 24px 0 0; }
+    .transport-modal-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); border: none; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .transport-modal-body { padding: 28px; }
+    .modal-section { margin-bottom: 24px; }
+    .modal-section h4 { font-size: 14px; font-weight: 700; color: #1A1A2E; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .modal-specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .modal-spec { background: #F9FAFB; border-radius: 10px; padding: 12px; }
+    .modal-spec-label { font-size: 11px; color: #9CA3AF; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+    .modal-spec-value { font-size: 14px; font-weight: 600; color: #1A1A2E; }
+    .modal-equip { display: flex; flex-wrap: wrap; gap: 8px; }
+    .modal-equip span { font-size: 12px; padding: 5px 12px; background: #ECFDF5; color: #065F46; border-radius: 999px; font-weight: 600; }
+    .modal-pricing { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-price-card { background: #F0FBFC; border: 1px solid rgba(9,177,186,0.15); border-radius: 12px; padding: 16px; text-align: center; }
+    .modal-price-card .price { font-size: 24px; font-weight: 800; color: #09B1BA; }
+    .modal-price-card .label { font-size: 12px; color: #6B7280; margin-top: 4px; }
+
+    /* Quote form */
+    .quote-form { background: #F9FAFB; border-radius: 16px; padding: 24px; }
+    .quote-form label { font-size: 13px; font-weight: 600; color: #1A1A2E; display: block; margin-bottom: 6px; }
+    .quote-form input, .quote-form select, .quote-form textarea { width: 100%; padding: 10px 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 14px; font-family: inherit; margin-bottom: 14px; box-sizing: border-box; }
+    .quote-form input:focus, .quote-form select:focus, .quote-form textarea:focus { border-color: #09B1BA; outline: none; }
+    .quote-form textarea { height: 80px; resize: vertical; }
+
+    /* CTA banner */
+    .become-transporter { background: linear-gradient(135deg, #0B3B3E, #09B1BA); border-radius: 24px; padding: 48px 32px; text-align: center; color: #fff; margin: 48px 0; }
+    .become-transporter h2 { font-size: 28px; font-weight: 800; margin: 0 0 12px; }
+    .become-transporter p { font-size: 15px; opacity: 0.85; margin: 0 0 24px; max-width: 500px; margin-inline: auto; }
+    .become-transporter .features { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; font-size: 14px; }
+    .become-transporter .features span { display: flex; align-items: center; gap: 6px; }
+    .notify-form { display: flex; gap: 10px; max-width: 400px; margin: 0 auto; }
+    .notify-form input { flex: 1; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; background: rgba(255,255,255,0.12); color: #fff; font-size: 14px; }
+    .notify-form input::placeholder { color: rgba(255,255,255,0.6); }
+    .notify-form button { padding: 12px 24px; border: none; border-radius: 12px; background: #fff; color: #0B3B3E; font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; }
+    .coming-soon-badge { display: inline-block; background: #FEF3C7; color: #92400E; padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    @media (max-width: 640px) {
+      .transport-hero { padding: 48px 20px 36px; }
+      .transport-grid { grid-template-columns: 1fr; padding: 24px 0; }
+      .transport-filters { flex-direction: column; align-items: stretch; }
+      .modal-specs-grid, .modal-pricing { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar injected by mega-menu.js -->
+  <nav class="navbar" id="main-navbar">
+    <div class="container navbar-container">
+      <a href="../index.html" class="site-logo">Swappo</a>
+      <div class="navbar-search"><input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder"></div>
+      <div class="nav-actions">
+        <div class="lang-selector" id="lang-selector"></div>
+        <a href="chat.html" class="nav-icon" title="Messages"><i class="fas fa-comment-dots"></i></a>
+        <a href="#" class="nav-icon" title="Account"><i class="fas fa-user"></i></a>
+        <a href="publier.html" class="btn-pill btn-pill-teal nav-cta" data-i18n="drop_item">Drop an Item</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="transport-hero">
+    <div class="container">
+      <div style="font-size:48px;margin-bottom:16px;">🚛</div>
+      <h1>Swappo Transport</h1>
+      <p>Trusted transporters for furniture, appliances, and large items across the UAE</p>
+      <div class="transport-filters">
+        <select id="filter-emirate">
+          <option value="">📍 All UAE</option>
+          <option value="Dubai">Dubai</option>
+          <option value="Abu Dhabi">Abu Dhabi</option>
+          <option value="Sharjah">Sharjah</option>
+          <option value="Ajman">Ajman</option>
+          <option value="RAK">Ras Al Khaimah</option>
+          <option value="Fujairah">Fujairah</option>
+          <option value="UAQ">Umm Al Quwain</option>
+        </select>
+        <select id="filter-vehicle">
+          <option value="">🚛 All Vehicles</option>
+          <option value="Pickup">Pickup</option>
+          <option value="Van">Van</option>
+          <option value="Small Truck">Small Truck</option>
+          <option value="Large Truck">Large Truck</option>
+        </select>
+        <select id="filter-sort">
+          <option value="rating">⭐ Top Rated</option>
+          <option value="price">💰 Lowest Price</option>
+          <option value="deliveries">📦 Most Deliveries</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TRANSPORTERS GRID ========== -->
+  <div class="container">
+    <div class="transport-grid" id="transport-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- ========== BECOME A TRANSPORTER ========== -->
+  <div class="container">
+    <div class="become-transporter">
+      <div class="coming-soon-badge">Coming Soon</div>
+      <h2>🚛 Own a truck or pickup?</h2>
+      <p>Join Swappo Transport and earn money delivering items across the UAE.</p>
+      <div class="features">
+        <span><i class="fas fa-check"></i> Set your own prices</span>
+        <span><i class="fas fa-check"></i> Choose your zones</span>
+        <span><i class="fas fa-check"></i> Get paid via Swappo</span>
+      </div>
+      <p style="font-size:13px;opacity:0.75;margin-bottom:20px;">We're selecting our first transport partners. Leave your email to be notified.</p>
+      <div class="notify-form">
+        <input type="email" id="notify-email" placeholder="your@email.com">
+        <button onclick="submitNotify()">Notify Me</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="site-logo footer-brand-text">Swappo</div>
+          <p data-i18n="footer_tagline">The UAE's first dedicated barter, gift & recycle platform.</p>
+          <div class="footer-contact" style="margin-top:16px;display:flex;flex-direction:column;gap:6px;font-size:13px;">
+            <a href="mailto:contact@swappo.ae" style="color:inherit;opacity:0.85;text-decoration:none;"><i class="fas fa-envelope" style="width:16px;opacity:0.7;"></i> contact@swappo.ae</a>
+            <a href="tel:+971543125559" style="color:inherit;opacity:0.85;text-decoration:none;"><i class="fas fa-phone" style="width:16px;opacity:0.7;"></i> +971 54 312 5559</a>
+            <a href="https://wa.me/971543125559" target="_blank" rel="noopener" style="color:inherit;opacity:0.85;text-decoration:none;"><i class="fab fa-whatsapp" style="width:16px;color:#25D366;"></i> WhatsApp</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="catalogue.html">Browse items</a></li>
+            <li><a href="giveaway.html">Gift Corner</a></li>
+            <li><a href="publier.html">List an item</a></li>
+            <li><a href="transport.html">Find a Truck</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="impact.html">Our Impact</a></li>
+            <li><a href="recycle.html">Recycle Hub</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="terms.html">Terms of use</a></li>
+            <li><a href="privacy.html">Privacy policy</a></li>
+            <li><a href="cookies.html">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Swappo. All rights reserved.</span>
+        <p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:8px 0 0;line-height:1.5;">Hannibal General Trading L.L.C - S.P.C · Abu Dhabi, UAE · TDRA e-activity licence NOL-26-100000206</p>
+        <div class="footer-social">
+          <a href="https://instagram.com/swappo.ae" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+          <a href="https://x.com/swappo_ae" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>
+          <a href="https://facebook.com/swappo.ae" target="_blank" rel="noopener"><i class="fab fa-facebook"></i></a>
+          <a href="https://tiktok.com/@swappo.ae" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/demo-engine.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mega-menu.js"></script>
+  <script src="../js/swappo-animations.js"></script>
+  <script>
+  // ═══════════════════════════════════════════
+  // TRANSPORT DATA — 5 pre-loaded transporters
+  // ═══════════════════════════════════════════
+  const TRANSPORTERS = [
+    {
+      id: 't-1', name: "Ahmed's Movers", vehicle: 'Pickup', vehicleModel: 'Toyota Hilux',
+      photo: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop',
+      capacity: 800, zones: ['Dubai','Sharjah','Ajman'], interEmirate: true,
+      priceBase: 80, priceInter: 150, rating: 4.8, deliveries: 12,
+      equipment: ['Protective cover','Straps','1-person loading help'],
+      verified: true, insured: true, topRated: false,
+      availability: 'Every day 8am–8pm',
+      dimensions: '240 × 160 × 50 cm',
+      description: 'Reliable pickup service for medium items. Furniture, appliances, gym equipment — handled with care.',
+      reviews: [
+        { user: 'Khalid M.', stars: 5, text: 'Moved my couch perfectly. On time and very careful.', date: '2026-03-15' },
+        { user: 'Sara A.', stars: 5, text: 'Great service for the price. Highly recommend!', date: '2026-03-02' }
+      ]
+    },
+    {
+      id: 't-2', name: 'Gulf Express Transport', vehicle: 'Van', vehicleModel: 'Nissan Urvan',
+      photo: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=400&fit=crop',
+      capacity: 1200, zones: ['Dubai','Abu Dhabi','Sharjah'], interEmirate: true,
+      priceBase: 120, priceInter: 250, rating: 4.6, deliveries: 28,
+      equipment: ['Protective cover','Straps','Dolly cart','2-person loading help','Loading ramp'],
+      verified: true, insured: true, topRated: false,
+      availability: 'Sat–Thu 7am–10pm',
+      dimensions: '320 × 180 × 180 cm',
+      description: 'Full-service moving van. We handle everything from loading to unloading. Stairs? No problem.',
+      reviews: [
+        { user: 'Omar R.', stars: 5, text: 'Moved a full bedroom set from Dubai to Abu Dhabi. Professional team.', date: '2026-02-20' },
+        { user: 'Fatima H.', stars: 4, text: 'Good service, slightly late but everything arrived in perfect condition.', date: '2026-01-15' }
+      ]
+    },
+    {
+      id: 't-3', name: 'Heavy Haul UAE', vehicle: 'Small Truck', vehicleModel: 'Mitsubishi Canter 3.5t',
+      photo: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&h=400&fit=crop',
+      capacity: 2500, zones: ['Dubai','Abu Dhabi','Sharjah','Ajman','RAK','Fujairah','UAQ'], interEmirate: true,
+      priceBase: 200, priceInter: 400, rating: 4.9, deliveries: 45,
+      equipment: ['Protective cover','Straps','Dolly cart','2-person loading help','Loading ramp'],
+      verified: true, insured: true, topRated: true,
+      availability: 'Every day 6am–11pm',
+      dimensions: '430 × 210 × 210 cm',
+      description: 'The heavy-duty option. Full apartment moves, large appliances, multiple items. All 7 emirates covered.',
+      reviews: [
+        { user: 'Raj P.', stars: 5, text: 'Moved an entire apartment in one trip. Incredible value.', date: '2026-03-28' },
+        { user: 'Aisha B.', stars: 5, text: 'Best moving service in UAE. Period.', date: '2026-03-10' },
+        { user: 'Youssef H.', stars: 5, text: 'From RAK to Abu Dhabi with a full truck. Flawless.', date: '2026-02-25' }
+      ]
+    },
+    {
+      id: 't-4', name: 'Quick Pickup', vehicle: 'Pickup', vehicleModel: 'Nissan Navara',
+      photo: 'https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=600&h=400&fit=crop',
+      capacity: 600, zones: ['RAK','Fujairah','UAQ','Ajman'], interEmirate: true,
+      priceBase: 60, priceInter: 100, rating: 4.3, deliveries: 8,
+      equipment: ['Protective cover','Straps'],
+      verified: true, insured: false, topRated: false,
+      availability: 'Sun–Fri 9am–6pm',
+      dimensions: '220 × 150 × 45 cm',
+      description: 'Budget-friendly pickup in the northern emirates. Perfect for single items like a desk, bike, or washing machine.',
+      reviews: [
+        { user: 'Youssef H.', stars: 4, text: 'Affordable and reliable. Moved my treadmill with no issues.', date: '2026-03-05' }
+      ]
+    },
+    {
+      id: 't-5', name: 'Abu Dhabi Movers', vehicle: 'Van', vehicleModel: 'Mercedes Sprinter',
+      photo: 'https://images.unsplash.com/photo-1586864387789-628af9feed72?w=600&h=400&fit=crop',
+      capacity: 1500, zones: ['Abu Dhabi','Al Ain','Dubai'], interEmirate: true,
+      priceBase: 100, priceInter: 200, rating: 4.5, deliveries: 18,
+      equipment: ['Protective cover','Straps','Dolly cart','1-person loading help'],
+      verified: true, insured: true, topRated: false,
+      availability: 'Every day 8am–9pm',
+      dimensions: '370 × 180 × 190 cm',
+      description: 'Premium Mercedes Sprinter van service. Abu Dhabi, Al Ain, and Dubai corridor specialist.',
+      reviews: [
+        { user: 'Aisha B.', stars: 5, text: 'Excellent service between Abu Dhabi and Dubai. Very professional.', date: '2026-03-18' },
+        { user: 'Khalid M.', stars: 4, text: 'Clean van, careful driver. Would use again.', date: '2026-02-12' }
+      ]
+    }
+  ];
+
+  // ═══ RENDER CARDS ═══
+  function renderTransporters() {
+    var emirate = document.getElementById('filter-emirate').value;
+    var vehicle = document.getElementById('filter-vehicle').value;
+    var sort = document.getElementById('filter-sort').value;
+
+    var filtered = TRANSPORTERS.filter(function(t) {
+      if (emirate && !t.zones.includes(emirate)) return false;
+      if (vehicle && t.vehicle !== vehicle) return false;
+      return true;
+    });
+
+    if (sort === 'rating') filtered.sort(function(a,b) { return b.rating - a.rating; });
+    else if (sort === 'price') filtered.sort(function(a,b) { return a.priceBase - b.priceBase; });
+    else if (sort === 'deliveries') filtered.sort(function(a,b) { return b.deliveries - a.deliveries; });
+
+    var grid = document.getElementById('transport-grid');
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:#6B7280;"><i class="fas fa-truck" style="font-size:2rem;margin-bottom:12px;display:block;opacity:0.3;"></i>No transporters found for this filter. Try "All UAE".</div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map(function(t) {
+      var stars = '★'.repeat(Math.floor(t.rating)) + (t.rating % 1 >= 0.5 ? '½' : '');
+      var badges = '<span class="transporter-spec spec-vehicle"><i class="fas fa-truck"></i> ' + t.vehicle + '</span>' +
+        '<span class="transporter-spec spec-capacity"><i class="fas fa-weight-hanging"></i> ' + t.capacity + ' kg</span>';
+      if (t.verified) badges += '<span class="transporter-spec spec-verified"><i class="fas fa-check-circle"></i> Verified</span>';
+      if (t.insured) badges += '<span class="transporter-spec spec-verified"><i class="fas fa-shield-alt"></i> Insured</span>';
+      if (t.topRated) badges += '<span class="transporter-spec spec-top"><i class="fas fa-star"></i> Top Rated</span>';
+
+      return '<div class="transporter-card" data-id="' + t.id + '">' +
+        '<div class="transporter-card-img">' +
+          '<img src="' + t.photo + '" alt="' + t.name + '" loading="lazy">' +
+          '<span class="vehicle-badge"><i class="fas fa-truck"></i> ' + t.vehicleModel + '</span>' +
+        '</div>' +
+        '<div class="transporter-card-body">' +
+          '<div class="transporter-name">' + t.name + '</div>' +
+          '<div class="transporter-rating">' + stars + ' ' + t.rating + '/5 <span>(' + t.deliveries + ' deliveries)</span></div>' +
+          '<div class="transporter-zones"><i class="fas fa-map-marker-alt"></i> ' + t.zones.join(', ') + (t.interEmirate ? ' · Inter-emirate' : '') + '</div>' +
+          '<div class="transporter-specs">' + badges + '</div>' +
+          '<div class="transporter-price">From ' + t.priceBase + ' AED <small>same emirate</small></div>' +
+          '<div class="transporter-actions">' +
+            '<button class="btn-view" onclick="event.stopPropagation();showProfile(\'' + t.id + '\')"><i class="fas fa-user"></i> View Profile</button>' +
+            '<button class="btn-quote" onclick="event.stopPropagation();showQuoteForm(\'' + t.id + '\')"><i class="fas fa-file-invoice-dollar"></i> Request Quote</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ═══ PROFILE MODAL ═══
+  function showProfile(id) {
+    var t = TRANSPORTERS.find(function(x) { return x.id === id; });
+    if (!t) return;
+
+    var reviewsHTML = t.reviews.map(function(r) {
+      return '<div style="border-bottom:1px solid #F3F4F6;padding:12px 0;">' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+          '<strong style="font-size:13px;">' + r.user + '</strong>' +
+          '<span style="color:#F59E0B;font-size:12px;">' + '★'.repeat(r.stars) + '</span>' +
+        '</div>' +
+        '<p style="font-size:13px;color:#6B7280;margin:0;">' + r.text + '</p>' +
+      '</div>';
+    }).join('');
+
+    var equipHTML = t.equipment.map(function(e) { return '<span><i class="fas fa-check" style="margin-right:4px;"></i>' + e + '</span>'; }).join('');
+
+    var overlay = document.createElement('div');
+    overlay.className = 'transport-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML =
+      '<div class="transport-modal">' +
+        '<div class="transport-modal-header">' +
+          '<img src="' + t.photo + '" alt="' + t.name + '">' +
+          '<button class="transport-modal-close" onclick="this.closest(\'.transport-modal-overlay\').remove()">&times;</button>' +
+        '</div>' +
+        '<div class="transport-modal-body">' +
+          '<h2 style="font-size:24px;font-weight:800;margin:0 0 4px;">' + t.name + '</h2>' +
+          '<div style="color:#F59E0B;margin-bottom:4px;">★ ' + t.rating + '/5 · ' + t.deliveries + ' deliveries</div>' +
+          '<p style="font-size:14px;color:#6B7280;margin:0 0 24px;">' + t.description + '</p>' +
+
+          '<div class="modal-section">' +
+            '<h4><i class="fas fa-truck" style="color:#09B1BA;margin-right:6px;"></i> Vehicle</h4>' +
+            '<div class="modal-specs-grid">' +
+              '<div class="modal-spec"><div class="modal-spec-label">Type</div><div class="modal-spec-value">' + t.vehicle + '</div></div>' +
+              '<div class="modal-spec"><div class="modal-spec-label">Model</div><div class="modal-spec-value">' + t.vehicleModel + '</div></div>' +
+              '<div class="modal-spec"><div class="modal-spec-label">Max Capacity</div><div class="modal-spec-value">' + t.capacity + ' kg</div></div>' +
+              '<div class="modal-spec"><div class="modal-spec-label">Cargo Dimensions</div><div class="modal-spec-value">' + t.dimensions + '</div></div>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="modal-section">' +
+            '<h4><i class="fas fa-tools" style="color:#09B1BA;margin-right:6px;"></i> Equipment</h4>' +
+            '<div class="modal-equip">' + equipHTML + '</div>' +
+          '</div>' +
+
+          '<div class="modal-section">' +
+            '<h4><i class="fas fa-map-marker-alt" style="color:#09B1BA;margin-right:6px;"></i> Coverage</h4>' +
+            '<p style="font-size:14px;color:#1A1A2E;margin:0;">' + t.zones.join(', ') + (t.interEmirate ? ' · <strong style="color:#09B1BA;">Inter-emirate available</strong>' : '') + '</p>' +
+            '<p style="font-size:13px;color:#6B7280;margin:6px 0 0;"><i class="fas fa-clock" style="margin-right:4px;"></i>' + t.availability + '</p>' +
+          '</div>' +
+
+          '<div class="modal-section">' +
+            '<h4><i class="fas fa-tag" style="color:#09B1BA;margin-right:6px;"></i> Pricing</h4>' +
+            '<div class="modal-pricing">' +
+              '<div class="modal-price-card"><div class="price">' + t.priceBase + ' AED</div><div class="label">Same emirate</div></div>' +
+              '<div class="modal-price-card"><div class="price">' + t.priceInter + ' AED</div><div class="label">Inter-emirate</div></div>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="modal-section">' +
+            '<h4><i class="fas fa-star" style="color:#F59E0B;margin-right:6px;"></i> Reviews (' + t.reviews.length + ')</h4>' +
+            reviewsHTML +
+          '</div>' +
+
+          '<button class="btn-quote" style="width:100%;padding:14px;font-size:15px;border-radius:14px;margin-top:8px;" onclick="this.closest(\'.transport-modal-overlay\').remove();showQuoteForm(\'' + t.id + '\')"><i class="fas fa-file-invoice-dollar"></i> Request a Quote</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  }
+
+  // ═══ QUOTE FORM ═══
+  function showQuoteForm(id) {
+    var t = TRANSPORTERS.find(function(x) { return x.id === id; });
+    if (!t) return;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'transport-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML =
+      '<div class="transport-modal">' +
+        '<div style="padding:28px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">' +
+            '<h2 style="font-size:22px;font-weight:800;margin:0;"><i class="fas fa-file-invoice-dollar" style="color:#09B1BA;margin-right:8px;"></i>Request a Quote</h2>' +
+            '<button onclick="this.closest(\'.transport-modal-overlay\').remove()" style="background:none;border:none;font-size:24px;color:#6B7280;cursor:pointer;">&times;</button>' +
+          '</div>' +
+          '<p style="font-size:14px;color:#6B7280;margin:0 0 20px;">Quote from <strong>' + t.name + '</strong> (' + t.vehicle + ' · ' + t.capacity + 'kg)</p>' +
+          '<div class="quote-form">' +
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+              '<div><label>Pickup Emirate *</label><select id="q-pickup"><option>Dubai</option><option>Abu Dhabi</option><option>Sharjah</option><option>Ajman</option><option>RAK</option><option>Fujairah</option><option>UAQ</option></select></div>' +
+              '<div><label>Delivery Emirate *</label><select id="q-delivery"><option>Dubai</option><option>Abu Dhabi</option><option>Sharjah</option><option>Ajman</option><option>RAK</option><option>Fujairah</option><option>UAQ</option></select></div>' +
+            '</div>' +
+            '<label>Item Description *</label>' +
+            '<textarea id="q-desc" placeholder="e.g. 3-seater sofa + coffee table"></textarea>' +
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+              '<div><label>Size</label><select id="q-size"><option>Small (fits in pickup bed)</option><option>Medium (needs a van)</option><option>Large (needs a truck)</option><option>Very Large (multiple items)</option></select></div>' +
+              '<div><label>Preferred Date</label><input type="date" id="q-date" min="' + new Date().toISOString().slice(0,10) + '"></div>' +
+            '</div>' +
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+              '<div><label>Pickup Floor</label><select id="q-floor-pickup"><option>Ground</option><option>1st</option><option>2nd</option><option>3rd+</option></select></div>' +
+              '<div><label>Delivery Floor</label><select id="q-floor-delivery"><option>Ground</option><option>1st</option><option>2nd</option><option>3rd+</option></select></div>' +
+            '</div>' +
+            '<label>Loading Help Needed?</label>' +
+            '<select id="q-help"><option value="no">No — I can load/unload myself</option><option value="yes">Yes — need help loading & unloading</option></select>' +
+            '<label>Notes (optional)</label>' +
+            '<textarea id="q-notes" placeholder="Any special instructions..."></textarea>' +
+            '<button class="btn-quote" style="width:100%;padding:14px;font-size:15px;border-radius:14px;margin-top:8px;" onclick="submitQuote(\'' + t.id + '\')"><i class="fas fa-paper-plane"></i> Send Request</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+  }
+
+  function submitQuote(id) {
+    var desc = document.getElementById('q-desc').value.trim();
+    if (!desc) { DemoNotifications.showToast('Please describe the item(s) to transport.', 'warning'); return; }
+    document.querySelector('.transport-modal-overlay').remove();
+    DemoNotifications.showToast('Quote request sent! The transporter will respond within a few hours. 📱', 'success');
+  }
+
+  function submitNotify() {
+    var email = document.getElementById('notify-email').value.trim();
+    if (!email || !email.includes('@')) { DemoNotifications.showToast('Please enter a valid email.', 'warning'); return; }
+    document.getElementById('notify-email').value = '';
+    DemoNotifications.showToast('You\'re on the list! We\'ll notify you when driver registration opens. 🚛', 'success');
+  }
+
+  // ═══ FILTERS ═══
+  document.getElementById('filter-emirate').addEventListener('change', renderTransporters);
+  document.getElementById('filter-vehicle').addEventListener('change', renderTransporters);
+  document.getElementById('filter-sort').addEventListener('change', renderTransporters);
+
+  // ═══ INIT ═══
+  renderTransporters();
+  if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
+  if (typeof renderMegaMenuBar === 'function') {
+    var mount = document.getElementById('mega-menu-mount');
+    if (!mount) {
+      mount = document.createElement('div');
+      mount.id = 'mega-menu-mount';
+      document.querySelector('.navbar').after(mount);
+    }
+    mount.innerHTML = renderMegaMenuBar(true);
+  }
+  </script>
+</body>
+</html>

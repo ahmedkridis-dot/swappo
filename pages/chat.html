@@ -264,6 +264,12 @@
 
 			<!-- Input -->
 			<div class="chat-input-bar" id="inputBar" style="display:none;">
+				<div style="display:flex;gap:8px;padding-bottom:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+					<button onclick="DemoNotifications.showToast('Meet in a safe public place. Use Confirm Exchange when ready!','info')" style="white-space:nowrap;padding:7px 14px;border:1px solid #E5E7EB;border-radius:999px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#1A1A2E;font-family:inherit;">📍 Meet in person</button>
+					<button onclick="DemoNotifications.showToast('Swappo Delivery: ~25-40 AED same city. Coming soon!','info')" style="white-space:nowrap;padding:7px 14px;border:1px solid #E5E7EB;border-radius:999px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#1A1A2E;font-family:inherit;">🚚 Swappo Delivery</button>
+					<button onclick="showTruckPopup()" style="white-space:nowrap;padding:7px 14px;border:1px solid #D97706;border-radius:999px;background:#FEF3C7;font-size:12px;font-weight:600;cursor:pointer;color:#92400E;font-family:inherit;">🚛 Find a Truck</button>
+					<button onclick="if(window.DemoQR)DemoQR.showConfirmation(activeConvId)" style="white-space:nowrap;padding:7px 14px;border:1px solid #10B981;border-radius:999px;background:#ECFDF5;font-size:12px;font-weight:600;cursor:pointer;color:#065F46;font-family:inherit;">✅ Confirm Exchange</button>
+				</div>
 				<div class="chat-input-row">
 					<input type="text" class="chat-text-input" id="chatInput" placeholder="Type a message...">
 					<button class="chat-send-btn" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
@@ -595,6 +601,29 @@
 	});
 
 	// ── Init ──
+	// ── Find a Truck popup ──
+	function showTruckPopup() {
+		var o = document.createElement('div');
+		o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
+		o.innerHTML =
+			'<div style="background:#fff;border-radius:24px;padding:36px 32px;max-width:440px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.25);">' +
+				'<div style="font-size:48px;margin-bottom:14px;">🚛</div>' +
+				'<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 8px;">Need a truck for a big item?</h3>' +
+				'<p style="font-size:14px;color:#6B7280;margin:0 0 20px;line-height:1.6;">Furniture, appliances, large equipment — we\'ve got trusted transporters.</p>' +
+				'<div style="text-align:left;margin-bottom:24px;">' +
+					'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:#1A1A2E;"><i class="fas fa-check-circle" style="color:#10B981;"></i> Verified drivers with insurance</div>' +
+					'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:#1A1A2E;"><i class="fas fa-check-circle" style="color:#10B981;"></i> Pickups, vans & trucks available</div>' +
+					'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:#1A1A2E;"><i class="fas fa-check-circle" style="color:#10B981;"></i> Transparent pricing</div>' +
+					'<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A2E;"><i class="fas fa-check-circle" style="color:#10B981;"></i> Photos before & after delivery</div>' +
+				'</div>' +
+				'<a href="transport.html" style="display:block;padding:14px;background:#09B1BA;color:#fff;border-radius:14px;font-weight:700;font-size:15px;text-decoration:none;margin-bottom:10px;"><i class="fas fa-truck"></i> Browse Transporters</a>' +
+				'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:#6B7280;font-size:13px;cursor:pointer;">Close</button>' +
+			'</div>';
+		o.addEventListener('click', function(e) { if (e.target === o) o.remove(); });
+		document.body.appendChild(o);
+	}
+	window.showTruckPopup = showTruckPopup;
+
 	function chatInit() {
 		currentUser = DemoAuth.getCurrentUser();
 		if (!currentUser) { window.location.href = 'login.html'; return; }
