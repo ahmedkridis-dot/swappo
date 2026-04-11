@@ -1,7 +1,16 @@
 # Swappo — Project Instructions for Claude Code
 
 ## What is Swappo?
-Swappo (swappo.ae) is the **UAE's first barter platform**. Users swap items (clothing to cars) using a **subscription model**. No cash changes hands between users — Swappo monetizes via monthly subscription tiers that grant a quota of swaps per month. Identity is revealed automatically when both parties accept a swap. Think Vinted meets a freemium subscription model.
+Swappo (swappo.ae) is the **UAE's first marketplace for swapping, buying, selling, and gifting**. Users list items with a price, then others can propose a swap, buy with cash, or make a combined offer. Identity is revealed only when both parties accept. Swappo monetizes via Swappo Pro subscriptions (29 AED/mo) and a 5% service fee on delivery purchases (Pro = 0% fee).
+
+## Règle d'or — SWAP FIRST (2026-04-11)
+- On the site, **swap is ALWAYS mentioned first**: "swapping, buying, selling, gifting"
+- CTA: "Start Swapping" (not "It's Free")
+- Primary button on product page: "Propose a Swap"
+- Badge order on cards: Swap > Buy > Gift
+- Buy/sell is a support, not the identity
+- Footer tagline: keep "barter, gift & recycle" — do NOT add buy/sell
+- B2B/pitch materials can lead with buy/sell, but user-facing site = swap first
 
 ## Communication
 - **Ahmed** is the project owner. He speaks **French** — always respond in French.
