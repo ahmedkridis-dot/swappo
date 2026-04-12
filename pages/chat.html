@@ -166,22 +166,60 @@
 		.msg.received .msg-bubble { background: var(--bg-light); color: var(--text); border-bottom-left-radius: 4px; }
 		.msg-time { font-size: 10px; color: var(--text-muted); white-space: nowrap; align-self: flex-end; }
 
-		/* ═══ INPUT BAR ═══ */
-		.chat-input-bar { padding: 10px 16px; border-top: 1px solid var(--border); background: #fff; flex-shrink: 0; }
-		.chat-input-row { display: flex; gap: 8px; align-items: center; }
+		/* ═══ INPUT BAR — prominent, always visible ═══ */
+		.chat-input-bar {
+			padding: 14px 20px 16px;
+			border-top: none;
+			background: linear-gradient(180deg, #F0FBFC 0%, #fff 100%);
+			flex-shrink: 0;
+			box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+			position: relative;
+			z-index: 10;
+		}
+		.chat-quick-actions {
+			display: flex;
+			gap: 8px;
+			padding-bottom: 12px;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			flex-shrink: 0;
+		}
+		.chat-quick-btn {
+			white-space: nowrap;
+			padding: 9px 16px;
+			border-radius: 999px;
+			font-size: 13px;
+			font-weight: 600;
+			cursor: pointer;
+			font-family: inherit;
+			transition: all 0.2s;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+		.chat-quick-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+		.chat-quick-btn.meet { background: #fff; border: 1.5px solid #E5E7EB; color: #1A1A2E; }
+		.chat-quick-btn.meet:hover { border-color: #09B1BA; color: #09B1BA; }
+		.chat-quick-btn.delivery { background: #fff; border: 1.5px solid #E5E7EB; color: #1A1A2E; }
+		.chat-quick-btn.delivery:hover { border-color: #09B1BA; color: #09B1BA; }
+		.chat-quick-btn.truck { background: #FEF3C7; border: 1.5px solid #F59E0B; color: #92400E; }
+		.chat-quick-btn.truck:hover { background: #FDE68A; }
+		.chat-quick-btn.confirm { background: #ECFDF5; border: 1.5px solid #10B981; color: #065F46; }
+		.chat-quick-btn.confirm:hover { background: #D1FAE5; }
+		.chat-input-row { display: flex; gap: 10px; align-items: center; }
 		.chat-text-input {
-			flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 24px;
-			font-family: inherit; font-size: 13px; background: var(--bg-light); transition: all .2s;
+			flex: 1; padding: 14px 18px; border: 2px solid #E5E7EB; border-radius: 28px;
+			font-family: inherit; font-size: 14px; background: #fff; transition: all .2s;
 		}
-		.chat-text-input:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(9,177,186,.1); }
+		.chat-text-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(9,177,186,.12); }
 		.chat-send-btn {
-			width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff;
+			width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: #fff;
 			border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-			font-size: 16px; transition: all .2s; flex-shrink: 0;
+			font-size: 17px; transition: all .2s; flex-shrink: 0;
 		}
-		.chat-send-btn:hover { background: var(--primary-dark, #078A91); transform: scale(1.05); }
-		.chat-send-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
-		.chat-input-hint { font-size: 10px; color: var(--text-muted); margin-top: 4px; padding-left: 4px; }
+		.chat-send-btn:hover { background: var(--primary-dark, #078A91); transform: scale(1.08); box-shadow: 0 4px 12px rgba(9,177,186,0.3); }
+		.chat-send-btn:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; transform: none; box-shadow: none; }
+		.chat-input-hint { font-size: 10px; color: var(--text-muted); margin-top: 6px; padding-left: 8px; opacity: 0.7; }
 		.chat-input-hint i { margin-right: 3px; }
 
 		/* ═══ RESPONSIVE ═══ */
@@ -264,17 +302,17 @@
 
 			<!-- Input -->
 			<div class="chat-input-bar" id="inputBar" style="display:none;">
-				<div style="display:flex;gap:6px;padding-bottom:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;">
-					<button onclick="DemoNotifications.showToast('Meet in a safe public place. Use Confirm Exchange when ready!','info')" style="white-space:nowrap;padding:7px 14px;border:1px solid #E5E7EB;border-radius:999px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#1A1A2E;font-family:inherit;">📍 Meet in person</button>
-					<button onclick="DemoNotifications.showToast('Swappo Delivery: ~25-40 AED same city. Coming soon!','info')" style="white-space:nowrap;padding:7px 14px;border:1px solid #E5E7EB;border-radius:999px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#1A1A2E;font-family:inherit;">🚚 Swappo Delivery</button>
-					<button onclick="showTruckPopup()" style="white-space:nowrap;padding:7px 14px;border:1px solid #D97706;border-radius:999px;background:#FEF3C7;font-size:12px;font-weight:600;cursor:pointer;color:#92400E;font-family:inherit;">🚛 Find a Truck</button>
-					<button onclick="if(window.DemoQR)DemoQR.showConfirmation(activeConvId)" style="white-space:nowrap;padding:7px 14px;border:1px solid #10B981;border-radius:999px;background:#ECFDF5;font-size:12px;font-weight:600;cursor:pointer;color:#065F46;font-family:inherit;">✅ Confirm Exchange</button>
+				<div class="chat-quick-actions">
+					<button class="chat-quick-btn meet" onclick="DemoNotifications.showToast('Meet in a safe public place. Use Confirm Exchange when ready!','info')">📍 Meet in person</button>
+					<button class="chat-quick-btn delivery" onclick="DemoNotifications.showToast('Swappo Delivery: ~25-40 AED same city. Coming soon!','info')">🚚 Delivery</button>
+					<button class="chat-quick-btn truck" onclick="showTruckPopup()">🚛 Find a Truck</button>
+					<button class="chat-quick-btn confirm" onclick="if(window.DemoQR)DemoQR.showConfirmation(activeConvId)">✅ Confirm Exchange</button>
 				</div>
 				<div class="chat-input-row">
 					<input type="text" class="chat-text-input" id="chatInput" placeholder="Type a message...">
 					<button class="chat-send-btn" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
 				</div>
-				<div class="chat-input-hint"><i class="fas fa-shield-alt"></i> Phone numbers, emails & links are filtered for safety</div>
+				<div class="chat-input-hint"><i class="fas fa-shield-alt"></i> Contact info is filtered for safety</div>
 			</div>
 		</div>
 	</div>
