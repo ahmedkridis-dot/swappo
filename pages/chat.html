@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/swappo-visual.css">
   <link rel="stylesheet" href="../css/swappo-modern-2026.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
   * { box-sizing: border-box; }
   body { font-family: 'Inter', sans-serif; margin: 0; background: #FAFBFC; }
@@ -178,14 +177,33 @@
   }
   @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-  /* ═══ MEETUP MAP ═══ */
-  .dp-map-wrap { padding: 0 16px 16px; }
-  .dp-map { width: 100%; height: 200px; border-radius: 14px; border: 1px solid #E5E7EB; overflow: hidden; }
-  .dp-map-hint { font-size: 11px; color: #6B7280; margin-top: 8px; text-align: center; }
-  .dp-map-confirm { margin-top: 10px; width: 100%; padding: 12px; border: none; border-radius: 12px; background: #09B1BA; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-  .dp-map-confirm:hover { background: #078A91; }
-  .dp-map-confirm:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; }
-  .leaflet-container { font-family: inherit; }
+  /* ═══ MEETUP — Safe Spots ═══ */
+  .dp-meetup-wrap { padding: 0 16px 16px; }
+  .dp-meetup-search { width: 100%; padding: 10px 14px 10px 36px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.2s; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239CA3AF' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 110-10 5 5 0 010 10z'/%3E%3C/svg%3E") 12px center no-repeat; margin-bottom: 10px; }
+  .dp-meetup-search:focus { border-color: #09B1BA; }
+  .dp-meetup-cats { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .dp-cat-chip { white-space: nowrap; padding: 6px 12px; border: 1.5px solid #E5E7EB; border-radius: 999px; font-size: 11px; font-weight: 600; cursor: pointer; background: #fff; color: #6B7280; font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
+  .dp-cat-chip:hover { border-color: #09B1BA; color: #09B1BA; }
+  .dp-cat-chip.active { background: #09B1BA; color: #fff; border-color: #09B1BA; }
+  .dp-spots-list { max-height: 260px; overflow-y: auto; }
+  .dp-spots-list::-webkit-scrollbar { width: 3px; } .dp-spots-list::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
+  .dp-spot { padding: 10px 12px; border: 1.5px solid #E5E7EB; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; transition: all 0.15s; background: #fff; }
+  .dp-spot:hover { border-color: #09B1BA; background: #F0FBFC; }
+  .dp-spot.selected { border-color: #09B1BA; background: #E6F7F8; }
+  .dp-spot-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .dp-spot-icon.mall { background: #FEF3C7; }
+  .dp-spot-icon.metro { background: #DBEAFE; }
+  .dp-spot-icon.cafe { background: #FDE8D0; }
+  .dp-spot-icon.park { background: #D1FAE5; }
+  .dp-spot-icon.gas { background: #F3F4F6; }
+  .dp-spot-info { flex: 1; min-width: 0; }
+  .dp-spot-name { font-size: 13px; font-weight: 600; color: #1A1A2E; }
+  .dp-spot-detail { font-size: 11px; color: #6B7280; display: flex; gap: 8px; margin-top: 1px; }
+  .dp-spot-dist { font-size: 11px; font-weight: 600; color: #09B1BA; white-space: nowrap; flex-shrink: 0; }
+  .dp-spot-confirm { margin-top: 10px; width: 100%; padding: 12px; border: none; border-radius: 12px; background: #09B1BA; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .dp-spot-confirm:hover { background: #078A91; }
+  .dp-spot-confirm:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; }
+  .dp-safety-tip { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #FEF3C7; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: #92400E; }
   </style>
 </head>
 <body>
@@ -270,7 +288,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/demo-engine.js"></script>
   <script src="../js/i18n.js"></script>
@@ -290,12 +307,41 @@
     'conv-f': { their_item_id: null, my_item_id: 'item-18', status: 'accepted', cash: 2500, type: 'purchase' }
   };
 
-  const MEETUP_PLACES = [
-    { icon: '🏬', name: 'Dubai Mall', area: 'Downtown Dubai' },
-    { icon: '🏬', name: 'Mall of the Emirates', area: 'Al Barsha' },
-    { icon: '🚇', name: 'Union Metro Station', area: 'Deira' },
-    { icon: '🏬', name: 'Abu Dhabi Mall', area: 'Abu Dhabi' },
-    { icon: '🏬', name: 'City Centre Sharjah', area: 'Sharjah' }
+  // ═══ SAFE SPOTS DATABASE ═══
+  const SAFE_SPOTS = [
+    // Malls
+    { id: 's1', name: 'Dubai Mall', area: 'Downtown Dubai', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 2.1 },
+    { id: 's2', name: 'Mall of the Emirates', area: 'Al Barsha', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 5.3 },
+    { id: 's3', name: 'Ibn Battuta Mall', area: 'Jebel Ali', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 18.2 },
+    { id: 's4', name: 'Abu Dhabi Mall', area: 'Tourist Club', emirate: 'Abu Dhabi', cat: 'mall', icon: '🏬', dist: 130 },
+    { id: 's5', name: 'City Centre Sharjah', area: 'Al Wahda', emirate: 'Sharjah', cat: 'mall', icon: '🏬', dist: 12.5 },
+    { id: 's6', name: 'Yas Mall', area: 'Yas Island', emirate: 'Abu Dhabi', cat: 'mall', icon: '🏬', dist: 135 },
+    { id: 's7', name: 'City Centre Ajman', area: 'Al Jurf', emirate: 'Ajman', cat: 'mall', icon: '🏬', dist: 22 },
+    { id: 's8', name: 'Al Ghurair Centre', area: 'Deira', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 4.8 },
+    // Metro
+    { id: 's9', name: 'Union Metro Station', area: 'Deira', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 4.2 },
+    { id: 's10', name: 'Burjuman Metro', area: 'Bur Dubai', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 3.1 },
+    { id: 's11', name: 'Mall of Emirates Metro', area: 'Al Barsha', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 5.4 },
+    { id: 's12', name: 'Dubai Marina Metro', area: 'Dubai Marina', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 8.7 },
+    // Cafés
+    { id: 's13', name: 'Starbucks — Dubai Mall', area: 'Downtown Dubai', emirate: 'Dubai', cat: 'cafe', icon: '☕', dist: 2.2 },
+    { id: 's14', name: 'Tim Hortons — JBR', area: 'Jumeirah Beach', emirate: 'Dubai', cat: 'cafe', icon: '☕', dist: 7.1 },
+    { id: 's15', name: 'Costa Coffee — Marina Walk', area: 'Dubai Marina', emirate: 'Dubai', cat: 'cafe', icon: '☕', dist: 8.5 },
+    // Parks
+    { id: 's16', name: 'Zabeel Park', area: 'Al Karama', emirate: 'Dubai', cat: 'park', icon: '🌳', dist: 3.6 },
+    { id: 's17', name: 'Al Mamzar Beach Park', area: 'Al Mamzar', emirate: 'Dubai', cat: 'park', icon: '🌳', dist: 9.2 },
+    { id: 's18', name: 'Corniche Park', area: 'Corniche Rd', emirate: 'Abu Dhabi', cat: 'park', icon: '🌳', dist: 128 },
+    // Gas Stations (24/7, well-lit)
+    { id: 's19', name: 'ADNOC — Sheikh Zayed Rd', area: 'Trade Centre', emirate: 'Dubai', cat: 'gas', icon: '⛽', dist: 1.8 },
+    { id: 's20', name: 'ENOC — Al Barsha', area: 'Al Barsha 1', emirate: 'Dubai', cat: 'gas', icon: '⛽', dist: 5.6 },
+  ];
+  const SPOT_CATEGORIES = [
+    { key: 'all', label: 'All', icon: '📍' },
+    { key: 'mall', label: 'Malls', icon: '🏬' },
+    { key: 'metro', label: 'Metro', icon: '🚇' },
+    { key: 'cafe', label: 'Cafés', icon: '☕' },
+    { key: 'park', label: 'Parks', icon: '🌳' },
+    { key: 'gas', label: '24/7 Spots', icon: '⛽' },
   ];
 
   function initial(n) { return n ? n.charAt(0).toUpperCase() : '?'; }
@@ -482,16 +528,18 @@
         '<button class="dp-btn primary" onclick="sendCounter(\'' + convId + '\')"><i class="fas fa-paper-plane"></i> Send Counter-Offer</button>' +
       '</div>';
 
-      // Meetup map section
-      var meetHTML = '<div class="dp-map-wrap">' +
-        '<div class="dp-section-title"><i class="fas fa-map-marker-alt" style="color:#09B1BA;margin-right:6px;"></i>Choose Meetup Location</div>' +
-        '<div class="dp-map" id="meetupMap"></div>' +
-        '<div class="dp-map-hint" id="mapHint">Tap the map to set a meetup point</div>' +
-        '<button class="dp-map-confirm" id="mapConfirmBtn" disabled onclick="confirmMeetupLocation()"><i class="fas fa-paper-plane"></i> Send Location</button>' +
+      // Safe Spots meetup section
+      var meetHTML = '<div class="dp-meetup-wrap">' +
+        '<div class="dp-section-title"><i class="fas fa-shield-alt" style="color:#09B1BA;margin-right:6px;"></i>Safe Meetup Spots</div>' +
+        '<div class="dp-safety-tip"><i class="fas fa-lightbulb"></i> Always meet in a public, well-lit place. Swappo recommends these verified spots.</div>' +
+        '<input type="text" class="dp-meetup-search" id="spotSearch" placeholder="Search malls, metro, cafés..." oninput="filterSpots()">' +
+        '<div class="dp-meetup-cats" id="spotCats"></div>' +
+        '<div class="dp-spots-list" id="spotsList"></div>' +
+        '<button class="dp-spot-confirm" id="spotConfirmBtn" disabled onclick="confirmSpot()"><i class="fas fa-paper-plane"></i> Send Meetup Location</button>' +
       '</div>';
       document.getElementById('dpMeetup').innerHTML = meetHTML;
-      // Init map after DOM update
-      setTimeout(initMeetupMap, 100);
+      renderSpotCategories();
+      filterSpots();
     }
     document.getElementById('dpNegotiate').innerHTML = '';
     document.getElementById('dpActions').innerHTML = negHTML;
@@ -542,85 +590,77 @@
     CONV_ITEM_MAP[convId].status = 'accepted'; // temporarily accept to show negotiation UI
     renderDealPanel(convId);
   }
-  // ═══ MEETUP MAP ═══
-  var meetupMap = null;
-  var meetupMarker = null;
-  var selectedMeetupCoords = null;
+  // ═══ SAFE SPOTS — Meetup Picker ═══
+  var selectedSpotId = null;
+  var activeSpotCat = 'all';
 
-  function initMeetupMap() {
-    var mapEl = document.getElementById('meetupMap');
-    if (!mapEl || !window.L) return;
-    if (meetupMap) { meetupMap.remove(); meetupMap = null; }
-
-    // Default center: UAE (Dubai)
-    meetupMap = L.map('meetupMap', { zoomControl: true, attributionControl: false }).setView([25.2048, 55.2708], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(meetupMap);
-
-    // Custom teal marker icon
-    var tealIcon = L.divIcon({
-      className: '',
-      html: '<div style="width:32px;height:32px;background:#09B1BA;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><i class="fas fa-map-pin" style="transform:rotate(45deg);color:#fff;font-size:14px;"></i></div>',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32]
-    });
-
-    // Add some suggested spots as small circles
-    var spots = [
-      { lat: 25.1972, lng: 55.2744, name: 'Dubai Mall' },
-      { lat: 25.1183, lng: 55.2006, name: 'Mall of the Emirates' },
-      { lat: 25.2653, lng: 55.3088, name: 'Union Metro' },
-      { lat: 24.4539, lng: 54.6533, name: 'Abu Dhabi Mall' },
-      { lat: 25.3463, lng: 55.4209, name: 'City Centre Sharjah' }
-    ];
-    spots.forEach(function(s) {
-      L.circleMarker([s.lat, s.lng], { radius: 6, fillColor: '#09B1BA', fillOpacity: 0.3, color: '#09B1BA', weight: 1 })
-        .bindTooltip(s.name, { direction: 'top', offset: [0, -8] })
-        .on('click', function() { placeMarker(s.lat, s.lng, s.name); })
-        .addTo(meetupMap);
-    });
-
-    // Click anywhere to place marker
-    meetupMap.on('click', function(e) {
-      placeMarker(e.latlng.lat, e.latlng.lng, null);
-    });
-
-    // Try geolocation
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        meetupMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
-      }, function() {}, { timeout: 3000 });
-    }
+  function renderSpotCategories() {
+    var container = document.getElementById('spotCats');
+    if (!container) return;
+    container.innerHTML = SPOT_CATEGORIES.map(function(c) {
+      return '<button class="dp-cat-chip' + (activeSpotCat === c.key ? ' active' : '') + '" onclick="setSpotCat(\'' + c.key + '\')">' + c.icon + ' ' + c.label + '</button>';
+    }).join('');
   }
 
-  function placeMarker(lat, lng, name) {
-    var tealIcon = L.divIcon({
-      className: '',
-      html: '<div style="width:36px;height:36px;background:#09B1BA;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><i class="fas fa-map-pin" style="transform:rotate(45deg);color:#fff;font-size:14px;"></i></div>',
-      iconSize: [36, 36],
-      iconAnchor: [18, 36]
+  function setSpotCat(cat) {
+    activeSpotCat = cat;
+    renderSpotCategories();
+    filterSpots();
+  }
+
+  function filterSpots() {
+    var search = (document.getElementById('spotSearch') || {}).value || '';
+    search = search.toLowerCase().trim();
+    var list = document.getElementById('spotsList');
+    if (!list) return;
+
+    var filtered = SAFE_SPOTS.filter(function(s) {
+      if (activeSpotCat !== 'all' && s.cat !== activeSpotCat) return false;
+      if (search && s.name.toLowerCase().indexOf(search) === -1 && s.area.toLowerCase().indexOf(search) === -1 && s.emirate.toLowerCase().indexOf(search) === -1) return false;
+      return true;
     });
 
-    if (meetupMarker) meetupMap.removeLayer(meetupMarker);
-    meetupMarker = L.marker([lat, lng], { icon: tealIcon }).addTo(meetupMap);
-    selectedMeetupCoords = { lat: lat, lng: lng, name: name };
+    // Sort by distance
+    filtered.sort(function(a, b) { return a.dist - b.dist; });
 
-    var hint = document.getElementById('mapHint');
-    if (hint) hint.textContent = name ? '📍 ' + name : '📍 ' + lat.toFixed(4) + ', ' + lng.toFixed(4);
-    var btn = document.getElementById('mapConfirmBtn');
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;"><i class="fas fa-search" style="display:block;font-size:20px;margin-bottom:8px;opacity:0.3;"></i>No spots found. Try a different search.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(function(s) {
+      var distText = s.dist < 1 ? (s.dist * 1000).toFixed(0) + 'm' : s.dist.toFixed(1) + ' km';
+      var iconClass = s.cat;
+      return '<div class="dp-spot' + (selectedSpotId === s.id ? ' selected' : '') + '" onclick="selectSpot(\'' + s.id + '\')">' +
+        '<div class="dp-spot-icon ' + iconClass + '">' + s.icon + '</div>' +
+        '<div class="dp-spot-info">' +
+          '<div class="dp-spot-name">' + s.name + '</div>' +
+          '<div class="dp-spot-detail"><span>' + s.area + ', ' + s.emirate + '</span></div>' +
+        '</div>' +
+        '<span class="dp-spot-dist">' + distText + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function selectSpot(id) {
+    selectedSpotId = id;
+    filterSpots(); // re-render to show selected state
+    var btn = document.getElementById('spotConfirmBtn');
     if (btn) btn.disabled = false;
   }
 
-  function confirmMeetupLocation() {
-    if (!selectedMeetupCoords || !activeConvId) return;
-    var loc = selectedMeetupCoords.name || (selectedMeetupCoords.lat.toFixed(4) + ', ' + selectedMeetupCoords.lng.toFixed(4));
-    DemoChat.sendMessage(activeConvId, '📍 Let\'s meet here: ' + loc + '\nhttps://maps.google.com/?q=' + selectedMeetupCoords.lat + ',' + selectedMeetupCoords.lng);
-    DemoNotifications.showToast('Meetup location sent! 📍', 'success');
+  function confirmSpot() {
+    if (!selectedSpotId || !activeConvId) return;
+    var spot = SAFE_SPOTS.find(function(s) { return s.id === selectedSpotId; });
+    if (!spot) return;
+
+    DemoChat.sendMessage(activeConvId, '📍 Let\'s meet at: ' + spot.icon + ' ' + spot.name + ' (' + spot.area + ', ' + spot.emirate + ')');
+    DemoNotifications.showToast('Meetup location sent! ' + spot.icon, 'success');
     loadMessages(activeConvId);
-    selectedMeetupCoords = null;
-    var btn = document.getElementById('mapConfirmBtn');
-    if (btn) { btn.disabled = true; }
-    var hint = document.getElementById('mapHint');
-    if (hint) hint.textContent = '✅ Location sent! Tap to change';
+
+    selectedSpotId = null;
+    var btn = document.getElementById('spotConfirmBtn');
+    if (btn) btn.disabled = true;
   }
 
   // ═══ SEND MESSAGE ═══
