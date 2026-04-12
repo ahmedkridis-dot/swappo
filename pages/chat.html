@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/swappo-visual.css">
   <link rel="stylesheet" href="../css/swappo-modern-2026.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
   * { box-sizing: border-box; }
   body { font-family: 'Inter', sans-serif; margin: 0; background: #FAFBFC; }
@@ -177,7 +178,14 @@
   }
   @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-  /* ═══ TRUCK POPUP (reused from previous) ═══ */
+  /* ═══ MEETUP MAP ═══ */
+  .dp-map-wrap { padding: 0 16px 16px; }
+  .dp-map { width: 100%; height: 200px; border-radius: 14px; border: 1px solid #E5E7EB; overflow: hidden; }
+  .dp-map-hint { font-size: 11px; color: #6B7280; margin-top: 8px; text-align: center; }
+  .dp-map-confirm { margin-top: 10px; width: 100%; padding: 12px; border: none; border-radius: 12px; background: #09B1BA; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .dp-map-confirm:hover { background: #078A91; }
+  .dp-map-confirm:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; }
+  .leaflet-container { font-family: inherit; }
   </style>
 </head>
 <body>
@@ -262,6 +270,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/demo-engine.js"></script>
   <script src="../js/i18n.js"></script>
@@ -473,16 +482,16 @@
         '<button class="dp-btn primary" onclick="sendCounter(\'' + convId + '\')"><i class="fas fa-paper-plane"></i> Send Counter-Offer</button>' +
       '</div>';
 
-      // Meetup section
-      var meetHTML = '<div class="dp-meetup">' +
-        '<div class="dp-section-title"><i class="fas fa-map-marker-alt" style="color:#09B1BA;margin-right:6px;"></i>Arrange Meetup</div>';
-      MEETUP_PLACES.forEach(function(p) {
-        meetHTML += '<div class="dp-place" onclick="selectMeetup(\'' + p.name + '\')">' +
-          '<span class="dp-place-icon">' + p.icon + '</span>' +
-          '<div><div class="dp-place-name">' + p.name + '</div><div class="dp-place-area">' + p.area + '</div></div></div>';
-      });
-      meetHTML += '</div>';
+      // Meetup map section
+      var meetHTML = '<div class="dp-map-wrap">' +
+        '<div class="dp-section-title"><i class="fas fa-map-marker-alt" style="color:#09B1BA;margin-right:6px;"></i>Choose Meetup Location</div>' +
+        '<div class="dp-map" id="meetupMap"></div>' +
+        '<div class="dp-map-hint" id="mapHint">Tap the map to set a meetup point</div>' +
+        '<button class="dp-map-confirm" id="mapConfirmBtn" disabled onclick="confirmMeetupLocation()"><i class="fas fa-paper-plane"></i> Send Location</button>' +
+      '</div>';
       document.getElementById('dpMeetup').innerHTML = meetHTML;
+      // Init map after DOM update
+      setTimeout(initMeetupMap, 100);
     }
     document.getElementById('dpNegotiate').innerHTML = '';
     document.getElementById('dpActions').innerHTML = negHTML;
@@ -533,10 +542,85 @@
     CONV_ITEM_MAP[convId].status = 'accepted'; // temporarily accept to show negotiation UI
     renderDealPanel(convId);
   }
-  function selectMeetup(place) {
-    DemoChat.sendMessage(activeConvId, 'Let\'s meet at ' + place + '! When works for you?');
+  // ═══ MEETUP MAP ═══
+  var meetupMap = null;
+  var meetupMarker = null;
+  var selectedMeetupCoords = null;
+
+  function initMeetupMap() {
+    var mapEl = document.getElementById('meetupMap');
+    if (!mapEl || !window.L) return;
+    if (meetupMap) { meetupMap.remove(); meetupMap = null; }
+
+    // Default center: UAE (Dubai)
+    meetupMap = L.map('meetupMap', { zoomControl: true, attributionControl: false }).setView([25.2048, 55.2708], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(meetupMap);
+
+    // Custom teal marker icon
+    var tealIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:32px;height:32px;background:#09B1BA;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><i class="fas fa-map-pin" style="transform:rotate(45deg);color:#fff;font-size:14px;"></i></div>',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    });
+
+    // Add some suggested spots as small circles
+    var spots = [
+      { lat: 25.1972, lng: 55.2744, name: 'Dubai Mall' },
+      { lat: 25.1183, lng: 55.2006, name: 'Mall of the Emirates' },
+      { lat: 25.2653, lng: 55.3088, name: 'Union Metro' },
+      { lat: 24.4539, lng: 54.6533, name: 'Abu Dhabi Mall' },
+      { lat: 25.3463, lng: 55.4209, name: 'City Centre Sharjah' }
+    ];
+    spots.forEach(function(s) {
+      L.circleMarker([s.lat, s.lng], { radius: 6, fillColor: '#09B1BA', fillOpacity: 0.3, color: '#09B1BA', weight: 1 })
+        .bindTooltip(s.name, { direction: 'top', offset: [0, -8] })
+        .on('click', function() { placeMarker(s.lat, s.lng, s.name); })
+        .addTo(meetupMap);
+    });
+
+    // Click anywhere to place marker
+    meetupMap.on('click', function(e) {
+      placeMarker(e.latlng.lat, e.latlng.lng, null);
+    });
+
+    // Try geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        meetupMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
+      }, function() {}, { timeout: 3000 });
+    }
+  }
+
+  function placeMarker(lat, lng, name) {
+    var tealIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:36px;height:36px;background:#09B1BA;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><i class="fas fa-map-pin" style="transform:rotate(45deg);color:#fff;font-size:14px;"></i></div>',
+      iconSize: [36, 36],
+      iconAnchor: [18, 36]
+    });
+
+    if (meetupMarker) meetupMap.removeLayer(meetupMarker);
+    meetupMarker = L.marker([lat, lng], { icon: tealIcon }).addTo(meetupMap);
+    selectedMeetupCoords = { lat: lat, lng: lng, name: name };
+
+    var hint = document.getElementById('mapHint');
+    if (hint) hint.textContent = name ? '📍 ' + name : '📍 ' + lat.toFixed(4) + ', ' + lng.toFixed(4);
+    var btn = document.getElementById('mapConfirmBtn');
+    if (btn) btn.disabled = false;
+  }
+
+  function confirmMeetupLocation() {
+    if (!selectedMeetupCoords || !activeConvId) return;
+    var loc = selectedMeetupCoords.name || (selectedMeetupCoords.lat.toFixed(4) + ', ' + selectedMeetupCoords.lng.toFixed(4));
+    DemoChat.sendMessage(activeConvId, '📍 Let\'s meet here: ' + loc + '\nhttps://maps.google.com/?q=' + selectedMeetupCoords.lat + ',' + selectedMeetupCoords.lng);
     DemoNotifications.showToast('Meetup location sent! 📍', 'success');
     loadMessages(activeConvId);
+    selectedMeetupCoords = null;
+    var btn = document.getElementById('mapConfirmBtn');
+    if (btn) { btn.disabled = true; }
+    var hint = document.getElementById('mapHint');
+    if (hint) hint.textContent = '✅ Location sent! Tap to change';
   }
 
   // ═══ SEND MESSAGE ═══

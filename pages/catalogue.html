@@ -14,9 +14,30 @@
   <link rel="stylesheet" href="../css/swappo-visual.css">
   <link rel="stylesheet" href="../css/swappo-modern-2026.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* Map view toggle */
+    .view-toggle { display: flex; gap: 4px; background: #F3F4F6; border-radius: 10px; padding: 3px; }
+    .view-toggle button { padding: 8px 14px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; background: transparent; color: #6B7280; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+    .view-toggle button.active { background: #fff; color: #1A1A2E; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .catalogue-split { display: flex; gap: 0; }
+    .catalogue-split .catalogue-list { flex: 1; min-width: 0; }
+    .catalogue-split .catalogue-map { width: 50%; height: calc(100vh - 200px); position: sticky; top: 100px; border-radius: 16px; overflow: hidden; border: 1px solid #E5E7EB; display: none; }
+    .catalogue-split.map-active .catalogue-map { display: block; }
+    .catalogue-split.map-active .catalogue-list { width: 50%; }
+    .catalogue-split.map-active .products-grid { grid-template-columns: 1fr !important; }
+    .map-item-popup { font-family: 'Inter', sans-serif; }
+    .map-item-popup img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; }
+    .map-item-popup h4 { font-size: 13px; font-weight: 700; margin: 0 0 2px; color: #1A1A2E; }
+    .map-item-popup .price { font-size: 14px; font-weight: 800; color: #09B1BA; }
+    @media (max-width: 900px) {
+      .catalogue-split.map-active .catalogue-map { width: 100%; height: 50vh; position: relative; top: auto; }
+      .catalogue-split.map-active .catalogue-list { width: 100%; }
+      .catalogue-split.map-active { flex-direction: column; }
+    }
+
     /* Filter bar — upgraded Vinted-style */
     .filter-bar {
       display: flex;
@@ -352,12 +373,22 @@
 
   <!-- ========== MAIN CONTENT ========== -->
   <div class="container">
-    <span class="result-count" id="item-count">Loading...</span>
-    <div class="products-grid" id="catalogue-grid" data-stagger-grid></div>
-
-    <!-- Load more -->
-    <div id="load-more-wrap" class="load-more-wrap" style="display:none;">
-      <button id="load-more-btn" class="btn-pill btn-pill-outline">Load more items</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span class="result-count" id="item-count">Loading...</span>
+      <div class="view-toggle" id="viewToggle">
+        <button class="active" onclick="setView('grid')"><i class="fas fa-th-large"></i> Grid</button>
+        <button onclick="setView('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
+      </div>
+    </div>
+    <div class="catalogue-split" id="catalogueSplit">
+      <div class="catalogue-list">
+        <div class="products-grid" id="catalogue-grid" data-stagger-grid></div>
+        <!-- Load more -->
+        <div id="load-more-wrap" class="load-more-wrap" style="display:none;">
+          <button id="load-more-btn" class="btn-pill btn-pill-outline">Load more items</button>
+        </div>
+      </div>
+      <div class="catalogue-map" id="catalogueMap"></div>
     </div>
   </div>
 
@@ -984,7 +1015,96 @@
       };
       document.body.appendChild(btn);
     })();
+
+    // ═══ MAP VIEW — Airbnb/PropertyFinder style ═══
+    var catalogueMapInstance = null;
+    var mapMarkers = [];
+
+    function setView(mode) {
+      var split = document.getElementById('catalogueSplit');
+      var btns = document.querySelectorAll('.view-toggle button');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+
+      if (mode === 'map') {
+        split.classList.add('map-active');
+        btns[1].classList.add('active');
+        setTimeout(initCatalogueMap, 150);
+      } else {
+        split.classList.remove('map-active');
+        btns[0].classList.add('active');
+      }
+    }
+    window.setView = setView;
+
+    function initCatalogueMap() {
+      var mapEl = document.getElementById('catalogueMap');
+      if (!mapEl || !window.L) return;
+
+      if (!catalogueMapInstance) {
+        catalogueMapInstance = L.map('catalogueMap', { zoomControl: true, attributionControl: false }).setView([25.2, 55.27], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(catalogueMapInstance);
+      } else {
+        catalogueMapInstance.invalidateSize();
+      }
+
+      // Clear old markers
+      mapMarkers.forEach(function(m) { catalogueMapInstance.removeLayer(m); });
+      mapMarkers = [];
+
+      // Emirates center coordinates
+      var emirateCoords = {
+        'Dubai': { lat: 25.2048, lng: 55.2708 },
+        'Abu Dhabi': { lat: 24.4539, lng: 54.3773 },
+        'Sharjah': { lat: 25.3463, lng: 55.4209 },
+        'Ajman': { lat: 25.4052, lng: 55.5136 },
+        'RAK': { lat: 25.7895, lng: 55.9432 },
+        'Fujairah': { lat: 25.1288, lng: 56.3264 },
+        'UAQ': { lat: 25.5647, lng: 55.5553 }
+      };
+
+      // Get filtered items from current catalogue view
+      var items = [];
+      if (window.DemoItems) {
+        var result = DemoItems.browse({ sortBy: 'newest' });
+        items = result.items || [];
+      }
+
+      // Place markers with jitter to avoid overlap
+      items.forEach(function(item, i) {
+        var emirate = item.emirate || 'Dubai';
+        var base = emirateCoords[emirate] || emirateCoords['Dubai'];
+        var jitterLat = (Math.random() - 0.5) * 0.06;
+        var jitterLng = (Math.random() - 0.5) * 0.06;
+        var lat = base.lat + jitterLat;
+        var lng = base.lng + jitterLng;
+
+        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type || 'Item';
+        var price = item.is_giveaway ? 'FREE' : (item.price || 0).toLocaleString() + ' AED';
+        var photo = item.photos && item.photos[0] ? item.photos[0] : '';
+        var href = 'product.html?id=' + item.id;
+
+        var priceIcon = L.divIcon({
+          className: '',
+          html: '<div style="background:#fff;border:2px solid #09B1BA;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;color:#1A1A2E;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;font-family:Inter,sans-serif;cursor:pointer;">' + price + '</div>',
+          iconSize: [0, 0],
+          iconAnchor: [30, 15]
+        });
+
+        var popupHTML = '<div class="map-item-popup" style="min-width:160px;">' +
+          (photo ? '<img src="' + photo + '" alt="' + title + '">' : '') +
+          '<h4>' + title + '</h4>' +
+          '<div class="price">' + price + '</div>' +
+          '<a href="' + href + '" style="display:block;margin-top:6px;text-align:center;padding:6px;background:#09B1BA;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">View item →</a>' +
+        '</div>';
+
+        var marker = L.marker([lat, lng], { icon: priceIcon })
+          .bindPopup(popupHTML, { maxWidth: 200 })
+          .addTo(catalogueMapInstance);
+        mapMarkers.push(marker);
+      });
+    }
   </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 </body>
 </html>
