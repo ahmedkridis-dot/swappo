@@ -1223,28 +1223,73 @@ a.site-logo:hover { color: #078A91 !important; }
 }
 
 @media (max-width: 768px) {
+  /* ── Navbar mobile ── */
   .navbar-nav { display: none; }
-  .navbar-search { display: none; }
-  .navbar-search { display: none; }
-  .navbar-actions > *:not(.lang-dropdown) { display: none !important; }
-  .navbar-inner { gap: 8px; }
-  .navbar-toggle { display: block; }
-  .products-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .navbar-search { display: none !important; }
+  .navbar-inner { gap: 8px; flex-wrap: wrap; }
+  .navbar-toggle { display: block !important; }
+  .navbar-actions { gap: 6px !important; }
+  .navbar-actions .btn-outline { display: none !important; }
+  .navbar-actions .btn-primary { font-size: 12px !important; padding: 8px 14px !important; }
+  .nav-dashboard-pill { padding: 4px !important; }
+  .nav-dashboard-meta { display: none !important; }
+  .nav-logout-btn { display: none !important; }
+
+  /* ── Mega menu mobile: horizontal scroll ── */
+  .mega-menu-bar { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  .mega-menu-bar__inner { justify-content: flex-start !important; padding: 0 12px !important; }
+
+  /* ── Eco ticker compact ── */
+  .eco-ticker-content { font-size: 11px; gap: 6px; }
+  .eco-ticker-separator { display: none; }
+  .eco-ticker-live { display: none; }
+
+  /* ── Grids ── */
+  .products-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
   .categories-grid { grid-template-columns: repeat(2, 1fr); }
+  .steps-grid, .steps-grid-4 { grid-template-columns: 1fr !important; max-width: 100% !important; }
+
+  /* ── Hero mobile ── */
   .hero { min-height: auto; padding: 40px 0; }
-  .hero-content { margin-left: 0; margin: 0 24px; max-width: 100%; padding: 32px; }
-  .hero-content h1 { font-size: 1.6rem; }
-  .giveaway-banner { flex-direction: column; text-align: center; padding: 28px; }
+  .hero-content { margin: 0 16px; max-width: 100%; padding: 24px; }
+  .hero-content h1 { font-size: 1.5rem; }
+  .hero-video-section { min-height: 70vh !important; }
+  .hero-video-content { padding: 80px 16px 60px !important; max-width: 100% !important; }
+  .hero-video-section .hero-copy h1 { font-size: 2rem !important; }
+  .hero-video-section .hero-subtitle-text { font-size: 0.95rem !important; }
+  .hero-video-section .hero-cta { flex-direction: column; align-items: stretch; }
+  .hero-video-section .hero-cta .btn-pill-teal,
+  .hero-video-section .hero-cta .hero-outline-btn { text-align: center; width: 100%; }
+  .hero-video-section .hero-trust { flex-direction: column; gap: 8px; }
+  .hero-video-float { display: none !important; }
+
+  /* ── Sections ── */
+  .giveaway-banner { flex-direction: column; text-align: center; padding: 28px 16px; }
   .giveaway-stats { justify-content: center; }
-  .footer-grid { grid-template-columns: 1fr; }
+  .section-title { font-size: 22px !important; }
+
+  /* ── Footer ── */
+  .footer-grid { grid-template-columns: 1fr !important; gap: 24px; }
   .footer-bottom { flex-direction: column; gap: 10px; }
+  .footer-social { justify-content: center; }
+  .footer-contact { align-items: center; }
+
+  /* ── Filter bar ── */
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-bar select, .filter-bar input[type="text"] { width: 100% !important; }
+
+  /* ── Pricing ── */
+  .plans-grid { grid-template-columns: 1fr !important; max-width: 100% !important; }
+
+  /* ── Surprise Me FAB ── */
+  .surprise-me-btn { bottom: 16px !important; right: 12px !important; padding: 10px 16px !important; font-size: 13px !important; }
 }
 
 @media (max-width: 480px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .categories-grid { grid-template-columns: 1fr; }
-  .hero-actions { flex-direction: column; }
-  .steps-grid { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+  .hero-video-section .hero-copy h1 { font-size: 1.7rem !important; }
+  .navbar-actions .btn-primary { font-size: 11px !important; padding: 6px 10px !important; }
+  .eco-ticker { font-size: 10px; }
 }
 
 /* ========================
