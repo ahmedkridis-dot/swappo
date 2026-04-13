@@ -12,141 +12,782 @@
   <link rel="stylesheet" href="../css/swappo-visual.css">
   <link rel="stylesheet" href="../css/swappo-modern-2026.css">
   <style>
-  * { box-sizing: border-box; }
-  body { font-family: 'Inter', sans-serif; margin: 0; background: #FAFBFC; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #F5F7FA; }
   .eco-ticker { display: none !important; }
   #mega-menu-mount { display: none !important; }
 
-  /* ═══ 3-COLUMN GRID ═══ */
-  .chat-page { display: grid; grid-template-columns: 300px 1fr 340px; height: calc(100vh - 64px); overflow: hidden; }
+  /* ═══════════════════════════════════════════
+     3-COLUMN GRID — Deal Hub Layout
+     ═══════════════════════════════════════════ */
+  .chat-page {
+    display: grid;
+    grid-template-columns: 320px 1fr 380px;
+    height: calc(100vh - 64px);
+    overflow: hidden;
+  }
 
-  /* ═══ SIDEBAR ═══ */
-  .chat-sb { background: #fff; border-right: 1px solid #F0F0F0; display: flex; flex-direction: column; overflow: hidden; }
-  .sb-head { padding: 20px 20px 12px; display: flex; align-items: center; justify-content: space-between; }
-  .sb-head h2 { font-size: 20px; font-weight: 800; color: #1A1A2E; margin: 0; letter-spacing: -0.02em; }
-  .sb-badge { background: #09B1BA; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
-  .sb-search { margin: 0 16px 12px; padding: 10px 14px 10px 36px; border: 1px solid #E5E7EB; border-radius: 24px; font-size: 13px; font-family: inherit; background: #FAFBFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239CA3AF' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 110-10 5 5 0 010 10z'/%3E%3C/svg%3E") 14px center no-repeat; width: calc(100% - 32px); outline: none; transition: border-color 0.2s; }
+  /* ═══════════════════════════════════════════
+     LEFT SIDEBAR — Conversations
+     ═══════════════════════════════════════════ */
+  .chat-sb {
+    background: #fff;
+    border-right: 1px solid #EDF0F3;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .sb-head {
+    padding: 20px 20px 8px;
+  }
+  .sb-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .sb-head h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1A1A2E;
+    letter-spacing: -0.03em;
+  }
+  .sb-badge {
+    background: linear-gradient(135deg, #09B1BA, #078A91);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    min-width: 22px;
+    text-align: center;
+  }
+  .sb-search {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 14px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #F8FAFB url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239CA3AF' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 110-10 5 5 0 010 10z'/%3E%3C/svg%3E") 14px center no-repeat;
+    outline: none;
+    transition: all 0.2s;
+  }
   .sb-search:focus { border-color: #09B1BA; background-color: #fff; }
-  .sb-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
-  .sb-list::-webkit-scrollbar { width: 3px; } .sb-list::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
 
-  .sb-card { display: flex; gap: 12px; padding: 14px 12px; border-radius: 14px; cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; margin-bottom: 2px; position: relative; }
+  /* Filter Tabs */
+  .sb-filters {
+    display: flex;
+    gap: 4px;
+    padding: 10px 16px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sb-filter {
+    white-space: nowrap;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #F3F4F6;
+    color: #6B7280;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .sb-filter:hover { background: #E5E7EB; }
+  .sb-filter.active { background: #09B1BA; color: #fff; }
+
+  .sb-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 8px 8px;
+  }
+  .sb-list::-webkit-scrollbar { width: 3px; }
+  .sb-list::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
+
+  .sb-card {
+    display: flex;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+    margin-bottom: 2px;
+    position: relative;
+  }
   .sb-card:hover { background: #F9FAFB; }
   .sb-card.active { background: #F0FBFC; border-left-color: #09B1BA; }
-  .sb-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+  .sb-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .sb-online {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 10px;
+    height: 10px;
+    background: #10B981;
+    border-radius: 50%;
+    border: 2px solid #fff;
+  }
   .sb-meta { flex: 1; min-width: 0; }
   .sb-row { display: flex; justify-content: space-between; align-items: center; }
   .sb-name { font-size: 14px; font-weight: 600; color: #1A1A2E; }
   .sb-time { font-size: 10px; color: #9CA3AF; }
   .sb-preview { font-size: 12px; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  .sb-status { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; margin-top: 4px; }
+  .sb-deal-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+  }
+  .sb-deal-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .sb-deal-type.swap { background: #E6F7F8; color: #078A91; }
+  .sb-deal-type.buy { background: #FEF3C7; color: #92400E; }
+  .sb-deal-type.gift { background: #D1FAE5; color: #065F46; }
+  .sb-deal-amount {
+    font-size: 11px;
+    font-weight: 700;
+    color: #09B1BA;
+  }
+  .sb-status {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
   .sb-status.pending { background: #FEF3C7; color: #92400E; }
   .sb-status.accepted { background: #D1FAE5; color: #065F46; }
   .sb-status.completed { background: #DBEAFE; color: #1E40AF; }
-  .sb-thumb { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid #F0F0F0; }
-  .sb-unread { position: absolute; top: 10px; right: 10px; min-width: 18px; height: 18px; background: #FF4B55; color: #fff; font-size: 10px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .sb-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #F0F0F0;
+  }
+  .sb-unread {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    min-width: 18px;
+    height: 18px;
+    background: #FF4B55;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  /* ═══ CENTER — MESSAGES ═══ */
-  .chat-center { display: flex; flex-direction: column; overflow: hidden; background: #fff; border-right: 1px solid #F0F0F0; }
-  .ch-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #F0F0F0; flex-shrink: 0; min-height: 60px; }
-  .ch-header-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  /* ═══════════════════════════════════════════
+     CENTER — Chat Area
+     ═══════════════════════════════════════════ */
+  .chat-center {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #fff;
+    border-right: 1px solid #EDF0F3;
+  }
+  .ch-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #EDF0F3;
+    flex-shrink: 0;
+    min-height: 64px;
+    background: #fff;
+  }
+  .ch-header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
   .ch-header-info { flex: 1; min-width: 0; }
   .ch-header-name { font-size: 15px; font-weight: 700; color: #1A1A2E; }
   .ch-header-badge { font-size: 11px; color: #6B7280; }
   .ch-header-actions { display: flex; gap: 8px; }
-  .ch-header-actions button { background: none; border: 1px solid #E5E7EB; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; color: #6B7280; font-family: inherit; transition: all 0.2s; }
+  .ch-header-actions button {
+    background: none;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #6B7280;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
   .ch-header-actions button:hover { border-color: #09B1BA; color: #09B1BA; }
-  .ch-deal-btn { display: none; background: #09B1BA !important; color: #fff !important; border-color: #09B1BA !important; }
+  .ch-deal-btn { display: none; background: linear-gradient(135deg, #09B1BA, #078A91) !important; color: #fff !important; border-color: transparent !important; }
 
-  .ch-msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
-  .ch-msgs::-webkit-scrollbar { width: 4px; } .ch-msgs::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
-  .msg-sys { align-self: center; text-align: center; font-size: 12px; color: #6B7280; padding: 8px 16px; background: #F3F4F6; border-radius: 12px; max-width: 85%; animation: msgIn 0.2s ease-out; }
-  .msg { display: flex; gap: 8px; align-items: flex-end; animation: msgIn 0.2s ease-out; }
+  /* Messages */
+  .ch-msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #FAFBFC;
+  }
+  .ch-msgs::-webkit-scrollbar { width: 4px; }
+  .ch-msgs::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
+
+  .msg-sys {
+    align-self: center;
+    text-align: center;
+    font-size: 12px;
+    color: #6B7280;
+    padding: 8px 18px;
+    background: #F3F4F6;
+    border-radius: 12px;
+    max-width: 85%;
+    animation: msgIn 0.3s ease-out;
+  }
+  .msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    animation: msgIn 0.3s ease-out;
+  }
   .msg.sent { flex-direction: row-reverse; }
-  .msg-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 10px; flex-shrink: 0; }
-  .msg-bubble { max-width: 60%; padding: 10px 14px; border-radius: 18px; font-size: 13px; line-height: 1.55; word-wrap: break-word; }
-  .msg.sent .msg-bubble { background: #09B1BA; color: #fff; border-bottom-right-radius: 4px; }
-  .msg.recv .msg-bubble { background: #F3F4F6; color: #1A1A2E; border-bottom-left-radius: 4px; }
+  .msg-av {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+  .msg-bubble {
+    max-width: 60%;
+    padding: 11px 16px;
+    border-radius: 18px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    word-wrap: break-word;
+  }
+  .msg.sent .msg-bubble {
+    background: linear-gradient(135deg, #09B1BA, #078A91);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.recv .msg-bubble {
+    background: #fff;
+    color: #1A1A2E;
+    border-bottom-left-radius: 4px;
+    border: 1px solid #EDF0F3;
+  }
   .msg-time { font-size: 10px; color: #9CA3AF; white-space: nowrap; align-self: flex-end; }
-  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .msg-read { font-size: 10px; color: #09B1BA; margin-left: 2px; }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-  .ch-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9CA3AF; gap: 8px; }
-  .ch-empty i { font-size: 48px; opacity: 0.2; }
+  /* Typing Indicator */
+  .typing-indicator {
+    display: none;
+    align-self: flex-start;
+    padding: 10px 16px;
+    background: #fff;
+    border: 1px solid #EDF0F3;
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    animation: msgIn 0.3s ease-out;
+  }
+  .typing-indicator.show { display: flex; gap: 4px; align-items: center; }
+  .typing-dot {
+    width: 7px;
+    height: 7px;
+    background: #9CA3AF;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
 
-  /* Input bar */
-  .ch-input { padding: 12px 16px 14px; background: #fff; border-top: 1px solid #F0F0F0; flex-shrink: 0; }
-  .ch-qa { display: flex; gap: 6px; margin-bottom: 10px; }
-  .qa-btn { width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid #E5E7EB; background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-  .qa-btn:hover { border-color: #09B1BA; background: #F0FBFC; transform: translateY(-1px); }
-  .qa-btn.amber { border-color: #F59E0B; background: #FFFBEB; }
-  .qa-btn.amber:hover { background: #FEF3C7; }
-  .qa-btn.green { border-color: #10B981; background: #F0FDF4; }
-  .qa-btn.green:hover { background: #D1FAE5; }
-  .ch-input-row { display: flex; gap: 8px; align-items: center; }
-  .ch-text { flex: 1; padding: 12px 18px; border: 2px solid #E5E7EB; border-radius: 28px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
-  .ch-text:focus { border-color: #09B1BA; }
-  .ch-send { width: 42px; height: 42px; border-radius: 50%; background: #09B1BA; color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; transition: all 0.2s; }
-  .ch-send:hover { background: #078A91; transform: scale(1.06); }
-  .ch-send:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; transform: none; }
-  .ch-hint { font-size: 10px; color: #9CA3AF; margin-top: 4px; padding-left: 6px; }
+  /* ═══ SMART CARDS — The Magic ═══ */
+  .smart-card {
+    align-self: center;
+    width: 90%;
+    max-width: 420px;
+    background: #fff;
+    border: 1.5px solid #EDF0F3;
+    border-left: 4px solid #09B1BA;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 8px 0;
+    animation: smartCardIn 0.4s ease-out;
+    box-shadow: 0 2px 12px rgba(9, 177, 186, 0.06);
+  }
+  .smart-card.delivery { border-left-color: #F59E0B; }
+  .smart-card.alert { border-left-color: #EF4444; }
+  .smart-card.success { border-left-color: #10B981; }
+  .smart-card.promo { border-left-color: #8B5CF6; }
 
-  /* ═══ DEAL PANEL ═══ */
-  .deal-panel { background: #FAFBFC; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
-  .deal-panel::-webkit-scrollbar { width: 3px; } .deal-panel::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
-  .dp-head { padding: 18px 20px 10px; font-size: 13px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em; }
-  .dp-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 13px; text-align: center; padding: 40px; }
+  .sc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .sc-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .sc-icon.teal { background: #E6F7F8; }
+  .sc-icon.amber { background: #FEF3C7; }
+  .sc-icon.green { background: #D1FAE5; }
+  .sc-icon.purple { background: #EDE9FE; }
+  .sc-icon.red { background: #FEE2E2; }
+
+  .sc-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1A1A2E;
+  }
+  .sc-subtitle {
+    font-size: 12px;
+    color: #6B7280;
+    margin-top: 1px;
+  }
+
+  .sc-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sc-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #FAFBFC;
+  }
+  .sc-option:hover {
+    border-color: #09B1BA;
+    background: #F0FBFC;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(9, 177, 186, 0.08);
+  }
+  .sc-option-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .sc-option-text { flex: 1; }
+  .sc-option-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1A1A2E;
+  }
+  .sc-option-desc {
+    font-size: 11px;
+    color: #6B7280;
+    margin-top: 1px;
+  }
+  .sc-option-price {
+    font-size: 12px;
+    font-weight: 700;
+    color: #09B1BA;
+    white-space: nowrap;
+  }
+  .sc-option-price.free { color: #10B981; }
+
+  .sc-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .sc-btn.primary { background: linear-gradient(135deg, #09B1BA, #078A91); color: #fff; }
+  .sc-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(9,177,186,0.3); }
+  .sc-btn.outline { background: #fff; color: #09B1BA; border: 1.5px solid #09B1BA; }
+  .sc-btn.outline:hover { background: #F0FBFC; }
+  .sc-btn.amber { background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; }
+  .sc-btn.amber:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(245,158,11,0.3); }
+  .sc-btn.ghost { background: none; color: #6B7280; font-weight: 600; }
+  .sc-btn.ghost:hover { color: #09B1BA; }
+
+  /* Delivery Tracker Card */
+  .delivery-tracker {
+    padding: 16px;
+    background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+    border-radius: 12px;
+    margin-top: 10px;
+  }
+  .dt-progress {
+    height: 6px;
+    background: #E5E7EB;
+    border-radius: 3px;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+  .dt-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #F59E0B, #10B981);
+    border-radius: 3px;
+    transition: width 1s ease-out;
+  }
+  .dt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6B7280;
+    margin-top: 8px;
+  }
+  .dt-row strong { color: #1A1A2E; }
+
+  /* QR Card */
+  .qr-card {
+    text-align: center;
+    padding: 20px;
+  }
+  .qr-code {
+    width: 160px;
+    height: 160px;
+    margin: 16px auto;
+    background: #1A1A2E;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .qr-code::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(255,255,255,0.05) 8px, rgba(255,255,255,0.05) 16px),
+                repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.05) 8px, rgba(255,255,255,0.05) 16px);
+  }
+  .qr-timer {
+    font-size: 28px;
+    font-weight: 800;
+    color: #09B1BA;
+    margin: 8px 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .qr-timer.expiring { color: #EF4444; animation: pulse-red 1s infinite; }
+  @keyframes pulse-red { 50% { opacity: 0.6; } }
+
+  @keyframes smartCardIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Empty state */
+  .ch-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #9CA3AF;
+    gap: 8px;
+  }
+  .ch-empty i { font-size: 48px; opacity: 0.15; }
+
+  /* Input Bar */
+  .ch-input {
+    padding: 12px 16px 14px;
+    background: #fff;
+    border-top: 1px solid #EDF0F3;
+    flex-shrink: 0;
+  }
+  .ch-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .ch-text {
+    flex: 1;
+    padding: 12px 18px;
+    border: 2px solid #EDF0F3;
+    border-radius: 28px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #F8FAFB;
+  }
+  .ch-text:focus { border-color: #09B1BA; background: #fff; }
+  .ch-send {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #09B1BA, #078A91);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(9,177,186,0.3);
+  }
+  .ch-send:hover { transform: scale(1.06); box-shadow: 0 4px 16px rgba(9,177,186,0.4); }
+  .ch-send:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; transform: none; box-shadow: none; }
+  .ch-hint { font-size: 10px; color: #9CA3AF; margin-top: 5px; padding-left: 6px; display: flex; align-items: center; gap: 4px; }
+
+  /* ═══════════════════════════════════════════
+     RIGHT — Deal Tracker Panel
+     ═══════════════════════════════════════════ */
+  .deal-panel {
+    background: #FAFBFC;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .deal-panel::-webkit-scrollbar { width: 3px; }
+  .deal-panel::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
+
+  .dp-head {
+    padding: 20px 20px 6px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .dp-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9CA3AF;
+    font-size: 13px;
+    text-align: center;
+    padding: 40px;
+  }
 
   /* Items */
-  .dp-items { padding: 0 16px; }
-  .dp-item { background: #fff; border: 1px solid #E5E7EB; border-radius: 14px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; cursor: pointer; }
-  .dp-item:hover { border-color: #09B1BA; }
-  .dp-item-photo { width: 100%; height: 120px; object-fit: cover; display: block; }
+  .dp-items { padding: 8px 16px 0; }
+  .dp-item {
+    background: #fff;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 16px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .dp-item:hover { border-color: #09B1BA; box-shadow: 0 4px 12px rgba(9,177,186,0.08); }
+  .dp-item-photo { width: 100%; height: 110px; object-fit: cover; display: block; }
   .dp-item-body { padding: 12px 14px; }
-  .dp-item-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .dp-item-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
   .dp-item-label.theirs { color: #6B7280; }
   .dp-item-label.yours { color: #09B1BA; }
   .dp-item-name { font-size: 14px; font-weight: 700; color: #1A1A2E; margin-bottom: 2px; }
   .dp-item-meta { font-size: 11px; color: #6B7280; }
-  .dp-item-price { font-size: 15px; font-weight: 800; color: #09B1BA; margin-top: 4px; }
+  .dp-item-price { font-size: 16px; font-weight: 800; color: #09B1BA; margin-top: 4px; }
   .dp-arrow { text-align: center; margin: -6px 0; position: relative; z-index: 2; }
-  .dp-arrow span { display: inline-flex; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #09B1BA, #5EEAD4); color: #fff; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 4px 12px rgba(9,177,186,0.3); }
+  .dp-arrow span {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #09B1BA, #5EEAD4);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(9,177,186,0.3);
+  }
   .dp-cash-pill { text-align: center; margin: 8px 0 4px; }
-  .dp-cash-pill span { display: inline-block; background: #FEF3C7; color: #92400E; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .dp-cash-pill span {
+    display: inline-block;
+    background: #FEF3C7;
+    color: #92400E;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
 
-  /* Status */
-  .dp-status { text-align: center; padding: 12px 16px 8px; }
-  .dp-status-badge { display: inline-block; padding: 5px 16px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  /* Status Badge */
+  .dp-status { text-align: center; padding: 12px 16px 4px; }
+  .dp-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
 
   /* Timeline */
-  .dp-timeline { padding: 8px 20px 16px; display: flex; align-items: center; gap: 0; justify-content: center; }
-  .dp-tl-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-  .dp-tl-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #E5E7EB; background: #fff; transition: all 0.3s; }
+  .dp-timeline {
+    padding: 8px 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dp-tl-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .dp-tl-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid #E5E7EB;
+    background: #fff;
+    transition: all 0.3s;
+  }
   .dp-tl-dot.done { background: #09B1BA; border-color: #09B1BA; }
   .dp-tl-dot.current { border-color: #09B1BA; animation: pulse 2s infinite; }
   .dp-tl-label { font-size: 9px; color: #9CA3AF; font-weight: 600; text-transform: uppercase; }
-  .dp-tl-line { flex: 1; height: 2px; background: #E5E7EB; min-width: 16px; margin-top: -14px; }
-  .dp-tl-line.done { background: #09B1BA; }
+  .dp-tl-line { flex: 1; height: 2.5px; background: #E5E7EB; min-width: 16px; margin-top: -14px; }
+  .dp-tl-line.done { background: linear-gradient(90deg, #09B1BA, #5EEAD4); }
   @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(9,177,186,0.4); } 50% { box-shadow: 0 0 0 6px rgba(9,177,186,0); } }
 
   /* Negotiation */
   .dp-negotiate { padding: 0 16px 16px; }
-  .dp-section-title { font-size: 12px; font-weight: 700; color: #1A1A2E; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 10px; }
+  .dp-section-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #1A1A2E;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 18px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
   .dp-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-  .dp-chip { padding: 6px 14px; border: 1.5px solid #E5E7EB; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer; background: #fff; color: #1A1A2E; font-family: inherit; transition: all 0.15s; }
+  .dp-chip {
+    padding: 7px 14px;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    color: #1A1A2E;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
   .dp-chip:hover { border-color: #09B1BA; color: #09B1BA; }
   .dp-chip.active { background: #09B1BA; color: #fff; border-color: #09B1BA; }
-  .dp-slider { width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px; background: #E5E7EB; outline: none; margin: 8px 0; }
-  .dp-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid #09B1BA; cursor: pointer; box-shadow: 0 2px 8px rgba(9,177,186,0.3); }
+  .dp-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: #E5E7EB;
+    outline: none;
+    margin: 8px 0;
+  }
+  .dp-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #09B1BA;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(9,177,186,0.3);
+  }
   .dp-amount { text-align: center; margin: 8px 0; }
-  .dp-amount-val { font-size: 32px; font-weight: 800; color: #09B1BA; letter-spacing: -0.02em; }
+  .dp-amount-val { font-size: 36px; font-weight: 800; color: #09B1BA; letter-spacing: -0.03em; }
   .dp-amount-cur { font-size: 14px; font-weight: 600; color: #6B7280; margin-left: 4px; }
   .dp-amount-hint { font-size: 10px; color: #9CA3AF; font-style: italic; margin-top: 2px; }
 
   /* Actions */
-  .dp-actions { padding: 0 16px 20px; display: flex; flex-direction: column; gap: 8px; }
-  .dp-btn { padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; border: none; text-align: center; }
-  .dp-btn.primary { background: #09B1BA; color: #fff; }
-  .dp-btn.primary:hover { background: #078A91; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(9,177,186,0.3); }
+  .dp-actions { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .dp-btn {
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    border: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .dp-btn.primary { background: linear-gradient(135deg, #09B1BA, #078A91); color: #fff; box-shadow: 0 4px 16px rgba(9,177,186,0.2); }
+  .dp-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(9,177,186,0.3); }
   .dp-btn.outline { background: #fff; color: #09B1BA; border: 2px solid #09B1BA; }
   .dp-btn.outline:hover { background: #F0FBFC; }
   .dp-btn.danger { background: none; color: #EF4444; border: none; font-size: 13px; }
@@ -154,43 +795,95 @@
   .dp-btn-row { display: flex; gap: 8px; }
   .dp-btn-row .dp-btn { flex: 1; }
 
-  /* Meetup picker */
-  .dp-meetup { padding: 0 16px 16px; }
-  .dp-place { padding: 12px; border: 1.5px solid #E5E7EB; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; transition: all 0.15s; background: #fff; }
-  .dp-place:hover { border-color: #09B1BA; background: #F0FBFC; }
-  .dp-place-icon { font-size: 22px; }
-  .dp-place-name { font-size: 13px; font-weight: 600; color: #1A1A2E; }
-  .dp-place-area { font-size: 11px; color: #6B7280; }
-
-  /* ═══ RESPONSIVE ═══ */
-  @media (max-width: 1100px) {
-    .chat-page { grid-template-columns: 280px 1fr; }
-    .deal-panel { display: none; position: fixed; right: 0; top: 64px; bottom: 0; width: 360px; z-index: 500; box-shadow: -8px 0 30px rgba(0,0,0,0.12); }
-    .deal-panel.open { display: flex; animation: slideInRight 0.3s ease-out; }
-    .ch-deal-btn { display: inline-flex !important; }
+  /* Services Section */
+  .dp-services { padding: 0 16px 16px; }
+  .dp-service-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 8px;
   }
-  @media (max-width: 768px) {
-    .chat-page { grid-template-columns: 1fr; }
-    .chat-sb { position: fixed; left: 0; top: 64px; bottom: 0; width: 100%; z-index: 400; transform: translateX(-100%); transition: transform 0.3s ease; }
-    .chat-sb.open { transform: translateX(0); }
-    .deal-panel { top: auto; bottom: 0; right: 0; left: 0; width: 100%; max-height: 85vh; border-radius: 20px 20px 0 0; }
+  .dp-service-card:hover { border-color: #09B1BA; background: #F0FBFC; transform: translateY(-1px); }
+  .dp-service-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
   }
-  @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  .dp-service-text { flex: 1; }
+  .dp-service-label { font-size: 13px; font-weight: 700; color: #1A1A2E; }
+  .dp-service-desc { font-size: 11px; color: #6B7280; margin-top: 1px; }
+  .dp-service-price { font-size: 12px; font-weight: 700; color: #09B1BA; white-space: nowrap; }
 
-  /* ═══ MEETUP — Safe Spots ═══ */
+  /* Safe Spots */
   .dp-meetup-wrap { padding: 0 16px 16px; }
-  .dp-meetup-search { width: 100%; padding: 10px 14px 10px 36px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.2s; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239CA3AF' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 110-10 5 5 0 010 10z'/%3E%3C/svg%3E") 12px center no-repeat; margin-bottom: 10px; }
+  .dp-meetup-search {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 12px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%239CA3AF' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 110-10 5 5 0 010 10z'/%3E%3C/svg%3E") 12px center no-repeat;
+    margin-bottom: 10px;
+  }
   .dp-meetup-search:focus { border-color: #09B1BA; }
-  .dp-meetup-cats { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
-  .dp-cat-chip { white-space: nowrap; padding: 6px 12px; border: 1.5px solid #E5E7EB; border-radius: 999px; font-size: 11px; font-weight: 600; cursor: pointer; background: #fff; color: #6B7280; font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
+  .dp-meetup-cats { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+  .dp-cat-chip {
+    white-space: nowrap;
+    padding: 6px 12px;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    color: #6B7280;
+    font-family: inherit;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
   .dp-cat-chip:hover { border-color: #09B1BA; color: #09B1BA; }
   .dp-cat-chip.active { background: #09B1BA; color: #fff; border-color: #09B1BA; }
-  .dp-spots-list { max-height: 260px; overflow-y: auto; }
-  .dp-spots-list::-webkit-scrollbar { width: 3px; } .dp-spots-list::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
-  .dp-spot { padding: 10px 12px; border: 1.5px solid #E5E7EB; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; transition: all 0.15s; background: #fff; }
+  .dp-spots-list { max-height: 220px; overflow-y: auto; }
+  .dp-spots-list::-webkit-scrollbar { width: 3px; }
+  .dp-spots-list::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
+  .dp-spot {
+    padding: 10px 12px;
+    border: 1.5px solid #EDF0F3;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    transition: all 0.15s;
+    background: #fff;
+  }
   .dp-spot:hover { border-color: #09B1BA; background: #F0FBFC; }
   .dp-spot.selected { border-color: #09B1BA; background: #E6F7F8; }
-  .dp-spot-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .dp-spot-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
   .dp-spot-icon.mall { background: #FEF3C7; }
   .dp-spot-icon.metro { background: #DBEAFE; }
   .dp-spot-icon.cafe { background: #FDE8D0; }
@@ -198,12 +891,112 @@
   .dp-spot-icon.gas { background: #F3F4F6; }
   .dp-spot-info { flex: 1; min-width: 0; }
   .dp-spot-name { font-size: 13px; font-weight: 600; color: #1A1A2E; }
-  .dp-spot-detail { font-size: 11px; color: #6B7280; display: flex; gap: 8px; margin-top: 1px; }
+  .dp-spot-detail { font-size: 11px; color: #6B7280; }
   .dp-spot-dist { font-size: 11px; font-weight: 600; color: #09B1BA; white-space: nowrap; flex-shrink: 0; }
-  .dp-spot-confirm { margin-top: 10px; width: 100%; padding: 12px; border: none; border-radius: 12px; background: #09B1BA; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-  .dp-spot-confirm:hover { background: #078A91; }
-  .dp-spot-confirm:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; }
-  .dp-safety-tip { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #FEF3C7; border-radius: 10px; margin-bottom: 12px; font-size: 11px; color: #92400E; }
+  .dp-spot-confirm {
+    margin-top: 10px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #09B1BA, #078A91);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .dp-spot-confirm:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(9,177,186,0.3); }
+  .dp-spot-confirm:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; transform: none; box-shadow: none; }
+  .dp-safety-tip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #FEF3C7;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: #92400E;
+  }
+
+  /* Pro Upsell */
+  .dp-pro-banner {
+    margin: 0 16px 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #EDE9FE, #DDD6FE);
+    border-radius: 14px;
+    text-align: center;
+  }
+  .dp-pro-banner h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5B21B6;
+    margin-bottom: 4px;
+  }
+  .dp-pro-banner p {
+    font-size: 11px;
+    color: #7C3AED;
+    margin-bottom: 10px;
+  }
+  .dp-pro-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .dp-pro-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE
+     ═══════════════════════════════════════════ */
+  @media (max-width: 1100px) {
+    .chat-page { grid-template-columns: 280px 1fr; }
+    .deal-panel {
+      display: none;
+      position: fixed;
+      right: 0;
+      top: 64px;
+      bottom: 0;
+      width: 380px;
+      z-index: 500;
+      box-shadow: -8px 0 30px rgba(0,0,0,0.12);
+    }
+    .deal-panel.open { display: flex; animation: slideInRight 0.3s ease-out; }
+    .ch-deal-btn { display: inline-flex !important; }
+  }
+  @media (max-width: 768px) {
+    .chat-page { grid-template-columns: 1fr; }
+    .chat-sb {
+      position: fixed;
+      left: 0;
+      top: 64px;
+      bottom: 0;
+      width: 100%;
+      z-index: 400;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .chat-sb.open { transform: translateX(0); }
+    .deal-panel {
+      top: auto;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      max-height: 85vh;
+      border-radius: 20px 20px 0 0;
+    }
+    #mobileBackBtn { display: inline-flex !important; }
+  }
+  @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
   </style>
 </head>
 <body>
@@ -222,16 +1015,24 @@
     </div>
   </nav>
 
-  <!-- ═══ CHAT PAGE ═══ -->
+  <!-- ═══ CHAT PAGE — Deal Hub ═══ -->
   <div class="chat-page">
 
     <!-- LEFT: Sidebar -->
     <aside class="chat-sb" id="chatSidebar">
       <div class="sb-head">
-        <h2>Messages</h2>
-        <span class="sb-badge" id="totalUnread">0</span>
+        <div class="sb-head-row">
+          <h2>Messages</h2>
+          <span class="sb-badge" id="totalUnread">0</span>
+        </div>
+        <input class="sb-search" placeholder="Search conversations..." id="sbSearch" oninput="filterConversations()">
       </div>
-      <input class="sb-search" placeholder="Search conversations..." id="sbSearch">
+      <div class="sb-filters">
+        <button class="sb-filter active" onclick="setSbFilter('all')">All</button>
+        <button class="sb-filter" onclick="setSbFilter('accepted')"><i class="fas fa-comments" style="margin-right:4px;"></i>Active</button>
+        <button class="sb-filter" onclick="setSbFilter('pending')"><i class="fas fa-clock" style="margin-right:4px;"></i>Pending</button>
+        <button class="sb-filter" onclick="setSbFilter('completed')"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Done</button>
+      </div>
       <div class="sb-list" id="sbList"></div>
     </aside>
 
@@ -252,18 +1053,20 @@
 
       <div class="ch-empty" id="chatEmpty">
         <i class="fas fa-comments"></i>
-        <div style="font-size:16px;font-weight:600;">Select a conversation</div>
-        <div style="font-size:13px;">Your active deals will appear here</div>
+        <div style="font-size:17px;font-weight:700;color:#1A1A2E;">Your Deal Hub</div>
+        <div style="font-size:13px;">Select a conversation to start negotiating</div>
       </div>
 
-      <div class="ch-msgs" id="msgArea" style="display:none;"></div>
+      <div class="ch-msgs" id="msgArea" style="display:none;">
+        <!-- Messages rendered here -->
+        <div class="typing-indicator" id="typingIndicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
 
       <div class="ch-input" id="inputBar" style="display:none;">
-        <div class="ch-qa">
-          <button class="qa-btn" onclick="DemoNotifications.showToast('Meet in a safe public place!','info')" title="Meet in person"><i class="fas fa-map-marker-alt"></i></button>
-          <button class="qa-btn amber" onclick="showTruckPopup()" title="Find a Truck"><i class="fas fa-truck"></i></button>
-          <button class="qa-btn green" onclick="if(window.DemoQR)DemoQR.showConfirmation(activeConvId)" title="Confirm Exchange"><i class="fas fa-qrcode"></i></button>
-        </div>
         <div class="ch-input-row">
           <input type="text" class="ch-text" id="chatInput" placeholder="Type a message...">
           <button class="ch-send" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
@@ -272,17 +1075,18 @@
       </div>
     </main>
 
-    <!-- RIGHT: Deal Panel -->
+    <!-- RIGHT: Deal Tracker Panel -->
     <aside class="deal-panel" id="dealPanel">
-      <div class="dp-head">Deal Details</div>
+      <div class="dp-head">Deal Tracker</div>
       <div class="dp-empty" id="dpEmpty">Select a conversation to see deal details</div>
       <div id="dpContent" style="display:none;">
         <div id="dpItems"></div>
         <div id="dpStatus"></div>
         <div id="dpTimeline"></div>
-        <div id="dpNegotiate"></div>
         <div id="dpActions"></div>
+        <div id="dpServices"></div>
         <div id="dpMeetup"></div>
+        <div id="dpProBanner"></div>
       </div>
     </aside>
   </div>
@@ -294,22 +1098,25 @@
   <script src="../js/mega-menu.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script>
-  // ═══════════════════════════════════════════
-  // SWAPPO CHAT — Redesigned Negotiation Hub
-  // ═══════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
+  // SWAPPO SWAPCHAT — Deal Hub v2
+  // Intelligent chat with contextual Smart Cards & integrated services
+  // ═══════════════════════════════════════════════════════════════
 
   let activeConvId = null;
   let currentUser = null;
   let dealCashAmount = 0;
+  let currentSbFilter = 'all';
+  let deliveryChoice = {}; // track each party's delivery preference per conv
+  let qrTimerInterval = null;
 
   const CONV_ITEM_MAP = {
-    'conv-e': { their_item_id: 'item-5', my_item_id: 'item-1', status: 'accepted', cash: 0 },
-    'conv-f': { their_item_id: null, my_item_id: 'item-18', status: 'accepted', cash: 2500, type: 'purchase' }
+    'conv-e': { their_item_id: 'item-5', my_item_id: 'item-1', status: 'accepted', cash: 0, type: 'swap', category: 'clothing' },
+    'conv-f': { their_item_id: null, my_item_id: 'item-18', status: 'accepted', cash: 2500, type: 'purchase', category: 'bags' }
   };
 
   // ═══ SAFE SPOTS DATABASE ═══
   const SAFE_SPOTS = [
-    // Malls
     { id: 's1', name: 'Dubai Mall', area: 'Downtown Dubai', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 2.1 },
     { id: 's2', name: 'Mall of the Emirates', area: 'Al Barsha', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 5.3 },
     { id: 's3', name: 'Ibn Battuta Mall', area: 'Jebel Ali', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 18.2 },
@@ -318,20 +1125,16 @@
     { id: 's6', name: 'Yas Mall', area: 'Yas Island', emirate: 'Abu Dhabi', cat: 'mall', icon: '🏬', dist: 135 },
     { id: 's7', name: 'City Centre Ajman', area: 'Al Jurf', emirate: 'Ajman', cat: 'mall', icon: '🏬', dist: 22 },
     { id: 's8', name: 'Al Ghurair Centre', area: 'Deira', emirate: 'Dubai', cat: 'mall', icon: '🏬', dist: 4.8 },
-    // Metro
     { id: 's9', name: 'Union Metro Station', area: 'Deira', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 4.2 },
     { id: 's10', name: 'Burjuman Metro', area: 'Bur Dubai', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 3.1 },
     { id: 's11', name: 'Mall of Emirates Metro', area: 'Al Barsha', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 5.4 },
     { id: 's12', name: 'Dubai Marina Metro', area: 'Dubai Marina', emirate: 'Dubai', cat: 'metro', icon: '🚇', dist: 8.7 },
-    // Cafés
     { id: 's13', name: 'Starbucks — Dubai Mall', area: 'Downtown Dubai', emirate: 'Dubai', cat: 'cafe', icon: '☕', dist: 2.2 },
     { id: 's14', name: 'Tim Hortons — JBR', area: 'Jumeirah Beach', emirate: 'Dubai', cat: 'cafe', icon: '☕', dist: 7.1 },
     { id: 's15', name: 'Costa Coffee — Marina Walk', area: 'Dubai Marina', emirate: 'Dubai', cat: 'cafe', icon: '☕', dist: 8.5 },
-    // Parks
     { id: 's16', name: 'Zabeel Park', area: 'Al Karama', emirate: 'Dubai', cat: 'park', icon: '🌳', dist: 3.6 },
     { id: 's17', name: 'Al Mamzar Beach Park', area: 'Al Mamzar', emirate: 'Dubai', cat: 'park', icon: '🌳', dist: 9.2 },
     { id: 's18', name: 'Corniche Park', area: 'Corniche Rd', emirate: 'Abu Dhabi', cat: 'park', icon: '🌳', dist: 128 },
-    // Gas Stations (24/7, well-lit)
     { id: 's19', name: 'ADNOC — Sheikh Zayed Rd', area: 'Trade Centre', emirate: 'Dubai', cat: 'gas', icon: '⛽', dist: 1.8 },
     { id: 's20', name: 'ENOC — Al Barsha', area: 'Al Barsha 1', emirate: 'Dubai', cat: 'gas', icon: '⛽', dist: 5.6 },
   ];
@@ -341,37 +1144,77 @@
     { key: 'metro', label: 'Metro', icon: '🚇' },
     { key: 'cafe', label: 'Cafés', icon: '☕' },
     { key: 'park', label: 'Parks', icon: '🌳' },
-    { key: 'gas', label: '24/7 Spots', icon: '⛽' },
+    { key: 'gas', label: '24/7', icon: '⛽' },
   ];
 
   function initial(n) { return n ? n.charAt(0).toUpperCase() : '?'; }
   function timeAgo(d) { if (!d) return ''; var m = Math.floor((Date.now() - new Date(d).getTime()) / 60000); if (m < 1) return 'now'; if (m < 60) return m + 'm'; var h = Math.floor(m / 60); return h < 24 ? h + 'h' : Math.floor(h / 24) + 'd'; }
 
+  // ═══ SIDEBAR FILTERS ═══
+  function setSbFilter(filter) {
+    currentSbFilter = filter;
+    document.querySelectorAll('.sb-filter').forEach(function(b) { b.classList.remove('active'); });
+    event.target.closest('.sb-filter').classList.add('active');
+    renderSidebar();
+  }
+
+  function filterConversations() {
+    renderSidebar();
+  }
+
   // ═══ SIDEBAR ═══
   function renderSidebar() {
     var convs = DemoChat.getConversations();
+    var search = (document.getElementById('sbSearch').value || '').toLowerCase().trim();
     var list = document.getElementById('sbList');
     var total = 0;
 
-    list.innerHTML = convs.map(function(c) {
+    // Filter conversations
+    var filtered = convs.filter(function(c) {
+      var o = c.other_user || {};
+      var map = CONV_ITEM_MAP[c.id] || {};
+      var status = map.status || c.status || 'accepted';
+
+      // Filter by tab
+      if (currentSbFilter !== 'all' && status !== currentSbFilter) return false;
+
+      // Filter by search
+      if (search) {
+        var name = (o.name || '').toLowerCase();
+        var msg = (c.last_message || '').toLowerCase();
+        if (name.indexOf(search) === -1 && msg.indexOf(search) === -1) return false;
+      }
+      return true;
+    });
+
+    list.innerHTML = filtered.map(function(c) {
       var o = c.other_user || {};
       var map = CONV_ITEM_MAP[c.id] || {};
       var item = map.my_item_id ? DemoItems.getById(map.my_item_id) : null;
       var photo = item && item.photos ? item.photos[0] : '';
       var status = map.status || 'accepted';
+      var dealType = map.type || 'swap';
+      var cash = map.cash || 0;
       var preview = c.last_message || 'Start chatting...';
       var lastMsg = c.messages && c.messages.length ? c.messages[c.messages.length - 1] : null;
       var time = lastMsg ? timeAgo(lastMsg.created_at) : '';
       total += (c.unread_count || 0);
 
+      var dealTypeHTML = '';
+      if (dealType === 'swap') dealTypeHTML = '<span class="sb-deal-type swap"><i class="fas fa-exchange-alt"></i> Swap</span>';
+      else if (dealType === 'purchase') dealTypeHTML = '<span class="sb-deal-type buy"><i class="fas fa-shopping-bag"></i> Buy</span>';
+      else if (dealType === 'gift') dealTypeHTML = '<span class="sb-deal-type gift"><i class="fas fa-gift"></i> Gift</span>';
+      if (cash > 0) dealTypeHTML += '<span class="sb-deal-amount">' + cash.toLocaleString() + ' AED</span>';
+
       return '<div class="sb-card' + (c.id === activeConvId ? ' active' : '') + '" onclick="openConv(\'' + c.id + '\')">' +
-        '<div class="sb-avatar" style="background:' + (o.avatar_color || '#09B1BA') + '">' + initial(o.name) + '</div>' +
+        '<div class="sb-avatar" style="background:' + (o.avatar_color || '#09B1BA') + '">' + initial(o.name) +
+        (status === 'accepted' ? '<span class="sb-online"></span>' : '') + '</div>' +
         '<div class="sb-meta">' +
           '<div class="sb-row"><span class="sb-name">' + (o.name || 'User') + '</span><span class="sb-time">' + time + '</span></div>' +
           '<div class="sb-preview">' + preview + '</div>' +
-          '<span class="sb-status ' + status + '">' + (status === 'pending' ? '⏳ Pending' : status === 'accepted' ? '✅ Active' : '🎉 Done') + '</span>' +
+          '<div class="sb-deal-info">' + dealTypeHTML + '</div>' +
         '</div>' +
-        (photo ? '<img class="sb-thumb" src="' + photo + '" alt="">' : '') +
+        (photo ? '<img class="sb-thumb" src="' + photo + '" alt="" loading="lazy">' : '') +
         (c.unread_count > 0 ? '<span class="sb-unread">' + c.unread_count + '</span>' : '') +
       '</div>';
     }).join('');
@@ -424,7 +1267,10 @@
     var conv = DemoChat.getConversations().find(function(c) { return c.id === convId; });
     var o = conv ? (conv.other_user || {}) : {};
     var myColor = currentUser ? (currentUser.avatar_color || '#09B1BA') : '#09B1BA';
+    var map = CONV_ITEM_MAP[convId] || {};
 
+    // Keep typing indicator
+    var typing = document.getElementById('typingIndicator');
     area.innerHTML = '';
 
     messages.forEach(function(m) {
@@ -435,17 +1281,322 @@
         area.appendChild(el);
         return;
       }
+      // Check for smart card markers
+      if (m.content && m.content.startsWith('__SMART_CARD__')) {
+        area.appendChild(renderSmartCardFromMsg(m));
+        return;
+      }
       var isMine = m.sender_id === (currentUser ? currentUser.id : '');
       var div = document.createElement('div');
       div.className = 'msg ' + (isMine ? 'sent' : 'recv');
       div.innerHTML =
         '<div class="msg-av" style="background:' + (isMine ? myColor : (o.avatar_color || '#6B7280')) + '">' + initial(isMine ? currentUser.name : o.name) + '</div>' +
         '<div class="msg-bubble">' + m.content + '</div>' +
-        '<span class="msg-time">' + (m.created_at ? new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '') + '</span>';
+        '<span class="msg-time">' + (m.created_at ? new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '') +
+        (isMine ? '<span class="msg-read"> ✓✓</span>' : '') + '</span>';
       area.appendChild(div);
     });
 
+    // Add smart cards based on deal status
+    if (map.status === 'accepted' && !deliveryChoice[convId]) {
+      area.appendChild(createExchangeMethodCard(convId));
+    }
+
+    // Re-add typing indicator
+    area.appendChild(typing);
     area.scrollTop = area.scrollHeight;
+  }
+
+  // ═══ SMART CARDS ═══
+
+  // Exchange Method Card — appears after deal is accepted
+  function createExchangeMethodCard(convId) {
+    var map = CONV_ITEM_MAP[convId] || {};
+    var isLargeItem = (map.category === 'furniture' || map.category === 'sports' || map.category === 'vehicles');
+    var isFree = currentUser && currentUser.plan === 'free';
+    var feeText = isFree ? '5% fee' : '0% fee';
+
+    var div = document.createElement('div');
+    div.className = 'smart-card';
+    div.innerHTML =
+      '<div class="sc-header">' +
+        '<div class="sc-icon teal">🤝</div>' +
+        '<div><div class="sc-title">How would you like to exchange?</div>' +
+        '<div class="sc-subtitle">Choose how to complete this deal</div></div>' +
+      '</div>' +
+      '<div class="sc-options">' +
+        '<div class="sc-option" onclick="chooseExchangeMethod(\'' + convId + '\', \'meet\')">' +
+          '<span class="sc-option-icon">📍</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Meet in Person</div><div class="sc-option-desc">Pick a safe public spot nearby</div></div>' +
+          '<span class="sc-option-price free">FREE</span>' +
+        '</div>' +
+        '<div class="sc-option" onclick="chooseExchangeMethod(\'' + convId + '\', \'delivery\')">' +
+          '<span class="sc-option-icon">🚚</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Swappo Delivery</div><div class="sc-option-desc">We pick up & deliver · ' + feeText + '</div></div>' +
+          '<span class="sc-option-price">from 25 AED</span>' +
+        '</div>' +
+        (isLargeItem ?
+        '<div class="sc-option" onclick="chooseExchangeMethod(\'' + convId + '\', \'truck\')">' +
+          '<span class="sc-option-icon">🚛</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Find a Truck</div><div class="sc-option-desc">For furniture & large items</div></div>' +
+          '<span class="sc-option-price">from 80 AED</span>' +
+        '</div>' : '') +
+      '</div>';
+    return div;
+  }
+
+  // Delivery Conflict Card
+  function createConflictCard(convId, otherChoice) {
+    var div = document.createElement('div');
+    div.className = 'smart-card delivery';
+    div.innerHTML =
+      '<div class="sc-header">' +
+        '<div class="sc-icon amber">⚡</div>' +
+        '<div><div class="sc-title">No time to meet up?</div>' +
+        '<div class="sc-subtitle">The other party chose ' + otherChoice + '</div></div>' +
+      '</div>' +
+      '<p style="font-size:13px;color:#4A4A5A;margin-bottom:14px;">Swappo can handle the exchange for you both — quick, safe, and hassle-free.</p>' +
+      '<button class="sc-btn amber" onclick="acceptDelivery(\'' + convId + '\')"><i class="fas fa-truck"></i> Accept Delivery · from 25 AED</button>' +
+      '<button class="sc-btn ghost" onclick="keepMeetup(\'' + convId + '\')">No thanks, let\'s meet</button>';
+    return div;
+  }
+
+  // Delivery Tracker Card
+  function createDeliveryTrackerCard(convId) {
+    var div = document.createElement('div');
+    div.className = 'smart-card delivery';
+    div.innerHTML =
+      '<div class="sc-header">' +
+        '<div class="sc-icon amber">🚚</div>' +
+        '<div><div class="sc-title">Swappo Delivery</div>' +
+        '<div class="sc-subtitle">Your item is on the way!</div></div>' +
+      '</div>' +
+      '<div class="delivery-tracker">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<span style="font-size:13px;font-weight:700;color:#1A1A2E;">📦 In transit</span>' +
+          '<span style="font-size:11px;color:#6B7280;">ETA ~45 min</span>' +
+        '</div>' +
+        '<div class="dt-progress"><div class="dt-progress-bar" style="width:60%;"></div></div>' +
+        '<div class="dt-row"><span>Pickup: <strong>Dubai Mall</strong></span><span>14:30</span></div>' +
+        '<div class="dt-row"><span>Dropoff: <strong>Burjuman Metro</strong></span><span>~15:15</span></div>' +
+        '<div class="dt-row" style="margin-top:8px;"><span>Driver: <strong>Ahmed K.</strong> ⭐ 4.9</span></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:12px;">' +
+        '<button class="sc-btn outline" style="flex:1;" onclick="DemoNotifications.showToast(\'Chat with driver opening...\',\'info\')"><i class="fas fa-comment"></i> Message</button>' +
+        '<button class="sc-btn outline" style="flex:1;" onclick="DemoNotifications.showToast(\'Live tracking map opening...\',\'info\')"><i class="fas fa-map-marker-alt"></i> Track</button>' +
+      '</div>';
+    return div;
+  }
+
+  // QR Confirmation Card
+  function createQRCard(convId) {
+    var div = document.createElement('div');
+    div.className = 'smart-card success';
+    div.innerHTML =
+      '<div class="qr-card">' +
+        '<div style="font-size:16px;font-weight:700;color:#1A1A2E;margin-bottom:4px;">Ready to confirm?</div>' +
+        '<div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Show this code to the other party</div>' +
+        '<div class="qr-code"><i class="fas fa-qrcode"></i></div>' +
+        '<div class="qr-timer" id="qrTimer">10</div>' +
+        '<div style="font-size:11px;color:#6B7280;">seconds remaining</div>' +
+        '<button class="sc-btn primary" style="margin-top:16px;" onclick="confirmExchange(\'' + convId + '\')"><i class="fas fa-check-circle"></i> Simulate Scan</button>' +
+        '<button class="sc-btn ghost" onclick="cancelQR()">Cancel</button>' +
+      '</div>';
+    return div;
+  }
+
+  // Boost Suggestion Card
+  function createBoostCard() {
+    var div = document.createElement('div');
+    div.className = 'smart-card promo';
+    div.innerHTML =
+      '<div class="sc-header">' +
+        '<div class="sc-icon purple">💡</div>' +
+        '<div><div class="sc-title">Boost your item</div>' +
+        '<div class="sc-subtitle">Get more offers, faster</div></div>' +
+      '</div>' +
+      '<p style="font-size:12px;color:#4A4A5A;margin-bottom:12px;">This item hasn\'t had new offers recently. A boost puts it at the top of the catalogue.</p>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<button class="sc-btn outline" style="flex:1;" onclick="DemoNotifications.showToast(\'24h Boost activated!\',\'success\')">5 AED · 24h</button>' +
+        '<button class="sc-btn primary" style="flex:1;" onclick="DemoNotifications.showToast(\'7-day Featured Boost!\',\'success\')">25 AED · 7d ⭐</button>' +
+      '</div>';
+    return div;
+  }
+
+  // Rating Card
+  function createRatingCard(convId) {
+    var div = document.createElement('div');
+    div.className = 'smart-card success';
+    div.innerHTML =
+      '<div style="text-align:center;">' +
+        '<div style="font-size:48px;margin-bottom:8px;">🎉</div>' +
+        '<div style="font-size:18px;font-weight:800;color:#1A1A2E;margin-bottom:4px;">Exchange Complete!</div>' +
+        '<div style="font-size:13px;color:#6B7280;margin-bottom:20px;">How was your experience?</div>' +
+        '<div id="ratingStars" style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;">' +
+          [1,2,3,4,5].map(function(i) {
+            return '<span onclick="setRating(' + i + ')" style="font-size:32px;cursor:pointer;transition:transform 0.2s;" onmouseenter="this.style.transform=\'scale(1.2)\'" onmouseleave="this.style.transform=\'scale(1)\'">☆</span>';
+          }).join('') +
+        '</div>' +
+        '<button class="sc-btn primary" onclick="submitRating(\'' + convId + '\')"><i class="fas fa-paper-plane"></i> Submit Rating</button>' +
+      '</div>';
+    return div;
+  }
+
+  function renderSmartCardFromMsg(msg) {
+    // Placeholder for message-embedded smart cards
+    var div = document.createElement('div');
+    div.className = 'msg-sys';
+    div.textContent = msg.content.replace('__SMART_CARD__', '');
+    return div;
+  }
+
+  // ═══ EXCHANGE METHOD ACTIONS ═══
+  function chooseExchangeMethod(convId, method) {
+    deliveryChoice[convId] = { me: method };
+
+    if (method === 'meet') {
+      DemoChat.sendMessage(convId, '📍 I\'d like to meet in person for this exchange!');
+      DemoNotifications.showToast('Great! Choose a safe meetup spot.', 'success');
+
+      // Simulate the other party choosing delivery (conflict scenario)
+      setTimeout(function() {
+        if (activeConvId === convId) {
+          var mockConv = (MOCK_CONVERSATIONS || []).find(function(c) { return c.id === convId; });
+          if (mockConv) {
+            mockConv.messages.push({
+              id: 'msg_conflict_' + Date.now(),
+              sender_id: mockConv.other_user ? mockConv.other_user.id : 'user-2',
+              content: '🚚 I\'d actually prefer delivery, if that\'s OK?',
+              created_at: new Date().toISOString(),
+              is_system: false
+            });
+          }
+          loadMessages(convId);
+          // Show conflict card after small delay
+          setTimeout(function() {
+            var area = document.getElementById('msgArea');
+            var typing = document.getElementById('typingIndicator');
+            area.insertBefore(createConflictCard(convId, 'delivery'), typing);
+            area.scrollTop = area.scrollHeight;
+          }, 800);
+        }
+      }, 2500);
+    } else if (method === 'delivery') {
+      DemoChat.sendMessage(convId, '🚚 I\'d like Swappo Delivery for this exchange!');
+      DemoNotifications.showToast('Swappo Delivery selected! Estimated 25-40 AED.', 'success');
+      loadMessages(convId);
+      // Show delivery tracker after delay
+      setTimeout(function() {
+        if (activeConvId === convId) {
+          var area = document.getElementById('msgArea');
+          var typing = document.getElementById('typingIndicator');
+          area.insertBefore(createDeliveryTrackerCard(convId), typing);
+          area.scrollTop = area.scrollHeight;
+        }
+      }, 2000);
+    } else if (method === 'truck') {
+      DemoChat.sendMessage(convId, '🚛 I need a truck for this item. Checking transporters...');
+      DemoNotifications.showToast('Opening Find a Truck...', 'info');
+      loadMessages(convId);
+      setTimeout(function() { window.open('transport.html', '_blank'); }, 500);
+    }
+    renderDealPanel(convId);
+  }
+
+  function acceptDelivery(convId) {
+    deliveryChoice[convId] = { me: 'delivery', resolved: true };
+    DemoChat.sendMessage(convId, '✅ OK, let\'s go with Swappo Delivery!');
+    DemoNotifications.showToast('Both parties agreed on delivery!', 'success');
+    loadMessages(convId);
+    setTimeout(function() {
+      if (activeConvId === convId) {
+        var area = document.getElementById('msgArea');
+        var typing = document.getElementById('typingIndicator');
+        area.insertBefore(createDeliveryTrackerCard(convId), typing);
+        area.scrollTop = area.scrollHeight;
+      }
+    }, 1500);
+  }
+
+  function keepMeetup(convId) {
+    deliveryChoice[convId] = { me: 'meet', resolved: true };
+    DemoChat.sendMessage(convId, '📍 No worries, let\'s meet in person instead!');
+    DemoNotifications.showToast('Meeting in person it is!', 'info');
+    loadMessages(convId);
+    renderDealPanel(convId);
+  }
+
+  // ═══ QR CONFIRMATION ═══
+  function showQRConfirmation(convId) {
+    var area = document.getElementById('msgArea');
+    var typing = document.getElementById('typingIndicator');
+    area.insertBefore(createQRCard(convId), typing);
+    area.scrollTop = area.scrollHeight;
+
+    // Start countdown
+    var remaining = 10;
+    var timerEl = document.getElementById('qrTimer');
+    if (qrTimerInterval) clearInterval(qrTimerInterval);
+    qrTimerInterval = setInterval(function() {
+      remaining--;
+      if (timerEl) {
+        timerEl.textContent = remaining;
+        if (remaining <= 3) timerEl.className = 'qr-timer expiring';
+      }
+      if (remaining <= 0) {
+        clearInterval(qrTimerInterval);
+        if (timerEl) timerEl.textContent = 'Expired';
+        DemoNotifications.showToast('QR expired. Generate a new one.', 'info');
+      }
+    }, 1000);
+  }
+
+  function confirmExchange(convId) {
+    if (qrTimerInterval) clearInterval(qrTimerInterval);
+    CONV_ITEM_MAP[convId].status = 'completed';
+    DemoNotifications.showToast('🎉 Exchange confirmed! Thank you!', 'success');
+
+    // Add system message
+    var mockConv = (MOCK_CONVERSATIONS || []).find(function(c) { return c.id === convId; });
+    if (mockConv) {
+      mockConv.messages.push({
+        id: 'msg_complete_' + Date.now(),
+        sender_id: 'system',
+        content: '🎉 Exchange completed successfully! Both parties confirmed.',
+        created_at: new Date().toISOString(),
+        is_system: true
+      });
+    }
+    loadMessages(convId);
+
+    // Show rating card
+    setTimeout(function() {
+      var area = document.getElementById('msgArea');
+      var typing = document.getElementById('typingIndicator');
+      area.insertBefore(createRatingCard(convId), typing);
+      area.scrollTop = area.scrollHeight;
+    }, 800);
+
+    renderDealPanel(convId);
+    renderSidebar();
+  }
+
+  function cancelQR() {
+    if (qrTimerInterval) clearInterval(qrTimerInterval);
+    DemoNotifications.showToast('QR cancelled.', 'info');
+  }
+
+  // ═══ RATING ═══
+  var currentRating = 0;
+  function setRating(n) {
+    currentRating = n;
+    var stars = document.querySelectorAll('#ratingStars span');
+    stars.forEach(function(s, i) { s.textContent = i < n ? '★' : '☆'; s.style.color = i < n ? '#F59E0B' : '#D1D5DB'; });
+  }
+  function submitRating(convId) {
+    if (currentRating === 0) { DemoNotifications.showToast('Please select a rating.', 'info'); return; }
+    DemoNotifications.showToast('Thanks! You rated ' + currentRating + ' stars ⭐', 'success');
+    currentRating = 0;
   }
 
   // ═══ DEAL PANEL ═══
@@ -465,7 +1616,7 @@
     if (theirItem) {
       var theirPhoto = theirItem.photos ? theirItem.photos[0] : '';
       itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + theirItem.id + '\')">' +
-        (theirPhoto ? '<img class="dp-item-photo" src="' + theirPhoto + '" alt="">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
+        (theirPhoto ? '<img class="dp-item-photo" src="' + theirPhoto + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
         '<div class="dp-item-body"><div class="dp-item-label theirs">THEIR ITEM</div>' +
         '<div class="dp-item-name">' + ((theirItem.brand || '') + ' ' + (theirItem.model || '')).trim() + '</div>' +
         '<div class="dp-item-meta">' + (theirItem.condition || '') + ' · ' + (theirItem.emirate || theirItem.city || '') + '</div>' +
@@ -474,13 +1625,11 @@
       itemsHTML += '<div class="dp-item"><div class="dp-item-photo" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);display:flex;align-items:center;justify-content:center;font-size:36px;">💰</div>' +
         '<div class="dp-item-body"><div class="dp-item-label theirs">CASH PURCHASE</div><div class="dp-item-name">Full cash offer</div><div class="dp-item-price">' + cash.toLocaleString() + ' AED</div></div></div>';
     }
-
     itemsHTML += '<div class="dp-arrow"><span><i class="fas fa-exchange-alt"></i></span></div>';
-
     if (myItem) {
       var myPhoto = myItem.photos ? myItem.photos[0] : '';
       itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + myItem.id + '\')">' +
-        (myPhoto ? '<img class="dp-item-photo" src="' + myPhoto + '" alt="">' : '<div class="dp-item-photo" style="background:#F0FBFC;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
+        (myPhoto ? '<img class="dp-item-photo" src="' + myPhoto + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F0FBFC;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
         '<div class="dp-item-body"><div class="dp-item-label yours">YOUR ITEM</div>' +
         '<div class="dp-item-name">' + ((myItem.brand || '') + ' ' + (myItem.model || '')).trim() + '</div>' +
         '<div class="dp-item-meta">' + (myItem.condition || '') + ' · ' + (myItem.emirate || myItem.city || '') + '</div>' +
@@ -497,6 +1646,9 @@
     // Timeline
     var steps = ['Proposed', 'Accepted', 'Meeting', 'Done'];
     var currentStep = status === 'pending' ? 0 : status === 'accepted' ? 1 : 3;
+    if (deliveryChoice[convId]) currentStep = 2;
+    if (status === 'completed') currentStep = 3;
+
     var tlHTML = '<div class="dp-timeline">';
     steps.forEach(function(s, i) {
       if (i > 0) tlHTML += '<div class="dp-tl-line' + (i <= currentStep ? ' done' : '') + '"></div>';
@@ -505,17 +1657,17 @@
     tlHTML += '</div>';
     document.getElementById('dpTimeline').innerHTML = tlHTML;
 
-    // Negotiation controls
-    var negHTML = '';
+    // Actions & Negotiation
+    var actionsHTML = '';
     if (status === 'pending') {
-      negHTML = '<div class="dp-actions">' +
+      actionsHTML = '<div class="dp-actions">' +
         '<button class="dp-btn primary" onclick="acceptDeal(\'' + convId + '\')"><i class="fas fa-check"></i> Accept Deal</button>' +
         '<button class="dp-btn outline" onclick="showCounterUI(\'' + convId + '\')"><i class="fas fa-redo"></i> Counter-Offer</button>' +
         '<button class="dp-btn danger" onclick="declineDeal(\'' + convId + '\')">Decline</button>' +
       '</div>';
     } else if (status === 'accepted') {
-      negHTML = '<div class="dp-negotiate">' +
-        '<div class="dp-section-title"><i class="fas fa-hand-holding-usd" style="color:#09B1BA;margin-right:6px;"></i>Adjust Cash</div>' +
+      actionsHTML = '<div class="dp-negotiate">' +
+        '<div class="dp-section-title"><i class="fas fa-hand-holding-usd" style="color:#09B1BA;"></i> Adjust Cash</div>' +
         '<div class="dp-chips">' +
           [0, 25, 50, 100, 200, 500].map(function(v) {
             return '<button class="dp-chip' + (dealCashAmount === v ? ' active' : '') + '" onclick="setCash(' + v + ')">' + (v === 0 ? 'No cash' : '+' + v) + '</button>';
@@ -526,23 +1678,67 @@
       '</div>' +
       '<div class="dp-actions">' +
         '<button class="dp-btn primary" onclick="sendCounter(\'' + convId + '\')"><i class="fas fa-paper-plane"></i> Send Counter-Offer</button>' +
+        '<button class="dp-btn outline" onclick="showQRConfirmation(\'' + convId + '\')"><i class="fas fa-qrcode"></i> Confirm Exchange</button>' +
       '</div>';
-
-      // Safe Spots meetup section
-      var meetHTML = '<div class="dp-meetup-wrap">' +
-        '<div class="dp-section-title"><i class="fas fa-shield-alt" style="color:#09B1BA;margin-right:6px;"></i>Safe Meetup Spots</div>' +
-        '<div class="dp-safety-tip"><i class="fas fa-lightbulb"></i> Always meet in a public, well-lit place. Swappo recommends these verified spots.</div>' +
-        '<input type="text" class="dp-meetup-search" id="spotSearch" placeholder="Search malls, metro, cafés..." oninput="filterSpots()">' +
-        '<div class="dp-meetup-cats" id="spotCats"></div>' +
-        '<div class="dp-spots-list" id="spotsList"></div>' +
-        '<button class="dp-spot-confirm" id="spotConfirmBtn" disabled onclick="confirmSpot()"><i class="fas fa-paper-plane"></i> Send Meetup Location</button>' +
-      '</div>';
-      document.getElementById('dpMeetup').innerHTML = meetHTML;
-      renderSpotCategories();
-      filterSpots();
     }
-    document.getElementById('dpNegotiate').innerHTML = '';
-    document.getElementById('dpActions').innerHTML = negHTML;
+    document.getElementById('dpActions').innerHTML = actionsHTML;
+
+    // Services Section (only for accepted deals)
+    var servicesHTML = '';
+    if (status === 'accepted') {
+      var isLargeItem = (map.category === 'furniture' || map.category === 'sports' || map.category === 'vehicles');
+      servicesHTML = '<div class="dp-services">' +
+        '<div class="dp-section-title"><i class="fas fa-concierge-bell" style="color:#09B1BA;"></i> Services</div>';
+
+      if (!deliveryChoice[convId] || !deliveryChoice[convId].resolved) {
+        servicesHTML +=
+          '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'delivery\')">' +
+            '<div class="dp-service-icon" style="background:#FEF3C7;">🚚</div>' +
+            '<div class="dp-service-text"><div class="dp-service-label">Swappo Delivery</div><div class="dp-service-desc">We handle pickup & delivery</div></div>' +
+            '<span class="dp-service-price">from 25 AED</span>' +
+          '</div>';
+        if (isLargeItem) {
+          servicesHTML +=
+            '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'truck\')">' +
+              '<div class="dp-service-icon" style="background:#E6F7F8;">🚛</div>' +
+              '<div class="dp-service-text"><div class="dp-service-label">Find a Truck</div><div class="dp-service-desc">For furniture & large items</div></div>' +
+              '<span class="dp-service-price">from 80 AED</span>' +
+            '</div>';
+        }
+      }
+      servicesHTML += '</div>';
+
+      // Safe Spots
+      if (deliveryChoice[convId] && deliveryChoice[convId].me === 'meet') {
+        var meetHTML = '<div class="dp-meetup-wrap">' +
+          '<div class="dp-section-title"><i class="fas fa-shield-alt" style="color:#09B1BA;"></i> Safe Meetup Spots</div>' +
+          '<div class="dp-safety-tip"><i class="fas fa-lightbulb"></i> Always meet in a public, well-lit place.</div>' +
+          '<input type="text" class="dp-meetup-search" id="spotSearch" placeholder="Search malls, metro, cafés..." oninput="filterSpots()">' +
+          '<div class="dp-meetup-cats" id="spotCats"></div>' +
+          '<div class="dp-spots-list" id="spotsList"></div>' +
+          '<button class="dp-spot-confirm" id="spotConfirmBtn" disabled onclick="confirmSpot()"><i class="fas fa-paper-plane"></i> Send Meetup Location</button>' +
+        '</div>';
+        document.getElementById('dpMeetup').innerHTML = meetHTML;
+        renderSpotCategories();
+        filterSpots();
+      } else {
+        document.getElementById('dpMeetup').innerHTML = '';
+      }
+    } else {
+      document.getElementById('dpMeetup').innerHTML = '';
+    }
+    document.getElementById('dpServices').innerHTML = servicesHTML;
+
+    // Pro upsell (only for free users on accepted deals)
+    var proHTML = '';
+    if (status === 'accepted' && currentUser && currentUser.plan === 'free') {
+      proHTML = '<div class="dp-pro-banner">' +
+        '<h4>💎 Upgrade to Pro</h4>' +
+        '<p>0% service fees · 3 free boosts · Priority support</p>' +
+        '<button class="dp-pro-btn" onclick="window.location.href=\'pricing.html\'">29 AED/month →</button>' +
+      '</div>';
+    }
+    document.getElementById('dpProBanner').innerHTML = proHTML;
   }
 
   // ═══ CASH CONTROLS ═══
@@ -585,12 +1781,14 @@
     DemoChat.sendMessage(convId, msg);
     DemoNotifications.showToast('Counter-offer sent! 📨', 'success');
     loadMessages(convId);
+    renderSidebar();
   }
   function showCounterUI(convId) {
-    CONV_ITEM_MAP[convId].status = 'accepted'; // temporarily accept to show negotiation UI
+    CONV_ITEM_MAP[convId].status = 'accepted';
     renderDealPanel(convId);
   }
-  // ═══ SAFE SPOTS — Meetup Picker ═══
+
+  // ═══ SAFE SPOTS ═══
   var selectedSpotId = null;
   var activeSpotCat = 'all';
 
@@ -618,33 +1816,25 @@
       if (activeSpotCat !== 'all' && s.cat !== activeSpotCat) return false;
       if (search && s.name.toLowerCase().indexOf(search) === -1 && s.area.toLowerCase().indexOf(search) === -1 && s.emirate.toLowerCase().indexOf(search) === -1) return false;
       return true;
-    });
-
-    // Sort by distance
-    filtered.sort(function(a, b) { return a.dist - b.dist; });
+    }).sort(function(a, b) { return a.dist - b.dist; });
 
     if (filtered.length === 0) {
-      list.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;"><i class="fas fa-search" style="display:block;font-size:20px;margin-bottom:8px;opacity:0.3;"></i>No spots found. Try a different search.</div>';
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;">No spots found.</div>';
       return;
     }
 
     list.innerHTML = filtered.map(function(s) {
       var distText = s.dist < 1 ? (s.dist * 1000).toFixed(0) + 'm' : s.dist.toFixed(1) + ' km';
-      var iconClass = s.cat;
       return '<div class="dp-spot' + (selectedSpotId === s.id ? ' selected' : '') + '" onclick="selectSpot(\'' + s.id + '\')">' +
-        '<div class="dp-spot-icon ' + iconClass + '">' + s.icon + '</div>' +
-        '<div class="dp-spot-info">' +
-          '<div class="dp-spot-name">' + s.name + '</div>' +
-          '<div class="dp-spot-detail"><span>' + s.area + ', ' + s.emirate + '</span></div>' +
-        '</div>' +
-        '<span class="dp-spot-dist">' + distText + '</span>' +
-      '</div>';
+        '<div class="dp-spot-icon ' + s.cat + '">' + s.icon + '</div>' +
+        '<div class="dp-spot-info"><div class="dp-spot-name">' + s.name + '</div><div class="dp-spot-detail">' + s.area + ', ' + s.emirate + '</div></div>' +
+        '<span class="dp-spot-dist">' + distText + '</span></div>';
     }).join('');
   }
 
   function selectSpot(id) {
     selectedSpotId = id;
-    filterSpots(); // re-render to show selected state
+    filterSpots();
     var btn = document.getElementById('spotConfirmBtn');
     if (btn) btn.disabled = false;
   }
@@ -653,11 +1843,9 @@
     if (!selectedSpotId || !activeConvId) return;
     var spot = SAFE_SPOTS.find(function(s) { return s.id === selectedSpotId; });
     if (!spot) return;
-
     DemoChat.sendMessage(activeConvId, '📍 Let\'s meet at: ' + spot.icon + ' ' + spot.name + ' (' + spot.area + ', ' + spot.emirate + ')');
     DemoNotifications.showToast('Meetup location sent! ' + spot.icon, 'success');
     loadMessages(activeConvId);
-
     selectedSpotId = null;
     var btn = document.getElementById('spotConfirmBtn');
     if (btn) btn.disabled = true;
@@ -673,9 +1861,14 @@
     document.getElementById('sendBtn').disabled = true;
     loadMessages(activeConvId);
     renderSidebar();
+
+    // Show typing indicator
+    document.getElementById('typingIndicator').classList.add('show');
+
     // Simulate reply
     setTimeout(function() {
-      var replies = ['Sounds good!', 'Let me check...', 'OK 👍', 'When works for you?', 'That\'s a deal!', 'Can we meet this weekend?'];
+      document.getElementById('typingIndicator').classList.remove('show');
+      var replies = ['Sounds good!', 'Let me check...', 'OK 👍', 'When works for you?', 'That\'s a deal!', 'Can we meet this weekend?', 'Perfect, thanks!', 'I can do tomorrow'];
       var convs = DemoChat.getConversations();
       var conv = convs.find(function(c) { return c.id === activeConvId; });
       if (conv && conv.other_user) {
@@ -690,28 +1883,7 @@
     }, 1500 + Math.random() * 2000);
   }
 
-  // ═══ TRUCK POPUP ═══
-  function showTruckPopup() {
-    var o = document.createElement('div');
-    o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;';
-    o.innerHTML =
-      '<div style="background:#fff;border-radius:24px;padding:36px 32px;max-width:440px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.25);">' +
-        '<div style="font-size:48px;margin-bottom:14px;">🚛</div>' +
-        '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 8px;">Need a truck?</h3>' +
-        '<p style="font-size:14px;color:#6B7280;margin:0 0 20px;">Furniture, appliances, large items — trusted transporters across the UAE.</p>' +
-        '<div style="text-align:left;margin-bottom:24px;">' +
-          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;"><i class="fas fa-check-circle" style="color:#10B981;"></i> Verified & insured drivers</div>' +
-          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;"><i class="fas fa-check-circle" style="color:#10B981;"></i> Pickups, vans & trucks</div>' +
-          '<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><i class="fas fa-check-circle" style="color:#10B981;"></i> Transparent pricing</div>' +
-        '</div>' +
-        '<a href="transport.html" style="display:block;padding:14px;background:#09B1BA;color:#fff;border-radius:14px;font-weight:700;font-size:15px;text-decoration:none;"><i class="fas fa-truck"></i> Browse Transporters</a>' +
-        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:#6B7280;font-size:13px;cursor:pointer;margin-top:10px;">Close</button>' +
-      '</div>';
-    o.addEventListener('click', function(e) { if (e.target === o) o.remove(); });
-    document.body.appendChild(o);
-  }
-
-  // ═══ DEAL PANEL TOGGLE (tablet/mobile) ═══
+  // ═══ DEAL PANEL TOGGLE ═══
   function toggleDealPanel() {
     document.getElementById('dealPanel').classList.toggle('open');
   }
@@ -722,7 +1894,6 @@
     if (!currentUser) { window.location.href = 'login.html'; return; }
     renderSidebar();
 
-    // Auto-open from ?user= param or first conversation
     var convs = DemoChat.getConversations();
     var params = new URLSearchParams(window.location.search);
     var targetUser = params.get('user');
@@ -740,6 +1911,7 @@
 
     if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
   }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', chatInit);
   else chatInit();
   </script>
