@@ -63,9 +63,12 @@ window.categoryFields = {
     sizeOptions: ['S', 'M', 'L', 'XL', 'One size']
   },
   books: {
-    types: ['Book', 'DVD/Blu-ray', 'Video Game', 'Vinyl', 'Board Game', 'Other'],
-    brands: ['N/A'],
-    showSize: false
+    type: { label: 'Type', type: 'select', options: ['Book', 'DVD/Blu-ray', 'Video Game', 'Vinyl', 'Board Game', 'Other'], required: true },
+    brand: { label: 'Book Title', type: 'text', placeholder: 'e.g. Atomic Habits, The Alchemist' },
+    model: { label: 'Author', type: 'text', placeholder: 'e.g. James Clear, Paulo Coelho' },
+    condition: { label: 'Condition', type: 'select', options: ['New', 'Like new', 'Good', 'Fair'], required: true },
+    year: { label: 'Year', type: 'select', options: ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2015', '2010', '2005', '2000', 'Before 2000'] },
+    color: { label: 'Language', type: 'select', options: ['English', 'Arabic', 'French', 'Urdu', 'Russian', 'Hindi', 'Other'] }
   },
   kids: {
     gender: { label: 'Gender', type: 'select', options: ['Girl', 'Boy', 'Unisex'], required: true },
