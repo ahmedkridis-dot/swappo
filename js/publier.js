@@ -268,7 +268,8 @@ window.renderDetailsFields = function() {
     var fieldKeys = Object.keys(cat);
     fieldKeys.forEach(function(fieldKey) {
       var field = cat[fieldKey];
-      var label = getFieldLabel(fieldKey, field.label);
+      var genericLabels = { type: 'Type', brand: 'Brand', model: 'Model', condition: 'Condition', year: 'Year', size: 'Size', color: 'Color' };
+      var label = (field.label && field.label !== genericLabels[fieldKey]) ? field.label : getFieldLabel(fieldKey, field.label);
       if (field.type === 'select') {
         html += buildSelectNew(fieldKey, label, field.options, field.required);
       } else if (field.type === 'text') {
