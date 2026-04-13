@@ -679,7 +679,9 @@ const DemoItems = {
         '<div class="product-brand">' + title + '</div>' +
         (conditionStr ? '<div class="product-details">' + conditionStr + '</div>' : '') +
         priceHTML +
-        '<div style="display:flex;gap:4px;margin-top:4px;">' + modesHTML + '</div>' +
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">' + modesHTML +
+          (['furniture', 'vehicles', 'sports'].includes(item.category) ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FDF2F8;color:#9D174D;">🚛 Truck</span>' : '') +
+        '</div>' +
       '</div>' +
     '</div>';
   }

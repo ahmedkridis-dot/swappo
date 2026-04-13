@@ -1698,14 +1698,12 @@
             '<div class="dp-service-text"><div class="dp-service-label">Swappo Delivery</div><div class="dp-service-desc">We handle pickup & delivery</div></div>' +
             '<span class="dp-service-price">from 25 AED</span>' +
           '</div>';
-        if (isLargeItem) {
-          servicesHTML +=
+        servicesHTML +=
             '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'truck\')">' +
-              '<div class="dp-service-icon" style="background:#E6F7F8;">🚛</div>' +
-              '<div class="dp-service-text"><div class="dp-service-label">Find a Truck</div><div class="dp-service-desc">For furniture & large items</div></div>' +
+              '<div class="dp-service-icon" style="background:#FDF2F8;">🚛</div>' +
+              '<div class="dp-service-text"><div class="dp-service-label">Find a Truck</div><div class="dp-service-desc">Large items · furniture · heavy</div></div>' +
               '<span class="dp-service-price">from 80 AED</span>' +
             '</div>';
-        }
       }
       servicesHTML += '</div>';
 
