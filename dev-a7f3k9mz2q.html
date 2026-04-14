@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Swappo — Swap it, sell it, or give it away.</title>
+  <meta name="description" content="Swappo is the UAE's first marketplace for swapping, buying, selling, and gifting. Trade items with your community. Start free.">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Swappo">
+  <meta property="og:title" content="Swappo — Swap your stuff. No cash needed.">
+  <meta property="og:description" content="The UAE's first dedicated barter, gift & recycle platform.">
+  <meta property="og:url" content="https://swappo.ae">
+  <meta property="og:image" content="https://swappo.ae/assets/brand/swappo-social-cover-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Swappo — Swap your stuff. No cash needed.">
+  <meta name="twitter:description" content="The UAE's first dedicated barter, gift & recycle platform.">
+  <meta name="twitter:image" content="https://swappo.ae/assets/brand/swappo-social-cover-1200x630.png">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#09B1BA">
+  <link rel="icon" type="image/x-icon" href="assets/brand/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/swappo-logo-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/brand/swappo-logo-192.png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Schema.org Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Swappo",
+    "legalName": "Hannibal General Trading L.L.C - S.P.C",
+    "url": "https://swappo.ae",
+    "logo": "https://swappo.ae/assets/brand/swappo-logo-512.png",
+    "email": "contact@swappo.ae",
+    "telephone": "+971543125559",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Abu Dhabi",
+      "addressCountry": "AE"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+971543125559",
+      "email": "contact@swappo.ae",
+      "contactType": "customer service",
+      "availableLanguage": ["en", "ar", "fr", "ur"]
+    },
+    "sameAs": []
+  }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/swappo-visual.css">
+  <link rel="stylesheet" href="css/swappo-modern-2026.css">
+  <link rel="stylesheet" href="css/landing-upgrade.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Homepage-specific styles */
+    .feed-section + .feed-section { padding-top: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-inner">
+        <a href="index.html" class="site-logo">Swappo</a>
+
+        <div class="navbar-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        </div>
+
+        <div class="navbar-actions">
+          <a href="pages/chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>
+          <a href="pages/profile.html" class="navbar-icon" title="My Swaps"><i class="fas fa-user-circle"></i></a>
+          <a href="pages/login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
+          <a href="pages/publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
+        </div>
+
+        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Eco Ticker -->
+  <div class="eco-ticker" id="ecoTicker">
+    <div class="eco-ticker-content">
+      <span class="eco-ticker-item">🌿 <span class="eco-ticker-number" data-target="6430" data-suffix=" kg">0</span> CO2 saved</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🔄 <span class="eco-ticker-number" data-target="1892" data-suffix="">0</span> items swapped</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">🎁 <span class="eco-ticker-number" data-target="247" data-suffix="">0</span> gifts today</span>
+      <span class="eco-ticker-separator">·</span>
+      <span class="eco-ticker-item">💰 <span class="eco-ticker-number" data-target="89" data-suffix="">0</span> items sold today</span>
+      <span class="eco-ticker-live">↑ <span id="ecoTickerLive">+12 in the last hour</span></span>
+    </div>
+    <button class="eco-ticker-close" id="ecoTickerClose" aria-label="Close">×</button>
+  </div>
+
+  <!-- ========== MEGA MENU ========== -->
+  <div id="mega-menu-mount"></div>
+  <script src="js/mega-menu.js"></script>
+  <script>
+    (function(){
+      var mount = document.getElementById('mega-menu-mount');
+      if (mount && typeof renderMegaMenuBar === 'function') {
+        mount.innerHTML = renderMegaMenuBar(false);
+        if (typeof initMegaMenu === 'function') initMegaMenu();
+      }
+    })();
+  </script>
+
+  <!-- ═══════════ HERO — Cluster BG + Floating Video ═══════════ -->
+  <section class="hero-video-section">
+    <!-- Full-width background image (cluster) -->
+    <div class="hero-video-bg">
+      <picture>
+        <source media="(max-width: 768px)" srcset="assets/brand/hero/hero-cluster-mobile.jpg">
+        <img src="assets/brand/hero/hero-cluster.jpg" alt="" class="hero-bg-img" loading="eager" fetchpriority="high">
+      </picture>
+      <div class="hero-video-overlay"></div>
+    </div>
+    <!-- Hero content floating over image -->
+    <div class="container hero-video-content">
+      <div class="hero-copy reveal reveal-up">
+        <span class="hero-badge" data-i18n="hero_badge">UAE's first barter community</span>
+        <h1 data-i18n-html="hero_title_v2">Someone needs what you have. <span class="gradient-text" data-i18n="hero_title_accent">Swap it.</span></h1>
+        <p class="hero-subtitle-text" data-i18n="hero_subtitle">The UAE's first marketplace for swapping, buying, selling, and gifting. Trade items with your community.</p>
+        <div class="hero-cta">
+          <a href="pages/login.html" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start Swapping</a>
+          <a href="#how-it-works" class="btn-pill btn-pill-outline hero-outline-btn" data-i18n="how_it_works">How it works</a>
+        </div>
+        <div class="hero-trust">
+          <span><span class="check">&#10003;</span> <span data-i18n="trust_items">5,000+ items listed</span></span>
+          <span><span class="check">&#10003;</span> <span data-i18n="trust_categories">12 categories</span></span>
+          <span><span class="check">&#10003;</span> <span data-i18n="trust_anonymous">100% anonymous until you agree</span></span>
+        </div>
+      </div>
+    </div>
+    <!-- Floating video card (desktop right side) -->
+    <div class="hero-video-float reveal reveal-scale" onclick="var v=this.querySelector('video');v.muted=!v.muted;">
+      <video autoplay muted loop playsinline preload="auto" aria-label="Swappo teaser">
+        <source src="video/teasing.mp4" type="video/mp4">
+      </video>
+      <div class="hero-video-float-badge"><i class="fas fa-play"></i> <span data-i18n="hero_watch_teaser">Watch teaser</span></div>
+      <button class="hero-sound-toggle" onclick="event.stopPropagation();var v=this.parentElement.querySelector('video');v.muted=!v.muted;this.innerHTML=v.muted?'<i class=\'fas fa-volume-mute\'></i>':'<i class=\'fas fa-volume-up\'></i>'" aria-label="Toggle sound">
+        <i class="fas fa-volume-mute"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- ═══════════ LOCATION BAND — Premium GPS + Radius Filter (CSS in style.css) ═══════════ -->
+  <section class="hero-location-band" aria-label="Your location and search radius">
+    <div class="container">
+      <div class="hero-location-inner">
+        <div class="hero-location-left">
+          <div class="hero-location-pin" aria-hidden="true">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="hero-location-text">
+            <span class="hero-location-label" data-i18n="items_near_you">items near you</span>
+            <span class="hero-location-name" id="locationName">
+              <i class="fas fa-spinner fa-spin" style="font-size:0.75rem;"></i>
+              <span data-i18n="detecting_location">Detecting location...</span>
+            </span>
+          </div>
+        </div>
+        <div class="hero-location-right">
+          <button class="radius-btn active" onclick="setRadius(5, this)">5 km</button>
+          <button class="radius-btn" onclick="setRadius(10, this)">10 km</button>
+          <button class="radius-btn" onclick="setRadius(25, this)">25 km</button>
+          <button class="radius-btn" onclick="setRadius(0, this)" data-i18n="all_uae">All UAE</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section class="how-it-works reveal" id="how-it-works">
+    <div class="container">
+      <div class="section-header" style="justify-content:center;">
+        <h2 class="section-title" data-i18n="how_it_works">How it works</h2>
+      </div>
+      <div class="steps-grid steps-grid-4">
+        <div class="step-card card-hover">
+          <div class="step-number">1</div>
+          <div class="step-icon-circle"><i class="fas fa-camera"></i></div>
+          <h3 data-i18n="step1_title_v5">List your item</h3>
+          <p data-i18n="step1_desc_v5">Set your price and add photos. Done in seconds.</p>
+        </div>
+        <div class="step-card card-hover">
+          <div class="step-number">2</div>
+          <div class="step-icon-circle"><i class="fas fa-comments-dollar"></i></div>
+          <h3 data-i18n="step2_title_v5">Get offers</h3>
+          <p data-i18n="step2_desc_v5">Swap, cash, or both — you choose what to accept.</p>
+        </div>
+        <div class="step-card card-hover">
+          <div class="step-number">3</div>
+          <div class="step-icon-circle"><i class="fas fa-people-arrows"></i></div>
+          <h3 data-i18n="step3_title_v5">Accept & connect</h3>
+          <p data-i18n="step3_desc_v5">Chat opens after both accept. Identities revealed.</p>
+        </div>
+        <div class="step-card card-hover">
+          <div class="step-number">4</div>
+          <div class="step-icon-circle"><i class="fas fa-qrcode"></i></div>
+          <h3 data-i18n="step4_title_v5">Meet & confirm</h3>
+          <p data-i18n="step4_desc_v5">QR code or delivery. Rate each other.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== POPULAR ITEMS ========== -->
+  <section class="feed-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="popular_now">Popular right now</h2>
+        <a href="pages/catalogue.html" class="section-link" data-i18n="see_all">See all →</a>
+      </div>
+      <div class="products-grid" id="popular-grid">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== GIFT CORNER TEASER ========== -->
+  <section class="reveal" style="padding:60px 0;background:linear-gradient(135deg, #FFF5F5 0%, #f0fdfd 100%);">
+    <div class="container" style="text-align:center;">
+      <h2 class="section-title" style="margin-bottom:12px;" data-i18n="gift_teaser_title">🎁 Free items from generous people</h2>
+      <p style="color:var(--gray-text,#6B7280);font-size:15px;margin-bottom:32px;" data-i18n="gift_teaser_subtitle">Claim items for free in the Gift Corner. One claim per month — give to get more!</p>
+      <div class="products-grid" id="gift-teaser-grid" style="margin-bottom:28px;">
+        <!-- Populated dynamically with 4 gift items -->
+      </div>
+      <a href="pages/giveaway.html" class="btn-pill btn-pill-coral" data-i18n="gift_teaser_cta">Visit the Gift Corner →</a>
+    </div>
+  </section>
+
+  <!-- Featured Categories removed from homepage — accessible via mega-menu + catalogue -->
+
+  <!-- ========== LIVE SWAP FEED ========== -->
+  <section class="swap-feed-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="community_title">The Swappo Community</h2>
+      <p style="text-align:center;color:var(--gray-text,#6B7280);margin:-32px 0 32px;font-size:15px;" data-i18n="happening_now">Happening Right Now</p>
+      <div class="swap-feed-grid">
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#10B981;">SM</div>
+            <div><div class="swap-user-name">@silver_moon</div><div class="swap-time" data-i18n="swap_2min">2 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name">iPhone 13</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name">MacBook Air</span></div>
+        </div>
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#09B1BA;">AK</div>
+            <div><div class="swap-user-name">@arctic_knight</div><div class="swap-time" data-i18n="swap_5min">5 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name">Nike Shoes</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name">Adidas Jacket</span></div>
+        </div>
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#8B5CF6;">FH</div>
+            <div><div class="swap-user-name">@forest_heart</div><div class="swap-time" data-i18n="swap_8min">8 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name" data-i18n="swap_plants">Plant Collection</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name" data-i18n="swap_bookshelf">Bookshelf</span></div>
+        </div>
+        <div class="swap-card card-hover">
+          <div class="swap-card-header">
+            <div class="swap-avatar" style="background:#F59E0B;">OS</div>
+            <div><div class="swap-user-name">@ocean_storm</div><div class="swap-time" data-i18n="swap_12min">12 min ago</div></div>
+          </div>
+          <div class="swap-items"><span class="swap-item-name">PS5 Controller</span><span class="swap-arrow"><i class="fas fa-exchange-alt"></i></span><span class="swap-item-name" data-i18n="swap_chair">Gaming Chair</span></div>
+        </div>
+      </div>
+
+      <!-- Testimonials (merged) -->
+      <h3 style="text-align:center;font-size:18px;font-weight:600;color:var(--navy,#1A1A2E);margin:40px 0 20px;" data-i18n="community_loves">What our community says</h3>
+      <div class="testimonials-grid" style="max-width:1100px;margin:0 auto;">
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#09B1BA;">LR</div>
+            <div><div class="testimonial-name">@lucky_raven</div><div class="testimonial-badge badge-silver" data-i18n="badge_pro">Pro Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_1">"I swapped my old PlayStation for a brand new bookshelf. Couldn't believe it!"</p>
+        </div>
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#8B5CF6;">MK</div>
+            <div><div class="testimonial-name">@mountain_keeper</div><div class="testimonial-badge badge-premium" data-i18n="badge_pro">Pro Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_2">"Swappo changed how I think about stuff I don't use. One person's clutter is another's treasure!"</p>
+        </div>
+        <div class="testimonial-card card-hover">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar" style="background:#F59E0B;">NA</div>
+            <div><div class="testimonial-name">@nomad_arrow</div><div class="testimonial-badge badge-bronze" data-i18n="badge_pro">Pro Member</div></div>
+          </div>
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i18n="testimonial_3">"The anonymous feature is genius. I felt safe from the very first swap."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WHY SWAPPO ========== -->
+  <section class="why-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="why_swappo">Why Swappo?</h2>
+      <div class="why-grid">
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F4B0;</div>
+          <h3 data-i18n="why_save_title">Save Money</h3>
+          <p data-i18n="why_save_desc">Why buy when you can swap? Get what you need for free.</p>
+        </div>
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F331;</div>
+          <h3 data-i18n="why_eco_title">Eco-Friendly</h3>
+          <p data-i18n="why_eco_desc">Every swap = one less item in a landfill.</p>
+        </div>
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F6E1;</div>
+          <h3 data-i18n="why_safe_title">Safe & Anonymous</h3>
+          <p data-i18n="why_safe_desc">Stay anonymous until both sides agree to swap.</p>
+        </div>
+        <div class="why-card card-hover">
+          <div class="why-icon">&#x1F49A;</div>
+          <h3 data-i18n="why_community_title">Community First</h3>
+          <p data-i18n="why_community_desc">Join thousands already swapping in the UAE.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== IMPACT COUNTER ========== -->
+  <section class="impact-counter-section reveal">
+    <div class="container">
+      <h2 data-i18n="the_swappo_effect">The Swappo Effect</h2>
+      <div class="impact-counters">
+        <div class="impact-stat"><div class="impact-number" data-target="12450" data-suffix="+">0</div><div class="impact-label" data-i18n="impact_items_swapped">Items Swapped</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="8200" data-suffix="+">0</div><div class="impact-label" data-i18n="impact_happy_swappers">Happy Swappers</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="15" data-suffix=" tons">0</div><div class="impact-label" data-i18n="impact_co2_saved">CO&#x2082; Saved</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="2500000" data-prefix="AED " data-suffix="+">0</div><div class="impact-label" data-i18n="impact_value_exchanged">Value Exchanged</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PRICING — Free vs Pro ========== -->
+  <section class="pricing-section reveal">
+    <div class="container">
+      <h2 class="section-title" data-i18n="pricing_hero_title">List for free. Go Pro to save more.</h2>
+      <p class="pricing-subtitle" data-i18n="pricing_hero_subtitle">Everyone can swap, buy, sell & gift. Pro members pay 0% service fee on purchases.</p>
+      <div class="plans-grid" style="grid-template-columns:repeat(2,1fr);max-width:750px;margin:0 auto;">
+        <!-- Free -->
+        <div class="plan-card card-hover">
+          <div class="plan-name" data-i18n="plan_free">Free</div>
+          <div class="plan-price" style="font-size:28px;">Free <span class="period">forever</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_unlimited_swaps">Unlimited swaps</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_unlimited_publish">Unlimited listings</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_gift_1">1 Gift Corner claim/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_free_fee">5% service fee on delivery</span></li>
+          </ul>
+          <a href="pages/login.html" class="plan-cta" data-i18n="cta_free">Get Started Free</a>
+        </div>
+        <!-- Swappo Pro -->
+        <div class="plan-card premium card-hover">
+          <div class="most-popular-badge" data-i18n="most_popular">Most Popular</div>
+          <div class="plan-name" data-i18n="plan_pro">Swappo Pro</div>
+          <div class="plan-price">29 <span class="currency">AED</span><span class="period">/mo</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check" style="color:#10B981;"></i> <span data-i18n="feat_pro_zero_fee" style="font-weight:700;color:#10B981;">0% service fee on purchases</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_no_ads">No ads</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_pro_boosts">3 boosts/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_pro_gifts">5 Gift Corner claims/month</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_pro_analytics">Analytics & priority search</span></li>
+            <li><i class="fas fa-check"></i> <span data-i18n="feat_pro_badge">Verified Pro badge</span></li>
+          </ul>
+          <p style="font-size:11px;color:#6B7280;text-align:center;margin:8px 0 0;font-style:italic;" data-i18n="pro_roi_hint">2 purchases/month and your Pro pays for itself</p>
+          <a href="pages/login.html" class="plan-cta" data-i18n="cta_pro">Go Pro</a>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <a href="pages/pricing.html" style="color:var(--teal,#09B1BA);font-weight:600;font-size:14px;text-decoration:none;">See all features →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== APP DOWNLOAD CTA ========== -->
+  <section class="cta-download reveal">
+    <div class="container">
+      <h2 data-i18n="ready_to_swap">Ready to swap?</h2>
+      <p data-i18n="cta_subtitle">Download Swappo and start trading with your community today.</p>
+      <div class="store-buttons">
+        <a href="#" class="store-btn" onclick="event.preventDefault();DemoNotifications.showToast('Coming soon on App Store! 🍎','info')"><i class="fab fa-apple"></i> <span>App Store</span></a>
+        <a href="#" class="store-btn" onclick="event.preventDefault();DemoNotifications.showToast('Coming soon on Google Play! 🤖','info')"><i class="fab fa-google-play"></i> <span>Google Play</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="site-logo footer-brand-text">Swappo</div>
+          <p data-i18n="footer_tagline">The UAE's first dedicated barter, gift & recycle platform.</p>
+          <div class="footer-contact" style="margin-top:16px;display:flex;flex-direction:column;gap:6px;font-size:13px;">
+            <a href="mailto:contact@swappo.ae" style="color:inherit;opacity:0.85;text-decoration:none;"><i class="fas fa-envelope" style="width:16px;opacity:0.7;"></i> contact@swappo.ae</a>
+            <a href="tel:+971543125559" style="color:inherit;opacity:0.85;text-decoration:none;" data-i18n-html="contact_phone_line"><i class="fas fa-phone" style="width:16px;opacity:0.7;"></i> +971 54 312 5559</a>
+            <a href="https://wa.me/971543125559" target="_blank" rel="noopener" style="color:inherit;opacity:0.85;text-decoration:none;"><i class="fab fa-whatsapp" style="width:16px;color:#25D366;"></i> WhatsApp</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_platform">Platform</h4>
+          <ul>
+            <li><a href="pages/catalogue.html" data-i18n="footer_browse_items">Browse items</a></li>
+            <li><a href="pages/giveaway.html" data-i18n="footer_free_giveaways">Free giveaways</a></li>
+            <li><a href="pages/publier.html" data-i18n="footer_list_item">List an item</a></li>
+            <li><a href="pages/pricing.html" data-i18n="footer_pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_company">Company</h4>
+          <ul>
+            <li><a href="pages/impact.html" data-i18n="footer_about">About</a></li>
+            <li><a href="pages/impact.html" data-i18n="impact_nav">Our Impact</a></li>
+            <li><a href="pages/recycle.html" data-i18n="recycle_nav">Recycle Hub</a></li>
+            <li><a href="#" data-i18n="footer_blog" onclick="event.preventDefault();if(window.DemoNotifications)DemoNotifications.showToast('Blog coming soon! 📝','info')">Blog</a></li>
+            <li><a href="#" data-i18n="footer_careers" onclick="event.preventDefault();if(window.DemoNotifications)DemoNotifications.showToast('Careers page coming soon! 💼','info')">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_legal">Legal</h4>
+          <ul>
+            <li><a href="pages/terms.html" data-i18n="footer_terms">Terms of use</a></li>
+            <li><a href="pages/privacy.html" data-i18n="footer_privacy">Privacy policy</a></li>
+            <li><a href="pages/cookies.html" data-i18n="footer_cookies">Cookie policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Swappo. All rights reserved. UAE</span>
+        <p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:8px 0 0;line-height:1.5;" data-i18n="footer_delivery_fee">Service fee 5% on deliveries only. In-person trades are always free.</p>
+        <p class="footer-legal-line" style="font-size:11px;color:var(--text-muted,#9CA3AF);margin:4px 0 0;line-height:1.5;" data-i18n="footer_legal_entity">Hannibal General Trading L.L.C - S.P.C · Abu Dhabi, UAE · TDRA e-activity licence NOL-26-100000206</p>
+        <div class="footer-social">
+          <a href="https://instagram.com/swappo.ae" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://x.com/swappo_ae" target="_blank" rel="noopener" aria-label="X/Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="https://facebook.com/swappo.ae" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="https://tiktok.com/@swappo.ae" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-banner-content">
+      <p>Swappo uses cookies to enhance your experience. <a href="pages/cookies.html">Learn more</a>.</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-decline" class="btn btn-sm" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);">Decline</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Accept All</button>
+        <button id="cookie-manage" class="btn btn-sm" style="background:transparent;color:var(--primary);border:1px solid var(--primary);">Manage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Mode Engine -->
+  <script src="js/mock-data.js"></script>
+  <script src="js/demo-engine.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/cookie-consent.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/swappo-animations.js"></script>
+  <script src="js/swappo-modern-2026.js"></script>
+  <script src="js/i18n.js"></script>
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.error('SW failed:', err));
+    }
+
+    // ── Render items into a grid ──
+    function renderGrid(gridEl, items) {
+      if (!gridEl) return;
+      gridEl.innerHTML = items.map(item => DemoItems.renderCard(item)).join('');
+    }
+
+    // ── Populate all grids ──
+    function populateGrids() {
+      // Popular: sorted by favorites
+      var popular = DemoItems.browse({ sortBy: 'popular' });
+      renderGrid(document.getElementById('popular-grid'), popular.items.slice(0, 10));
+
+      // Gift Corner teaser (4 gift items)
+      var giftGrid = document.getElementById('gift-teaser-grid');
+      if (giftGrid && DemoItems.getGiveaways) {
+        var gifts = DemoItems.getGiveaways().slice(0, 4);
+        if (gifts.length > 0) {
+          giftGrid.innerHTML = gifts.map(function(item) { return DemoItems.renderCard(item); }).join('');
+        }
+      }
+    }
+
+    // ── Search dropdown ──
+    function initSearch() {
+      var input = document.querySelector('.navbar-search input');
+      if (!input) return;
+
+      var dropdown = document.getElementById('search-dropdown');
+      if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = 'search-dropdown';
+        dropdown.style.cssText = 'position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:360px;overflow-y:auto;z-index:1000;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.1);';
+        input.parentElement.style.position = 'relative';
+        input.parentElement.appendChild(dropdown);
+      }
+
+      var debounce;
+      input.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(function() {
+          var q = input.value.trim();
+          if (q.length < 2) { dropdown.style.display = 'none'; return; }
+
+          var result = DemoItems.browse({ search: q, limit: 8 });
+          if (result.items.length === 0) {
+            dropdown.innerHTML = '<div style="padding:16px;color:var(--text-muted);text-align:center;">No items found</div>';
+          } else {
+            dropdown.innerHTML = result.items.map(function(item) {
+              var title = (item.brand + ' ' + item.model).trim();
+              var photo = (item.photos && item.photos[0]) || '';
+              var href = 'pages/product.html?id=' + item.id;
+              return '<a href="' + href + '" style="display:flex;align-items:center;gap:12px;padding:10px 14px;text-decoration:none;color:var(--text);border-bottom:1px solid var(--border);transition:background 0.15s;" onmouseover="this.style.background=\'#f5f5f5\'" onmouseout="this.style.background=\'transparent\'">' +
+                '<img src="' + photo + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px;">' +
+                '<div><div style="font-weight:600;font-size:0.88rem;">' + title + '</div>' +
+                '<div style="font-size:0.78rem;color:var(--text-muted);">' + (item.category || '') + '</div></div></a>';
+            }).join('');
+          }
+          dropdown.style.display = 'block';
+        }, 250);
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!input.parentElement.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Category bar filtering ──
+    function initCategoryBar() {
+      var links = document.querySelectorAll('.categories-bar .cat-link');
+      links.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var i18nKey = link.getAttribute('data-i18n');
+          if (!i18nKey || i18nKey === 'all' || i18nKey === 'gift_corner') return;
+          var catMap = {
+            clothing: 'clothing', electronics: 'electronics', gaming: 'gaming', furniture: 'furniture',
+            vehicles: 'vehicles', sports: 'sports', books: 'books', kids: 'kids',
+            bags_accessories: 'bags_accessories'
+          };
+          var cat = catMap[i18nKey];
+          if (!cat) return;
+          e.preventDefault();
+          links.forEach(function(l) { l.classList.remove('active'); });
+          link.classList.add('active');
+          var popular = DemoItems.browse({ category: cat, sortBy: 'popular', limit: 10 });
+          renderGrid(document.getElementById('popular-grid'), popular.items);
+          // removed: recent-grid and explore-grid no longer exist
+        });
+      });
+    }
+
+    // ── Main init ──
+    function homeInit() {
+      populateGrids();
+      initSearch();
+      initCategoryBar();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', homeInit);
+    } else {
+      homeInit();
+    }
+
+    // Suggestions for logged-in users
+    (function() {
+      if (!window.DemoAuth || !DemoAuth.isLoggedIn()) return;
+      if (!window.DemoSuggestions) return;
+      var user = DemoAuth.getCurrentUser();
+      var suggestions = DemoSuggestions.getForUser(user.id, 6);
+      if (suggestions.length === 0) return;
+
+      var section = document.getElementById('suggestions-section');
+      var grid = document.getElementById('suggestions-grid');
+      if (!section || !grid) return;
+
+      section.style.display = 'block';
+      grid.innerHTML = suggestions.map(function(item) {
+        return DemoItems.renderCard(item);
+      }).join('');
+    })();
+
+    // ── Scroll Reveal ──
+    (function() {
+      var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.reveal').forEach(function(el) {
+        revealObserver.observe(el);
+      });
+    })();
+
+    // ── Impact Counter Animation ──
+    (function() {
+      var counters = document.querySelectorAll('.impact-number');
+      if (!counters.length) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            var target = parseInt(el.getAttribute('data-target'));
+            var suffix = el.getAttribute('data-suffix') || '';
+            var prefix = el.getAttribute('data-prefix') || '';
+            var current = 0;
+            var increment = target / 60;
+            var timer = setInterval(function() {
+              current += increment;
+              if (current >= target) {
+                current = target;
+                clearInterval(timer);
+              }
+              el.textContent = prefix + Math.floor(current).toLocaleString() + suffix;
+            }, 25);
+            observer.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+      counters.forEach(function(c) { observer.observe(c); });
+    })();
+
+    // ── Pricing Toggle ──
+    (function() {
+      var toggle = document.querySelector('.pricing-toggle');
+      if (!toggle) return;
+      var btns = toggle.querySelectorAll('button');
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          btns.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+        });
+      });
+    })();
+
+    // Early Adopter counter
+    (function() {
+      if (!window.DemoEarlyAdopter) return;
+      var remaining = DemoEarlyAdopter.getRemaining();
+      var count = DemoEarlyAdopter.getCount();
+      var pct = Math.round((count / DemoEarlyAdopter.MAX_SPOTS) * 100);
+
+      var titleEl = document.getElementById('early-adopter-title');
+      var countEl = document.getElementById('ea-remaining');
+      var fillEl = document.getElementById('early-adopter-fill');
+      var banner = document.getElementById('early-adopter-banner');
+
+      if (countEl) countEl.textContent = remaining;
+      if (fillEl) fillEl.style.width = pct + '%';
+
+      // Update subtitle HTML with i18n (contains <strong> tags, can't use data-i18n)
+      var subtitleEl = document.getElementById('early-adopter-subtitle');
+      function updateEASubtitle() {
+        if (subtitleEl && remaining > 0 && typeof t === 'function') {
+          subtitleEl.innerHTML = t('early_adopter_subtitle_html');
+        }
+      }
+      updateEASubtitle();
+      document.addEventListener('languageChanged', updateEASubtitle);
+
+      if (remaining <= 0 && titleEl) {
+        titleEl.textContent = typeof t === 'function' ? t('early_adopter_full_title') : '500 Early Adopters have joined Swappo!';
+        titleEl.setAttribute('data-i18n', 'early_adopter_full_title');
+        var subtitle = banner.querySelector('.early-adopter-subtitle');
+        if (subtitle) {
+          subtitle.textContent = typeof t === 'function' ? t('early_adopter_full_subtitle') : 'Stay tuned for the next wave.';
+          subtitle.setAttribute('data-i18n', 'early_adopter_full_subtitle');
+        }
+        var btn = banner.querySelector('.early-adopter-btn');
+        if (btn) {
+          btn.textContent = typeof t === 'function' ? t('join_swap') : 'Join the Swap';
+          btn.setAttribute('data-i18n', 'join_swap');
+        }
+      }
+    })();
+
+    // ── Mechanism 6: Swap→Gift 30-day suggestion — DISABLED for clean demo ──
+    (function() {
+      return; // disabled: popup blocks homepage on every load
+      if (!window.DemoAuth || !DemoAuth.isLoggedIn()) return;
+      if (!window.DemoItems) return;
+      var user = DemoAuth.getCurrentUser();
+      var userItems = DemoItems.getByUser(user.id);
+      var thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      userItems.forEach(function(item) {
+        if (item.is_giveaway) return; // already a gift
+        if (item.giftSuggestionShown) return; // already shown
+        var created = new Date(item.created_at);
+        if (created > thirtyDaysAgo) return; // less than 30 days old
+
+        // Show suggestion notification
+        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'your item';
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
+        overlay.innerHTML =
+          '<div style="background:white;border-radius:20px;padding:32px;max-width:460px;width:100%;text-align:center;animation:slideUp 0.3s ease;">' +
+            '<div style="font-size:48px;margin-bottom:12px;">💡</div>' +
+            '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 8px;">Your "' + title + '" hasn\'t found a match</h3>' +
+            '<p style="font-size:14px;color:#6B7280;margin:0 0 20px;">Want to give it away in the Gift Corner? It could find a new home within hours!</p>' +
+            '<div style="display:flex;gap:10px;justify-content:center;">' +
+              '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:#F3F4F6;border:none;padding:10px 24px;border-radius:999px;font-weight:600;cursor:pointer;color:#6B7280;">Keep as swap</button>' +
+              '<button onclick="convertToGift(\'' + item.id + '\', this)" style="background:#09B1BA;color:white;border:none;padding:10px 24px;border-radius:999px;font-weight:600;cursor:pointer;">Yes, give it away 🎁</button>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+
+        // Mark as shown (only show once)
+        item.giftSuggestionShown = true;
+        return; // only show one at a time
+      });
+    })();
+
+    // ── Surprise Me ──
+    (function() {
+      // Add floating button
+      var btn = document.createElement('button');
+      btn.className = 'surprise-me-btn';
+      btn.innerHTML = '<i class="fas fa-dice"></i> Surprise Me!';
+      btn.onclick = function() { showSurprise(); };
+      document.body.appendChild(btn);
+
+      window.showSurprise = function() {
+        var items = DemoItems.browse({ sortBy: 'popular' }).items;
+        if (!items.length) return;
+        var item = items[Math.floor(Math.random() * Math.min(20, items.length))];
+        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Item';
+        var photo = (item.photos && item.photos[0]) || '';
+        var cat = item.category || '';
+        var cond = item.condition || '';
+
+        var overlay = document.createElement('div');
+        overlay.className = 'surprise-overlay';
+        overlay.innerHTML =
+          '<div class="surprise-modal surprise-modal-card">' +
+            '<button class="surprise-close" onclick="this.closest(\'.surprise-overlay\').remove()">&times;</button>' +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:16px;" alt="">' : '') +
+            '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
+            '<p style="font-size:13px;color:#9CA3AF;margin:0 0 16px;">' + cat + ' · ' + cond + '</p>' +
+            '<p style="font-size:12px;color:#6B7280;font-style:italic;margin:0 0 20px;">Popular in your area</p>' +
+            '<div style="display:flex;gap:10px;justify-content:center;">' +
+              '<button onclick="this.closest(\'.surprise-overlay\').remove();showSurprise();" class="btn-pill btn-pill-outline" style="font-size:13px;padding:10px 20px;"><i class="fas fa-dice"></i> Another</button>' +
+              '<a href="pages/product.html?id=' + item.id + '" class="btn-pill btn-pill-teal" style="font-size:13px;padding:10px 20px;">View item →</a>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+      };
+    })();
+
+    function convertToGift(itemId, btn) {
+      if (window.DemoItems && DemoItems.update) {
+        DemoItems.update(itemId, { is_giveaway: true });
+      }
+      DemoNotifications.showToast('Item moved to Gift Corner! 🎁', 'success');
+      btn.closest('div[style*="fixed"]').remove();
+    }
+  </script>
+</body>
+</html>

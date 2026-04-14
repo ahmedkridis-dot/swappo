@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/swappo-logo-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/brand/swappo-logo-192.png">
   <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
   <title>Swap Market — Swappo</title>
   <meta name="description" content="Browse all items available for swap on Swappo. Discover thousands of items in your area.">
+  <link rel="canonical" href="https://swappo.ae/pages/catalogue.html">
+  <meta property="og:title" content="Swap Market — Swappo">
+  <meta property="og:description" content="Browse thousands of items to swap, buy, or gift across the UAE.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://swappo.ae/pages/catalogue.html">
+  <meta property="og:image" content="https://swappo.ae/assets/brand/swappo-logo-master.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="manifest" href="../manifest.json">
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/swappo-visual.css">
@@ -226,9 +234,11 @@
       background: #09B1BA;
       color: white;
     }
+    .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   </style>
 </head>
 <body>
+  <h1 class="sr-only">Swap Market — browse items available for swap, buy, or gift across the UAE</h1>
 
   <!-- ========== NAVBAR ========== -->
   <nav class="navbar">
@@ -276,6 +286,32 @@
       }
     })();
   </script>
+
+  <!-- ========== LOCATION BAND (compact) ========== -->
+  <section class="hero-location-band compact" aria-label="Your location and search radius">
+    <div class="container">
+      <div class="hero-location-inner">
+        <div class="hero-location-left">
+          <div class="hero-location-pin" aria-hidden="true">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="hero-location-text">
+            <span class="hero-location-label" data-i18n="items_near_you">items near you</span>
+            <span class="hero-location-name" id="locationName">
+              <i class="fas fa-spinner fa-spin" style="font-size:0.75rem;"></i>
+              <span data-i18n="detecting_location">Detecting location...</span>
+            </span>
+          </div>
+        </div>
+        <div class="hero-location-right">
+          <button class="radius-btn active" onclick="setRadius(5, this)">5 km</button>
+          <button class="radius-btn" onclick="setRadius(10, this)">10 km</button>
+          <button class="radius-btn" onclick="setRadius(25, this)">25 km</button>
+          <button class="radius-btn" onclick="setRadius(0, this)" data-i18n="all_uae">All UAE</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ========== FILTER BAR (Vinted-style horizontal) ========== -->
   <div class="container">
@@ -472,6 +508,9 @@
   <script src="../js/animations.js"></script>
   <script src="../js/cookie-consent.js"></script>
   <script src="../js/i18n.js"></script>
+  <script src="../js/register-sw.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>

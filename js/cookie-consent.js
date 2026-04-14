@@ -54,6 +54,5 @@ document.addEventListener('DOMContentLoaded', function() {
   function enableAnalyticsCookies() {
     // Placeholder: Initialize Google Analytics or other analytics tools here
     // Example: if (typeof gtag === 'function') { gtag('consent', 'update', { analytics_storage: 'granted' }); }
-    console.log('Swappo: Analytics cookies enabled');
   }
 });

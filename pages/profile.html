@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="My Swaps — your Swappo dashboard. Track your swaps, items, badges, subscription, and chat history in one place.">
+    <link rel="canonical" href="https://swappo.ae/pages/profile.html">
+    <meta property="og:title" content="My Swaps — Swappo">
+    <meta property="og:description" content="Your Swappo dashboard: swaps, items, badges, and more.">
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="https://swappo.ae/pages/profile.html">
+    <meta property="og:image" content="https://swappo.ae/assets/brand/swappo-logo-master.png">
+    <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/swappo-logo-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/brand/swappo-logo-192.png">
@@ -1291,6 +1300,9 @@
     <script src="../js/animations.js"></script>
     <script src="../js/cookie-consent.js"></script>
     <script src="../js/i18n.js"></script>
+    <script src="../js/register-sw.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
     <script src="../js/app.js"></script>
     <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -1457,7 +1469,7 @@
 
             // Stats + quota bars (v4: swaps unlimited → show completed count, no bar)
             const quotasContainer = document.getElementById('sidebar-quotas');
-            const swapsCompleted = planInfo.swaps_used || 0;
+            swapsCompleted = planInfo.swaps_used || 0;
             const claimsPct = planInfo.claims_limit > 0 ? Math.round((planInfo.claims_used / planInfo.claims_limit) * 100) : 0;
             const boostsPct = planInfo.boosts_limit > 0 ? Math.round((planInfo.boosts_used / planInfo.boosts_limit) * 100) : 0;
 
@@ -1862,7 +1874,12 @@
             });
 
             // ── Logout ───────────────────────────────────────────────────
-            document.getElementById('logout-btn').addEventListener('click', () => {
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                try {
+                    if (window.SwappoAuth && window.SwappoAuth.isReady()) {
+                        await window.SwappoAuth.signOut();
+                    }
+                } catch (e) { /* ignore */ }
                 DemoAuth.signOut();
                 window.location.href = 'login.html';
             });

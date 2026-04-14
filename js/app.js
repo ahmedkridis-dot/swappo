@@ -3,23 +3,65 @@
    ============================================ */
 
 // ---- GEOLOCATION (auto GPS like FB Marketplace) ----
+// Persists across pages via localStorage so distance shows immediately
+// on every product card (catalogue, giveaway, landing, etc.).
 
-let userLat = null;
-let userLng = null;
-let currentRadius = 5; // default 5km
+const LS_KEYS = {
+  LAT: 'swappo_user_lat',
+  LNG: 'swappo_user_lng',
+  AREA: 'swappo_user_area',
+  RADIUS: 'swappo_radius'
+};
+
+// Restore from localStorage immediately so any render() call sees them
+let userLat = parseFloat(localStorage.getItem(LS_KEYS.LAT)) || null;
+let userLng = parseFloat(localStorage.getItem(LS_KEYS.LNG)) || null;
+let userArea = localStorage.getItem(LS_KEYS.AREA) || null;
+let currentRadius = parseInt(localStorage.getItem(LS_KEYS.RADIUS), 10);
+if (isNaN(currentRadius)) currentRadius = 5;
+
+// Public namespace so other scripts (DemoItems.renderCard etc) can reach helpers
+window.Swappo = window.Swappo || {};
+Swappo.userLat = () => userLat;
+Swappo.userLng = () => userLng;
+Swappo.userArea = () => userArea;
+Swappo.currentRadius = () => currentRadius;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // If we already have cached coords, paint the location bar without waiting
+  hydrateLocationBarFromCache();
+  hydrateRadiusButtons();
   initGeolocation();
   initFavorites();
   initMobileMenu();
+  // Apply saved radius filter on every page load (after a tick so cards render)
+  setTimeout(() => { if (currentRadius > 0) filterProductsByDistance(currentRadius); }, 250);
 });
+
+function hydrateLocationBarFromCache() {
+  const locationEl = document.getElementById('locationName');
+  if (!locationEl) return;
+  if (userArea) {
+    locationEl.innerHTML = `<strong>${userArea}</strong>`;
+  }
+}
+
+function hydrateRadiusButtons() {
+  const btns = document.querySelectorAll('.radius-btn');
+  if (!btns.length) return;
+  btns.forEach(b => b.classList.remove('active'));
+  btns.forEach(b => {
+    const onclick = b.getAttribute('onclick') || '';
+    const m = onclick.match(/setRadius\((\d+)/);
+    if (m && parseInt(m[1], 10) === currentRadius) b.classList.add('active');
+  });
+}
 
 function initGeolocation() {
   const locationEl = document.getElementById('locationName');
-  if (!locationEl) return;
 
   if (!navigator.geolocation) {
-    locationEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--warning);"></i> GPS not available';
+    if (locationEl) locationEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--warning);"></i> GPS not available';
     return;
   }
 
@@ -28,40 +70,45 @@ function initGeolocation() {
     (position) => {
       userLat = position.coords.latitude;
       userLng = position.coords.longitude;
+      localStorage.setItem(LS_KEYS.LAT, userLat);
+      localStorage.setItem(LS_KEYS.LNG, userLng);
 
       // Reverse geocode using OpenStreetMap Nominatim (free, no API key)
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLat}&lon=${userLng}&zoom=16&addressdetails=1`)
         .then(res => res.json())
         .then(data => {
-          const addr = data.address;
-          // Try to get neighborhood, suburb, or city
+          const addr = data.address || {};
           const area = addr.neighbourhood || addr.suburb || addr.city_district || addr.town || addr.city || 'Your area';
           const city = addr.city || addr.town || addr.state || '';
+          const display = city && city !== area ? `${area}, ${city}` : area;
 
-          locationEl.innerHTML = `<strong>${area}</strong>${city && city !== area ? ', ' + city : ''}`;
+          userArea = display;
+          localStorage.setItem(LS_KEYS.AREA, display);
 
-          // Update distances on product cards based on real position
-          updateProductDistances();
+          if (locationEl) {
+            locationEl.innerHTML = `<strong>${area}</strong>${city && city !== area ? ', ' + city : ''}`;
+          }
+          // Re-flow distance on every visible product card
+          Swappo.refreshCardDistances();
+          // Re-apply current radius (now with real distances)
+          if (currentRadius > 0) filterProductsByDistance(currentRadius);
         })
         .catch(() => {
-          locationEl.innerHTML = `<strong>${userLat.toFixed(2)}, ${userLng.toFixed(2)}</strong>`;
+          if (locationEl) locationEl.innerHTML = `<strong>${userLat.toFixed(2)}, ${userLng.toFixed(2)}</strong>`;
+          Swappo.refreshCardDistances();
         });
     },
     // Error — GPS denied or failed
     (error) => {
+      if (!locationEl) return;
+      // If we have a cached area, keep it visible — don't replace with an error message
+      if (userArea) return;
       let msg = '';
       switch(error.code) {
-        case error.PERMISSION_DENIED:
-          msg = 'Location access denied';
-          break;
-        case error.POSITION_UNAVAILABLE:
-          msg = 'Location unavailable';
-          break;
-        case error.TIMEOUT:
-          msg = 'Location timeout';
-          break;
-        default:
-          msg = 'Location error';
+        case error.PERMISSION_DENIED: msg = 'Location access denied'; break;
+        case error.POSITION_UNAVAILABLE: msg = 'Location unavailable'; break;
+        case error.TIMEOUT: msg = 'Location timeout'; break;
+        default: msg = 'Location error';
       }
       locationEl.innerHTML = `<i class="fas fa-map-marker-alt" style="color:var(--text-muted);"></i> ${msg} · <span class="location-change" onclick="retryLocation()">Try again</span>`;
     },
@@ -84,28 +131,33 @@ function retryLocation() {
 // Radius selector
 function setRadius(km, btn) {
   currentRadius = km;
+  localStorage.setItem(LS_KEYS.RADIUS, km);
 
   // Update active button
   document.querySelectorAll('.radius-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
 
-  // Filter products by distance
+  // Re-flow distances first then filter
+  Swappo.refreshCardDistances();
   filterProductsByDistance(km);
 }
 
 function filterProductsByDistance(maxKm) {
-  const cards = document.querySelectorAll('.product-card');
-  cards.forEach(card => {
-    const locEl = card.querySelector('.product-location');
-    if (!locEl) return;
+  document.querySelectorAll('.product-card').forEach(card => {
+    if (maxKm === 0) { card.style.display = ''; return; }
 
-    if (maxKm === 0) {
-      // "All UAE" — show everything
-      card.style.display = '';
+    const lat = parseFloat(card.getAttribute('data-lat'));
+    const lng = parseFloat(card.getAttribute('data-lng'));
+
+    // If we have user coords AND item coords → real distance check
+    if (userLat && userLng && !isNaN(lat) && !isNaN(lng)) {
+      const dist = calculateDistance(userLat, userLng, lat, lng);
+      card.style.display = dist <= maxKm ? '' : 'none';
       return;
     }
-
-    // Extract distance from text (e.g., "3.2 km — JBR")
+    // Fallback: parse "X km" from .product-location text
+    const locEl = card.querySelector('.product-location');
+    if (!locEl) return;
     const match = locEl.textContent.match(/([\d.]+)\s*km/);
     if (match) {
       const dist = parseFloat(match[1]);
@@ -114,15 +166,41 @@ function filterProductsByDistance(maxKm) {
   });
 }
 
-// Simulated distances for prototype (in production, calculated from GPS coords)
+// Re-render distance text on every visible card from current GPS
+Swappo.refreshCardDistances = function() {
+  document.querySelectorAll('.product-card').forEach(card => {
+    const locEl = card.querySelector('.product-location');
+    if (!locEl) return;
+    const lat = parseFloat(card.getAttribute('data-lat'));
+    const lng = parseFloat(card.getAttribute('data-lng'));
+    const fallback = card.getAttribute('data-city') || '';
+    let label = fallback;
+    if (userLat && userLng && !isNaN(lat) && !isNaN(lng)) {
+      const dist = calculateDistance(userLat, userLng, lat, lng);
+      label = Swappo.formatDistance(dist);
+    }
+    locEl.innerHTML = '<i class="fas fa-map-marker-alt"></i> ' + label;
+  });
+};
+
+Swappo.formatDistance = function(km) {
+  if (km == null || isNaN(km)) return '';
+  if (km < 1) return Math.round(km * 1000) + ' m';
+  if (km < 10) return km.toFixed(1) + ' km';
+  return Math.round(km) + ' km';
+};
+
+// Public helper for one-off uses (eg. product detail page)
+Swappo.distanceTo = function(lat, lng) {
+  if (!userLat || !userLng || !lat || !lng) return null;
+  return calculateDistance(userLat, userLng, lat, lng);
+};
+
 function updateProductDistances() {
-  // In production: calculate real distance between user coords and product coords
-  // For prototype: distances are already hardcoded in HTML
-  console.log('User position:', userLat, userLng);
+  Swappo.refreshCardDistances();
 }
 
 // Calculate distance between two GPS points (Haversine formula)
-// Ready for production use
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180;

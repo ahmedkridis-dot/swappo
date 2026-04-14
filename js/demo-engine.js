@@ -35,6 +35,16 @@ function _getArray(key) {
   return _get(key) || [];
 }
 
+/** SAFE JSON.parse from localStorage with fallback (M-6) */
+function _safeParse(key, fallback) {
+  try {
+    var raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    var parsed = JSON.parse(raw);
+    return parsed == null ? fallback : parsed;
+  } catch (e) { return fallback; }
+}
+
 function _uid() {
   return 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
 }
@@ -65,6 +75,23 @@ function _conditionLabel(c) {
   return map[c] || c;
 }
 
+/** SAFE — escape HTML for use in text nodes AND attribute values (quotes covered) */
+function _esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, function(c) {
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+
+/** SAFE — allow only http(s) and relative URLs as image sources; blocks javascript:/data:/vbscript: */
+function _safeUrl(u) {
+  if (!u) return '';
+  var s = String(u).trim();
+  if (/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(s)) return _esc(s);
+  if (/^data:image\//i.test(s)) return _esc(s);
+  return '';
+}
+
 /** Get category metadata for display */
 function _categoryMeta(catKey) {
   const meta = (window.CATEGORY_META || []).find(m => m.key === catKey);
@@ -79,14 +106,33 @@ const DemoAuth = {
 
   /** Sign up a new user. Returns { success, user?, error? } */
   signUp(email, password, name, extras = {}) {
+    // H-2 fix — enforce validation server-side in the JS function, not just via HTML input patterns.
     if (!email || !password || !name) {
       return { success: false, error: 'All fields are required.' };
     }
-    if (password.length < 6) {
-      return { success: false, error: 'Password must be at least 6 characters.' };
+    email = String(email).trim().toLowerCase();
+    name = String(name).trim();
+    extras = extras || {};
+    // Email format
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      return { success: false, error: 'Invalid email address.' };
     }
-    email = email.trim().toLowerCase();
-    name = name.trim();
+    // Password minimum
+    if (String(password).length < 8) {
+      return { success: false, error: 'Password must be at least 8 characters.' };
+    }
+    // Name — 2-50 chars, letters / spaces / hyphens / apostrophes (Latin + common Arabic/Cyrillic)
+    if (name.length < 2 || name.length > 50 || !/^[\p{L}\p{M}\s'\-]{2,50}$/u.test(name)) {
+      return { success: false, error: 'Invalid name (2-50 letters only).' };
+    }
+    // Pseudo — must match the HTML pattern if provided
+    if (extras.pseudo != null && extras.pseudo !== '' && !/^[a-zA-Z0-9_]{3,20}$/.test(String(extras.pseudo))) {
+      return { success: false, error: 'Invalid username (3-20 chars: letters, numbers, underscore).' };
+    }
+    // Phone — UAE format 5XXXXXXXX when provided
+    if (extras.phone != null && extras.phone !== '' && !/^5[0-9]{8}$/.test(String(extras.phone).replace(/\s|\+971|-/g, ''))) {
+      return { success: false, error: 'Invalid UAE phone number.' };
+    }
 
     // Check demo users
     if (email === DEMO_USER.email || (typeof DEMO_USER_FREE !== 'undefined' && email === DEMO_USER_FREE.email)) {
@@ -644,16 +690,26 @@ const DemoItems = {
       .slice(0, limit);
   },
 
-  /** Render a product card HTML string */
+  /** Render a product card HTML string — all user-controlled strings escaped (H-3) */
   renderCard(item) {
     if (!item) return '';
 
-    const href = _productHref(item.id);
-    const title = (item.brand + ' ' + item.model).trim();
-    const photo = (item.photos && item.photos[0]) || '';
+    const href = _esc(_productHref(item.id));
+    const title = _esc(((item.brand || '') + ' ' + (item.model || '')).trim());
+    const photo = _safeUrl((item.photos && item.photos[0]) || '');
     const fav = this.isFavorited(item.id);
-    const conditionStr = item.condition ? _conditionLabel(item.condition) : '';
+    const conditionStr = item.condition ? _esc(_conditionLabel(item.condition)) : '';
     const catMeta = _categoryMeta(item.category);
+    const itemIdAttr = _esc(item.id);
+    const catSafe = _esc(item.category || '');
+
+    // Distance (or city fallback) — uses Swappo helpers from app.js if loaded
+    let locationLabel = item.city || '';
+    if (window.Swappo && Swappo.distanceTo) {
+      const km = Swappo.distanceTo(item.lat, item.lng);
+      if (km != null) locationLabel = Swappo.formatDistance(km);
+    }
+    const locSafe = _esc(locationLabel);
 
     // Price + mode badges (v5 marketplace)
     let priceHTML = '';
@@ -662,16 +718,21 @@ const DemoItems = {
       priceHTML = '<div class="product-price" style="color:var(--secondary);font-weight:800;font-size:15px;">FREE</div>';
       modesHTML = '<span class="mode-badge mode-gift" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#ECFDF5;color:#065F46;">Gift</span>';
     } else {
-      const price = item.price || 0;
-      priceHTML = '<div class="product-price" style="font-weight:800;font-size:15px;color:#1A1A2E;">' + price.toLocaleString() + ' <span style="font-size:11px;font-weight:600;color:#6B7280;">AED</span></div>';
+      const price = Number(item.price) || 0;
+      priceHTML = '<div class="product-price" style="font-weight:800;font-size:15px;color:#1A1A2E;">' + _esc(price.toLocaleString()) + ' <span style="font-size:11px;font-weight:600;color:#6B7280;">AED</span></div>';
       modesHTML = '<span class="mode-badge mode-swap" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>' +
         '<span class="mode-badge mode-buy" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>';
     }
 
-    return '<div class="product-card" onclick="window.location.href=\'' + href + '\'" style="cursor:pointer">' +
+    const latSafe = _esc(item.lat != null ? item.lat : '');
+    const lngSafe = _esc(item.lng != null ? item.lng : '');
+    const citySafe = _esc(item.city || '');
+    const dataAttrs = ' data-lat="' + latSafe + '" data-lng="' + lngSafe + '" data-city="' + citySafe + '" data-item-id="' + itemIdAttr + '"';
+
+    return '<div class="product-card"' + dataAttrs + ' data-href="' + href + '" onclick="if(!event.target.closest(\'.product-fav\'))window.location.href=this.dataset.href" style="cursor:pointer">' +
       '<div class="product-img">' +
-        '<img src="' + photo + '" alt="' + title + '" loading="lazy">' +
-        '<button class="product-fav" style="top:8px; bottom:auto;" onclick="event.stopPropagation(); DemoItems.toggleFavorite(\'' + item.id + '\'); this.querySelector(\'i\').className = DemoItems.isFavorited(\'' + item.id + '\') ? \'fas fa-heart\' : \'far fa-heart\';">' +
+        (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '<div style="width:100%;height:100%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>') +
+        '<button class="product-fav" type="button" style="top:8px; bottom:auto;" data-fav-id="' + itemIdAttr + '" onclick="event.stopPropagation(); var id=this.dataset.favId; DemoItems.toggleFavorite(id); this.querySelector(\'i\').className = DemoItems.isFavorited(id) ? \'fas fa-heart\' : \'far fa-heart\';">' +
           '<i class="' + (fav ? 'fas fa-heart' : 'far fa-heart') + '"></i>' +
         '</button>' +
       '</div>' +
@@ -679,7 +740,8 @@ const DemoItems = {
         '<div class="product-brand">' + title + '</div>' +
         (conditionStr ? '<div class="product-details">' + conditionStr + '</div>' : '') +
         priceHTML +
-        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">' + modesHTML +
+        (locSafe ? '<div class="product-location" style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:#6B7280;margin-top:4px;font-weight:500;"><i class="fas fa-map-marker-alt" style="color:#09B1BA;font-size:0.7rem;"></i> ' + locSafe + '</div>' : '') +
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">' + modesHTML +
           (['furniture', 'vehicles', 'sports'].includes(item.category) ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FDF2F8;color:#9D174D;">🚛 Truck</span>' : '') +
         '</div>' +
       '</div>' +
@@ -1013,19 +1075,38 @@ const DemoChat = {
     return { success: true, messages, wasFiltered };
   },
 
-  /** Filter contact info from message text */
+  /** Filter contact info from message text — M-1 hardened */
   filterContactInfo(text) {
     if (!text) return text;
 
     // Phone numbers: sequences of 7+ digits (with optional separators)
     text = text.replace(/(\+?\d[\d\s\-().]{6,}\d)/g, '***');
 
-    // Email addresses
+    // Email addresses (standard form)
     text = text.replace(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g, '***');
+    // Obfuscated emails like "name at gmail dot com", "name_at_gmail_dot_com"
+    text = text.replace(/\b[a-zA-Z0-9._%+\-]+\s*[\[\(_]?\s*(?:at|arobase|@)\s*[\]\)_]?\s*[a-zA-Z0-9.\-]+\s*[\[\(_]?\s*(?:dot|point|\.)\s*[\]\)_]?\s*[a-zA-Z]{2,}\b/gi, '***');
 
     // URLs: http, https, www
     text = text.replace(/https?:\/\/[^\s]+/gi, '***');
     text = text.replace(/www\.[^\s]+/gi, '***');
+
+    // Bare domain names (evil.com, dubizzle.ae, etc.) — common TLDs only
+    text = text.replace(/\b[a-z0-9][a-z0-9\-]{1,62}\.(com|ae|net|org|io|co|me|app|xyz|store|shop|online|site|biz|info|dev|tech|fr|uk|de|es|it|ma|tn|sa)\b/gi, '***');
+
+    // Social handles: @abc, @user_123 (≥3 chars)
+    text = text.replace(/(?:^|[\s\u00A0(,;:.!?-])@[a-zA-Z0-9_.]{3,30}/g, function(m) {
+      return m.replace(/@.*/, '***');
+    });
+
+    // Keycap-emoji digits: 0️⃣1️⃣2️⃣... Strip any run of ≥5 keycap emojis.
+    // Keycap is DIGIT + U+FE0F + U+20E3. This regex matches that sequence.
+    text = text.replace(/(?:[0-9]\uFE0F\u20E3\s*){5,}/g, '***');
+
+    // Spelled-out digit sequences (EN + FR). If ≥7 consecutive digit words, redact the run.
+    var digitWords = '(?:zero|one|two|three|four|five|six|seven|eight|nine|oh|z[eé]ro|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf)';
+    var spelledRe = new RegExp('(?:\\b' + digitWords + '\\b[\\s,\\-]*){7,}', 'gi');
+    text = text.replace(spelledRe, '***');
 
     return text;
   },
@@ -1332,7 +1413,7 @@ function updateNavbarForDemo() {
           '<span class="nav-dashboard-hello">' + firstName + '</span>' +
           '<span class="nav-dashboard-label"><i class="fas fa-th-large"></i> My dashboard</span>' +
         '</div>' +
-        '<button class="nav-logout-btn" onclick="event.stopPropagation();event.preventDefault();DemoAuth.signOut();window.location.href=\'' + loginPath + '\';" title="Sign out" aria-label="Sign out"><i class="fas fa-sign-out-alt"></i></button>';
+        '<button class="nav-logout-btn" onclick="event.stopPropagation();event.preventDefault();(async function(){try{if(window.SwappoAuth&&window.SwappoAuth.isReady())await window.SwappoAuth.signOut();}catch(e){}DemoAuth.signOut();window.location.href=\'' + loginPath + '\';})();" title="Sign out" aria-label="Sign out"><i class="fas fa-sign-out-alt"></i></button>';
       avatarArea.style.display = 'inline-flex';
 
       // Inject styles once
@@ -1358,12 +1439,21 @@ function updateNavbarForDemo() {
     }
   }
 
+  // ── Hide generic profile icon when logged in (avoid duplicate with dashboard pill) ──
+  const profileIcons = document.querySelectorAll('a.navbar-icon[href*="profile"]');
+  profileIcons.forEach(icon => {
+    icon.style.display = user ? 'none' : '';
+  });
+
   // ── Chat badge ────────────────────────────────────────────────────────
   const chatLinks = document.querySelectorAll('a[href*="chat"]');
   chatLinks.forEach(link => {
-    // Remove old badge
+    // Remove old dynamic badge
     const oldBadge = link.querySelector('.chat-badge');
     if (oldBadge) oldBadge.remove();
+    // Remove static placeholder badge (hardcoded in some page templates)
+    const staticBadge = link.querySelector('.badge-count');
+    if (staticBadge) staticBadge.remove();
 
     if (user) {
       const unread = DemoChat.getUnreadCount();
@@ -1455,7 +1545,7 @@ const DemoEarlyAdopter = {
     localStorage.setItem(this.STORAGE_KEY, count.toString());
 
     // Mark user as pioneer
-    const pioneers = JSON.parse(localStorage.getItem('swappo_pioneers') || '[]');
+    const pioneers = _safeParse('swappo_pioneers', []);
     if (!pioneers.includes(userId)) {
       pioneers.push(userId);
       localStorage.setItem('swappo_pioneers', JSON.stringify(pioneers));
@@ -1470,7 +1560,7 @@ const DemoEarlyAdopter = {
   },
 
   isPioneer(userId) {
-    const pioneers = JSON.parse(localStorage.getItem('swappo_pioneers') || '[]');
+    const pioneers = _safeParse('swappo_pioneers', []);
     // Also check mock users - first 5 mock users are pioneers
     const mockPioneers = ['user-1', 'user-2', 'user-3', 'user-7'];
     return pioneers.includes(userId) || mockPioneers.includes(userId);
@@ -1491,7 +1581,7 @@ const DemoSuggestions = {
     var userCategories = [...new Set(userItems.map(function(i) { return i.category; }))];
 
     // Get browsing history (stored categories)
-    var browsed = JSON.parse(localStorage.getItem('swappo_browsed_categories') || '[]');
+    var browsed = _safeParse('swappo_browsed_categories', []);
     var interestCategories = [...new Set([...userCategories, ...browsed])];
 
     // Find matching items from other users
@@ -1519,7 +1609,7 @@ const DemoSuggestions = {
 
   trackBrowsedCategory(category) {
     if (!category) return;
-    var browsed = JSON.parse(localStorage.getItem('swappo_browsed_categories') || '[]');
+    var browsed = _safeParse('swappo_browsed_categories', []);
     if (!browsed.includes(category)) {
       browsed.push(category);
       if (browsed.length > 10) browsed.shift();
@@ -1573,7 +1663,7 @@ const DemoBadges = {
     }
 
     // Generous (5+ giveaways)
-    var allItems = [...(window.MOCK_ITEMS || []), ...(JSON.parse(localStorage.getItem('swappo_user_items') || '[]'))];
+    var allItems = [...(window.MOCK_ITEMS || []), ..._safeParse('swappo_user_items', [])];
     var giveaways = allItems.filter(function(i) { return i.user_id === userId && i.is_giveaway; });
     if (giveaways.length >= 5) {
       badges.push(SPECIAL_BADGES.find(function(b) { return b.id === 'generous'; }));
@@ -1834,20 +1924,24 @@ const DemoQR = {
     overlay.id = 'rating-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:9600;display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.innerHTML =
-      '<div style="background:#fff;border-radius:24px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);">' +
-        '<div style="font-size:48px;margin-bottom:12px;">⭐</div>' +
-        '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 8px;">Rate this exchange</h3>' +
-        '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">How was your experience?</p>' +
-        '<div id="rating-stars" style="font-size:36px;cursor:pointer;margin-bottom:16px;letter-spacing:8px;">' +
+      '<style>@keyframes swapPulseModal{0%,100%{transform:scale(1);box-shadow:0 8px 24px rgba(9,177,186,0.35)}50%{transform:scale(1.08);box-shadow:0 10px 32px rgba(9,177,186,0.55)}}</style>' +
+      '<div style="background:linear-gradient(180deg,#E6F7F8 0%,#FFFFFF 55%);border-radius:24px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);border:1.5px solid #09B1BA;">' +
+        '<div style="display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#09B1BA,#078A91);margin-bottom:14px;animation:swapPulseModal 1.8s ease-in-out infinite;">' +
+          '<span style="font-size:44px;">🤝</span>' +
+        '</div>' +
+        '<h3 style="font-size:30px;font-weight:900;color:#09B1BA;margin:0 0 4px;letter-spacing:-0.03em;">Swapped!</h3>' +
+        '<p style="font-size:13px;color:#078A91;font-weight:600;margin:0 0 4px;">Another deal sealed the Swappo way</p>' +
+        '<p style="font-size:12px;color:#6B7280;margin:0 0 20px;">Rate your experience — help build community trust</p>' +
+        '<div id="rating-stars" style="font-size:38px;cursor:pointer;margin-bottom:16px;letter-spacing:8px;color:#FFB800;">' +
           '<span onclick="DemoQR.setStars(1)" data-star="1">☆</span>' +
           '<span onclick="DemoQR.setStars(2)" data-star="2">☆</span>' +
           '<span onclick="DemoQR.setStars(3)" data-star="3">☆</span>' +
           '<span onclick="DemoQR.setStars(4)" data-star="4">☆</span>' +
           '<span onclick="DemoQR.setStars(5)" data-star="5">☆</span>' +
         '</div>' +
-        '<textarea id="rating-comment" maxlength="200" placeholder="Optional comment..." style="width:100%;height:60px;border:1px solid #E5E7EB;border-radius:12px;padding:12px;font-family:inherit;font-size:13px;resize:none;margin-bottom:16px;"></textarea>' +
-        '<button id="submit-rating-btn" onclick="DemoQR.submitRating(\'' + swapId + '\')" style="width:100%;padding:14px;border:none;border-radius:12px;background:#09B1BA;color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Submit Rating</button>' +
-        '<button onclick="document.getElementById(\'rating-overlay\').remove();" style="width:100%;padding:10px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;margin-top:4px;">Skip</button>' +
+        '<textarea id="rating-comment" maxlength="200" placeholder="Leave a kind word for your swap partner..." style="width:100%;height:60px;border:1px solid #E5E7EB;border-radius:12px;padding:12px;font-family:inherit;font-size:13px;resize:none;margin-bottom:16px;background:#fff;"></textarea>' +
+        '<button id="submit-rating-btn" onclick="DemoQR.submitRating(\'' + swapId + '\')" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#09B1BA,#078A91);color:#fff;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 6px 18px rgba(9,177,186,0.35);letter-spacing:0.01em;">🤝 Seal the Swap</button>' +
+        '<button onclick="document.getElementById(\'rating-overlay\').remove();" style="width:100%;padding:10px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;margin-top:4px;">Maybe later</button>' +
       '</div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });

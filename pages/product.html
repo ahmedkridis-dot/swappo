@@ -3,11 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="View item details on Swappo. Propose a swap, buy with cash, or combine both on the UAE's first barter, gift & recycle marketplace.">
+  <link rel="canonical" href="https://swappo.ae/pages/product.html">
+  <meta property="og:title" content="Product — Swappo">
+  <meta property="og:description" content="Swap, buy, or gift items across the UAE on Swappo.">
+  <meta property="og:type" content="product">
+  <meta property="og:url" content="https://swappo.ae/pages/product.html">
+  <meta property="og:image" content="https://swappo.ae/assets/brand/swappo-logo-master.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/swappo-logo-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/brand/swappo-logo-192.png">
   <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
-  <title>Loading... — Swappo</title>
+  <title>Product — Swappo</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -528,6 +537,9 @@
 <script src="../js/animations.js"></script>
 <script src="../js/cookie-consent.js"></script>
 <script src="../js/i18n.js"></script>
+<script src="../js/register-sw.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
 <script src="../js/app.js"></script>
 <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -699,8 +711,11 @@
     });
 
     detailsHTML += '<div class="location-row"><i class="fas fa-map-marker-alt" style="color:var(--primary);"></i>';
-    if (item.distance) {
-      detailsHTML += '<strong>' + item.distance + ' km</strong> ' + t('detail_away') + ' \u2014 ';
+    // Real GPS-based distance (Swappo helper from app.js) — falls back to mock value if no GPS
+    var realDist = (window.Swappo && Swappo.distanceTo) ? Swappo.distanceTo(item.lat, item.lng) : null;
+    var distLabel = realDist != null ? Swappo.formatDistance(realDist) : (item.distance ? item.distance + ' km' : null);
+    if (distLabel) {
+      detailsHTML += '<strong>' + distLabel + '</strong> ' + t('detail_away') + ' \u2014 ';
     }
     detailsHTML += (item.city || 'UAE') + '</div>';
 

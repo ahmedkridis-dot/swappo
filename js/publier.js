@@ -2,7 +2,21 @@
 // PUBLIER.JS — Drop an Item page logic
 // ========================
 
-console.log('[PUBLIER] Script loaded');
+// SAFE — escape HTML for use in text AND attributes (blocks XSS H-4)
+function _pubEsc(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, function(c) {
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+// SAFE — only allow http(s), data:image, and relative URLs in image sources
+function _pubSafeUrl(u) {
+  if (!u) return '';
+  var s = String(u).trim();
+  if (/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(s)) return _pubEsc(s);
+  if (/^data:image\//i.test(s)) return _pubEsc(s);
+  return '';
+}
 
 // ========================
 // AUTH CHECK
@@ -389,10 +403,20 @@ window.refreshPhotoGrid = function() {
   slots.forEach(function(slot, idx) {
     if (formState.photos[idx]) {
       slot.classList.add('filled');
-      slot.innerHTML = '<img src="' + formState.photos[idx] + '" alt="Photo ' + (idx + 1) + '">';
+      // SAFE: use createElement + img.src instead of innerHTML concat (H-4)
+      slot.textContent = '';
+      var img = document.createElement('img');
+      img.alt = 'Photo ' + (idx + 1);
+      var u = String(formState.photos[idx]).trim();
+      if (/^(https?:\/\/|\/|\.\/|\.\.\/|data:image\/)/i.test(u)) img.src = u;
+      slot.appendChild(img);
     } else {
       slot.classList.remove('filled');
-      slot.innerHTML = '<div class="photo-placeholder">+</div>';
+      slot.textContent = '';
+      var ph = document.createElement('div');
+      ph.className = 'photo-placeholder';
+      ph.textContent = '+';
+      slot.appendChild(ph);
     }
   });
 }
@@ -405,10 +429,12 @@ window.populateReview = function() {
   var catLabel = (typeof t === 'function') ? t(catKey) : (categoryNames[formState.category] || 'Other');
   document.getElementById('reviewCategory').textContent = catLabel;
 
+  // SAFE: escape photo URLs + details values (H-4 fix)
   var photosHtml = '';
   for (var i = 0; i < 4; i++) {
     if (formState.photos[i]) {
-      photosHtml += '<div class="review-photo-thumb"><img src="' + formState.photos[i] + '" alt="Photo"></div>';
+      var safeSrc = _pubSafeUrl(formState.photos[i]);
+      photosHtml += '<div class="review-photo-thumb">' + (safeSrc ? '<img src="' + safeSrc + '" alt="Photo">' : '') + '</div>';
     } else {
       photosHtml += '<div class="review-photo-thumb">+</div>';
     }
@@ -422,8 +448,8 @@ window.populateReview = function() {
     var val = formState.details[key];
     if (val) {
       detailsHtml += '<div class="review-section">' +
-        '<div class="review-label">' + getFieldLabel(key, key) + '</div>' +
-        '<div class="review-value">' + val + '</div>' +
+        '<div class="review-label">' + _pubEsc(getFieldLabel(key, key)) + '</div>' +
+        '<div class="review-value">' + _pubEsc(val) + '</div>' +
         '</div>';
     }
   });

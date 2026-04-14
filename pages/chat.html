@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="SwapChat — Swappo's in-app messaging for swappers. Negotiate, agree on meetup spots, and confirm exchanges safely in the UAE's first barter, gift & recycle platform.">
+  <link rel="canonical" href="https://swappo.ae/pages/chat.html">
+  <meta property="og:title" content="SwapChat — Swappo">
+  <meta property="og:description" content="Secure in-app chat for negotiating swaps, buys, and gifts in the UAE.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://swappo.ae/pages/chat.html">
+  <meta property="og:image" content="https://swappo.ae/assets/brand/swappo-logo-master.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/swappo-logo-32.png">
   <title>SwapChat — Swappo</title>
@@ -25,7 +34,7 @@
     grid-template-columns: minmax(260px, 300px) 1fr minmax(300px, 360px);
     height: calc(100vh - 64px);
     overflow: hidden;
-    max-width: 100vw;
+    max-width: 100%;
   }
 
   /* ═══════════════════════════════════════════
@@ -998,9 +1007,15 @@
     #mobileBackBtn { display: inline-flex !important; }
   }
   @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes swapPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(9,177,186,0.35); }
+    50% { transform: scale(1.08); box-shadow: 0 10px 32px rgba(9,177,186,0.55); }
+  }
+    .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   </style>
 </head>
 <body>
+  <h1 class="sr-only">SwapChat — in-app messaging on Swappo</h1>
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container">
@@ -1096,6 +1111,9 @@
   <script src="../js/mock-data.js"></script>
   <script src="../js/demo-engine.js"></script>
   <script src="../js/i18n.js"></script>
+  <script src="../js/register-sw.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
   <script src="../js/mega-menu.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script>
@@ -1150,6 +1168,30 @@
 
   function initial(n) { return n ? n.charAt(0).toUpperCase() : '?'; }
   function timeAgo(d) { if (!d) return ''; var m = Math.floor((Date.now() - new Date(d).getTime()) / 60000); if (m < 1) return 'now'; if (m < 60) return m + 'm'; var h = Math.floor(m / 60); return h < 24 ? h + 'h' : Math.floor(h / 24) + 'd'; }
+  // SAFE HTML escaping — blocks stored-XSS via innerHTML concatenation
+  function escapeHTML(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  // Allow only http(s) or data:image URLs for <img src=> — blocks javascript:/vbscript:/file:
+  function safeImgUrl(u) {
+    if (!u) return '';
+    var s = String(u).trim();
+    if (/^(https?:|data:image\/)/i.test(s)) return escapeHTML(s);
+    if (s.charAt(0) === '/' || s.indexOf('./') === 0 || s.indexOf('../') === 0) return escapeHTML(s);
+    return '';
+  }
+  // Accept only CSS color-ish strings (no ; or " or newlines) — blocks style injection
+  function safeColor(c) {
+    if (!c) return '#09B1BA';
+    var s = String(c).trim();
+    if (/^#[0-9a-fA-F]{3,8}$/.test(s)) return s;
+    if (/^(rgb|rgba|hsl|hsla)\([0-9.,\s%]+\)$/.test(s)) return s;
+    if (/^[a-zA-Z]{3,20}$/.test(s)) return s;
+    return '#09B1BA';
+  }
 
   // ═══ SIDEBAR FILTERS ═══
   function setSbFilter(filter) {
@@ -1207,16 +1249,25 @@
       else if (dealType === 'gift') dealTypeHTML = '<span class="sb-deal-type gift"><i class="fas fa-gift"></i> Gift</span>';
       if (cash > 0) dealTypeHTML += '<span class="sb-deal-amount">' + cash.toLocaleString() + ' AED</span>';
 
-      return '<div class="sb-card' + (c.id === activeConvId ? ' active' : '') + '" onclick="openConv(\'' + c.id + '\')">' +
-        '<div class="sb-avatar" style="background:' + (o.avatar_color || '#09B1BA') + '">' + initial(o.name) +
+      // SAFE: escape all user-controlled strings before HTML concatenation (C-1 stored-XSS fix)
+      var safeConvId = escapeHTML(c.id);
+      var safeName = escapeHTML(o.name || 'User');
+      var safePreview = escapeHTML(preview);
+      var safeAvatarColor = safeColor(o.avatar_color || '#09B1BA');
+      var safePhoto = safeImgUrl(photo);
+      var safeTime = escapeHTML(time);
+      var safeUnread = escapeHTML(String(c.unread_count || 0));
+
+      return '<div class="sb-card' + (c.id === activeConvId ? ' active' : '') + '" onclick="openConv(\'' + safeConvId + '\')">' +
+        '<div class="sb-avatar" style="background:' + safeAvatarColor + '">' + escapeHTML(initial(o.name)) +
         (status === 'accepted' ? '<span class="sb-online"></span>' : '') + '</div>' +
         '<div class="sb-meta">' +
-          '<div class="sb-row"><span class="sb-name">' + (o.name || 'User') + '</span><span class="sb-time">' + time + '</span></div>' +
-          '<div class="sb-preview">' + preview + '</div>' +
+          '<div class="sb-row"><span class="sb-name">' + safeName + '</span><span class="sb-time">' + safeTime + '</span></div>' +
+          '<div class="sb-preview">' + safePreview + '</div>' +
           '<div class="sb-deal-info">' + dealTypeHTML + '</div>' +
         '</div>' +
-        (photo ? '<img class="sb-thumb" src="' + photo + '" alt="" loading="lazy">' : '') +
-        (c.unread_count > 0 ? '<span class="sb-unread">' + c.unread_count + '</span>' : '') +
+        (safePhoto ? '<img class="sb-thumb" src="' + safePhoto + '" alt="" loading="lazy">' : '') +
+        (c.unread_count > 0 ? '<span class="sb-unread">' + safeUnread + '</span>' : '') +
       '</div>';
     }).join('');
 
@@ -1278,7 +1329,7 @@
       if (m.is_system || m.sender_id === 'system') {
         var el = document.createElement('div');
         el.className = 'msg-sys';
-        el.innerHTML = m.content;
+        el.textContent = m.content; // SAFE — fixes stored-XSS C-1 on system messages
         area.appendChild(el);
         return;
       }
@@ -1290,11 +1341,26 @@
       var isMine = m.sender_id === (currentUser ? currentUser.id : '');
       var div = document.createElement('div');
       div.className = 'msg ' + (isMine ? 'sent' : 'recv');
-      div.innerHTML =
-        '<div class="msg-av" style="background:' + (isMine ? myColor : (o.avatar_color || '#6B7280')) + '">' + initial(isMine ? currentUser.name : o.name) + '</div>' +
-        '<div class="msg-bubble">' + m.content + '</div>' +
-        '<span class="msg-time">' + (m.created_at ? new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '') +
-        (isMine ? '<span class="msg-read"> ✓✓</span>' : '') + '</span>';
+      // Build with DOM + textContent (fixes stored-XSS C-1).
+      var av = document.createElement('div');
+      av.className = 'msg-av';
+      av.style.background = isMine ? myColor : (o.avatar_color || '#6B7280');
+      av.textContent = initial(isMine ? currentUser.name : o.name);
+      var bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = m.content; // SAFE
+      var time = document.createElement('span');
+      time.className = 'msg-time';
+      time.textContent = m.created_at ? new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+      if (isMine) {
+        var read = document.createElement('span');
+        read.className = 'msg-read';
+        read.textContent = ' \u2713\u2713';
+        time.appendChild(read);
+      }
+      div.appendChild(av);
+      div.appendChild(bubble);
+      div.appendChild(time);
       area.appendChild(div);
     });
 
@@ -1424,21 +1490,26 @@
     return div;
   }
 
-  // Rating Card
+  // Rating Card — Swappo branded "Swapped!" celebration
   function createRatingCard(convId) {
     var div = document.createElement('div');
     div.className = 'smart-card success';
+    div.style.background = 'linear-gradient(135deg, #E6F7F8 0%, #FFFFFF 70%)';
+    div.style.border = '1.5px solid #09B1BA';
     div.innerHTML =
-      '<div style="text-align:center;">' +
-        '<div style="font-size:48px;margin-bottom:8px;">🎉</div>' +
-        '<div style="font-size:18px;font-weight:800;color:#1A1A2E;margin-bottom:4px;">Exchange Complete!</div>' +
-        '<div style="font-size:13px;color:#6B7280;margin-bottom:20px;">How was your experience?</div>' +
+      '<div style="text-align:center;padding:8px 4px;">' +
+        '<div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#09B1BA,#078A91);margin-bottom:12px;box-shadow:0 8px 24px rgba(9,177,186,0.35);animation:swapPulse 1.8s ease-in-out infinite;">' +
+          '<span style="font-size:38px;">🤝</span>' +
+        '</div>' +
+        '<div style="font-size:26px;font-weight:900;color:#09B1BA;margin-bottom:2px;letter-spacing:-0.03em;">Swapped!</div>' +
+        '<div style="font-size:13px;color:#078A91;font-weight:600;margin-bottom:4px;">Another deal sealed the Swappo way</div>' +
+        '<div style="font-size:12px;color:#6B7280;margin-bottom:18px;">Rate your experience — help the community trust</div>' +
         '<div id="ratingStars" style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;">' +
           [1,2,3,4,5].map(function(i) {
-            return '<span onclick="setRating(' + i + ')" style="font-size:32px;cursor:pointer;transition:transform 0.2s;" onmouseenter="this.style.transform=\'scale(1.2)\'" onmouseleave="this.style.transform=\'scale(1)\'">☆</span>';
+            return '<span onclick="setRating(' + i + ')" style="font-size:34px;cursor:pointer;transition:transform 0.2s;color:#FFB800;" onmouseenter="this.style.transform=\'scale(1.25) rotate(-8deg)\'" onmouseleave="this.style.transform=\'scale(1)\'">☆</span>';
           }).join('') +
         '</div>' +
-        '<button class="sc-btn primary" onclick="submitRating(\'' + convId + '\')"><i class="fas fa-paper-plane"></i> Submit Rating</button>' +
+        '<button class="sc-btn primary" style="background:linear-gradient(135deg,#09B1BA,#078A91);box-shadow:0 6px 18px rgba(9,177,186,0.35);" onclick="submitRating(\'' + convId + '\')"><i class="fas fa-handshake"></i> Seal the Swap</button>' +
       '</div>';
     return div;
   }
@@ -1612,29 +1683,42 @@
     document.getElementById('dpEmpty').style.display = 'none';
     document.getElementById('dpContent').style.display = '';
 
-    // Items
+    // Items — all user-controlled strings escaped (C-1 stored-XSS hardening)
     var itemsHTML = '<div class="dp-items">';
     if (theirItem) {
       var theirPhoto = theirItem.photos ? theirItem.photos[0] : '';
-      itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + theirItem.id + '\')">' +
-        (theirPhoto ? '<img class="dp-item-photo" src="' + theirPhoto + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
+      var theirPhotoSafe = safeImgUrl(theirPhoto);
+      var theirIdSafe = escapeHTML(theirItem.id);
+      var theirName = escapeHTML(((theirItem.brand || '') + ' ' + (theirItem.model || '')).trim());
+      var theirCond = escapeHTML(theirItem.condition || '');
+      var theirLoc = escapeHTML(theirItem.emirate || theirItem.city || '');
+      var theirPrice = escapeHTML((theirItem.price || 0).toLocaleString());
+      itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + theirIdSafe + '\')">' +
+        (theirPhotoSafe ? '<img class="dp-item-photo" src="' + theirPhotoSafe + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
         '<div class="dp-item-body"><div class="dp-item-label theirs">THEIR ITEM</div>' +
-        '<div class="dp-item-name">' + ((theirItem.brand || '') + ' ' + (theirItem.model || '')).trim() + '</div>' +
-        '<div class="dp-item-meta">' + (theirItem.condition || '') + ' · ' + (theirItem.emirate || theirItem.city || '') + '</div>' +
-        '<div class="dp-item-price">' + (theirItem.price || 0).toLocaleString() + ' AED</div></div></div>';
+        '<div class="dp-item-name">' + theirName + '</div>' +
+        '<div class="dp-item-meta">' + theirCond + ' · ' + theirLoc + '</div>' +
+        '<div class="dp-item-price">' + theirPrice + ' AED</div></div></div>';
     } else if (map.type === 'purchase') {
+      var cashSafe = escapeHTML(cash.toLocaleString());
       itemsHTML += '<div class="dp-item"><div class="dp-item-photo" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);display:flex;align-items:center;justify-content:center;font-size:36px;">💰</div>' +
-        '<div class="dp-item-body"><div class="dp-item-label theirs">CASH PURCHASE</div><div class="dp-item-name">Full cash offer</div><div class="dp-item-price">' + cash.toLocaleString() + ' AED</div></div></div>';
+        '<div class="dp-item-body"><div class="dp-item-label theirs">CASH PURCHASE</div><div class="dp-item-name">Full cash offer</div><div class="dp-item-price">' + cashSafe + ' AED</div></div></div>';
     }
     itemsHTML += '<div class="dp-arrow"><span><i class="fas fa-exchange-alt"></i></span></div>';
     if (myItem) {
       var myPhoto = myItem.photos ? myItem.photos[0] : '';
-      itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + myItem.id + '\')">' +
-        (myPhoto ? '<img class="dp-item-photo" src="' + myPhoto + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F0FBFC;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
+      var myPhotoSafe = safeImgUrl(myPhoto);
+      var myIdSafe = escapeHTML(myItem.id);
+      var myName = escapeHTML(((myItem.brand || '') + ' ' + (myItem.model || '')).trim());
+      var myCond = escapeHTML(myItem.condition || '');
+      var myLoc = escapeHTML(myItem.emirate || myItem.city || '');
+      var myPrice = escapeHTML((myItem.price || 0).toLocaleString());
+      itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + myIdSafe + '\')">' +
+        (myPhotoSafe ? '<img class="dp-item-photo" src="' + myPhotoSafe + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F0FBFC;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
         '<div class="dp-item-body"><div class="dp-item-label yours">YOUR ITEM</div>' +
-        '<div class="dp-item-name">' + ((myItem.brand || '') + ' ' + (myItem.model || '')).trim() + '</div>' +
-        '<div class="dp-item-meta">' + (myItem.condition || '') + ' · ' + (myItem.emirate || myItem.city || '') + '</div>' +
-        '<div class="dp-item-price">' + (myItem.price || 0).toLocaleString() + ' AED</div></div></div>';
+        '<div class="dp-item-name">' + myName + '</div>' +
+        '<div class="dp-item-meta">' + myCond + ' · ' + myLoc + '</div>' +
+        '<div class="dp-item-price">' + myPrice + ' AED</div></div></div>';
     }
     itemsHTML += '</div>';
     document.getElementById('dpItems').innerHTML = itemsHTML;

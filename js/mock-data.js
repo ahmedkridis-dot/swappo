@@ -1043,6 +1043,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-plant-1',
     user_id: 'user-3',
+    emirate: 'Dubai',
     category: 'plants',
     type: 'Indoor Plant',
     brand: 'Monstera Deliciosa',
@@ -1073,6 +1074,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-plant-2',
     user_id: 'user-5',
+    emirate: 'Abu Dhabi',
     category: 'plants',
     type: 'Indoor Plant',
     brand: 'Snake Plant',
@@ -1103,6 +1105,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-plant-3',
     user_id: 'user-2',
+    emirate: 'Dubai',
     category: 'plants',
     type: 'Indoor Plant',
     brand: 'Peace Lily',
@@ -1133,6 +1136,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-plant-4',
     user_id: 'user-8',
+    emirate: 'Dubai',
     category: 'plants',
     type: 'Succulent Set',
     brand: 'Succulent Collection',
@@ -1165,6 +1169,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-bag-1',
     user_id: 'user-2',
+    emirate: 'Dubai',
     category: 'bags_accessories',
     subcategory: 'Handbags',
     type: 'Handbag',
@@ -1196,6 +1201,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-bag-2',
     user_id: 'user-6',
+    emirate: 'Abu Dhabi',
     category: 'bags_accessories',
     subcategory: 'Backpacks',
     type: 'Backpack',
@@ -1227,6 +1233,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-bag-3',
     user_id: 'user-1',
+    emirate: 'Dubai',
     category: 'bags_accessories',
     subcategory: 'Sunglasses',
     type: 'Sunglasses',
@@ -1258,6 +1265,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-bag-4',
     user_id: 'user-5',
+    emirate: 'Sharjah',
     category: 'bags_accessories',
     subcategory: 'Watches',
     type: 'Watch',
@@ -1289,6 +1297,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-bag-5',
     user_id: 'user-4',
+    emirate: 'Dubai',
     category: 'bags_accessories',
     subcategory: 'Wallets',
     type: 'Wallet',
@@ -1322,6 +1331,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-game-1',
     user_id: 'user-3',
+    emirate: 'Dubai',
     category: 'gaming',
     type: 'Console',
     brand: 'Sony',
@@ -1353,6 +1363,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-game-2',
     user_id: 'user-1',
+    emirate: 'Dubai',
     category: 'gaming',
     type: 'Gaming Headset',
     brand: 'SteelSeries',
@@ -1384,6 +1395,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-game-3',
     user_id: 'user-7',
+    emirate: 'Dubai',
     category: 'gaming',
     type: 'Gaming Keyboard',
     brand: 'Razer',
@@ -1415,6 +1427,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-game-4',
     user_id: 'user-5',
+    emirate: 'Abu Dhabi',
     category: 'gaming',
     type: 'Video Game',
     brand: 'Nintendo',
@@ -1446,6 +1459,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-game-5',
     user_id: 'user-2',
+    emirate: 'Dubai',
     category: 'gaming',
     type: 'Gaming Chair',
     brand: 'Secretlab',
@@ -1477,6 +1491,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-game-6',
     user_id: 'user-8',
+    emirate: 'Dubai',
     category: 'gaming',
     type: 'Graphics Card',
     brand: 'NVIDIA',
@@ -1543,6 +1558,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-demo-1',
     user_id: 'user-demo',
+    emirate: 'Dubai',
     category: 'electronics',
     type: 'Smartphone',
     brand: 'Apple',
@@ -1559,6 +1575,7 @@ const MOCK_ITEMS = [
     is_boosted: true,
     is_giveaway: false,
     price: 1495,
+    status: 'active',
     created_at: '2026-03-10',
     lat: 25.0800,
     lng: 55.1380,
@@ -1570,6 +1587,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-demo-2',
     user_id: 'user-demo',
+    emirate: 'Dubai',
     category: 'clothing',
     clothing_gender: 'male',
     type: 'Sneakers',
@@ -1586,6 +1604,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     is_giveaway: false,
     price: 220,
+    status: 'active',
     created_at: '2026-03-15',
     lat: 25.0800,
     lng: 55.1380,
@@ -1597,6 +1616,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-demo-3',
     user_id: 'user-demo',
+    emirate: 'Dubai',
     category: 'books',
     type: 'Book Set',
     brand: 'Cal Newport, Eric Ries, Peter Thiel',
@@ -1610,6 +1630,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     is_giveaway: true,
     price: 0,
+    status: 'active',
     created_at: '2026-03-20',
     lat: 25.0800,
     lng: 55.1380,
@@ -1621,6 +1642,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-demo-4',
     user_id: 'user-demo',
+    emirate: 'Dubai',
     category: 'electronics',
     type: 'Tablet',
     brand: 'Apple',
@@ -1636,6 +1658,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     is_giveaway: false,
     price: 1635,
+    status: 'active',
     created_at: '2026-03-25',
     lat: 25.0800,
     lng: 55.1380,
@@ -1647,6 +1670,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-demo-5',
     user_id: 'user-demo',
+    emirate: 'Dubai',
     category: 'sports',
     type: 'Fitness Equipment',
     brand: 'Peloton',
@@ -1661,6 +1685,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     is_giveaway: false,
     price: 490,
+    status: 'active',
     created_at: '2026-03-28',
     lat: 25.0800,
     lng: 55.1380,
@@ -1674,6 +1699,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-free-1',
     user_id: 'user-demo-free',
+    emirate: 'Abu Dhabi',
     category: 'clothing',
     type: 'Dress',
     brand: 'Zara',
@@ -1688,6 +1714,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     is_giveaway: false,
     price: 135,
+    status: 'active',
     created_at: '2026-03-20',
     lat: 24.4539,
     lng: 54.3773,
@@ -1699,6 +1726,7 @@ const MOCK_ITEMS = [
   {
     id: 'item-free-2',
     user_id: 'user-demo-free',
+    emirate: 'Abu Dhabi',
     category: 'books',
     type: 'Book',
     brand: 'James Clear',
@@ -1712,6 +1740,7 @@ const MOCK_ITEMS = [
     is_boosted: false,
     is_giveaway: true,
     price: 0,
+    status: 'active',
     created_at: '2026-03-22',
     lat: 24.4539,
     lng: 54.3773,
@@ -2019,4 +2048,4 @@ window.getMockGiveaways = getMockGiveaways;
 window.getMockBoostedItems = getMockBoostedItems;
 window.getMockItemsSorted = getMockItemsSorted;
 
-console.log('[Swappo] Mock data loaded:', MOCK_ITEMS.length, 'items,', MOCK_USERS.length, 'users');
+// mock data loaded
