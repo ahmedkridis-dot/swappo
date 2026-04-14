@@ -1834,20 +1834,24 @@ const DemoQR = {
     overlay.id = 'rating-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:9600;display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.innerHTML =
-      '<div style="background:#fff;border-radius:24px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);">' +
-        '<div style="font-size:48px;margin-bottom:12px;">⭐</div>' +
-        '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 8px;">Rate this exchange</h3>' +
-        '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">How was your experience?</p>' +
-        '<div id="rating-stars" style="font-size:36px;cursor:pointer;margin-bottom:16px;letter-spacing:8px;">' +
+      '<style>@keyframes swapPulseModal{0%,100%{transform:scale(1);box-shadow:0 8px 24px rgba(9,177,186,0.35)}50%{transform:scale(1.08);box-shadow:0 10px 32px rgba(9,177,186,0.55)}}</style>' +
+      '<div style="background:linear-gradient(180deg,#E6F7F8 0%,#FFFFFF 55%);border-radius:24px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);border:1.5px solid #09B1BA;">' +
+        '<div style="display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#09B1BA,#078A91);margin-bottom:14px;animation:swapPulseModal 1.8s ease-in-out infinite;">' +
+          '<span style="font-size:44px;">🤝</span>' +
+        '</div>' +
+        '<h3 style="font-size:30px;font-weight:900;color:#09B1BA;margin:0 0 4px;letter-spacing:-0.03em;">Swapped!</h3>' +
+        '<p style="font-size:13px;color:#078A91;font-weight:600;margin:0 0 4px;">Another deal sealed the Swappo way</p>' +
+        '<p style="font-size:12px;color:#6B7280;margin:0 0 20px;">Rate your experience — help build community trust</p>' +
+        '<div id="rating-stars" style="font-size:38px;cursor:pointer;margin-bottom:16px;letter-spacing:8px;color:#FFB800;">' +
           '<span onclick="DemoQR.setStars(1)" data-star="1">☆</span>' +
           '<span onclick="DemoQR.setStars(2)" data-star="2">☆</span>' +
           '<span onclick="DemoQR.setStars(3)" data-star="3">☆</span>' +
           '<span onclick="DemoQR.setStars(4)" data-star="4">☆</span>' +
           '<span onclick="DemoQR.setStars(5)" data-star="5">☆</span>' +
         '</div>' +
-        '<textarea id="rating-comment" maxlength="200" placeholder="Optional comment..." style="width:100%;height:60px;border:1px solid #E5E7EB;border-radius:12px;padding:12px;font-family:inherit;font-size:13px;resize:none;margin-bottom:16px;"></textarea>' +
-        '<button id="submit-rating-btn" onclick="DemoQR.submitRating(\'' + swapId + '\')" style="width:100%;padding:14px;border:none;border-radius:12px;background:#09B1BA;color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Submit Rating</button>' +
-        '<button onclick="document.getElementById(\'rating-overlay\').remove();" style="width:100%;padding:10px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;margin-top:4px;">Skip</button>' +
+        '<textarea id="rating-comment" maxlength="200" placeholder="Leave a kind word for your swap partner..." style="width:100%;height:60px;border:1px solid #E5E7EB;border-radius:12px;padding:12px;font-family:inherit;font-size:13px;resize:none;margin-bottom:16px;background:#fff;"></textarea>' +
+        '<button id="submit-rating-btn" onclick="DemoQR.submitRating(\'' + swapId + '\')" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#09B1BA,#078A91);color:#fff;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 6px 18px rgba(9,177,186,0.35);letter-spacing:0.01em;">🤝 Seal the Swap</button>' +
+        '<button onclick="document.getElementById(\'rating-overlay\').remove();" style="width:100%;padding:10px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;margin-top:4px;">Maybe later</button>' +
       '</div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });

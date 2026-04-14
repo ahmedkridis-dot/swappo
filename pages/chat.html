@@ -998,6 +998,10 @@
     #mobileBackBtn { display: inline-flex !important; }
   }
   @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes swapPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(9,177,186,0.35); }
+    50% { transform: scale(1.08); box-shadow: 0 10px 32px rgba(9,177,186,0.55); }
+  }
   </style>
 </head>
 <body>
@@ -1424,21 +1428,26 @@
     return div;
   }
 
-  // Rating Card
+  // Rating Card — Swappo branded "Swapped!" celebration
   function createRatingCard(convId) {
     var div = document.createElement('div');
     div.className = 'smart-card success';
+    div.style.background = 'linear-gradient(135deg, #E6F7F8 0%, #FFFFFF 70%)';
+    div.style.border = '1.5px solid #09B1BA';
     div.innerHTML =
-      '<div style="text-align:center;">' +
-        '<div style="font-size:48px;margin-bottom:8px;">🎉</div>' +
-        '<div style="font-size:18px;font-weight:800;color:#1A1A2E;margin-bottom:4px;">Exchange Complete!</div>' +
-        '<div style="font-size:13px;color:#6B7280;margin-bottom:20px;">How was your experience?</div>' +
+      '<div style="text-align:center;padding:8px 4px;">' +
+        '<div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#09B1BA,#078A91);margin-bottom:12px;box-shadow:0 8px 24px rgba(9,177,186,0.35);animation:swapPulse 1.8s ease-in-out infinite;">' +
+          '<span style="font-size:38px;">🤝</span>' +
+        '</div>' +
+        '<div style="font-size:26px;font-weight:900;color:#09B1BA;margin-bottom:2px;letter-spacing:-0.03em;">Swapped!</div>' +
+        '<div style="font-size:13px;color:#078A91;font-weight:600;margin-bottom:4px;">Another deal sealed the Swappo way</div>' +
+        '<div style="font-size:12px;color:#6B7280;margin-bottom:18px;">Rate your experience — help the community trust</div>' +
         '<div id="ratingStars" style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;">' +
           [1,2,3,4,5].map(function(i) {
-            return '<span onclick="setRating(' + i + ')" style="font-size:32px;cursor:pointer;transition:transform 0.2s;" onmouseenter="this.style.transform=\'scale(1.2)\'" onmouseleave="this.style.transform=\'scale(1)\'">☆</span>';
+            return '<span onclick="setRating(' + i + ')" style="font-size:34px;cursor:pointer;transition:transform 0.2s;color:#FFB800;" onmouseenter="this.style.transform=\'scale(1.25) rotate(-8deg)\'" onmouseleave="this.style.transform=\'scale(1)\'">☆</span>';
           }).join('') +
         '</div>' +
-        '<button class="sc-btn primary" onclick="submitRating(\'' + convId + '\')"><i class="fas fa-paper-plane"></i> Submit Rating</button>' +
+        '<button class="sc-btn primary" style="background:linear-gradient(135deg,#09B1BA,#078A91);box-shadow:0 6px 18px rgba(9,177,186,0.35);" onclick="submitRating(\'' + convId + '\')"><i class="fas fa-handshake"></i> Seal the Swap</button>' +
       '</div>';
     return div;
   }
