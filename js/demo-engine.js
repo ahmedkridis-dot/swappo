@@ -1367,9 +1367,12 @@ function updateNavbarForDemo() {
   // ── Chat badge ────────────────────────────────────────────────────────
   const chatLinks = document.querySelectorAll('a[href*="chat"]');
   chatLinks.forEach(link => {
-    // Remove old badge
+    // Remove old dynamic badge
     const oldBadge = link.querySelector('.chat-badge');
     if (oldBadge) oldBadge.remove();
+    // Remove static placeholder badge (hardcoded in some page templates)
+    const staticBadge = link.querySelector('.badge-count');
+    if (staticBadge) staticBadge.remove();
 
     if (user) {
       const unread = DemoChat.getUnreadCount();
