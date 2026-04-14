@@ -278,6 +278,32 @@
     })();
   </script>
 
+  <!-- ========== LOCATION BAND (compact) ========== -->
+  <section class="hero-location-band compact" aria-label="Your location and search radius">
+    <div class="container">
+      <div class="hero-location-inner">
+        <div class="hero-location-left">
+          <div class="hero-location-pin" aria-hidden="true">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="hero-location-text">
+            <span class="hero-location-label" data-i18n="items_near_you">items near you</span>
+            <span class="hero-location-name" id="locationName">
+              <i class="fas fa-spinner fa-spin" style="font-size:0.75rem;"></i>
+              <span data-i18n="detecting_location">Detecting location...</span>
+            </span>
+          </div>
+        </div>
+        <div class="hero-location-right">
+          <button class="radius-btn active" onclick="setRadius(5, this)">5 km</button>
+          <button class="radius-btn" onclick="setRadius(10, this)">10 km</button>
+          <button class="radius-btn" onclick="setRadius(25, this)">25 km</button>
+          <button class="radius-btn" onclick="setRadius(0, this)" data-i18n="all_uae">All UAE</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== FILTER BAR (Vinted-style horizontal) ========== -->
   <div class="container">
     <div class="filter-bar">

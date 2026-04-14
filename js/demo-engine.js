@@ -655,6 +655,13 @@ const DemoItems = {
     const conditionStr = item.condition ? _conditionLabel(item.condition) : '';
     const catMeta = _categoryMeta(item.category);
 
+    // Distance (or city fallback) — uses Swappo helpers from app.js if loaded
+    let locationLabel = item.city || '';
+    if (window.Swappo && Swappo.distanceTo) {
+      const km = Swappo.distanceTo(item.lat, item.lng);
+      if (km != null) locationLabel = Swappo.formatDistance(km);
+    }
+
     // Price + mode badges (v5 marketplace)
     let priceHTML = '';
     let modesHTML = '';
@@ -668,7 +675,9 @@ const DemoItems = {
         '<span class="mode-badge mode-buy" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>';
     }
 
-    return '<div class="product-card" onclick="window.location.href=\'' + href + '\'" style="cursor:pointer">' +
+    const dataAttrs = ' data-lat="' + (item.lat || '') + '" data-lng="' + (item.lng || '') + '" data-city="' + (item.city || '').replace(/"/g, '&quot;') + '"';
+
+    return '<div class="product-card"' + dataAttrs + ' onclick="window.location.href=\'' + href + '\'" style="cursor:pointer">' +
       '<div class="product-img">' +
         '<img src="' + photo + '" alt="' + title + '" loading="lazy">' +
         '<button class="product-fav" style="top:8px; bottom:auto;" onclick="event.stopPropagation(); DemoItems.toggleFavorite(\'' + item.id + '\'); this.querySelector(\'i\').className = DemoItems.isFavorited(\'' + item.id + '\') ? \'fas fa-heart\' : \'far fa-heart\';">' +
@@ -679,7 +688,8 @@ const DemoItems = {
         '<div class="product-brand">' + title + '</div>' +
         (conditionStr ? '<div class="product-details">' + conditionStr + '</div>' : '') +
         priceHTML +
-        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">' + modesHTML +
+        (locationLabel ? '<div class="product-location" style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:#6B7280;margin-top:4px;font-weight:500;"><i class="fas fa-map-marker-alt" style="color:#09B1BA;font-size:0.7rem;"></i> ' + locationLabel + '</div>' : '') +
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">' + modesHTML +
           (['furniture', 'vehicles', 'sports'].includes(item.category) ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FDF2F8;color:#9D174D;">🚛 Truck</span>' : '') +
         '</div>' +
       '</div>' +

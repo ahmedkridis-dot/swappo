@@ -700,8 +700,11 @@
     });
 
     detailsHTML += '<div class="location-row"><i class="fas fa-map-marker-alt" style="color:var(--primary);"></i>';
-    if (item.distance) {
-      detailsHTML += '<strong>' + item.distance + ' km</strong> ' + t('detail_away') + ' \u2014 ';
+    // Real GPS-based distance (Swappo helper from app.js) — falls back to mock value if no GPS
+    var realDist = (window.Swappo && Swappo.distanceTo) ? Swappo.distanceTo(item.lat, item.lng) : null;
+    var distLabel = realDist != null ? Swappo.formatDistance(realDist) : (item.distance ? item.distance + ' km' : null);
+    if (distLabel) {
+      detailsHTML += '<strong>' + distLabel + '</strong> ' + t('detail_away') + ' \u2014 ';
     }
     detailsHTML += (item.city || 'UAE') + '</div>';
 

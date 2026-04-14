@@ -160,76 +160,7 @@
     </div>
   </section>
 
-  <!-- ═══════════ LOCATION BAND — Premium GPS + Radius Filter ═══════════ -->
-  <style>
-    .hero-location-band {
-      background: linear-gradient(180deg, #FFFFFF 0%, #F0FBFC 100%);
-      border-bottom: 1px solid #E5F3F4;
-      padding: 18px 0;
-      position: relative;
-      z-index: 5;
-    }
-    .hero-location-inner {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 20px; flex-wrap: wrap;
-    }
-    .hero-location-left {
-      display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1;
-    }
-    .hero-location-pin {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: linear-gradient(135deg, #09B1BA 0%, #078A91 100%);
-      color: #fff; display: flex; align-items: center; justify-content: center;
-      font-size: 17px; box-shadow: 0 6px 18px rgba(9, 177, 186, 0.28);
-      flex-shrink: 0;
-      animation: heroPinPulse 2.4s ease-in-out infinite;
-    }
-    @keyframes heroPinPulse {
-      0%, 100% { box-shadow: 0 6px 18px rgba(9, 177, 186, 0.28); }
-      50% { box-shadow: 0 6px 24px rgba(9, 177, 186, 0.45); }
-    }
-    .hero-location-text {
-      display: flex; flex-direction: column; line-height: 1.2; min-width: 0;
-    }
-    .hero-location-label {
-      font-size: 11px; color: #6B7280; font-weight: 600;
-      letter-spacing: 0.6px; text-transform: uppercase;
-    }
-    .hero-location-name {
-      font-size: 16px; font-weight: 700; color: #171717; margin-top: 3px;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      max-width: 320px;
-    }
-    .hero-location-name strong { font-weight: 700; }
-    .hero-location-right {
-      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    }
-    .hero-location-right .radius-btn {
-      padding: 7px 14px; background: #fff;
-      border: 1px solid #E5E7EB; border-radius: 999px;
-      font-size: 0.8rem; font-weight: 600; color: #374151;
-      cursor: pointer; transition: all 0.18s ease;
-    }
-    .hero-location-right .radius-btn:hover {
-      border-color: #09B1BA; color: #09B1BA;
-    }
-    .hero-location-right .radius-btn.active {
-      background: #09B1BA; border-color: #09B1BA; color: #fff;
-      box-shadow: 0 3px 10px rgba(9, 177, 186, 0.3);
-    }
-    @media (max-width: 640px) {
-      .hero-location-band { padding: 14px 0; }
-      .hero-location-inner { gap: 12px; }
-      .hero-location-left { width: 100%; }
-      .hero-location-name { max-width: calc(100vw - 120px); }
-      .hero-location-right {
-        width: 100%; overflow-x: auto; flex-wrap: nowrap;
-        padding-bottom: 2px; -webkit-overflow-scrolling: touch;
-      }
-      .hero-location-right::-webkit-scrollbar { display: none; }
-      .hero-location-right .radius-btn { flex-shrink: 0; }
-    }
-  </style>
+  <!-- ═══════════ LOCATION BAND — Premium GPS + Radius Filter (CSS in style.css) ═══════════ -->
   <section class="hero-location-band" aria-label="Your location and search radius">
     <div class="container">
       <div class="hero-location-inner">
