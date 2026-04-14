@@ -1303,6 +1303,9 @@
     <script src="../js/register-sw.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
+    <script src="../js/swappo-items.js"></script>
+    <script src="../js/swappo-swaps.js"></script>
+    <script src="../js/swappo-chat.js"></script>
     <script src="../js/app.js"></script>
     <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -1320,9 +1323,51 @@
             { tier: 'legend',   emoji: '👑', label: 'Legend',   min_swaps: 75 }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Phase 2 data helpers — prefer Swappo*, fallback to Demo*
+        const _useSwappoProfile = function() { return !!(window.db); };
+
+        async function _getItemsByUser(userId) {
+            if (window.SwappoItems && _useSwappoProfile()) {
+                try { return (await window.SwappoItems.getByUser(userId)) || []; } catch (e) { console.error(e); return []; }
+            }
+            return (window.DemoItems && DemoItems.getByUser) ? DemoItems.getByUser(userId) : [];
+        }
+        async function _getFavoriteItems() {
+            if (window.SwappoItems && _useSwappoProfile()) {
+                try { return (await window.SwappoItems.getFavorites()) || []; } catch (e) { console.error(e); return []; }
+            }
+            return (window.DemoItems && DemoItems.getFavorites) ? DemoItems.getFavorites().map(function(id) { return DemoItems.getById(id); }).filter(Boolean) : [];
+        }
+        async function _getSwaps(userId) {
+            if (window.SwappoSwaps && _useSwappoProfile()) {
+                try {
+                    const [sent, received, history] = await Promise.all([
+                        window.SwappoSwaps.getSent ? window.SwappoSwaps.getSent(userId) : [],
+                        window.SwappoSwaps.getReceived ? window.SwappoSwaps.getReceived(userId) : [],
+                        window.SwappoSwaps.getHistory ? window.SwappoSwaps.getHistory(userId) : []
+                    ]);
+                    return { sent: sent || [], received: received || [], history: history || [] };
+                } catch (e) { console.error(e); return { sent: [], received: [], history: [] }; }
+            }
+            return {
+                sent: (window.DemoSwaps && DemoSwaps.getSent) ? DemoSwaps.getSent(userId) : [],
+                received: (window.DemoSwaps && DemoSwaps.getReceived) ? DemoSwaps.getReceived(userId) : [],
+                history: (window.DemoSwaps && DemoSwaps.getHistory) ? DemoSwaps.getHistory(userId) : []
+            };
+        }
+        async function _getCurrentUser() {
+            if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
+                try {
+                    const u = await window.SwappoAuth.getCurrentUser();
+                    if (u) return u;
+                } catch (e) {}
+            }
+            return (window.DemoAuth && DemoAuth.getCurrentUser) ? DemoAuth.getCurrentUser() : null;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
             // ── Auth check ───────────────────────────────────────────────
-            const user = DemoAuth.getCurrentUser();
+            const user = await _getCurrentUser();
             if (!user) {
                 window.location.href = 'login.html';
                 return;
@@ -1435,15 +1480,24 @@
             // ── Stats ────────────────────────────────────────────────────
             const planInfo = DemoSubscription.getPlan(user.id);
             const tierInfo = planInfo.tier;
-            const userItems = DemoItems.getByUser(user.id);
-            const favorites = DemoItems.getFavorites();
+            const userItems = await _getItemsByUser(user.id);
+            const favoriteItems = await _getFavoriteItems();
+            // Preserve legacy `favorites` name as a list of ids (used only for length check later)
+            const favorites = favoriteItems.map(function(it) { return it.id; });
             const donatedCount = userItems.filter(i => i.is_giveaway).length;
 
             // Dashboard stats — all clickable
             document.getElementById('stat-swaps').textContent = userItems.filter(function(i){return i.status==='active';}).length;
-            document.getElementById('stat-donated').textContent = DemoChat.getUnreadCount ? DemoChat.getUnreadCount() : 3;
+            // Unread count — async via SwappoChat if available; Demo fallback otherwise
+            let _unread = 0;
+            if (window.SwappoChat && _useSwappoProfile()) {
+                try { _unread = await window.SwappoChat.getUnreadCount(); } catch (e) { _unread = 0; }
+            } else if (window.DemoChat && DemoChat.getUnreadCount) {
+                _unread = DemoChat.getUnreadCount();
+            }
+            document.getElementById('stat-donated').textContent = _unread;
             var chatBadge = document.getElementById('chat-badge-count');
-            if (chatBadge) chatBadge.textContent = DemoChat.getUnreadCount ? DemoChat.getUnreadCount() : 3;
+            if (chatBadge) chatBadge.textContent = _unread;
             document.getElementById('stat-saved').textContent = (user.rating || 4.9).toFixed(1);
             // Plan card: show swaps completed (v5: unlimited, no quota)
             var swapsCompleted = planInfo.swaps_used || swapCount || 0;
@@ -1618,8 +1672,12 @@
             }
 
             // ── TAB: SWAP DASHBOARD ────────────────────────────────────────
-            // Check expired swaps first
-            if (DemoSwaps.checkExpired) DemoSwaps.checkExpired();
+            // Check expired swaps first (async for Swappo; sync for Demo)
+            if (window.SwappoSwaps && _useSwappoProfile() && window.SwappoSwaps.checkExpired) {
+                try { await window.SwappoSwaps.checkExpired(); } catch (e) {}
+            } else if (window.DemoSwaps && DemoSwaps.checkExpired) {
+                DemoSwaps.checkExpired();
+            }
 
             function switchSwapTab(tab, btn) {
                 document.querySelectorAll('.swap-tab').forEach(t => t.classList.remove('active'));
@@ -1628,17 +1686,45 @@
                 document.getElementById('swap-' + tab).classList.add('active');
             }
 
+            // Phase 2 hydration caches (populated by renderSwapDashboard)
+            const _itemsCache = new Map();
+            const _usersCache = new Map();
+
             function findItem(itemId) {
+                if (!itemId) return null;
+                if (_itemsCache.has(itemId)) return _itemsCache.get(itemId);
                 const allItems = [...(window.MOCK_ITEMS || []), ...(JSON.parse(localStorage.getItem('swappo_user_items') || '[]'))];
                 return allItems.find(i => i.id === itemId);
             }
 
             function findUser(userId) {
+                if (!userId) return { pseudo: 'Unknown', avatar: null };
+                if (_usersCache.has(userId)) return _usersCache.get(userId);
                 if (userId === 'user-demo') return window.DEMO_USER;
                 const mockUser = (window.MOCK_USERS || []).find(u => u.id === userId);
                 if (mockUser) return mockUser;
                 const localUsers = JSON.parse(localStorage.getItem('swappo_users') || '[]');
                 return localUsers.find(u => u.id === userId) || { pseudo: 'Unknown', avatar: null };
+            }
+
+            async function _hydrateSwaps(swapsArr) {
+                if (!window.db || !swapsArr.length) return;
+                const itemIds = new Set();
+                const userIds = new Set();
+                swapsArr.forEach(s => {
+                    if (s.proposer_item_id) itemIds.add(s.proposer_item_id);
+                    if (s.receiver_item_id) itemIds.add(s.receiver_item_id);
+                    if (s.proposer_id) userIds.add(s.proposer_id);
+                    if (s.receiver_id) userIds.add(s.receiver_id);
+                });
+                try {
+                    const [itemsResp, usersResp] = await Promise.all([
+                        itemIds.size ? window.db.from('items').select('id,brand,model,category,photos,price,condition').in('id', Array.from(itemIds)) : Promise.resolve({data:[]}),
+                        userIds.size ? window.db.from('users').select('id,pseudo,name,avatar,avatar_color,plan,badge,swap_count').in('id', Array.from(userIds)) : Promise.resolve({data:[]})
+                    ]);
+                    (itemsResp.data || []).forEach(it => _itemsCache.set(it.id, it));
+                    (usersResp.data || []).forEach(u => _usersCache.set(u.id, u));
+                } catch (e) { console.error('_hydrateSwaps error', e); }
             }
 
             function getItemPhoto(item) {
@@ -1729,52 +1815,81 @@
                 '</div>';
             }
 
-            function cancelSwap(swapId) {
+            async function cancelSwap(swapId) {
                 if (!confirm('Cancel this swap request?')) return;
-                var result = DemoSwaps.cancel(swapId);
-                if (result.success) {
+                var result;
+                if (window.SwappoSwaps && _useSwappoProfile()) {
+                    result = await window.SwappoSwaps.cancel(swapId);
+                } else {
+                    result = DemoSwaps.cancel(swapId);
+                }
+                if (result && result.success) {
                     DemoNotifications.showToast('Swap cancelled', 'info');
                     renderSwapDashboard();
                 } else {
-                    DemoNotifications.showToast(result.error, 'error');
+                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
                 }
             }
 
-            function acceptSwap(swapId) {
-                var result = DemoSwaps.respond(swapId, true);
-                if (result.success) {
+            async function acceptSwap(swapId) {
+                var result;
+                if (window.SwappoSwaps && _useSwappoProfile()) {
+                    result = await window.SwappoSwaps.respond(swapId, true);
+                } else {
+                    result = DemoSwaps.respond(swapId, true);
+                }
+                if (result && result.success) {
                     DemoNotifications.showToast('Swap accepted! Identities revealed.', 'success');
                     renderSwapDashboard();
                 } else {
-                    DemoNotifications.showToast(result.error, 'error');
+                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
                 }
             }
 
-            function rejectSwap(swapId) {
+            async function rejectSwap(swapId) {
                 if (!confirm('Decline this swap request?')) return;
-                var result = DemoSwaps.respond(swapId, false);
-                if (result.success) {
+                var result;
+                if (window.SwappoSwaps && _useSwappoProfile()) {
+                    result = await window.SwappoSwaps.respond(swapId, false);
+                } else {
+                    result = DemoSwaps.respond(swapId, false);
+                }
+                if (result && result.success) {
                     DemoNotifications.showToast('Swap declined', 'info');
                     renderSwapDashboard();
                 } else {
-                    DemoNotifications.showToast(result.error, 'error');
+                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
                 }
             }
 
-            function rateSwap(swapId, stars) {
-                var result = DemoSwaps.rate(swapId, stars);
-                if (result.success) {
+            async function rateSwap(swapId, stars) {
+                var result;
+                if (window.SwappoSwaps && _useSwappoProfile()) {
+                    result = await window.SwappoSwaps.rate(swapId, stars);
+                } else {
+                    result = DemoSwaps.rate(swapId, stars);
+                }
+                if (result && result.success) {
                     DemoNotifications.showToast('Thanks for rating!', 'success');
                     renderSwapDashboard();
                 } else {
-                    DemoNotifications.showToast(result.error, 'error');
+                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
                 }
             }
 
-            function renderSwapDashboard() {
-                var sent = DemoSwaps.getSent ? DemoSwaps.getSent(user.id) : [];
-                var received = DemoSwaps.getReceived ? DemoSwaps.getReceived(user.id) : [];
-                var history = DemoSwaps.getHistory ? DemoSwaps.getHistory(user.id) : [];
+            // Expose to inline onclick handlers
+            window.cancelSwap = cancelSwap;
+            window.acceptSwap = acceptSwap;
+            window.rejectSwap = rejectSwap;
+            window.rateSwap = rateSwap;
+
+            async function renderSwapDashboard() {
+                var swaps = await _getSwaps(user.id);
+                var sent = swaps.sent;
+                var received = swaps.received;
+                var history = swaps.history;
+                // Phase 2: hydrate items + users from Supabase
+                await _hydrateSwaps([].concat(sent, received, history));
 
                 var sentPending = sent.filter(function(s) { return s.status === 'pending'; }).length;
                 var receivedPending = received.filter(function(s) { return s.status === 'pending'; }).length;
@@ -1812,17 +1927,16 @@
                 }
             }
 
-            renderSwapDashboard();
+            await renderSwapDashboard();
 
             // ── TAB: Saved Items ─────────────────────────────────────────
             const savedGrid = document.getElementById('saved-items-grid');
-            if (favorites.length === 0) {
+            if (favoriteItems.length === 0) {
                 savedGrid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">No saved items yet. Browse the <a href="catalogue.html" style="color:var(--primary);">Swap Market</a> and tap the heart!</div>';
             } else {
-                savedGrid.innerHTML = favorites.map(itemId => {
-                    const item = DemoItems.getById(itemId);
+                savedGrid.innerHTML = favoriteItems.map(function(item) {
                     if (!item) return '';
-                    const title = (item.brand + ' ' + item.model).trim() || item.type;
+                    const title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type || 'Item';
                     const photo = (item.photos && item.photos[0]) || '';
                     return '<div class="product-card" onclick="window.location.href=\'product.html?id=' + item.id + '\'" style="cursor:pointer;">' +
                         '<div class="product-image">' +
@@ -1962,19 +2076,37 @@
             DemoNotifications.showToast('Counter-offer of ' + parseInt(newAmount).toLocaleString() + ' AED sent!', 'success');
         }
 
-        function deleteItem(itemId) {
+        async function deleteItem(itemId) {
             if (!confirm('Delete this item?')) return;
-            // Remove from user items in localStorage
-            const key = 'swappo_user_items';
-            let items = JSON.parse(localStorage.getItem(key) || '[]');
-            items = items.filter(i => i.id !== itemId);
-            localStorage.setItem(key, JSON.stringify(items));
+            if (window.SwappoItems && window.db) {
+                try {
+                    const res = await window.SwappoItems.remove(itemId);
+                    if (res && res.success === false) {
+                        DemoNotifications.showToast(res.error || 'Could not delete.', 'error');
+                        return;
+                    }
+                } catch (e) {
+                    console.error('deleteItem error', e);
+                    DemoNotifications.showToast('Could not delete.', 'error');
+                    return;
+                }
+            } else {
+                // Demo fallback
+                const key = 'swappo_user_items';
+                let items = JSON.parse(localStorage.getItem(key) || '[]');
+                items = items.filter(i => i.id !== itemId);
+                localStorage.setItem(key, JSON.stringify(items));
+            }
             DemoNotifications.showToast('Item deleted.', 'success');
             location.reload();
         }
 
-        function unfavorite(itemId) {
-            DemoItems.toggleFavorite(itemId);
+        async function unfavorite(itemId) {
+            if (window.SwappoItems && window.db) {
+                try { await window.SwappoItems.toggleFavorite(itemId); } catch (e) { console.error(e); }
+            } else if (window.DemoItems && DemoItems.toggleFavorite) {
+                DemoItems.toggleFavorite(itemId);
+            }
             DemoNotifications.showToast('Removed from saved items.', 'info');
             location.reload();
         }

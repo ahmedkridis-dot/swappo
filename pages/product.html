@@ -540,6 +540,9 @@
 <script src="../js/register-sw.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase.js"></script>
+<script src="../js/swappo-items.js"></script>
+<script src="../js/swappo-swaps.js"></script>
+<script src="../js/swappo-chat.js"></script>
 <script src="../js/app.js"></script>
 <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -579,8 +582,46 @@
     setTimeout(function() { toast.remove(); }, 3000);
   }
 
+  // Phase 2: resolve user/item via Supabase when available
+  async function _resolveCurrentUser() {
+    if (window.SwappoAuth && window.SwappoAuth.isReady()) {
+      var u = await window.SwappoAuth.getCurrentUser();
+      if (u) {
+        // Merge in the mirrored profile (name, avatar, pseudo, plan, etc.)
+        var mirror = null;
+        try { mirror = JSON.parse(localStorage.getItem('swappo_current_user') || 'null'); } catch (e) {}
+        return Object.assign({}, mirror || {}, { id: u.id, email: u.email });
+      }
+    }
+    return (window.DemoAuth && DemoAuth.getCurrentUser()) || null;
+  }
+  async function _resolveOwner(userId) {
+    if (!userId) return null;
+    if (window.db) {
+      try {
+        var res = await window.db.from('users')
+          .select('id,pseudo,name,avatar,plan,swap_count,badge').eq('id', userId).maybeSingle();
+        if (res && res.data) {
+          return Object.assign({}, res.data, {
+            avatar_color: '#09B1BA',
+            badge_emoji: { newcomer: '\u{1F331}', swapper: '\u{2B50}', active: '\u{1F525}', pro: '\u{1F48E}', elite: '\u{1F3C6}', legend: '\u{1F451}' }[res.data.badge] || '\u{1F331}',
+            badge_tier: res.data.badge || 'newcomer'
+          });
+        }
+      } catch (e) {}
+    }
+    return window.getMockUserById ? getMockUserById(userId) : null;
+  }
+  async function _resolveItem(itemId) {
+    if (window.SwappoItems && window.db) {
+      var it = await window.SwappoItems.getById(itemId);
+      if (it) return it;
+    }
+    return window.DemoItems ? DemoItems.getById(itemId) : null;
+  }
+
   // ============ MAIN INIT ============
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', async function() {
     initDemoMode();
 
     var params = new URLSearchParams(window.location.search);
@@ -591,7 +632,12 @@
       return;
     }
 
-    var item = DemoItems.getById(itemId);
+    // Preload favorite ids so isFavoritedSync works
+    if (window.SwappoItems && window.SwappoItems.getFavoriteIds) {
+      try { await window.SwappoItems.getFavoriteIds(); } catch (e) {}
+    }
+
+    var item = await _resolveItem(itemId);
     if (!item) {
       document.getElementById('product-container').innerHTML =
         '<div style="text-align:center;padding:80px;">' +
@@ -602,9 +648,9 @@
     }
 
     currentItem = item;
-    currentUser = DemoAuth.getCurrentUser();
+    currentUser = await _resolveCurrentUser();
     var isGuest = !currentUser;
-    var owner = getMockUserById(item.user_id);
+    var owner = await _resolveOwner(item.user_id);
     var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type;
     var interestedCount = Math.floor(Math.random() * 15) + 1;
 
@@ -726,7 +772,9 @@
     document.getElementById('details-card').innerHTML = detailsHTML;
 
     // ── Action buttons ──
-    var isFav = DemoItems.isFavorited(item.id);
+    var isFav = (window.SwappoItems && window.SwappoItems.isFavoritedSync)
+      ? SwappoItems.isFavoritedSync(item.id)
+      : DemoItems.isFavorited(item.id);
     var actionsHTML = '';
 
     // Item + Cash section — NEGOTIATION TOOL ONLY
@@ -835,7 +883,9 @@
     document.getElementById('seller-card').innerHTML = sellerHTML;
 
     // ── Similar items ──
-    var similar = DemoItems.getSimilar(itemId, 4);
+    var similar = (window.SwappoItems && window.db)
+      ? await window.SwappoItems.getSimilar(itemId, 4)
+      : DemoItems.getSimilar(itemId, 4);
     if (similar.length > 0) {
       document.getElementById('similar-section').style.display = '';
       var simGrid = document.getElementById('similar-grid');
@@ -880,13 +930,19 @@
   }
 
   // ============ FAVORITE ============
-  function toggleFavorite() {
+  async function toggleFavorite() {
     if (!currentItem) return;
     if (!currentUser) {
       window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
       return;
     }
-    var nowFav = DemoItems.toggleFavorite(currentItem.id);
+    var nowFav;
+    if (window.SwappoItems && window.db) {
+      var res = await window.SwappoItems.toggleFavorite(currentItem.id);
+      nowFav = !!res.favorited;
+    } else {
+      nowFav = DemoItems.toggleFavorite(currentItem.id);
+    }
     var btn = document.getElementById('saveBtn');
     if (nowFav) {
       btn.innerHTML = '<i class="fas fa-heart"></i> Saved';
@@ -1023,19 +1079,27 @@
   window.selectCashAmount = selectCashAmount;
   window.updateCashFromSlider = updateCashFromSlider;
 
-  // ============ BUY (v5) — opens chat with pre-filled message ============
-  function startBuy() {
+  // ============ BUY (v5) — sends a purchase offer (no chat yet) ============
+  async function startBuy() {
     if (!currentItem || !currentUser) return;
     var price = currentItem.price || 0;
-    var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
-    // v5: Create a buy offer (notification to seller, NO chat yet)
-    if (window.DemoSwaps && DemoSwaps.propose) {
-      DemoSwaps.propose(null, currentItem.id, { type: 'buy', amount: price });
+    var res;
+    if (window.SwappoSwaps && window.db) {
+      res = await window.SwappoSwaps.propose({
+        theirItemId: currentItem.id,
+        cashAmount: price,
+        cashDirection: 'proposer_pays',
+        isPurchase: true
+      });
+    } else if (window.DemoSwaps && DemoSwaps.propose) {
+      res = DemoSwaps.propose(null, currentItem.id, { type: 'buy', amount: price });
     }
-    DemoNotifications.showToast('Purchase offer sent for ' + price.toLocaleString() + ' AED! The seller will review it. ✅', 'success');
-    setTimeout(function() {
-      window.location.href = 'profile.html';
-    }, 1200);
+    if (res && res.success === false) {
+      DemoNotifications.showToast(res.error || 'Could not send offer.', 'error');
+      return;
+    }
+    DemoNotifications.showToast('Purchase offer sent for ' + price.toLocaleString() + ' AED! The seller will review it. \u2705', 'success');
+    setTimeout(function() { window.location.href = 'profile.html'; }, 1200);
   }
   window.startBuy = startBuy;
 
@@ -1064,14 +1128,33 @@
   }
   window.openOfferModal = openOfferModal;
 
-  function submitOffer() {
+  async function submitOffer() {
     var amount = parseInt(document.getElementById('offer-amount').value) || 0;
     if (amount < 1) { DemoNotifications.showToast('Please enter a valid amount.', 'warning'); return; }
-    // v5: Send offer as notification (no chat before acceptance)
-    if (window.DemoSwaps && DemoSwaps.propose) {
-      DemoSwaps.propose(null, currentItem.id, { type: 'offer', amount: amount });
+    if (!currentItem) return;
+    var res;
+    try {
+      if (window.SwappoSwaps && window.db) {
+        res = await window.SwappoSwaps.propose({
+          theirItemId: currentItem.id,
+          cashAmount: amount,
+          cashDirection: 'proposer_pays',
+          isPurchase: true
+        });
+      } else if (window.DemoSwaps && DemoSwaps.propose) {
+        res = DemoSwaps.propose(null, currentItem.id, { type: 'offer', amount: amount });
+      }
+    } catch (e) {
+      console.error('submitOffer error', e);
+      DemoNotifications.showToast('Could not send offer. Please try again.', 'error');
+      return;
     }
-    document.querySelector('div[style*="fixed"]').remove();
+    if (res && res.success === false) {
+      DemoNotifications.showToast(res.error || 'Could not send offer', 'error');
+      return;
+    }
+    var modal = document.querySelector('div[style*="fixed"]');
+    if (modal) modal.remove();
     DemoNotifications.showToast('Offer of ' + amount.toLocaleString() + ' AED sent! The seller will review it. ✅', 'success');
     setTimeout(function() { window.location.href = 'profile.html'; }, 1000);
   }
@@ -1110,10 +1193,21 @@
     btn.style.cursor = 'not-allowed';
   }
 
-  function loadMyItemsInModal() {
+  async function loadMyItemsInModal() {
     var grid = document.getElementById('my-items-grid');
     var emptyState = document.getElementById('emptyState');
-    var myItems = DemoItems.getByUser(currentUser.id).filter(function(i) { return i.status === 'active'; });
+    var myItems = [];
+    try {
+      if (window.SwappoItems && window.db) {
+        myItems = await window.SwappoItems.getByUser(currentUser.id);
+      } else if (window.DemoItems && DemoItems.getByUser) {
+        myItems = DemoItems.getByUser(currentUser.id);
+      }
+    } catch (e) {
+      console.error('loadMyItemsInModal error', e);
+      myItems = [];
+    }
+    myItems = (myItems || []).filter(function(i) { return i.status === 'active'; });
 
     if (myItems.length === 0) {
       grid.style.display = 'none';
@@ -1163,28 +1257,42 @@
     btn.style.cursor = selectedSwapItemId ? 'pointer' : 'not-allowed';
   }
 
-  function confirmSwap() {
+  async function confirmSwap() {
     if (!selectedSwapItemId || !currentItem) return;
 
-    var result = DemoSwaps.propose(selectedSwapItemId, currentItem.id);
-    if (result.success) {
-      closeSwapModal();
-      var myItem = DemoItems.getById(selectedSwapItemId);
-      var myTitle = myItem ? ((myItem.brand || '') + ' ' + (myItem.model || '')).trim() : 'my item';
-      var theirTitle = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'your item';
-      var cashText = selectedCashAmount > 0 ? ' + ' + selectedCashAmount + ' AED cash top-up' : '';
-      var msg = 'Hi! I\'d like to swap my "' + myTitle + '" for your "' + theirTitle + '"' + cashText + '. What do you think?';
+    var result;
+    try {
+      if (window.SwappoSwaps && window.db) {
+        var payload = {
+          myItemId: selectedSwapItemId,
+          theirItemId: currentItem.id
+        };
+        if (selectedCashAmount && selectedCashAmount > 0) {
+          payload.cashAmount = selectedCashAmount;
+          payload.cashDirection = 'proposer_pays';
+        }
+        result = await window.SwappoSwaps.propose(payload);
+      } else if (window.DemoSwaps && DemoSwaps.propose) {
+        result = DemoSwaps.propose(selectedSwapItemId, currentItem.id);
+      }
+    } catch (e) {
+      console.error('confirmSwap error', e);
+      showToast('Could not send proposal. Please try again.');
+      return;
+    }
 
+    if (result && result.success !== false) {
+      closeSwapModal();
       // v5: NO chat before acceptance — send notification only
       DemoNotifications.showToast('Swap proposal sent! The seller will review your offer. ✅', 'success');
-      updateNavbarForDemo();
+      if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
 
       // Redirect to dashboard offers tab (not chat)
       setTimeout(function() {
         window.location.href = 'profile.html';
       }, 1200);
     } else {
-      showToast(result.error || 'Could not send proposal');
+      showToast((result && result.error) || 'Could not send proposal');
     }
   }
 

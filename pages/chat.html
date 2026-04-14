@@ -1114,6 +1114,9 @@
   <script src="../js/register-sw.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
+  <script src="../js/swappo-items.js"></script>
+  <script src="../js/swappo-swaps.js"></script>
+  <script src="../js/swappo-chat.js"></script>
   <script src="../js/mega-menu.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script>
@@ -1128,11 +1131,82 @@
   let currentSbFilter = 'all';
   let deliveryChoice = {}; // track each party's delivery preference per conv
   let qrTimerInterval = null;
+  let _rtUnsub = null; // Realtime unsubscribe fn for current conv
+  let _convCache = []; // last fetched conversations (Swappo or Demo shape)
+  let _msgCache = {}; // convId -> messages
 
   const CONV_ITEM_MAP = {
     'conv-e': { their_item_id: 'item-5', my_item_id: 'item-1', status: 'accepted', cash: 0, type: 'swap', category: 'clothing' },
     'conv-f': { their_item_id: null, my_item_id: 'item-18', status: 'accepted', cash: 2500, type: 'purchase', category: 'bags' }
   };
+
+  // ═══ API SHIM — prefers Swappo*, falls back to Demo* ═══
+  const useSwappo = function() { return !!(window.SwappoChat && window.db); };
+
+  async function fetchConversations() {
+    if (useSwappo()) {
+      try {
+        const convs = await window.SwappoChat.getConversations();
+        // Normalize to Demo-compatible shape (inject messages+unread on top)
+        return (convs || []).map(function(c) {
+          return Object.assign({}, c, {
+            messages: [], // loaded on demand via fetchMessages
+            unread_count: 0,
+            status: 'accepted'
+          });
+        });
+      } catch (e) {
+        console.error('fetchConversations error', e);
+        return [];
+      }
+    }
+    return (window.DemoChat && DemoChat.getConversations) ? DemoChat.getConversations() : [];
+  }
+
+  async function fetchMessages(convId) {
+    if (useSwappo()) {
+      try {
+        const msgs = await window.SwappoChat.getMessages(convId);
+        _msgCache[convId] = msgs || [];
+        return _msgCache[convId];
+      } catch (e) {
+        console.error('fetchMessages error', e);
+        return [];
+      }
+    }
+    return (window.DemoChat && DemoChat.getMessages) ? DemoChat.getMessages(convId) : [];
+  }
+
+  async function sendChatMessage(convId, text) {
+    if (useSwappo()) {
+      try {
+        const res = await window.SwappoChat.sendMessage(convId, text);
+        if (!res.success) return res;
+        _msgCache[convId] = (_msgCache[convId] || []).concat(res.message);
+        return res;
+      } catch (e) {
+        console.error('sendChatMessage error', e);
+        return { success: false, error: e.message };
+      }
+    }
+    if (window.DemoChat && DemoChat.sendMessage) {
+      DemoChat.sendMessage(convId, text);
+      return { success: true };
+    }
+    return { success: false, error: 'No chat backend' };
+  }
+
+  function attachRealtime(convId) {
+    if (_rtUnsub) { try { _rtUnsub(); } catch (e) {} _rtUnsub = null; }
+    if (!useSwappo()) return;
+    _rtUnsub = window.SwappoChat.subscribe(convId, function(msg) {
+      if (!msg || msg.conversation_id !== convId) return;
+      _msgCache[convId] = (_msgCache[convId] || []).concat(msg);
+      if (convId === activeConvId) {
+        renderMessagesFrom(_msgCache[convId]);
+      }
+    });
+  }
 
   // ═══ SAFE SPOTS DATABASE ═══
   const SAFE_SPOTS = [
@@ -1206,8 +1280,9 @@
   }
 
   // ═══ SIDEBAR ═══
-  function renderSidebar() {
-    var convs = DemoChat.getConversations();
+  async function renderSidebar() {
+    var convs = await fetchConversations();
+    _convCache = convs;
     var search = (document.getElementById('sbSearch').value || '').toLowerCase().trim();
     var list = document.getElementById('sbList');
     var total = 0;
@@ -1223,24 +1298,35 @@
 
       // Filter by search
       if (search) {
-        var name = (o.name || '').toLowerCase();
+        var name = (o.name || o.pseudo || '').toLowerCase();
         var msg = (c.last_message || '').toLowerCase();
         if (name.indexOf(search) === -1 && msg.indexOf(search) === -1) return false;
       }
       return true;
     });
 
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#9CA3AF;font-size:13px;">' +
+        '<div style="font-size:36px;margin-bottom:12px;">💬</div>' +
+        'No conversations yet.<br>Chat opens after a swap is accepted.' +
+        '</div>';
+      document.getElementById('totalUnread').textContent = '';
+      document.getElementById('totalUnread').style.display = 'none';
+      return;
+    }
+
     list.innerHTML = filtered.map(function(c) {
       var o = c.other_user || {};
       var map = CONV_ITEM_MAP[c.id] || {};
-      var item = map.my_item_id ? DemoItems.getById(map.my_item_id) : null;
+      // Prefer item from SwappoChat response; fallback to Demo lookup
+      var item = c.item || (map.my_item_id && window.DemoItems ? DemoItems.getById(map.my_item_id) : null);
       var photo = item && item.photos ? item.photos[0] : '';
       var status = map.status || 'accepted';
       var dealType = map.type || 'swap';
       var cash = map.cash || 0;
       var preview = c.last_message || 'Start chatting...';
-      var lastMsg = c.messages && c.messages.length ? c.messages[c.messages.length - 1] : null;
-      var time = lastMsg ? timeAgo(lastMsg.created_at) : '';
+      var time = c.last_message_at ? timeAgo(c.last_message_at)
+        : (c.messages && c.messages.length ? timeAgo(c.messages[c.messages.length - 1].created_at) : '');
       total += (c.unread_count || 0);
 
       var dealTypeHTML = '';
@@ -1276,9 +1362,10 @@
   }
 
   // ═══ OPEN CONVERSATION ═══
-  function openConv(convId) {
+  async function openConv(convId) {
     activeConvId = convId;
-    var convs = DemoChat.getConversations();
+    var convs = _convCache.length ? _convCache : await fetchConversations();
+    _convCache = convs;
     var conv = convs.find(function(c) { return c.id === convId; });
     if (!conv) return;
     var o = conv.other_user || {};
@@ -1291,11 +1378,17 @@
     if (activeCard) activeCard.classList.add('active');
 
     // Header
+    var displayName = o.name || o.pseudo || 'Swapper';
     document.getElementById('chatHeader').style.display = '';
     document.getElementById('chAvatar').style.background = o.avatar_color || '#09B1BA';
-    document.getElementById('chAvatar').textContent = initial(o.name);
-    document.getElementById('chName').textContent = o.name || 'Swapper';
-    document.getElementById('chBadge').textContent = (o.badge_emoji || '') + ' ' + ((o.badge_tier || '').charAt(0).toUpperCase() + (o.badge_tier || '').slice(1)) + ' · ' + (o.city || o.emirate || '');
+    document.getElementById('chAvatar').textContent = initial(displayName);
+    document.getElementById('chName').textContent = displayName;
+    var badgeText = '';
+    if (o.badge_emoji || o.badge_tier) {
+      badgeText = (o.badge_emoji || '') + ' ' + ((o.badge_tier || '').charAt(0).toUpperCase() + (o.badge_tier || '').slice(1));
+    }
+    if (o.city || o.emirate) badgeText += (badgeText ? ' · ' : '') + (o.city || o.emirate || '');
+    document.getElementById('chBadge').textContent = badgeText;
 
     // Hide empty, show messages
     document.getElementById('chatEmpty').style.display = 'none';
@@ -1303,7 +1396,10 @@
     document.getElementById('inputBar').style.display = status === 'pending' ? 'none' : '';
 
     // Load messages
-    loadMessages(convId);
+    await loadMessages(convId);
+
+    // Attach Realtime subscription
+    attachRealtime(convId);
 
     // Render deal panel
     renderDealPanel(convId);
@@ -1313,10 +1409,21 @@
   }
 
   // ═══ LOAD MESSAGES ═══
-  function loadMessages(convId) {
-    var messages = DemoChat.getMessages(convId);
+  async function loadMessages(convId) {
+    var messages = await fetchMessages(convId);
+    renderMessagesFrom(messages, convId);
+    // Mark read (async, fire-and-forget)
+    if (useSwappo()) {
+      try { await window.SwappoChat.markRead(convId); } catch (e) {}
+    }
+  }
+
+  // Pure renderer — used by loadMessages AND Realtime handler
+  function renderMessagesFrom(messages, convId) {
+    convId = convId || activeConvId;
     var area = document.getElementById('msgArea');
-    var conv = DemoChat.getConversations().find(function(c) { return c.id === convId; });
+    if (!area) return;
+    var conv = _convCache.find(function(c) { return c.id === convId; });
     var o = conv ? (conv.other_user || {}) : {};
     var myColor = currentUser ? (currentUser.avatar_color || '#09B1BA') : '#09B1BA';
     var map = CONV_ITEM_MAP[convId] || {};
@@ -1325,7 +1432,7 @@
     var typing = document.getElementById('typingIndicator');
     area.innerHTML = '';
 
-    messages.forEach(function(m) {
+    (messages || []).forEach(function(m) {
       if (m.is_system || m.sender_id === 'system') {
         var el = document.createElement('div');
         el.className = 'msg-sys';
@@ -1370,7 +1477,7 @@
     }
 
     // Re-add typing indicator
-    area.appendChild(typing);
+    if (typing) area.appendChild(typing);
     area.scrollTop = area.scrollHeight;
   }
 
@@ -1527,7 +1634,7 @@
     deliveryChoice[convId] = { me: method };
 
     if (method === 'meet') {
-      DemoChat.sendMessage(convId, '📍 I\'d like to meet in person for this exchange!');
+      sendChatMessage(convId, '📍 I\'d like to meet in person for this exchange!');
       DemoNotifications.showToast('Great! Choose a safe meetup spot.', 'success');
 
       // Simulate the other party choosing delivery (conflict scenario)
@@ -1554,7 +1661,7 @@
         }
       }, 2500);
     } else if (method === 'delivery') {
-      DemoChat.sendMessage(convId, '🚚 I\'d like Swappo Delivery for this exchange!');
+      sendChatMessage(convId, '🚚 I\'d like Swappo Delivery for this exchange!');
       DemoNotifications.showToast('Swappo Delivery selected! Estimated 25-40 AED.', 'success');
       loadMessages(convId);
       // Show delivery tracker after delay
@@ -1567,7 +1674,7 @@
         }
       }, 2000);
     } else if (method === 'truck') {
-      DemoChat.sendMessage(convId, '🚛 I need a truck for this item. Checking transporters...');
+      sendChatMessage(convId, '🚛 I need a truck for this item. Checking transporters...');
       DemoNotifications.showToast('Opening Find a Truck...', 'info');
       loadMessages(convId);
       setTimeout(function() { window.open('transport.html', '_blank'); }, 500);
@@ -1577,7 +1684,7 @@
 
   function acceptDelivery(convId) {
     deliveryChoice[convId] = { me: 'delivery', resolved: true };
-    DemoChat.sendMessage(convId, '✅ OK, let\'s go with Swappo Delivery!');
+    sendChatMessage(convId, '✅ OK, let\'s go with Swappo Delivery!');
     DemoNotifications.showToast('Both parties agreed on delivery!', 'success');
     loadMessages(convId);
     setTimeout(function() {
@@ -1592,7 +1699,7 @@
 
   function keepMeetup(convId) {
     deliveryChoice[convId] = { me: 'meet', resolved: true };
-    DemoChat.sendMessage(convId, '📍 No worries, let\'s meet in person instead!');
+    sendChatMessage(convId, '📍 No worries, let\'s meet in person instead!');
     DemoNotifications.showToast('Meeting in person it is!', 'info');
     loadMessages(convId);
     renderDealPanel(convId);
@@ -1674,9 +1781,11 @@
   // ═══ DEAL PANEL ═══
   function renderDealPanel(convId) {
     var map = CONV_ITEM_MAP[convId] || {};
-    var theirItem = map.their_item_id ? DemoItems.getById(map.their_item_id) : null;
-    var myItem = map.my_item_id ? DemoItems.getById(map.my_item_id) : null;
-    var status = map.status || 'accepted';
+    var conv = _convCache.find(function(c) { return c.id === convId; }) || {};
+    // Phase 2: prefer conversation's item (from Supabase); Demo fallback uses map
+    var theirItem = (conv.item) || (map.their_item_id && window.DemoItems ? DemoItems.getById(map.their_item_id) : null);
+    var myItem = map.my_item_id && window.DemoItems ? DemoItems.getById(map.my_item_id) : null;
+    var status = map.status || (conv.identity_revealed ? 'accepted' : 'pending');
     var cash = map.cash || 0;
     dealCashAmount = cash;
 
@@ -1859,12 +1968,12 @@
     document.getElementById('dpEmpty').style.display = '';
     renderSidebar();
   }
-  function sendCounter(convId) {
+  async function sendCounter(convId) {
     var msg = dealCashAmount > 0 ? 'Counter-offer: swap + ' + dealCashAmount + ' AED cash top-up' : 'I confirmed the current swap deal.';
-    DemoChat.sendMessage(convId, msg);
+    await sendChatMessage(convId, msg);
     DemoNotifications.showToast('Counter-offer sent! 📨', 'success');
-    loadMessages(convId);
-    renderSidebar();
+    await loadMessages(convId);
+    await renderSidebar();
   }
   function showCounterUI(convId) {
     CONV_ITEM_MAP[convId].status = 'accepted';
@@ -1922,48 +2031,45 @@
     if (btn) btn.disabled = false;
   }
 
-  function confirmSpot() {
+  async function confirmSpot() {
     if (!selectedSpotId || !activeConvId) return;
     var spot = SAFE_SPOTS.find(function(s) { return s.id === selectedSpotId; });
     if (!spot) return;
-    DemoChat.sendMessage(activeConvId, '📍 Let\'s meet at: ' + spot.icon + ' ' + spot.name + ' (' + spot.area + ', ' + spot.emirate + ')');
+    await sendChatMessage(activeConvId, '📍 Let\'s meet at: ' + spot.icon + ' ' + spot.name + ' (' + spot.area + ', ' + spot.emirate + ')');
     DemoNotifications.showToast('Meetup location sent! ' + spot.icon, 'success');
-    loadMessages(activeConvId);
+    await loadMessages(activeConvId);
     selectedSpotId = null;
     var btn = document.getElementById('spotConfirmBtn');
     if (btn) btn.disabled = true;
   }
 
   // ═══ SEND MESSAGE ═══
-  function sendMsg() {
+  async function sendMsg() {
     var input = document.getElementById('chatInput');
     var txt = input.value.trim();
     if (!txt || !activeConvId) return;
-    DemoChat.sendMessage(activeConvId, txt);
     input.value = '';
     document.getElementById('sendBtn').disabled = true;
-    loadMessages(activeConvId);
-    renderSidebar();
 
-    // Show typing indicator
-    document.getElementById('typingIndicator').classList.add('show');
-
-    // Simulate reply
-    setTimeout(function() {
-      document.getElementById('typingIndicator').classList.remove('show');
-      var replies = ['Sounds good!', 'Let me check...', 'OK 👍', 'When works for you?', 'That\'s a deal!', 'Can we meet this weekend?', 'Perfect, thanks!', 'I can do tomorrow'];
-      var convs = DemoChat.getConversations();
-      var conv = convs.find(function(c) { return c.id === activeConvId; });
-      if (conv && conv.other_user) {
-        var mockConv = (MOCK_CONVERSATIONS || []).find(function(c) { return c.id === activeConvId; });
-        if (mockConv) {
-          mockConv.messages.push({ id: 'msg_r_' + Date.now(), sender_id: conv.other_user.id, content: replies[Math.floor(Math.random() * replies.length)], created_at: new Date().toISOString(), is_system: false });
-          mockConv.last_message = mockConv.messages[mockConv.messages.length - 1].content;
-        }
-        loadMessages(activeConvId);
-        renderSidebar();
+    var res = await sendChatMessage(activeConvId, txt);
+    if (!res.success) {
+      if (typeof DemoNotifications !== 'undefined') {
+        DemoNotifications.showToast(res.error || 'Could not send message.', 'error');
       }
-    }, 1500 + Math.random() * 2000);
+      return;
+    }
+    if (res.wasFiltered && typeof DemoNotifications !== 'undefined') {
+      DemoNotifications.showToast('Contact info was filtered out for your safety.', 'warning');
+    }
+
+    // Realtime will echo the new message back. For Demo fallback, refresh manually.
+    if (!useSwappo()) {
+      await loadMessages(activeConvId);
+      await renderSidebar();
+    } else {
+      // Optimistic: refresh immediately (Realtime echo will dedupe by re-rendering cache)
+      renderMessagesFrom(_msgCache[activeConvId] || [], activeConvId);
+    }
   }
 
   // ═══ DEAL PANEL TOGGLE ═══
@@ -1972,20 +2078,32 @@
   }
 
   // ═══ INIT ═══
-  function chatInit() {
-    currentUser = DemoAuth.getCurrentUser();
+  async function chatInit() {
+    // Prefer SwappoAuth (Supabase session); fallback to DemoAuth
+    if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
+      try { currentUser = await window.SwappoAuth.getCurrentUser(); } catch (e) { currentUser = null; }
+    }
+    if (!currentUser && window.DemoAuth && DemoAuth.getCurrentUser) {
+      currentUser = DemoAuth.getCurrentUser();
+    }
     if (!currentUser) { window.location.href = 'login.html'; return; }
-    renderSidebar();
 
-    var convs = DemoChat.getConversations();
+    await renderSidebar();
+
+    var convs = _convCache;
     var params = new URLSearchParams(window.location.search);
     var targetUser = params.get('user');
+    var targetConv = params.get('conv');
     var opened = false;
-    if (targetUser && convs.length > 0) {
-      var match = convs.find(function(c) { return c.other_user && c.other_user.id === targetUser; });
-      if (match) { openConv(match.id); opened = true; }
+    if (targetConv) {
+      var matchC = convs.find(function(c) { return c.id === targetConv; });
+      if (matchC) { await openConv(matchC.id); opened = true; }
     }
-    if (!opened && convs.length > 0) openConv(convs[0].id);
+    if (!opened && targetUser && convs.length > 0) {
+      var match = convs.find(function(c) { return c.other_user && c.other_user.id === targetUser; });
+      if (match) { await openConv(match.id); opened = true; }
+    }
+    if (!opened && convs.length > 0) await openConv(convs[0].id);
 
     // Wire input
     document.getElementById('sendBtn').addEventListener('click', sendMsg);
@@ -1994,6 +2112,11 @@
 
     if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
   }
+
+  // Cleanup Realtime on navigate
+  window.addEventListener('beforeunload', function() {
+    if (_rtUnsub) { try { _rtUnsub(); } catch (e) {} }
+  });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', chatInit);
   else chatInit();

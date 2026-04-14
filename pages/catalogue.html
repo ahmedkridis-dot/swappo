@@ -511,6 +511,7 @@
   <script src="../js/register-sw.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
+  <script src="../js/swappo-items.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -562,13 +563,28 @@
         });
       }
 
-      function renderCatalogue() {
-        const result = DemoItems.browse({
-          category: currentFilters.category || undefined,
-          condition: currentFilters.condition || undefined,
-          search: currentFilters.search || undefined,
-          sortBy: currentFilters.sortBy
-        });
+      // Phase 2: source of truth = Supabase (SwappoItems). Fall back to Demo if unavailable.
+      async function renderCatalogue() {
+        const useSwappo = !!(window.SwappoItems && window.db);
+        if (useSwappo && window.SwappoItems.getFavoriteIds) {
+          try { await window.SwappoItems.getFavoriteIds(); } catch (e) {}
+        }
+        const result = useSwappo
+          ? await window.SwappoItems.browse({
+              category: currentFilters.category || undefined,
+              condition: currentFilters.condition || undefined,
+              search: currentFilters.search || undefined,
+              sortBy: currentFilters.sortBy
+            })
+          : DemoItems.browse({
+              category: currentFilters.category || undefined,
+              condition: currentFilters.condition || undefined,
+              search: currentFilters.search || undefined,
+              sortBy: currentFilters.sortBy
+            });
+        const renderCard = useSwappo
+          ? window.SwappoItems.renderCard
+          : DemoItems.renderCard.bind(DemoItems);
 
         // Apply subcategory filters
         let items = result.items;
@@ -636,13 +652,13 @@
         const visible = items.slice(0, visibleCount);
 
         if (grid) {
-          grid.innerHTML = visible.map(item => DemoItems.renderCard(item)).join('');
+          grid.innerHTML = visible.map(item => renderCard(item)).join('');
         }
 
         if (items.length === 0 && grid) {
           grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted);">' +
             '<i class="fas fa-search" style="font-size:2rem;margin-bottom:12px;display:block;"></i>' +
-            'No items found. Try different filters.</div>';
+            'No items yet. Be the first to <a href="publier.html" style="color:var(--primary);font-weight:600;">drop an item</a>.</div>';
         }
 
         // Show/hide load more
@@ -1016,7 +1032,11 @@
         var proDiv = document.getElementById('ai-pro-suggestions');
         proDiv.style.display = 'block';
         var scroll = document.getElementById('ai-suggestions-scroll');
-        var items = DemoItems.browse({ sortBy: 'popular' }).items.slice(0, 6);
+        var browseP = (window.SwappoItems && window.db)
+          ? window.SwappoItems.browse({ sortBy: 'popular', limit: 6 })
+          : Promise.resolve(DemoItems.browse({ sortBy: 'popular' }));
+        browseP.then(function(res) {
+        var items = (res.items || []).slice(0, 6);
         scroll.innerHTML = items.map(function(item) {
           var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Item';
           var photo = (item.photos && item.photos[0]) || '';
@@ -1029,6 +1049,7 @@
             '<div style="font-size:11px;color:#09B1BA;font-weight:600;">' + score + '% match</div>' +
             '</div></div></a>';
         }).join('');
+        });
       } else {
         document.getElementById('ai-free-teaser').style.display = 'block';
       }
@@ -1039,8 +1060,11 @@
       var btn = document.createElement('button');
       btn.className = 'surprise-me-btn';
       btn.innerHTML = '<i class="fas fa-dice"></i> Surprise Me!';
-      btn.onclick = function() {
-        var items = DemoItems.browse({ sortBy: 'popular' }).items;
+      btn.onclick = async function() {
+        var res = (window.SwappoItems && window.db)
+          ? await window.SwappoItems.browse({ sortBy: 'popular', limit: 20 })
+          : DemoItems.browse({ sortBy: 'popular' });
+        var items = res.items || [];
         if (!items.length) return;
         var item = items[Math.floor(Math.random() * Math.min(20, items.length))];
         var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Item';
@@ -1084,7 +1108,7 @@
     }
     window.setView = setView;
 
-    function initCatalogueMap() {
+    async function initCatalogueMap() {
       var mapEl = document.getElementById('catalogueMap');
       if (!mapEl || !window.L) return;
 
@@ -1112,10 +1136,13 @@
 
       // Get filtered items from current catalogue view
       var items = [];
-      if (window.DemoItems) {
-        var result = DemoItems.browse({ sortBy: 'newest' });
-        items = result.items || [];
+      var result;
+      if (window.SwappoItems && window.db) {
+        result = await window.SwappoItems.browse({ sortBy: 'newest', limit: 100 });
+      } else if (window.DemoItems) {
+        result = DemoItems.browse({ sortBy: 'newest' });
       }
+      items = (result && result.items) || [];
 
       // Place markers with jitter to avoid overlap
       items.forEach(function(item, i) {

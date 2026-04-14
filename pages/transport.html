@@ -140,9 +140,10 @@
   <!-- ========== HERO ========== -->
   <section class="transport-hero">
     <div class="container">
+      <div style="display:inline-block;background:#FEF3C7;color:#92400E;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:16px;letter-spacing:0.05em;text-transform:uppercase;">🚧 Coming Soon — Preview Only</div>
       <div style="font-size:48px;margin-bottom:16px;">🚛</div>
       <h1>Swappo Transport</h1>
-      <p>Trusted transporters for furniture, appliances, and large items across the UAE</p>
+      <p>Trusted transporters for furniture, appliances, and large items across the UAE. Booking launches soon — this page is a preview.</p>
       <div class="transport-filters">
         <select id="filter-emirate">
           <option value="">📍 All UAE</option>
@@ -503,10 +504,11 @@
   }
 
   function submitQuote(id) {
+    // Phase 2: booking is not yet live — collect interest only
     var desc = document.getElementById('q-desc').value.trim();
     if (!desc) { DemoNotifications.showToast('Please describe the item(s) to transport.', 'warning'); return; }
     document.querySelector('.transport-modal-overlay').remove();
-    DemoNotifications.showToast('Quote request sent! The transporter will respond within a few hours. 📱', 'success');
+    DemoNotifications.showToast('Thanks! Transport booking launches soon — we\'ll be in touch when it goes live. 🚛', 'info');
   }
 
   function submitNotify() {

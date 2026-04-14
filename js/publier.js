@@ -381,45 +381,114 @@ window.updateDetails = function(field, value) {
 }
 
 // ========================
-// STEP 3: PHOTOS (DEMO)
+// STEP 3: PHOTOS (real file upload — Phase 2)
+// Per-slot state: formState.photoBlobs[idx] = { preview, processed, uploadedUrl }
 // ========================
-window.togglePhoto = function(index) {
-  var cat = formState.category || 'other';
-  var photos = categoryPhotos[cat] || categoryPhotos.other;
+formState.photoBlobs = formState.photoBlobs || [];
+var _pendingSlotIndex = null;
 
-  if (formState.photos[index]) {
-    formState.photos[index] = null;
-  } else {
-    formState.photos[index] = photos[index] || photos[0];
+window.openPhotoPicker = function(index) {
+  // If slot already has a photo, clicking removes it
+  if (formState.photoBlobs[index]) {
+    removePhoto(index);
+    return;
   }
+  _pendingSlotIndex = index;
+  var input = document.getElementById('photoFileInput');
+  if (input) { input.value = ''; input.click(); }
+};
+
+window.removePhoto = function(index) {
+  if (formState.photoBlobs[index] && formState.photoBlobs[index].preview) {
+    try { URL.revokeObjectURL(formState.photoBlobs[index].preview); } catch (e) {}
+  }
+  formState.photoBlobs[index] = null;
   refreshPhotoGrid();
-}
+};
+
+window.handlePhotoFiles = async function(e) {
+  var files = Array.from(e.target.files || []);
+  if (!files.length) return;
+
+  if (!window.SwappoStorage) {
+    DemoNotifications.showToast('Photo module not loaded. Please refresh.', 'error');
+    return;
+  }
+
+  // Start at the pending slot (or first empty), and fill forward
+  var start = _pendingSlotIndex != null ? _pendingSlotIndex : 0;
+  var maxSlots = SwappoStorage.MAX_FILES || 5;
+
+  for (var i = 0; i < files.length; i++) {
+    var slotIdx = -1;
+    // Preferred slot first, then fill the next empties
+    if (i === 0 && !formState.photoBlobs[start]) slotIdx = start;
+    else {
+      for (var j = 0; j < maxSlots; j++) {
+        if (!formState.photoBlobs[j]) { slotIdx = j; break; }
+      }
+    }
+    if (slotIdx === -1) {
+      DemoNotifications.showToast('Max ' + maxSlots + ' photos reached.', 'warning');
+      break;
+    }
+    var slotEl = document.querySelector('.photo-slot[data-index="' + slotIdx + '"]');
+    if (slotEl) slotEl.classList.add('uploading');
+    try {
+      var processed = await SwappoStorage.processFile(files[i]);
+      formState.photoBlobs[slotIdx] = {
+        preview: processed.preview,
+        processed: processed,
+        uploadedUrl: null
+      };
+    } catch (err) {
+      DemoNotifications.showToast('Could not read ' + (files[i].name || 'image') + '.', 'error');
+    } finally {
+      if (slotEl) slotEl.classList.remove('uploading');
+    }
+    refreshPhotoGrid();
+  }
+  _pendingSlotIndex = null;
+};
 
 window.refreshPhotoGrid = function() {
   var slots = document.querySelectorAll('.photo-slot');
-  var cat = formState.category || 'other';
-  var photos = categoryPhotos[cat] || categoryPhotos.other;
-
   slots.forEach(function(slot, idx) {
-    if (formState.photos[idx]) {
+    // Wipe non-progress children
+    Array.from(slot.children).forEach(function(ch) {
+      if (!ch.classList || !ch.classList.contains('slot-progress')) slot.removeChild(ch);
+    });
+
+    var entry = formState.photoBlobs[idx];
+    if (entry && entry.preview) {
       slot.classList.add('filled');
-      // SAFE: use createElement + img.src instead of innerHTML concat (H-4)
-      slot.textContent = '';
       var img = document.createElement('img');
       img.alt = 'Photo ' + (idx + 1);
-      var u = String(formState.photos[idx]).trim();
-      if (/^(https?:\/\/|\/|\.\/|\.\.\/|data:image\/)/i.test(u)) img.src = u;
-      slot.appendChild(img);
+      img.src = entry.preview;
+      slot.insertBefore(img, slot.firstChild);
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'remove-photo';
+      btn.setAttribute('aria-label', 'Remove photo');
+      btn.innerHTML = '<i class="fas fa-times"></i>';
+      btn.onclick = function(ev) {
+        ev.stopPropagation();
+        removePhoto(idx);
+      };
+      slot.insertBefore(btn, slot.firstChild);
     } else {
       slot.classList.remove('filled');
-      slot.textContent = '';
       var ph = document.createElement('div');
       ph.className = 'photo-placeholder';
       ph.textContent = '+';
-      slot.appendChild(ph);
+      slot.insertBefore(ph, slot.firstChild);
     }
   });
-}
+
+  // Keep formState.photos mirrored for legacy reviewPhotos rendering
+  formState.photos = formState.photoBlobs.map(function(e) { return e ? e.preview : null; });
+};
 
 // ========================
 // STEP 4: REVIEW
@@ -469,10 +538,15 @@ window.toggleGiveaway = function() {
 // ========================
 // PUBLISH
 // ========================
-window.publishItem = function(e) {
+window.publishItem = async function(e) {
   e.preventDefault();
 
-  var user = DemoAuth.getCurrentUser();
+  // Auth check — prefer Supabase, fall back to DemoAuth for dev
+  var user = null;
+  if (window.SwappoAuth && window.SwappoAuth.isReady()) {
+    user = await window.SwappoAuth.getCurrentUser();
+  }
+  if (!user && window.DemoAuth) user = window.DemoAuth.getCurrentUser();
   if (!user) {
     window.location.href = 'login.html?redirect=/pages/publier.html';
     return;
@@ -483,42 +557,81 @@ window.publishItem = function(e) {
     return;
   }
 
+  var entries = (formState.photoBlobs || []).filter(function(p) { return p && p.processed; });
+  if (!entries.length) {
+    DemoNotifications.showToast('Please add at least one photo.', 'warning');
+    return;
+  }
+
   var btn = document.getElementById('btnPublish');
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading photos...';
   btn.disabled = true;
   btn.style.opacity = '0.7';
 
-  var selectedPhotos = formState.photos.filter(function(p) { return !!p; });
+  // --- 1. Upload photos to Supabase Storage ---
+  var photoUrls = [];
+  try {
+    for (var i = 0; i < entries.length; i++) {
+      var url = await window.SwappoStorage.uploadOne(
+        { _processed: entries[i].processed, type: entries[i].processed.mime },
+        user.id
+      );
+      photoUrls.push(url);
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading ' + (i + 1) + '/' + entries.length + '...';
+    }
+  } catch (err) {
+    console.error('[publier] upload failed:', err);
+    DemoNotifications.showToast('Upload failed: ' + (err.message || 'unknown error'), 'error');
+    btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    return;
+  }
 
-  var conditionMap = {
-    'New': 'new', 'Like New': 'like_new', 'Good': 'good', 'Fair': 'fair'
-  };
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+
+  // --- 2. Build item payload ---
+  var conditionMap = { 'New': 'new', 'Like New': 'like_new', 'Good': 'good', 'Fair': 'fair' };
+  var priceEl = document.getElementById('item-price');
+  var emirateEl = document.getElementById('item-emirate');
 
   var itemData = {
-    user_id: user.id,
     category: formState.category,
+    subcategory: formState.details.subcategory || '',
     type: formState.details.type || formState.category,
     brand: formState.details.brand || '',
     model: formState.details.model || '',
     condition: conditionMap[formState.details.condition] || 'good',
-    year: formState.details.year ? parseInt(formState.details.year) : new Date().getFullYear(),
-    size: formState.details.size || null,
-    color: formState.details.color || null,
-    photos: selectedPhotos,
-    is_giveaway: formState.isGiveaway,
-    price: parseInt(document.getElementById('item-price').value) || 0,
-    emirate: (document.getElementById('item-emirate') || {}).value || 'Dubai',
-    is_boosted: false,
-    status: 'active',
+    year: formState.details.year ? String(formState.details.year) : String(new Date().getFullYear()),
+    size: formState.details.size || '',
+    color: formState.details.color || '',
+    photos: photoUrls,
+    is_giveaway: !!formState.isGiveaway,
+    price: parseInt(priceEl ? priceEl.value : '0') || 0,
+    emirate: (emirateEl && emirateEl.value) || user.emirate || 'Dubai',
     city: user.city || 'Dubai',
-    distance: Math.round(Math.random() * 10 * 10) / 10,
-    lat: 25.2048 + (Math.random() - 0.5) * 0.1,
-    lng: 55.2708 + (Math.random() - 0.5) * 0.1
+    lat: (window.Swappo && Swappo.userLat) || null,
+    lng: (window.Swappo && Swappo.userLng) || null
   };
 
-  DemoItems.create(itemData);
+  // --- 3. Insert via Supabase, fall back to Demo in dev ---
+  var result = null;
+  if (window.SwappoItems) {
+    result = await window.SwappoItems.create(itemData);
+  } else if (window.DemoItems) {
+    result = window.DemoItems.create(itemData);
+  }
+
+  if (!result || !result.success) {
+    DemoNotifications.showToast('Publish failed: ' + ((result && result.error) || 'unknown'), 'error');
+    btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    return;
+  }
+
   DemoNotifications.showToast('Item published! \uD83C\uDF89', 'success');
   setTimeout(function() {
     window.location.href = 'catalogue.html';
-  }, 1500);
-}
+  }, 1200);
+};

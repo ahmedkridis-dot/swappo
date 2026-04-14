@@ -214,9 +214,53 @@
        ======================== */
     .photo-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 12px;
       margin-top: 24px;
+    }
+    @media (max-width: 640px) {
+      .photo-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .photo-slot .remove-photo {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      border: 0;
+      cursor: pointer;
+      z-index: 3;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    .photo-slot.filled .remove-photo { display: flex; }
+    .photo-slot .slot-progress {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: rgba(9,177,186,0.15);
+      overflow: hidden;
+      display: none;
+      z-index: 2;
+    }
+    .photo-slot .slot-progress::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--primary);
+      transform-origin: left;
+      animation: slot-pulse 1.2s ease-in-out infinite;
+    }
+    .photo-slot.uploading .slot-progress { display: block; }
+    @keyframes slot-pulse {
+      0% { transform: scaleX(0); }
+      50% { transform: scaleX(0.7); }
+      100% { transform: scaleX(1); }
     }
 
     .photo-slot {
@@ -726,25 +770,35 @@
           <!-- ========== STEP 3: PHOTOS ========== -->
           <div class="step-section" data-section="photos">
             <h2 class="step-title" data-i18n="publish_add_photos">Add photos of your item</h2>
-            <p class="step-subtitle" data-i18n="publish_step3_subtitle">Step 3 of 4 — Click slots to add demo photos</p>
+            <p class="step-subtitle" data-i18n="publish_step3_subtitle">Step 3 of 4 — Up to 5 photos, 2 MB each. Auto-resized & optimized.</p>
+
+            <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoFiles(event)">
 
             <div class="photo-grid" id="photoGrid">
-              <div class="photo-slot" data-index="0" onclick="togglePhoto(0)">
+              <div class="photo-slot" data-index="0" onclick="openPhotoPicker(0)">
                 <div class="photo-placeholder">+</div>
+                <div class="slot-progress"></div>
               </div>
-              <div class="photo-slot" data-index="1" onclick="togglePhoto(1)">
+              <div class="photo-slot" data-index="1" onclick="openPhotoPicker(1)">
                 <div class="photo-placeholder">+</div>
+                <div class="slot-progress"></div>
               </div>
-              <div class="photo-slot" data-index="2" onclick="togglePhoto(2)">
+              <div class="photo-slot" data-index="2" onclick="openPhotoPicker(2)">
                 <div class="photo-placeholder">+</div>
+                <div class="slot-progress"></div>
               </div>
-              <div class="photo-slot" data-index="3" onclick="togglePhoto(3)">
+              <div class="photo-slot" data-index="3" onclick="openPhotoPicker(3)">
                 <div class="photo-placeholder">+</div>
+                <div class="slot-progress"></div>
+              </div>
+              <div class="photo-slot" data-index="4" onclick="openPhotoPicker(4)">
+                <div class="photo-placeholder">+</div>
+                <div class="slot-progress"></div>
               </div>
             </div>
 
             <div class="photo-tips">
-              <span data-i18n="publish_photo_tip">Demo mode: Click each slot to add a placeholder photo for your category.</span>
+              <span data-i18n="publish_photo_tip">Tap a slot to pick a photo. Up to 5 photos, max 2&nbsp;MB each. Photos are resized to 1600&nbsp;px and saved as WebP.</span>
             </div>
 
             <div class="step-actions">
@@ -894,6 +948,8 @@
   <script src="../js/register-sw.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase.js"></script>
+  <script src="../js/swappo-storage.js"></script>
+  <script src="../js/swappo-items.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
