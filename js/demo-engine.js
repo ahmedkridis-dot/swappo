@@ -1358,6 +1358,12 @@ function updateNavbarForDemo() {
     }
   }
 
+  // ── Hide generic profile icon when logged in (avoid duplicate with dashboard pill) ──
+  const profileIcons = document.querySelectorAll('a.navbar-icon[href*="profile"]');
+  profileIcons.forEach(icon => {
+    icon.style.display = user ? 'none' : '';
+  });
+
   // ── Chat badge ────────────────────────────────────────────────────────
   const chatLinks = document.querySelectorAll('a[href*="chat"]');
   chatLinks.forEach(link => {
