@@ -1,0 +1,14 @@
+# Swappo - Coming Soon phase
+# Only the landing page is indexable during pre-launch
+
+User-agent: *
+Disallow: /pages/
+Disallow: /js/
+Disallow: /css/
+Disallow: /assets/
+Disallow: /dev-
+Disallow: /*.html$
+Allow: /$
+Allow: /index.html
+
+# No sitemap exposed during Coming Soon phase

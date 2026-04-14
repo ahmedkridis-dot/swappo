@@ -4,29 +4,17 @@
  * Cache-first for assets, Network-first for HTML and API calls
  */
 
-const CACHE_NAME = 'swappo-v35';
-const ASSET_CACHE = 'swappo-assets-v32';
-const API_CACHE = 'swappo-api-v32';
+const CACHE_NAME = 'swappo-v37';
+const ASSET_CACHE = 'swappo-assets-v37';
+const API_CACHE = 'swappo-api-v37';
 
 // Files to pre-cache during install
+// NOTE: During Coming Soon phase, we only precache the landing page and its assets.
+// Internal /pages/* are intentionally NOT precached to avoid leaking pre-launch
+// concept to visitors who only see the Coming Soon page.
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/css/style.css',
-  '/js/app.js',
-  '/js/mock-data.js',
-  '/js/demo-engine.js',
-  '/js/i18n.js',
-  '/js/animations.js',
-  '/js/publier.js',
-  '/js/cookie-consent.js',
-  '/pages/catalogue.html',
-  '/pages/login.html',
-  '/pages/publier.html',
-  '/pages/giveaway.html',
-  '/pages/product.html',
-  '/pages/profile.html',
-  '/pages/chat.html',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
 ];

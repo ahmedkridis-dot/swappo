@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/swappo-logo-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/brand/swappo-logo-192.png">
@@ -1457,7 +1458,7 @@
 
             // Stats + quota bars (v4: swaps unlimited → show completed count, no bar)
             const quotasContainer = document.getElementById('sidebar-quotas');
-            const swapsCompleted = planInfo.swaps_used || 0;
+            swapsCompleted = planInfo.swaps_used || 0;
             const claimsPct = planInfo.claims_limit > 0 ? Math.round((planInfo.claims_used / planInfo.claims_limit) * 100) : 0;
             const boostsPct = planInfo.boosts_limit > 0 ? Math.round((planInfo.boosts_used / planInfo.boosts_limit) * 100) : 0;
 
