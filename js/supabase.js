@@ -159,12 +159,23 @@ const SwappoAuth = {
     return { success: true };
   },
 
-  /** Returns the currently authenticated Supabase user, or null. */
+  /**
+   * Returns the currently authenticated Supabase user, or null.
+   * Uses getSession() (local read of cached JWT) rather than getUser()
+   * which makes a network roundtrip and can hang indefinitely if the
+   * /auth/v1/user endpoint is slow or blocked. Wrapped in a 3s timeout
+   * as a belt-and-braces safety.
+   */
   getCurrentUser: async function () {
     if (!db) return null;
     try {
-      const { data } = await db.auth.getUser();
-      return data ? data.user : null;
+      const res = await Promise.race([
+        db.auth.getSession(),
+        new Promise((resolve) => setTimeout(
+          () => resolve({ data: { session: null } }), 3000
+        ))
+      ]);
+      return res && res.data && res.data.session ? res.data.session.user : null;
     } catch (e) { return null; }
   },
 
@@ -172,10 +183,16 @@ const SwappoAuth = {
   syncMirror: async function () {
     if (!db) return null;
     try {
-      const { data } = await db.auth.getUser();
-      if (!data || !data.user) { _clearMirror(); return null; }
-      const profile = await _fetchProfile(data.user.id);
-      return _mirrorFromSupabase(data.user, profile);
+      const res = await Promise.race([
+        db.auth.getSession(),
+        new Promise((resolve) => setTimeout(
+          () => resolve({ data: { session: null } }), 3000
+        ))
+      ]);
+      const sessionUser = res && res.data && res.data.session ? res.data.session.user : null;
+      if (!sessionUser) { _clearMirror(); return null; }
+      const profile = await _fetchProfile(sessionUser.id);
+      return _mirrorFromSupabase(sessionUser, profile);
     } catch (e) { return null; }
   }
 };

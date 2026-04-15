@@ -564,9 +564,25 @@ window.publishItem = async function(e) {
     var user = null;
     var supabaseReady = !!(window.SwappoAuth && window.SwappoAuth.isReady());
     console.log('[publish] SwappoAuth ready?', supabaseReady);
-    if (supabaseReady) {
-      user = await window.SwappoAuth.getCurrentUser();
-      console.log('[publish] supabase user:', user ? user.email : 'null');
+    if (supabaseReady && window.db) {
+      // Use getSession() — LOCAL read of cached JWT, no network call.
+      // getUser() makes a network roundtrip to verify token and can hang
+      // forever when that endpoint is slow/blocked. Guard with a 3s timeout
+      // just in case getSession ever stalls (it shouldn't — it's sync-ish).
+      try {
+        var sessionRes = await Promise.race([
+          window.db.auth.getSession(),
+          new Promise(function(resolve) {
+            setTimeout(function() { resolve({ data: { session: null }, error: new Error('timeout') }); }, 3000);
+          })
+        ]);
+        user = sessionRes && sessionRes.data && sessionRes.data.session
+          ? sessionRes.data.session.user
+          : null;
+        console.log('[publish] supabase session user:', user ? user.email : 'null');
+      } catch (e) {
+        console.warn('[publish] getSession error:', e.message);
+      }
     }
     if (!user && window.DemoAuth) {
       user = window.DemoAuth.getCurrentUser();
