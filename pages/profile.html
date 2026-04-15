@@ -1367,8 +1367,13 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
           try {
-            // ── Auth check ───────────────────────────────────────────────
-            const user = await _getCurrentUser();
+            // ── Auth check (retry once to beat the Supabase restore race) ──
+            let user = await _getCurrentUser();
+            if (!user) {
+                // Brief wait + retry — SDK may still be restoring the session.
+                await new Promise(r => setTimeout(r, 600));
+                user = await _getCurrentUser();
+            }
             if (!user) {
                 window.location.href = 'login.html';
                 return;

@@ -2080,12 +2080,19 @@
 
   // ═══ INIT ═══
   async function chatInit() {
-    // Prefer SwappoAuth (Supabase session); fallback to DemoAuth
-    if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
-      try { currentUser = await window.SwappoAuth.getCurrentUser(); } catch (e) { currentUser = null; }
+    // Prefer SwappoAuth (Supabase session); fallback to DemoAuth.
+    // Retry once after a brief wait to survive the Supabase session-restore
+    // race (SDK may still be decoding the cached JWT on cold page load).
+    async function _resolve() {
+      if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
+        try { var u = await window.SwappoAuth.getCurrentUser(); if (u) return u; } catch (e) {}
+      }
+      return (window.DemoAuth && DemoAuth.getCurrentUser) ? DemoAuth.getCurrentUser() : null;
     }
-    if (!currentUser && window.DemoAuth && DemoAuth.getCurrentUser) {
-      currentUser = DemoAuth.getCurrentUser();
+    currentUser = await _resolve();
+    if (!currentUser) {
+      await new Promise(r => setTimeout(r, 600));
+      currentUser = await _resolve();
     }
     if (!currentUser) { window.location.href = 'login.html'; return; }
 
