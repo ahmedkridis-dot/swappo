@@ -1030,18 +1030,16 @@
         // Track claimed items in this session for UI updates
         const claimedItems = new Set();
 
-        // Supabase-first user + items resolver (fallback to DemoAuth).
+        // Supabase session resolver (no DemoAuth fallback — this page is 100%
+        // backed by Supabase. If the session can't be read, the page falls
+        // through to the guest overlay.)
         async function _getUser() {
-            if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
-                try { const u = await window.SwappoAuth.getCurrentUser(); if (u) return u; } catch (e) {}
-            }
-            return (window.DemoAuth && DemoAuth.getCurrentUser) ? DemoAuth.getCurrentUser() : null;
+            if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return null;
+            try { return await window.SwappoAuth.getCurrentUser(); } catch (e) { return null; }
         }
         async function _getUserItems(uid) {
-            if (window.SwappoItems && window.db) {
-                try { return await window.SwappoItems.getByUser(uid); } catch (e) {}
-            }
-            return (window.DemoItems && DemoItems.getByUser) ? DemoItems.getByUser(uid) : [];
+            if (!uid || !(window.SwappoItems && window.db)) return [];
+            try { return await window.SwappoItems.getByUser(uid); } catch (e) { return []; }
         }
 
         document.addEventListener('DOMContentLoaded', async function() {
@@ -1074,8 +1072,15 @@
 
             // ── Has access ──────────────────────────────────────────────────
             giveawayContent.style.display = 'block';
-            updateClaimsCounter();
-            updateKarmaBar(user);
+            // Preload favorite ids so isFavoritedSync() works inside the card
+            // builder without making a query per card.
+            try {
+                if (window.SwappoItems && window.SwappoItems.getFavoriteIds) {
+                    await window.SwappoItems.getFavoriteIds();
+                }
+            } catch (e) { /* empty cache is fine */ }
+            await updateClaimsCounter();
+            await updateKarmaBar(user);
             await renderGiveawayItems();
             setupFilters();
           } catch (err) {
@@ -1083,7 +1088,7 @@
           }
         });
 
-        /** Render giveaway items into the grid (Supabase-first, Demo fallback) */
+        /** Render giveaway items into the grid (100% Supabase). */
         async function renderGiveawayItems(categoryFilter) {
             const grid = document.getElementById('giveaway-grid');
             if (!grid) return;
@@ -1091,9 +1096,6 @@
             let items = [];
             if (window.SwappoItems && window.db && window.SwappoItems.getGiveaways) {
                 try { items = await window.SwappoItems.getGiveaways(); } catch (e) { items = []; }
-            }
-            if ((!items || !items.length) && window.DemoItems && DemoItems.getGiveaways) {
-                items = DemoItems.getGiveaways();
             }
 
             // Apply category filter
@@ -1117,7 +1119,11 @@
         function buildGiveawayCard(item) {
             var title = (item.brand + ' ' + item.model).trim();
             var photo = (item.photos && item.photos[0]) || '';
-            var fav = DemoItems.isFavorited(item.id);
+            // Favorite state uses the SwappoItems in-memory cache populated at
+            // page load (getFavoriteIds). No DemoItems dependency.
+            var fav = (window.SwappoItems && window.SwappoItems.isFavoritedSync)
+              ? window.SwappoItems.isFavoritedSync(item.id)
+              : false;
             var isClaimed = claimedItems.has(item.id);
 
             var details = [];
@@ -1159,66 +1165,103 @@
             '</div>';
         }
 
-        /** Handle claiming a giveaway item — 5-step UX flow */
-        function handleClaim(itemId, btnEl) {
-            var user = DemoAuth.getCurrentUser();
+        /** Handle claiming a giveaway item — 5-step UX flow (Supabase).
+         *
+         *  Rules (all enforced server-side via RLS + the queries below):
+         *    1. Must be signed in.
+         *    2. Must have at least one item published (proof-of-contribution).
+         *    3. Cannot claim your own gift.
+         *    4. Cannot have already claimed N gifts this calendar month
+         *       (N = 1 for free, 5 for pro).
+         */
+        async function handleClaim(itemId, btnEl) {
+            // STEP 1 — Must be signed in (use the Supabase session, not DemoAuth)
+            var user = await _getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
 
-            // STEP 1 — Not logged in → sign up popup
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
+            try {
+                // 2) Check the user has published at least one item
+                var { count: hasItems, error: cntErr } = await window.db
+                    .from('items')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', user.id);
+                if (cntErr) throw cntErr;
+                if (!hasItems || hasItems === 0) { showNeedsListingModal(); return; }
 
-            // Attempt claim via DemoGiveaway (backend has all the rules)
-            var result = DemoGiveaway.claim(itemId);
+                // 3) Load plan + monthly quota (1 free, 5 pro)
+                var { data: profile } = await window.db
+                    .from('users').select('plan').eq('id', user.id).maybeSingle();
+                var plan = (profile && profile.plan) || 'free';
+                var limit = plan === 'pro' ? 5 : 1;
 
-            if (!result.success) {
-                // STEP 2 — User has never listed anything → pedagogical modal
-                if (result.code === 'needs_listing') {
-                    showNeedsListingModal();
+                var monthStart = new Date();
+                monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+
+                var { count: claimedThisMonth } = await window.db
+                    .from('swaps')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('proposer_id', user.id)
+                    .eq('is_giveaway_claim', true)
+                    .gte('created_at', monthStart.toISOString());
+                if ((claimedThisMonth || 0) >= limit) {
+                    if (plan === 'pro') showProQuotaInfoModal(limit);
+                    else showFreeQuotaSoftPaywall();
                     return;
                 }
 
-                // STEP 4 & 5 — Quota reached
-                if (result.code === 'quota_reached') {
-                    if (result.plan === 'pro') {
-                        showProQuotaInfoModal(result.limit);
-                    } else {
-                        showFreeQuotaSoftPaywall();
-                    }
-                    return;
+                // 4) Resolve the gift's owner (receiver of the claim)
+                var { data: item, error: itErr } = await window.db
+                    .from('items').select('id,user_id,is_giveaway,status')
+                    .eq('id', itemId).maybeSingle();
+                if (itErr || !item) { DemoNotifications.showToast('This gift is no longer available.', 'error'); return; }
+                if (!item.is_giveaway) { DemoNotifications.showToast('This item is no longer a gift.', 'error'); return; }
+                if (item.user_id === user.id) { DemoNotifications.showToast("You can't claim your own gift.", 'warning'); return; }
+                if (item.status && item.status !== 'available') {
+                    DemoNotifications.showToast('This gift has already been claimed.', 'info'); return;
                 }
 
-                // Other errors (category lock, not found, etc.) → gentle toast
-                DemoNotifications.showToast(result.error || 'Claim failed.', 'info');
-                return;
+                // 5) Insert the giveaway claim as a swap row
+                var { data: swap, error: swapErr } = await window.db.from('swaps').insert({
+                    proposer_id: user.id,
+                    receiver_id: item.user_id,
+                    receiver_item_id: itemId,
+                    is_giveaway_claim: true,
+                    cash_direction: 'none',
+                    cash_amount: 0,
+                    status: 'pending'
+                }).select('*').single();
+                if (swapErr) throw swapErr;
+
+                // 6) Notify the giver (RLS INSERT policy in place since migration 004)
+                try {
+                    await window.db.from('notifications').insert({
+                        user_id: item.user_id,
+                        kind: 'gift_claimed',
+                        payload: { swap_id: swap.id, item_id: itemId, claimer_id: user.id }
+                    });
+                } catch (nErr) { console.warn('[giveaway] notify giver failed:', nErr.message || nErr); }
+
+                // STEP 3 — Success state
+                claimedItems.add(itemId);
+                if (btnEl) {
+                    btnEl.className = 'giveaway-card-button claimed';
+                    btnEl.innerHTML = '<i class="fas fa-check"></i> Claimed';
+                }
+                await updateClaimsCounter();
+                DemoNotifications.showToast('🎁 Gift claimed! The giver will contact you soon.', 'success');
+                await updateKarmaBar(user);
+                showThankYouModal(itemId);
+            } catch (err) {
+                console.error('[giveaway] claim failed:', err);
+                var msg = err && err.message ? err.message : 'Claim failed.';
+                // 42501 = RLS denial; friendlier message than raw Postgres error
+                if (msg.toLowerCase().indexOf('row-level security') !== -1 || msg.indexOf('42501') !== -1) {
+                    msg = 'Not allowed — please sign in again and retry.';
+                }
+                DemoNotifications.showToast(msg, 'error');
             }
-
-            // STEP 3 — Success: celebrate, no upsell
-            claimedItems.add(itemId);
-
-            // Update button to show claimed state
-            if (btnEl) {
-                btnEl.className = 'giveaway-card-button claimed';
-                btnEl.innerHTML = '<i class="fas fa-check"></i> Claimed';
-            }
-
-            // Update claims counter
-            updateClaimsCounter();
-
-            // Update navbar
-            if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
-
-            // Celebratory confirmation toast
-            DemoNotifications.showToast('🎁 Gift claimed! The giver will contact you soon.', 'success');
-
-            // Update karma bar
-            var user2 = DemoAuth.getCurrentUser();
-            if (user2) updateKarmaBar(user2);
-
-            // Show thank-you modal
-            showThankYouModal(itemId);
         }
+        window.handleClaim = handleClaim;
 
         /** Generic centered modal helper */
         function _buildModal(innerHTML) {
@@ -1269,11 +1312,17 @@
         }
 
         /** Show thank-you modal after claiming */
-        function showThankYouModal(itemId) {
-            // Find the item to get its name
-            var items = DemoItems.getGiveaways();
-            var item = items.find(function(i) { return i.id === itemId; });
-            var itemName = item ? ((item.brand || '') + ' ' + (item.model || '')).trim() || 'this item' : 'this item';
+        async function showThankYouModal(itemId) {
+            // Fetch the claimed item's display name from Supabase
+            var itemName = 'this item';
+            try {
+                var { data: item } = await window.db
+                    .from('items').select('brand,model,category')
+                    .eq('id', itemId).maybeSingle();
+                if (item) {
+                    itemName = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.category || 'this item';
+                }
+            } catch (e) { /* fall back to "this item" */ }
 
             var overlay = document.createElement('div');
             overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -1298,22 +1347,45 @@
             btn.closest('div[style*="fixed"]').remove();
         }
 
-        /** Update the claims remaining counter */
-        function updateClaimsCounter() {
-            var user = DemoAuth.getCurrentUser();
+        /** Update the claims remaining counter — reads from Supabase. */
+        async function updateClaimsCounter() {
+            var user = await _getUser();
             if (!user) return;
-            var planInfo = DemoSubscription.getPlan(user.id);
-            var remaining = planInfo.claims_limit - planInfo.claims_used;
-            var el = document.getElementById('claims-remaining');
-            if (el) el.textContent = remaining;
-            var maxEl = document.getElementById('claims-max');
-            if (maxEl) maxEl.textContent = planInfo.claims_limit;
+            try {
+                var { data: profile } = await window.db
+                    .from('users').select('plan').eq('id', user.id).maybeSingle();
+                var plan = (profile && profile.plan) || 'free';
+                var limit = plan === 'pro' ? 5 : 1;
+
+                var monthStart = new Date();
+                monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+                var { count: used } = await window.db
+                    .from('swaps')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('proposer_id', user.id)
+                    .eq('is_giveaway_claim', true)
+                    .gte('created_at', monthStart.toISOString());
+
+                var remaining = Math.max(0, limit - (used || 0));
+                var el = document.getElementById('claims-remaining');
+                if (el) el.textContent = remaining;
+                var maxEl = document.getElementById('claims-max');
+                if (maxEl) maxEl.textContent = limit;
+            } catch (e) { console.warn('[giveaway] updateClaimsCounter:', e.message || e); }
         }
 
-        /** Toggle favorite on a card */
-        function toggleFav(btnEl, itemId) {
-            var nowFav = DemoItems.toggleFavorite(itemId);
+        /** Toggle favorite on a card — Supabase-backed (SwappoItems.toggleFavorite) */
+        async function toggleFav(btnEl, itemId) {
             var icon = btnEl.querySelector('i');
+            var nowFav = false;
+            try {
+                if (window.SwappoItems && window.SwappoItems.toggleFavorite) {
+                    nowFav = await window.SwappoItems.toggleFavorite(itemId);
+                }
+            } catch (e) {
+                DemoNotifications.showToast('Could not update favorite — please sign in.', 'error');
+                return;
+            }
             if (nowFav) {
                 btnEl.classList.add('liked');
                 icon.className = 'fas fa-heart';
@@ -1322,6 +1394,7 @@
                 icon.className = 'far fa-heart';
             }
         }
+        window.toggleFav = toggleFav;
 
         /** Set up category filter chips */
         function setupFilters() {
@@ -1350,10 +1423,15 @@
             container.style.position = 'relative';
             container.appendChild(overlay);
         }
-    // ── Karma Bar ──
-    function updateKarmaBar(user) {
-      var userItems = DemoItems.getByUser ? DemoItems.getByUser(user.id) : [];
-      var donations = userItems.filter(function(i) { return i.is_giveaway; }).length;
+    // ── Karma Bar (Supabase) ──
+    async function updateKarmaBar(user) {
+      var userItems = [];
+      try {
+        if (window.SwappoItems && window.SwappoItems.getByUser) {
+          userItems = await window.SwappoItems.getByUser(user.id);
+        }
+      } catch (e) { userItems = []; }
+      var donations = (userItems || []).filter(function(i) { return i.is_giveaway; }).length;
       var swaps = user.swap_count || 0;
       var karma = (donations * 20) + (swaps * 10);
       var levels = [
@@ -1388,8 +1466,13 @@
       var btn = document.createElement('button');
       btn.className = 'surprise-me-btn gift-variant';
       btn.innerHTML = '<i class="fas fa-gift"></i> Surprise Gift!';
-      btn.onclick = function() {
-        var items = DemoItems.getGiveaways ? DemoItems.getGiveaways() : [];
+      btn.onclick = async function() {
+        var items = [];
+        try {
+          if (window.SwappoItems && window.SwappoItems.getGiveaways) {
+            items = await window.SwappoItems.getGiveaways();
+          }
+        } catch (e) { items = []; }
         if (!items.length) { DemoNotifications.showToast('No gifts available right now!', 'info'); return; }
         var item = items[Math.floor(Math.random() * items.length)];
         var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Gift';
