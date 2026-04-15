@@ -937,44 +937,17 @@
     /* ========================
        Quick Demo Login
        ======================== */
-    /** Fresh demo login — clears ALL old data, reinits, then signs in */
-    function freshDemoPro() {
-      // Clear everything except keep language as EN
-      Object.keys(localStorage).forEach(function(k) { if (k.startsWith('swappo')) localStorage.removeItem(k); });
-      localStorage.setItem('swappo_language', 'en'); // Force EN, not browser lang
-      // Re-seed
-      if (window.initDemoMode) initDemoMode();
-      // Sign in as Pro
-      var result = DemoAuth.signIn('pro@swappo.ae', 'pro123');
-      if (result.success) {
-        showToast('Welcome Fatima! Pro account loaded. 💎', 'success');
-        setTimeout(function() {
-          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
-        }, 1000);
-      }
+    // "Quick Demo" shortcuts were removed from the UI on 2026-04-15 (phone-
+    // first signup rebuild) — there is no demo seed anymore. The functions
+    // are kept as no-ops with legacy names so any orphaned onclick handler
+    // on a cached page template doesn't throw.
+    function _demoShortcutRemoved() {
+      showToast('Demo shortcuts removed — please sign up via phone or email.', 'info');
     }
-    window.freshDemoPro = freshDemoPro;
-
-    function freshDemoFree() {
-      // Clear everything except keep language as EN
-      Object.keys(localStorage).forEach(function(k) { if (k.startsWith('swappo')) localStorage.removeItem(k); });
-      localStorage.setItem('swappo_language', 'en'); // Force EN, not browser lang
-      // Re-seed
-      if (window.initDemoMode) initDemoMode();
-      // Sign in as Free
-      var result = DemoAuth.signIn('free@swappo.ae', 'free123');
-      if (result.success) {
-        showToast('Welcome Khalid! Free plan loaded. 🌱', 'success');
-        setTimeout(function() {
-          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
-        }, 1000);
-      }
-    }
-    window.freshDemoFree = freshDemoFree;
-
-    // Legacy aliases
-    window.quickDemoLogin = freshDemoPro;
-    window.quickDemoFree = freshDemoFree;
+    window.freshDemoPro = _demoShortcutRemoved;
+    window.freshDemoFree = _demoShortcutRemoved;
+    window.quickDemoLogin = _demoShortcutRemoved;
+    window.quickDemoFree = _demoShortcutRemoved;
 
     /* ========================
        Forgot password (email flow)
@@ -1010,10 +983,7 @@
             return;
           }
         }
-      } catch (e) { /* ignore and fall through to DemoAuth */ }
-      if (window.DemoAuth && DemoAuth.isLoggedIn && DemoAuth.isLoggedIn()) {
-        window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
-      }
+      } catch (e) { /* unauthenticated — stay on login */ }
     })();
   </script>
 </body>

@@ -569,6 +569,8 @@
         if (useSwappo && window.SwappoItems.getFavoriteIds) {
           try { await window.SwappoItems.getFavoriteIds(); } catch (e) {}
         }
+        // 100% Supabase — if the service isn't ready, we show the empty
+        // state instead of falling back to localStorage fixtures.
         const result = useSwappo
           ? await window.SwappoItems.browse({
               category: currentFilters.category || undefined,
@@ -576,15 +578,10 @@
               search: currentFilters.search || undefined,
               sortBy: currentFilters.sortBy
             })
-          : DemoItems.browse({
-              category: currentFilters.category || undefined,
-              condition: currentFilters.condition || undefined,
-              search: currentFilters.search || undefined,
-              sortBy: currentFilters.sortBy
-            });
+          : { items: [], total: 0 };
         const renderCard = useSwappo
           ? window.SwappoItems.renderCard
-          : DemoItems.renderCard.bind(DemoItems);
+          : function() { return ''; };
 
         // Apply subcategory filters
         let items = result.items;
@@ -1016,10 +1013,14 @@
       updateSubcategoryBar();
     });
     // ── AI Teaser ──
-    (function() {
+    (async function() {
       var container = document.getElementById('ai-teaser-container');
       if (!container) return;
-      var user = window.DemoAuth && DemoAuth.getCurrentUser();
+      // Read session from Supabase (mirrored in localStorage by supabase.js)
+      var user = null;
+      if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
+        try { user = await window.SwappoAuth.getCurrentUser(); } catch (e) { user = null; }
+      }
       if (!user) {
         // Show free teaser for non-logged-in
         container.style.display = 'block';
@@ -1034,7 +1035,7 @@
         var scroll = document.getElementById('ai-suggestions-scroll');
         var browseP = (window.SwappoItems && window.db)
           ? window.SwappoItems.browse({ sortBy: 'popular', limit: 6 })
-          : Promise.resolve(DemoItems.browse({ sortBy: 'popular' }));
+          : Promise.resolve({ items: [] });
         browseP.then(function(res) {
         var items = (res.items || []).slice(0, 6);
         scroll.innerHTML = items.map(function(item) {
@@ -1063,7 +1064,7 @@
       btn.onclick = async function() {
         var res = (window.SwappoItems && window.db)
           ? await window.SwappoItems.browse({ sortBy: 'popular', limit: 20 })
-          : DemoItems.browse({ sortBy: 'popular' });
+          : { items: [] };
         var items = res.items || [];
         if (!items.length) return;
         var item = items[Math.floor(Math.random() * Math.min(20, items.length))];
@@ -1139,8 +1140,8 @@
       var result;
       if (window.SwappoItems && window.db) {
         result = await window.SwappoItems.browse({ sortBy: 'newest', limit: 100 });
-      } else if (window.DemoItems) {
-        result = DemoItems.browse({ sortBy: 'newest' });
+      } else {
+        result = { items: [] };
       }
       items = (result && result.items) || [];
 
