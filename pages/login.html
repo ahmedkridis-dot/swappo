@@ -664,7 +664,7 @@
        absolute URLs (https?://…), javascript:, data:, vbscript:.
        ======================== */
     function safeRedirect(fallback) {
-      fallback = fallback || '../index.html';
+      fallback = fallback || '../dev-a7f3k9mz2q.html';
       try {
         var params = new URLSearchParams(window.location.search);
         var target = params.get('redirect');
@@ -870,7 +870,7 @@
 
         showToast('Welcome to Swappo!', 'success');
         setTimeout(() => {
-          window.location.href = safeRedirect('../index.html');
+          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
         }, 1200);
       } catch (err) {
         showToast(err.message || 'Signup failed', 'error');
@@ -913,7 +913,7 @@
 
         showToast('Welcome back!', 'success');
         setTimeout(() => {
-          window.location.href = safeRedirect('../index.html');
+          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
         }, 1000);
       } catch (err) {
         showToast(err.message || 'Login failed', 'error');
@@ -954,7 +954,7 @@
       if (result.success) {
         showToast('Welcome Fatima! Pro account loaded. 💎', 'success');
         setTimeout(function() {
-          window.location.href = safeRedirect('../index.html');
+          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
         }, 1000);
       }
     }
@@ -971,7 +971,7 @@
       if (result.success) {
         showToast('Welcome Khalid! Free plan loaded. 🌱', 'success');
         setTimeout(function() {
-          window.location.href = safeRedirect('../index.html');
+          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
         }, 1000);
       }
     }
@@ -1051,13 +1051,13 @@
         if (window.SwappoAuth && window.SwappoAuth.isReady()) {
           const supaUser = await window.SwappoAuth.getCurrentUser();
           if (supaUser) {
-            window.location.href = safeRedirect('../index.html');
+            window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
             return;
           }
         }
       } catch (e) { /* ignore and fall through to DemoAuth */ }
       if (DemoAuth.isLoggedIn()) {
-        window.location.href = safeRedirect('../index.html');
+        window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
       }
     })();
   </script>
