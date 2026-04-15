@@ -658,6 +658,7 @@
     currentUser = await _resolveCurrentUser();
     var isGuest = !currentUser;
     var owner = await _resolveOwner(item.user_id);
+    var isOwner = !!(currentUser && item.user_id && currentUser.id === item.user_id);
     var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type;
     var interestedCount = Math.floor(Math.random() * 15) + 1;
 
@@ -808,7 +809,19 @@
       actionsHTML += '</div>';
     }
 
-    if (item.is_giveaway) {
+    if (isOwner) {
+      // Owner view: show management actions, NOT swap/buy/offer (you can't
+      // swap or buy your own item).
+      actionsHTML += '<div style="background:#F0FBFC;border:1px solid #09B1BA;border-radius:14px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">' +
+        '<i class="fas fa-user-check" style="color:#09B1BA;font-size:18px;"></i>' +
+        '<div><div style="font-size:14px;font-weight:700;color:#1A1A2E;">This is your listing</div>' +
+        '<div style="font-size:12px;color:#555;">Manage it from your dashboard or boost it to get more views.</div></div>' +
+      '</div>';
+      actionsHTML += '<button class="btn-primary" style="font-size:15px;" onclick="window.location.href=\'profile.html\'">' +
+        '<i class="fas fa-cog"></i> Manage in My Swaps</button>';
+      actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" onclick="window.location.href=\'profile.html#boost-' + encodeURIComponent(item.id) + '\'">' +
+        '<i class="fas fa-rocket"></i> Boost this listing</button>';
+    } else if (item.is_giveaway) {
       // Giveaway: Claim button
       if (isGuest) {
         actionsHTML += '<button class="btn-primary" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
@@ -818,7 +831,7 @@
           '<i class="fas fa-gift"></i> ' + t('claim_item') + '</button>';
       }
     } else {
-      // v5 Marketplace: Buy / Swap / Offer buttons
+      // v5 Marketplace: Buy / Swap / Offer buttons (other users only)
       var itemPrice = (currentItem && currentItem.price) || 0;
       if (isGuest) {
         actionsHTML += '<button class="btn-primary" style="font-size:16px;" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
@@ -1101,6 +1114,10 @@
   // ============ BUY (v5) — sends a purchase offer (no chat yet) ============
   async function startBuy() {
     if (!currentItem || !currentUser) return;
+    if (currentItem.user_id === currentUser.id) {
+      DemoNotifications.showToast("You can't buy your own item.", 'warning');
+      return;
+    }
     var price = currentItem.price || 0;
     var res;
     if (window.SwappoSwaps && window.db) {
@@ -1125,6 +1142,10 @@
   // ============ OFFER MODAL (v5) — cash + optional item ============
   function openOfferModal() {
     if (!currentItem || !currentUser) return;
+    if (currentItem.user_id === currentUser.id) {
+      DemoNotifications.showToast("You can't make an offer on your own item.", 'warning');
+      return;
+    }
     var price = currentItem.price || 0;
     var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
     var overlay = document.createElement('div');
@@ -1180,15 +1201,22 @@
   window.submitOffer = submitOffer;
 
   // ============ SWAP MODAL ============
-  function openSwapModal() {
+  async function openSwapModal() {
     if (!currentUser) {
       window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
       return;
     }
-    // Publish gate: user must have at least one active item before proposing
-    if (window.checkPublishGate && checkPublishGate()) {
-      showPublishGate();
+    // Can't swap with yourself — defensive (button should already be hidden).
+    if (currentItem && currentUser && currentItem.user_id === currentUser.id) {
+      DemoNotifications.showToast("You can't swap with yourself.", 'warning');
       return;
+    }
+    // Publish gate: user must have at least one active item before proposing
+    if (window.checkPublishGate) {
+      try {
+        var needsPublish = await checkPublishGate();
+        if (needsPublish) { showPublishGate(); return; }
+      } catch (e) { console.warn('[openSwapModal] publish gate check failed:', e); }
     }
     selectedSwapItemId = null;
     document.getElementById('swapModal').classList.add('open');
@@ -1197,6 +1225,7 @@
     // Refresh recap to show current cash amount
     updateCashDisplay(selectedCashAmount || 0);
   }
+  window.openSwapModal = openSwapModal;
 
   function closeSwapModal() {
     document.getElementById('swapModal').classList.remove('open');
@@ -1226,7 +1255,12 @@
       console.error('loadMyItemsInModal error', e);
       myItems = [];
     }
-    myItems = (myItems || []).filter(function(i) { return i.status === 'active'; });
+    // Accept legacy Demo 'active' AND Supabase 'available' as listable items.
+    // Exclude 'reserved' (already in a pending swap), 'swapped', 'sold', 'removed', 'pending'.
+    myItems = (myItems || []).filter(function(i) {
+      var s = i.status || 'available';
+      return s === 'available' || s === 'active';
+    });
 
     if (myItems.length === 0) {
       grid.style.display = 'none';

@@ -100,6 +100,22 @@
     const { data, error } = await global.db.from(TABLE).insert(row).select('*').single();
     if (error) return { success: false, error: error.message };
 
+    // Notify the RECEIVER in Supabase (so they see it across devices).
+    try {
+      await global.db.from('notifications').insert({
+        user_id: theirItem.user_id,
+        kind: isPurchase ? 'offer_received' : 'swap_proposed',
+        payload: {
+          swap_id: data.id,
+          item_id: theirItemId,
+          proposer_id: uid,
+          cash_amount: Number(cashAmount) || 0,
+          cash_direction: cashDirection
+        }
+      });
+    } catch (e) { console.warn('[propose] notify receiver failed:', e.message || e); }
+
+    // Local toast for the proposer
     if (global.DemoNotifications) {
       global.DemoNotifications.add({
         type: 'swap_proposed',
@@ -164,6 +180,20 @@
         is_system: true
       });
     }
+
+    // Notify the PROPOSER in Supabase (they initiated, now need to know the
+    // receiver accepted so they can open the chat).
+    try {
+      await global.db.from('notifications').insert({
+        user_id: updated.proposer_id,
+        kind: 'swap_accepted',
+        payload: {
+          swap_id: updated.id,
+          conversation_id: conversationId,
+          item_id: updated.receiver_item_id
+        }
+      });
+    } catch (e) { console.warn('[respond] notify proposer failed:', e.message || e); }
 
     if (global.DemoNotifications) {
       global.DemoNotifications.add({

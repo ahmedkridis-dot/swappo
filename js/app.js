@@ -354,7 +354,20 @@ function closeMobileMenu() {
 }
 
 // ─── PUBLISH GATE MODAL ─────────────────────────────────────────────────────
-function checkPublishGate() {
+// Returns a PROMISE<boolean> — true means user needs to publish first.
+// Prefers SwappoItems (Supabase) and falls back to DemoItems (localStorage).
+async function checkPublishGate() {
+  // Prefer Supabase if available
+  if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
+    try {
+      var u = await window.SwappoAuth.getCurrentUser();
+      if (u && window.SwappoItems && window.SwappoItems.hasActiveItems) {
+        var has = await window.SwappoItems.hasActiveItems(u.id);
+        return !has; // gate if NO active items
+      }
+    } catch (e) { /* fall through to DemoAuth */ }
+  }
+  // Demo fallback
   if (!window.DemoAuth || !DemoAuth.isLoggedIn()) return false;
   var user = DemoAuth.getCurrentUser();
   if (!user) return false;
