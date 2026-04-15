@@ -1119,14 +1119,40 @@
                             <div class="settings-section">
                                 <h3><i class="fas fa-user"></i> Profile Settings</h3>
                                 <div style="display:flex;flex-direction:column;gap:14px;">
+                                    <!-- Avatar picker -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Name</label>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Avatar</label>
+                                        <div id="settings-avatar-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px;"></div>
+                                        <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--primary);cursor:pointer;">
+                                            <i class="fas fa-cloud-upload-alt"></i> Upload my own photo
+                                            <input type="file" id="settings-avatar-upload" accept="image/png,image/jpeg,image/webp" style="display:none;">
+                                        </label>
+                                    </div>
+                                    <!-- Pseudo -->
+                                    <div>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Username <span style="color:var(--text-muted);font-weight:400;">(public)</span></label>
+                                        <input type="text" id="settings-pseudo" maxlength="20" placeholder="e.g. ahmed_k" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                        <span id="settings-pseudo-hint" style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">3–20 letters, numbers and underscores.</span>
+                                    </div>
+                                    <!-- Name -->
+                                    <div>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Full name <span style="color:var(--text-muted);font-weight:400;">(shown only after swap accepted)</span></label>
                                         <input type="text" id="settings-name" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
                                     </div>
+                                    <!-- Email -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Email</label>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Email <span style="color:var(--text-muted);font-weight:400;">(read-only)</span></label>
                                         <input type="email" id="settings-email" disabled style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg-light);color:var(--text-muted);">
                                     </div>
+                                    <!-- Phone -->
+                                    <div>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Phone <span style="color:var(--text-muted);font-weight:400;">(UAE 5XXXXXXXX)</span></label>
+                                        <div style="display:flex;align-items:center;gap:8px;">
+                                            <span style="padding:10px 12px;background:var(--bg-light);border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;color:var(--text);">🇦🇪 +971</span>
+                                            <input type="tel" id="settings-phone" maxlength="9" pattern="^5[0-9]{8}$" placeholder="5X XXX XXXX" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                        </div>
+                                    </div>
+                                    <!-- City -->
                                     <div>
                                         <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">City</label>
                                         <select id="settings-city" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
@@ -1981,22 +2007,180 @@
             }
 
             // ── Save settings button ─────────────────────────────────────
-            document.getElementById('save-settings-btn').addEventListener('click', () => {
+            // ── Settings: avatar picker + pseudo availability + save ─────
+            (async function setupSettings() {
+              // Fetch latest profile row from Supabase so the settings are fresh
+              let profile = null;
+              if (window.db) {
+                try {
+                  const { data } = await window.db.from('users').select('*').eq('id', user.id).maybeSingle();
+                  profile = data || null;
+                } catch (e) { /* use `user` as fallback */ }
+              }
+              const p = profile || user || {};
+              document.getElementById('settings-name').value = p.name || '';
+              document.getElementById('settings-email').value = p.email || '';
+              document.getElementById('settings-pseudo').value = p.pseudo || '';
+              const phoneRaw = (p.phone || '').replace(/^\+971/, '');
+              document.getElementById('settings-phone').value = phoneRaw;
+              const citySelect = document.getElementById('settings-city');
+              if (p.city) citySelect.value = p.city;
+
+              // ---- Avatar grid (same 12 presets as onboarding) ----
+              let _selectedAvatar = p.avatar || null;
+              let _uploadBlob = null;
+              const grid = document.getElementById('settings-avatar-grid');
+              if (grid && window.SWAPPO_AVATARS) {
+                const keys = Object.keys(window.SWAPPO_AVATARS).slice(0, 12);
+                grid.innerHTML = keys.map(k => {
+                  const a = window.SWAPPO_AVATARS[k];
+                  const sel = (k === _selectedAvatar) ? ' selected' : '';
+                  return '<button type="button" class="avatar-slot' + sel + '" data-key="' + k + '" style="aspect-ratio:1;border-radius:10px;border:2px solid ' + (sel ? '#09B1BA' : '#E5E7EB') + ';background:#fff;padding:4px;cursor:pointer;overflow:hidden;transition:all 0.2s;">' + a.svg + '</button>';
+                }).join('');
+                // If current avatar is a URL (uploaded), show it as first selected slot
+                if (_selectedAvatar && /^https?:\/\//.test(_selectedAvatar)) {
+                  const first = grid.querySelector('.avatar-slot');
+                  if (first) {
+                    first.innerHTML = '<img src="' + _selectedAvatar + '" alt="Your photo" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
+                    first.classList.add('selected');
+                    first.style.borderColor = '#09B1BA';
+                    first.dataset.key = _selectedAvatar;
+                  }
+                }
+                grid.querySelectorAll('.avatar-slot').forEach(btn => {
+                  btn.addEventListener('click', () => {
+                    grid.querySelectorAll('.avatar-slot').forEach(b => { b.classList.remove('selected'); b.style.borderColor = '#E5E7EB'; });
+                    btn.classList.add('selected');
+                    btn.style.borderColor = '#09B1BA';
+                    _selectedAvatar = btn.dataset.key;
+                    _uploadBlob = null;
+                  });
+                });
+              }
+
+              // ---- Avatar upload ----
+              const upInput = document.getElementById('settings-avatar-upload');
+              if (upInput && window.SwappoStorage) {
+                upInput.addEventListener('change', async (ev) => {
+                  const file = ev.target.files && ev.target.files[0];
+                  if (!file) return;
+                  try {
+                    const processed = await window.SwappoStorage.processFile(file);
+                    _uploadBlob = processed;
+                    _selectedAvatar = null;
+                    // Preview in first slot
+                    const first = grid && grid.querySelector('.avatar-slot');
+                    if (first) {
+                      grid.querySelectorAll('.avatar-slot').forEach(b => { b.classList.remove('selected'); b.style.borderColor = '#E5E7EB'; });
+                      first.classList.add('selected');
+                      first.style.borderColor = '#09B1BA';
+                      first.innerHTML = '<img src="' + processed.preview + '" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
+                    }
+                    DemoNotifications.showToast('Photo ready — click Save Settings to apply.', 'info');
+                  } catch (err) {
+                    DemoNotifications.showToast('Could not process photo: ' + (err.message || 'unknown'), 'error');
+                  }
+                });
+              }
+
+              // ---- Pseudo availability (debounced) ----
+              let _pseudoOk = !!p.pseudo;   // existing pseudo is considered ok
+              let _pseudoCheckTimer = null;
+              const pseudoInput = document.getElementById('settings-pseudo');
+              const pseudoHint = document.getElementById('settings-pseudo-hint');
+              pseudoInput.addEventListener('input', (ev) => {
+                clearTimeout(_pseudoCheckTimer);
+                const v = (ev.target.value || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+                ev.target.value = v;
+                _pseudoOk = false;
+                if (v === (p.pseudo || '')) {   // unchanged
+                  _pseudoOk = true;
+                  pseudoHint.style.color = 'var(--text-muted)';
+                  pseudoHint.textContent = 'Current username.';
+                  return;
+                }
+                if (v.length === 0) {
+                  pseudoHint.style.color = 'var(--text-muted)';
+                  pseudoHint.textContent = '3–20 letters, numbers and underscores.';
+                  return;
+                }
+                if (v.length < 3) { pseudoHint.style.color = '#EF4444'; pseudoHint.textContent = 'At least 3 characters.'; return; }
+                if (v.length > 20) { pseudoHint.style.color = '#EF4444'; pseudoHint.textContent = 'Max 20 characters.'; return; }
+                pseudoHint.style.color = 'var(--text-muted)';
+                pseudoHint.textContent = 'Checking availability…';
+                _pseudoCheckTimer = setTimeout(async () => {
+                  try {
+                    const avail = await window.SwappoAuth.isPseudoAvailable(v);
+                    _pseudoOk = avail;
+                    pseudoHint.style.color = avail ? '#22C55E' : '#EF4444';
+                    pseudoHint.textContent = avail ? '@' + v + ' is available!' : '@' + v + ' is taken.';
+                  } catch (e) { pseudoHint.textContent = 'Could not check availability.'; }
+                }, 350);
+              });
+
+              // ---- Save handler ----
+              document.getElementById('save-settings-btn').addEventListener('click', async () => {
                 const newName = document.getElementById('settings-name').value.trim();
                 const newCity = document.getElementById('settings-city').value;
-                if (newName) {
-                    DemoAuth.updateProfile(user.id, { name: newName, city: newCity });
-                    DemoNotifications.showToast('Settings saved! (Demo mode)', 'success');
-                    // Update header display
-                    document.getElementById('profile-name').textContent = newName;
-                    document.querySelector('#profile-location span').textContent = newCity || 'UAE';
-                    const newInitials = newName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                    document.getElementById('profile-avatar').textContent = newInitials;
-                    updateNavbarForDemo();
-                } else {
-                    DemoNotifications.showToast('Name cannot be empty.', 'error');
+                const newPseudo = document.getElementById('settings-pseudo').value.trim().toLowerCase();
+                const newPhoneRaw = document.getElementById('settings-phone').value.trim();
+
+                if (!newPseudo) { DemoNotifications.showToast('Username cannot be empty.', 'error'); return; }
+                if (!_pseudoOk) { DemoNotifications.showToast('Please choose an available username first.', 'error'); return; }
+                if (newPhoneRaw && !/^5[0-9]{8}$/.test(newPhoneRaw)) {
+                  DemoNotifications.showToast('UAE phone must be 5XXXXXXXX (9 digits).', 'error');
+                  return;
                 }
-            });
+
+                const btn = document.getElementById('save-settings-btn');
+                btn.disabled = true;
+                const origLabel = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+                // Upload avatar if user picked a new photo
+                let avatarValue = _selectedAvatar || '';
+                if (_uploadBlob && window.SwappoStorage) {
+                  try {
+                    const url = await window.SwappoStorage.uploadOne(
+                      { _processed: _uploadBlob, type: _uploadBlob.mime }, user.id
+                    );
+                    avatarValue = url;
+                  } catch (upErr) {
+                    DemoNotifications.showToast('Avatar upload failed — saving other fields.', 'error');
+                  }
+                }
+
+                // Update via Supabase (RLS will enforce own-row only)
+                if (window.SwappoAuth && window.SwappoAuth.updateProfile) {
+                  const res = await window.SwappoAuth.updateProfile({
+                    name: newName,
+                    city: newCity,
+                    pseudo: newPseudo,
+                    avatar: avatarValue,
+                    phone: newPhoneRaw ? '+971' + newPhoneRaw : null
+                  });
+                  btn.disabled = false;
+                  btn.innerHTML = origLabel;
+                  if (!res.success) {
+                    DemoNotifications.showToast(res.error || 'Could not save.', 'error');
+                    return;
+                  }
+                  DemoNotifications.showToast('Settings saved.', 'success');
+                  // Refresh visible header
+                  document.getElementById('profile-name').textContent = newName || ('@' + newPseudo);
+                  const locEl = document.querySelector('#profile-location span');
+                  if (locEl) locEl.textContent = newCity || 'UAE';
+                } else {
+                  // Demo fallback
+                  if (window.DemoAuth && DemoAuth.updateProfile) {
+                    DemoAuth.updateProfile(user.id, { name: newName, city: newCity });
+                  }
+                  btn.disabled = false;
+                  btn.innerHTML = origLabel;
+                  DemoNotifications.showToast('Settings saved (local only).', 'success');
+                }
+              });
+            })();
 
             // ── Logout ───────────────────────────────────────────────────
             document.getElementById('logout-btn').addEventListener('click', async () => {
