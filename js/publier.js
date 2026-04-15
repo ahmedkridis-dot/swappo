@@ -556,99 +556,128 @@ window.toggleGiveaway = function() {
 // PUBLISH
 // ========================
 window.publishItem = async function(e) {
-  e.preventDefault();
+  console.log('[publish] clicked — entering publishItem');
+  if (e && e.preventDefault) e.preventDefault();
 
-  // Auth check — prefer Supabase, fall back to DemoAuth for dev
-  var user = null;
-  if (window.SwappoAuth && window.SwappoAuth.isReady()) {
-    user = await window.SwappoAuth.getCurrentUser();
-  }
-  if (!user && window.DemoAuth) user = window.DemoAuth.getCurrentUser();
-  if (!user) {
-    window.location.href = 'login.html?redirect=/pages/publier.html';
-    return;
-  }
-
-  if (!formState.category) {
-    DemoNotifications.showToast('Please select a category.', 'warning');
-    return;
-  }
-
-  var entries = (formState.photoBlobs || []).filter(function(p) { return p && p.processed; });
-  if (!entries.length) {
-    DemoNotifications.showToast('Please add at least one photo.', 'warning');
-    return;
-  }
-
-  var btn = document.getElementById('btnPublish');
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading photos...';
-  btn.disabled = true;
-  btn.style.opacity = '0.7';
-
-  // --- 1. Upload photos to Supabase Storage ---
-  var photoUrls = [];
   try {
-    for (var i = 0; i < entries.length; i++) {
-      var url = await window.SwappoStorage.uploadOne(
-        { _processed: entries[i].processed, type: entries[i].processed.mime },
-        user.id
-      );
-      photoUrls.push(url);
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading ' + (i + 1) + '/' + entries.length + '...';
+    // Auth check — prefer Supabase, fall back to DemoAuth for dev
+    var user = null;
+    var supabaseReady = !!(window.SwappoAuth && window.SwappoAuth.isReady());
+    console.log('[publish] SwappoAuth ready?', supabaseReady);
+    if (supabaseReady) {
+      user = await window.SwappoAuth.getCurrentUser();
+      console.log('[publish] supabase user:', user ? user.email : 'null');
     }
-  } catch (err) {
-    console.error('[publier] upload failed:', err);
-    DemoNotifications.showToast('Upload failed: ' + (err.message || 'unknown error'), 'error');
-    btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    return;
+    if (!user && window.DemoAuth) {
+      user = window.DemoAuth.getCurrentUser();
+      console.log('[publish] demo user fallback:', user ? user.email : 'null');
+    }
+    if (!user) {
+      console.warn('[publish] no user → redirecting to login');
+      window.location.href = 'login.html?redirect=/pages/publier.html';
+      return;
+    }
+
+    if (!formState.category) {
+      console.warn('[publish] no category selected');
+      DemoNotifications.showToast('Please select a category.', 'warning');
+      return;
+    }
+
+    var entries = (formState.photoBlobs || []).filter(function(p) { return p && p.processed; });
+    console.log('[publish] photo entries count:', entries.length);
+    if (!entries.length) {
+      DemoNotifications.showToast('Please add at least one photo.', 'warning');
+      return;
+    }
+
+    var btn = document.getElementById('btnPublish');
+    if (!btn) { console.error('[publish] #btnPublish not found in DOM'); return; }
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading photos...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+
+    // --- 1. Upload photos to Supabase Storage ---
+    console.log('[publish] starting photo upload, SwappoStorage ready?', !!window.SwappoStorage);
+    var photoUrls = [];
+    try {
+      for (var i = 0; i < entries.length; i++) {
+        console.log('[publish] uploading photo', i + 1, 'of', entries.length);
+        var url = await window.SwappoStorage.uploadOne(
+          { _processed: entries[i].processed, type: entries[i].processed.mime },
+          user.id
+        );
+        photoUrls.push(url);
+        console.log('[publish] photo uploaded →', url);
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading ' + (i + 1) + '/' + entries.length + '...';
+      }
+    } catch (err) {
+      console.error('[publish] upload failed:', err);
+      DemoNotifications.showToast('Upload failed: ' + (err.message || 'unknown error'), 'error');
+      btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      return;
+    }
+
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+
+    // --- 2. Build item payload ---
+    var conditionMap = { 'New': 'new', 'Like New': 'like_new', 'Good': 'good', 'Fair': 'fair' };
+    var priceEl = document.getElementById('item-price');
+    var emirateEl = document.getElementById('item-emirate');
+
+    var itemData = {
+      category: formState.category,
+      subcategory: formState.details.subcategory || '',
+      type: formState.details.type || formState.category,
+      brand: formState.details.brand || '',
+      model: formState.details.model || '',
+      condition: conditionMap[formState.details.condition] || 'good',
+      year: formState.details.year ? String(formState.details.year) : String(new Date().getFullYear()),
+      size: formState.details.size || '',
+      color: formState.details.color || '',
+      photos: photoUrls,
+      is_giveaway: !!formState.isGiveaway,
+      price: parseInt(priceEl ? priceEl.value : '0') || 0,
+      emirate: (emirateEl && emirateEl.value) || user.emirate || 'Dubai',
+      city: user.city || 'Dubai',
+      lat: (window.Swappo && Swappo.userLat) || null,
+      lng: (window.Swappo && Swappo.userLng) || null
+    };
+    console.log('[publish] item payload built:', itemData);
+
+    // --- 3. Insert via Supabase, fall back to Demo in dev ---
+    console.log('[publish] SwappoItems available?', !!window.SwappoItems);
+    var result = null;
+    if (window.SwappoItems) {
+      result = await window.SwappoItems.create(itemData);
+    } else if (window.DemoItems) {
+      result = window.DemoItems.create(itemData);
+    }
+    console.log('[publish] insert result:', result);
+
+    if (!result || !result.success) {
+      DemoNotifications.showToast('Publish failed: ' + ((result && result.error) || 'unknown'), 'error');
+      btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      return;
+    }
+
+    DemoNotifications.showToast('Item published! \uD83C\uDF89', 'success');
+    setTimeout(function() {
+      window.location.href = 'catalogue.html';
+    }, 1200);
+
+  } catch (outerErr) {
+    console.error('[publish] fatal error in publishItem:', outerErr);
+    try { DemoNotifications.showToast('Something went wrong: ' + (outerErr.message || outerErr), 'error'); } catch(e){}
+    var btn = document.getElementById('btnPublish');
+    if (btn) {
+      btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
   }
-
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
-
-  // --- 2. Build item payload ---
-  var conditionMap = { 'New': 'new', 'Like New': 'like_new', 'Good': 'good', 'Fair': 'fair' };
-  var priceEl = document.getElementById('item-price');
-  var emirateEl = document.getElementById('item-emirate');
-
-  var itemData = {
-    category: formState.category,
-    subcategory: formState.details.subcategory || '',
-    type: formState.details.type || formState.category,
-    brand: formState.details.brand || '',
-    model: formState.details.model || '',
-    condition: conditionMap[formState.details.condition] || 'good',
-    year: formState.details.year ? String(formState.details.year) : String(new Date().getFullYear()),
-    size: formState.details.size || '',
-    color: formState.details.color || '',
-    photos: photoUrls,
-    is_giveaway: !!formState.isGiveaway,
-    price: parseInt(priceEl ? priceEl.value : '0') || 0,
-    emirate: (emirateEl && emirateEl.value) || user.emirate || 'Dubai',
-    city: user.city || 'Dubai',
-    lat: (window.Swappo && Swappo.userLat) || null,
-    lng: (window.Swappo && Swappo.userLng) || null
-  };
-
-  // --- 3. Insert via Supabase, fall back to Demo in dev ---
-  var result = null;
-  if (window.SwappoItems) {
-    result = await window.SwappoItems.create(itemData);
-  } else if (window.DemoItems) {
-    result = window.DemoItems.create(itemData);
-  }
-
-  if (!result || !result.success) {
-    DemoNotifications.showToast('Publish failed: ' + ((result && result.error) || 'unknown'), 'error');
-    btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    return;
-  }
-
-  DemoNotifications.showToast('Item published! \uD83C\uDF89', 'success');
-  setTimeout(function() {
-    window.location.href = 'catalogue.html';
-  }, 1200);
 };
