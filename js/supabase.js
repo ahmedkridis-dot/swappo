@@ -125,9 +125,19 @@ const SwappoAuth = {
       if (!data.session) {
         return { success: true, needsVerification: true, user: data.user };
       }
-      // Auto-confirmed: mirror into localStorage for DemoAuth compat
-      const profile = await _fetchProfile(data.user.id);
-      _mirrorFromSupabase(data.user, profile);
+      // Auto-confirmed: mirror into localStorage for DemoAuth compat.
+      // Profile fetch is non-blocking — if it stalls (network hiccup) we
+      // still complete the signup flow and redirect the user.
+      try {
+        const profile = await Promise.race([
+          _fetchProfile(data.user.id),
+          new Promise((r) => setTimeout(() => r(null), 3000))
+        ]);
+        _mirrorFromSupabase(data.user, profile);
+      } catch (e) {
+        console.warn('[signUp] profile mirror skipped:', e.message || e);
+        _mirrorFromSupabase(data.user, null);
+      }
       return { success: true, needsVerification: false, user: data.user };
     } catch (e) {
       return { success: false, error: e.message || 'Signup failed.' };
@@ -144,8 +154,19 @@ const SwappoAuth = {
     try {
       const { data, error } = await db.auth.signInWithPassword({ email: email, password: password });
       if (error) return { success: false, error: error.message || 'Invalid credentials.' };
-      const profile = await _fetchProfile(data.user.id);
-      _mirrorFromSupabase(data.user, profile);
+      // Profile fetch is non-blocking so login UI doesn't get stuck on a
+      // slow SELECT users query. If it times out, we still complete the
+      // login and mirror minimal user_metadata into localStorage.
+      try {
+        const profile = await Promise.race([
+          _fetchProfile(data.user.id),
+          new Promise((r) => setTimeout(() => r(null), 3000))
+        ]);
+        _mirrorFromSupabase(data.user, profile);
+      } catch (e) {
+        console.warn('[signIn] profile mirror skipped:', e.message || e);
+        _mirrorFromSupabase(data.user, null);
+      }
       return { success: true, user: data.user };
     } catch (e) {
       return { success: false, error: e.message || 'Login failed.' };
@@ -244,12 +265,18 @@ async function getCurrentSession() {
 async function _fetchProfile(userId) {
   if (!db || !userId) return null;
   try {
-    const { data, error } = await db.from('users').select('*').eq('id', userId).single();
-    if (error) {
-      console.warn('[_fetchProfile] supabase error:', error.message || error);
+    // 3s timeout so the whole site can't be hung by a slow profile SELECT
+    const res = await Promise.race([
+      db.from('users').select('*').eq('id', userId).single(),
+      new Promise((resolve) => setTimeout(
+        () => resolve({ data: null, error: { message: 'profile fetch timeout' } }), 3000
+      ))
+    ]);
+    if (res.error) {
+      console.warn('[_fetchProfile] supabase error:', res.error.message || res.error);
       return null;
     }
-    return data;
+    return res.data;
   } catch (e) {
     console.warn('[_fetchProfile] exception:', e.message || e);
     return null;
