@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Welcome to Swappo — Complete your profile</title>
+  <meta name="description" content="Finish setting up your Swappo profile — choose a username and avatar to start swapping.">
+  <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: #171717;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(9,177,186,0.18), transparent 60%),
+        radial-gradient(900px 500px at 110% 110%, rgba(9,177,186,0.12), transparent 60%),
+        linear-gradient(180deg, #F7FBFC 0%, #FFFFFF 40%);
+    }
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px 80px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 20px;
+      padding: 36px 32px;
+      max-width: 640px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+    }
+    .header { text-align: center; margin-bottom: 28px; }
+    .header img { width: 56px; height: 56px; margin-bottom: 12px; }
+    .header h1 { font-size: 1.6rem; font-weight: 800; color: #1A1A2E; margin: 0 0 6px; }
+    .header p { font-size: 0.95rem; color: #6B7280; margin: 0; line-height: 1.5; }
+    .step-counter { display: inline-block; background: #E6F7F8; color: #078A91; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 999px; margin-bottom: 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+    .section { margin-bottom: 26px; }
+    .section-title { font-size: 0.82rem; font-weight: 700; color: #1A1A2E; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 10px; }
+
+    .input-wrap { position: relative; }
+    .input { width: 100%; padding: 14px 16px 14px 42px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 1rem; font-weight: 500; color: #171717; font-family: inherit; outline: none; transition: border-color 0.2s; background: #fff; }
+    .input:focus { border-color: #09B1BA; }
+    .input-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6B7280; font-weight: 600; pointer-events: none; }
+
+    .hint { font-size: 12px; color: #9CA3AF; margin-top: 6px; }
+    .hint.ok { color: #22C55E; font-weight: 600; }
+    .hint.error { color: #EF4444; font-weight: 600; }
+    .hint i { margin-right: 4px; }
+
+    /* Avatar grid */
+    .avatar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    @media (max-width: 560px) { .avatar-grid { grid-template-columns: repeat(4, 1fr); } }
+    .avatar-option { position: relative; aspect-ratio: 1; border-radius: 14px; border: 2px solid #E5E7EB; background: #fff; cursor: pointer; padding: 6px; transition: all 0.2s; overflow: hidden; }
+    .avatar-option:hover { border-color: #09B1BA; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(9,177,186,0.15); }
+    .avatar-option.selected { border-color: #09B1BA; background: linear-gradient(135deg, #E6F7F8 0%, #FFFFFF 80%); box-shadow: 0 6px 16px rgba(9,177,186,0.25); }
+    .avatar-option.selected::after { content: '✓'; position: absolute; top: 4px; right: 6px; width: 18px; height: 18px; background: #09B1BA; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+    .avatar-option svg { width: 100%; height: 100%; display: block; }
+    .avatar-option.upload { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; color: #6B7280; font-size: 10px; font-weight: 600; }
+    .avatar-option.upload i { font-size: 20px; color: #09B1BA; }
+    .avatar-option.upload img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+    .upload-input { display: none; }
+
+    .divider { text-align: center; margin: 14px 0; position: relative; }
+    .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #E5E7EB; }
+    .divider span { background: #fff; padding: 0 12px; position: relative; font-size: 11px; color: #9CA3AF; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, #09B1BA 0%, #078A91 100%); color: #fff; box-shadow: 0 8px 20px rgba(9,177,186,0.3); }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(9,177,186,0.4); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .toast { position: fixed; top: 20px; right: 20px; padding: 14px 20px; border-radius: 10px; color: #fff; font-weight: 600; font-size: 0.9rem; z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; }
+    .toast.success { background: #22C55E; }
+    .toast.error { background: #EF4444; }
+    .toast.info { background: #09B1BA; }
+    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <img src="../assets/brand/swappo-logo-teal.png" alt="Swappo">
+        <div class="step-counter">Step 1 of 1 — Quick setup</div>
+        <h1>Welcome to Swappo</h1>
+        <p>Pick a username and avatar — these stay on your profile until swaps are accepted (we keep identities private by default).</p>
+      </div>
+
+      <!-- ── PSEUDO ─────────────────────────────────────────────── -->
+      <div class="section">
+        <h3 class="section-title">Choose a username</h3>
+        <div class="input-wrap">
+          <span class="input-prefix">@</span>
+          <input class="input" type="text" id="ob-pseudo" autocomplete="off" placeholder="e.g. ahmed_k, sarah2024" maxlength="20" autocapitalize="off">
+        </div>
+        <div class="hint" id="ob-pseudo-hint">3–20 letters, numbers and underscores.</div>
+      </div>
+
+      <!-- ── AVATAR ─────────────────────────────────────────────── -->
+      <div class="section">
+        <h3 class="section-title">Choose an avatar</h3>
+        <div class="avatar-grid" id="ob-avatar-grid"></div>
+        <div class="divider"><span>or</span></div>
+        <label class="btn" style="background:#fff;border:1.5px solid #E5E7EB;color:#1A1A2E;cursor:pointer;">
+          <i class="fas fa-cloud-upload-alt" style="color:#09B1BA;"></i>
+          <span id="ob-upload-label">Upload your own photo (max 500 KB)</span>
+          <input type="file" id="ob-upload" class="upload-input" accept="image/png,image/jpeg,image/webp">
+        </label>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="ob-submit" disabled>
+        <span id="ob-submit-label">Enter Swappo</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+
+      <p class="hint" style="text-align:center;margin-top:14px;">You can change these anytime from Settings.</p>
+    </div>
+  </div>
+
+  <!-- Supabase + Swappo scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/avatars.js"></script>
+  <script src="../js/swappo-storage.js"></script>
+  <script src="../js/register-sw.js" defer></script>
+
+  <script>
+    /* ============================================================
+       Onboarding — pseudo + avatar (mandatory after first signup)
+       Uses:
+         - RPC is_pseudo_available(candidate)
+         - SwappoAuth.updateProfile({ pseudo, avatar })
+         - SwappoStorage.uploadOne(...) for custom photos
+       ============================================================ */
+
+    let _selectedAvatar = null;  // preset key OR data URL (upload preview) OR https:// (after upload)
+    let _uploadBlob = null;      // processed Blob if user uploaded
+    let _pseudoAvailable = false;
+    let _pseudoCheckTimer = null;
+
+    function toast(msg, type) {
+      type = type || 'info';
+      var prev = document.querySelector('.toast');
+      if (prev) prev.remove();
+      var el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(function() { el.remove(); }, 4200);
+    }
+
+    function ensureAuthed() {
+      // Page must only be reachable after a valid session. If not, send to login.
+      return (async function() {
+        if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
+          toast('Auth service unavailable. Please refresh.', 'error');
+          setTimeout(function() { window.location.href = 'login.html'; }, 1500);
+          return null;
+        }
+        var u = await window.SwappoAuth.getCurrentUser();
+        if (!u) {
+          window.location.href = 'login.html';
+          return null;
+        }
+        return u;
+      })();
+    }
+
+    function renderAvatarGrid() {
+      var grid = document.getElementById('ob-avatar-grid');
+      if (!grid || !window.SWAPPO_AVATARS) return;
+      // 12 first avatars (6 pairs) — keep it compact, varied, anonymous feel
+      var keys = Object.keys(window.SWAPPO_AVATARS).slice(0, 12);
+      grid.innerHTML = keys.map(function(k) {
+        var a = window.SWAPPO_AVATARS[k];
+        return '<button type="button" class="avatar-option" data-key="' + k + '" aria-label="' + a.name + '">' + a.svg + '</button>';
+      }).join('');
+      grid.querySelectorAll('.avatar-option').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          grid.querySelectorAll('.avatar-option').forEach(function(b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          _selectedAvatar = btn.getAttribute('data-key');
+          _uploadBlob = null;
+          updateSubmitState();
+        });
+      });
+    }
+
+    /* ---- Pseudo real-time availability check ---- */
+    function updatePseudoHint(state, text) {
+      var hint = document.getElementById('ob-pseudo-hint');
+      hint.className = 'hint ' + (state || '');
+      hint.innerHTML = (state === 'ok' ? '<i class="fas fa-check"></i> ' : state === 'error' ? '<i class="fas fa-exclamation-circle"></i> ' : '') + text;
+    }
+
+    document.getElementById('ob-pseudo').addEventListener('input', function(e) {
+      clearTimeout(_pseudoCheckTimer);
+      var v = (e.target.value || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+      e.target.value = v;
+      _pseudoAvailable = false;
+      updateSubmitState();
+      if (v.length === 0) {
+        updatePseudoHint('', '3–20 letters, numbers and underscores.');
+        return;
+      }
+      if (v.length < 3) {
+        updatePseudoHint('error', 'At least 3 characters.');
+        return;
+      }
+      if (v.length > 20) {
+        updatePseudoHint('error', 'Maximum 20 characters.');
+        return;
+      }
+      updatePseudoHint('', 'Checking availability…');
+      _pseudoCheckTimer = setTimeout(async function() {
+        try {
+          var available = await window.SwappoAuth.isPseudoAvailable(v);
+          if (available) {
+            _pseudoAvailable = true;
+            updatePseudoHint('ok', '@' + v + ' is available!');
+          } else {
+            _pseudoAvailable = false;
+            updatePseudoHint('error', '@' + v + ' is taken. Try another.');
+          }
+          updateSubmitState();
+        } catch (err) {
+          updatePseudoHint('error', 'Could not check availability.');
+        }
+      }, 350);
+    });
+
+    /* ---- Upload handler ---- */
+    document.getElementById('ob-upload').addEventListener('change', async function(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 500 * 1024 && !(window.SwappoStorage && window.SwappoStorage.processFile)) {
+        toast('Photo must be under 500 KB (or enable storage processing).', 'error');
+        return;
+      }
+      try {
+        // Use the same pipeline as item photos: resize + WebP compress
+        var processed = await window.SwappoStorage.processFile(file);
+        _uploadBlob = processed;
+        // Preview
+        var grid = document.getElementById('ob-avatar-grid');
+        grid.querySelectorAll('.avatar-option').forEach(function(b) { b.classList.remove('selected'); });
+        // Mark a "custom" slot as selected
+        var first = grid.querySelector('.avatar-option');
+        if (first) {
+          first.classList.add('selected');
+          first.innerHTML = '<img src="' + processed.preview + '" alt="Your photo" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">';
+        }
+        _selectedAvatar = null; // will become the uploaded URL after submit
+        document.getElementById('ob-upload-label').textContent = 'Change photo (' + processed.sizeKB + ' KB)';
+        updateSubmitState();
+      } catch (err) {
+        toast('Could not process the photo: ' + (err.message || 'unknown error'), 'error');
+      }
+    });
+
+    /* ---- Submit button state ---- */
+    function updateSubmitState() {
+      var btn = document.getElementById('ob-submit');
+      var hasAvatar = !!(_selectedAvatar || _uploadBlob);
+      btn.disabled = !(_pseudoAvailable && hasAvatar);
+    }
+
+    /* ---- Submit ---- */
+    document.getElementById('ob-submit').addEventListener('click', async function() {
+      var btn = document.getElementById('ob-submit');
+      var label = document.getElementById('ob-submit-label');
+      btn.disabled = true;
+      label.textContent = 'Saving…';
+      try {
+        var u = await window.SwappoAuth.getCurrentUser();
+        if (!u) { window.location.href = 'login.html'; return; }
+        var pseudo = (document.getElementById('ob-pseudo').value || '').trim().toLowerCase();
+
+        // Determine avatar value: preset key OR uploaded URL
+        var avatarValue = _selectedAvatar;
+        if (_uploadBlob && window.SwappoStorage) {
+          label.textContent = 'Uploading photo…';
+          try {
+            var url = await window.SwappoStorage.uploadOne(
+              { _processed: _uploadBlob, type: _uploadBlob.mime },
+              u.id
+            );
+            avatarValue = url;
+          } catch (upErr) {
+            toast('Could not upload photo. Picking a preset instead.', 'error');
+            btn.disabled = false;
+            label.textContent = 'Enter Swappo';
+            return;
+          }
+        }
+
+        label.textContent = 'Saving profile…';
+        var res = await window.SwappoAuth.updateProfile({ pseudo: pseudo, avatar: avatarValue || '' });
+        if (!res.success) {
+          toast(res.error || 'Could not save profile.', 'error');
+          btn.disabled = false;
+          label.textContent = 'Enter Swappo';
+          return;
+        }
+        toast('All set! Welcome to Swappo.', 'success');
+        setTimeout(function() { window.location.href = '../dev-a7f3k9mz2q.html'; }, 900);
+      } catch (err) {
+        toast(err.message || 'Something went wrong.', 'error');
+        btn.disabled = false;
+        label.textContent = 'Enter Swappo';
+      }
+    });
+
+    /* ---- Init ---- */
+    (async function init() {
+      var u = await ensureAuthed();
+      if (!u) return;
+      renderAvatarGrid();
+      // If profile already has values, prefill (rare — this page is post-signup)
+      try {
+        var { data: profile } = await window.db.from('users').select('pseudo,avatar').eq('id', u.id).maybeSingle();
+        if (profile && profile.pseudo) {
+          document.getElementById('ob-pseudo').value = profile.pseudo;
+          updatePseudoHint('ok', '@' + profile.pseudo + ' — your current username.');
+          _pseudoAvailable = true;
+        }
+        if (profile && profile.avatar && window.SWAPPO_AVATARS[profile.avatar]) {
+          var el = document.querySelector('.avatar-option[data-key="' + profile.avatar + '"]');
+          if (el) { el.classList.add('selected'); _selectedAvatar = profile.avatar; }
+        }
+        updateSubmitState();
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>
