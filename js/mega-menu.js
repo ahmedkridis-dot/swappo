@@ -973,6 +973,10 @@
     // Hover on Level 2 items
     document.addEventListener('mouseenter', function (e) {
       if (isMobile()) return;
+      // Guard: e.target can be a non-Element (Document/text node) in capture-phase
+      // events on some browsers. Without this guard, closest() throws TypeError
+      // which breaks subsequent event handlers (including onclick buttons).
+      if (!e.target || typeof e.target.closest !== 'function') return;
       var leftItem = e.target.closest('.mega-left__item');
       if (!leftItem) return;
       var dropdown = leftItem.closest('.mega-dropdown');
