@@ -376,207 +376,148 @@
   <div class="auth-page">
     <div class="auth-card">
 
-      <!-- ========== VIEW: MAIN (Social First) ========== -->
+      <!-- ========== VIEW: SIGNUP (Phone-first UAE) ========== -->
       <div id="signup" class="auth-tab-content active">
         <div class="auth-header">
           <div class="logo-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><img src="../assets/brand/swappo-logo-teal.png" alt="Swappo" width="56" height="56"></div>
-          <h2 data-i18n="auth_social_title">Join the Swap Community</h2>
-          <p data-i18n="auth_social_subtitle">Start swapping for free. No credit card needed.</p>
+          <h2>Join Swappo</h2>
+          <p>Swap, buy, sell, gift — across the UAE.</p>
         </div>
 
-        <div class="auth-social">
-          <button type="button" class="auth-social-btn google-btn" onclick="handleSocialSignup('google')">
-            <i class="fab fa-google"></i> <span data-i18n="auth_google">Continue with Google</span>
-          </button>
-          <button type="button" class="auth-social-btn apple-btn" onclick="handleSocialSignup('apple')">
-            <i class="fab fa-apple"></i> <span data-i18n="auth_apple">Continue with Apple</span>
-          </button>
-          <button type="button" class="auth-social-btn facebook-btn" onclick="handleSocialSignup('facebook')">
-            <i class="fab fa-facebook-f"></i> <span data-i18n="auth_facebook">Continue with Facebook</span>
-          </button>
-        </div>
-
-        <div class="auth-divider" data-i18n="auth_or">or</div>
-
-        <button type="button" class="auth-email-btn" onclick="openSignupModal()">
-          <i class="fas fa-envelope"></i> <span data-i18n="auth_signup_email">Sign up with email</span>
-        </button>
-
-        <div class="auth-footer-link">
-          <span data-i18n="auth_already_account">Already have an account?</span> <a href="#" onclick="switchTab('login'); return false;" data-i18n="auth_login">Log in</a>
-        </div>
-
-        <!-- Quick Demo Options -->
-        <div style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--gray-border,#E5E7EB);text-align:center;">
-          <p style="font-size:12px;font-weight:600;color:var(--gray-text,#6B7280);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">Try a demo account</p>
-          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-            <button type="button" onclick="freshDemoFree()" style="background:white;border:2px solid var(--gray-border,#E5E7EB);color:var(--navy,#1A1A2E);padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor=''">
-              🌱 Free Plan
-            </button>
-            <button type="button" onclick="freshDemoPro()" style="background:linear-gradient(135deg,var(--teal,#09B1BA),var(--teal-dark,#067A80));color:white;border:none;padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
-              👑 Pro Plan
-            </button>
-          </div>
-          <div style="font-size:0.7rem;color:var(--gray-muted,#9CA3AF);margin-top:8px;">Fresh data — all v5 features active</div>
-        </div>
-      </div>
-
-      <!-- ========== VIEW: LOGIN ========== -->
-      <div id="login" class="auth-tab-content">
-        <div class="auth-header">
-          <div class="logo-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><img src="../assets/brand/swappo-logo-teal.png" alt="Swappo" width="56" height="56"></div>
-          <h2 data-i18n="auth_welcome_back">Welcome back</h2>
-        </div>
-
-        <div class="auth-social">
-          <button type="button" class="auth-social-btn google-btn" onclick="handleSocialLogin('google')">
-            <i class="fab fa-google"></i> <span data-i18n="auth_google">Continue with Google</span>
-          </button>
-          <button type="button" class="auth-social-btn apple-btn" onclick="handleSocialLogin('apple')">
-            <i class="fab fa-apple"></i> <span data-i18n="auth_apple">Continue with Apple</span>
-          </button>
-          <button type="button" class="auth-social-btn facebook-btn" onclick="handleSocialLogin('facebook')">
-            <i class="fab fa-facebook-f"></i> <span data-i18n="auth_facebook">Continue with Facebook</span>
-          </button>
-        </div>
-
-        <div class="auth-divider" data-i18n="auth_or">or</div>
-
-        <form class="auth-form" onsubmit="handleLogin(event)">
+        <!-- ── Phone-first signup ─────────────────────────────── -->
+        <form class="auth-form" id="signup-phone-form" onsubmit="handlePhoneSignup(event)" style="margin-bottom:12px;">
           <div class="form-group">
-            <label class="form-label" for="login-email" data-i18n="auth_email">Email Address</label>
-            <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="login-password" data-i18n="auth_password">Password</label>
-            <input class="form-input" type="password" id="login-password" name="password" data-i18n-placeholder="auth_login_password_placeholder" placeholder="Your password" required>
-          </div>
-
-          <div class="auth-forgot">
-            <a href="#" onclick="event.preventDefault();if(window.DemoNotifications)DemoNotifications.showToast('Password reset email sent! (Demo mode)','success')" data-i18n="auth_forgot_password">Forgot password?</a>
-          </div>
-
-          <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_login_btn">
-            Log In
-          </button>
-        </form>
-
-        <div class="auth-footer-link">
-          <span data-i18n="auth_no_account">Don't have an account?</span> <a href="#" onclick="switchTab('signup'); return false;" data-i18n="auth_signup">Sign up</a>
-        </div>
-
-        <!-- Quick Demo Options -->
-        <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--gray-border,#E5E7EB);text-align:center;">
-          <p style="font-size:12px;font-weight:600;color:var(--gray-text,#6B7280);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">Try a demo account</p>
-          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-            <button type="button" onclick="freshDemoFree()" style="background:white;border:2px solid var(--gray-border,#E5E7EB);color:var(--navy,#1A1A2E);padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor=''">
-              🌱 Free Plan
-            </button>
-            <button type="button" onclick="freshDemoPro()" style="background:linear-gradient(135deg,var(--teal,#09B1BA),var(--teal-dark,#067A80));color:white;border:none;padding:10px 20px;border-radius:var(--radius-md,12px);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
-              👑 Pro Plan
-            </button>
-          </div>
-          <div style="font-size:0.7rem;color:var(--gray-muted,#9CA3AF);margin-top:8px;">Fresh data — all v5 features active</div>
-        </div>
-        <div style="margin-top:8px;text-align:center;">
-          <button type="button" onclick="resetAndDemo()" style="background:none;border:1px solid var(--gray-border,#E5E7EB);color:var(--gray-text,#6B7280);padding:6px 16px;border-radius:var(--radius-pill,999px);font-size:0.78rem;cursor:pointer;">
-            <i class="fas fa-sync-alt"></i> <span data-i18n="auth_reset_demo">Reset Demo Data</span>
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ========== SIGNUP MODAL (opens on "Sign up with email") ========== -->
-  <div class="signup-modal-overlay" id="signup-modal">
-    <div class="signup-modal">
-      <button class="signup-modal-close" onclick="closeSignupModal()">&times;</button>
-      <h2 data-i18n="auth_create_account">Create your account</h2>
-
-      <form class="auth-form" onsubmit="handleSignup(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="signup-name" data-i18n="auth_full_name">Full Name</label>
-            <input class="form-input" type="text" id="signup-name" name="name" data-i18n-placeholder="auth_name_placeholder" placeholder="Ahmed Mohammed" required>
+            <label class="form-label" for="su-phone-name">Full name</label>
+            <input class="form-input" type="text" id="su-phone-name" name="name" placeholder="Ahmed Mohammed" required minlength="2" maxlength="50">
           </div>
           <div class="form-group">
-            <label class="form-label" for="signup-pseudo" data-i18n="auth_username">Username</label>
-            <input class="form-input" type="text" id="signup-pseudo" data-i18n-placeholder="auth_username_placeholder" placeholder="Letters, numbers & underscores (3-20)" pattern="^[a-zA-Z0-9_]{3,20}$" required>
-            <span class="pseudo-feedback" id="pseudo-feedback"></span>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="signup-email" data-i18n="auth_email">Email Address</label>
-            <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="signup-phone" data-i18n="auth_phone">Phone Number</label>
+            <label class="form-label" for="su-phone">Phone number</label>
             <div class="phone-input-group">
-              <span class="phone-prefix">+971</span>
-              <input class="form-input" type="tel" id="signup-phone" data-i18n-placeholder="auth_phone_placeholder" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" required>
+              <span class="phone-prefix">🇦🇪 +971</span>
+              <input class="form-input" type="tel" id="su-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required>
             </div>
-            <div class="verification-step" id="phone-verify-step">
-              <input class="form-input code-input" type="text" id="phone-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$">
-              <div>
-                <button type="button" class="resend-link" id="resend-code" onclick="resendCode()" data-i18n="resend_code">Resend code</button>
-                <span id="resend-timer"></span>
+            <span style="font-size:11px;color:#9CA3AF;margin-top:4px;display:block;">We'll send a 6-digit code via SMS</span>
+          </div>
+
+          <!-- OTP verification step (revealed after "Send code") -->
+          <div id="su-otp-section" style="display:none;">
+            <div class="form-group" style="margin-top:12px;">
+              <label class="form-label" for="su-otp-code">Verification code</label>
+              <input class="form-input code-input" type="text" id="su-otp-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$" inputmode="numeric" style="text-align:center;font-size:24px;letter-spacing:6px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                <span style="font-size:12px;color:#6B7280;">Code sent to <span id="su-otp-phone-display" style="font-weight:600;"></span></span>
+                <button type="button" class="resend-link" onclick="resendPhoneOtp()" style="background:none;border:none;color:var(--teal,#09B1BA);font-weight:600;font-size:12px;cursor:pointer;padding:0;">Resend</button>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label class="form-label" data-i18n="auth_choose_avatar">Choose your avatar</label>
-          <button type="button" class="avatar-picker-btn" id="avatar-picker-btn" onclick="openAvatarModal()">
-            <div class="avatar-picker-placeholder" id="avatar-preview"><i class="fas fa-user"></i></div>
-            <span class="avatar-picker-text" data-i18n="auth_tap_choose_avatar">Tap to choose your avatar</span>
-          </button>
-          <input type="hidden" id="signup-avatar" value="">
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="signup-password" data-i18n="auth_password">Password</label>
-            <input class="form-input" type="password" id="signup-password" name="password" data-i18n-placeholder="auth_password_placeholder" placeholder="At least 8 characters" required>
+          <div class="auth-checkbox" style="margin-top:10px;">
+            <input type="checkbox" id="su-phone-terms" required>
+            <label for="su-phone-terms">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></label>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="signup-confirm" data-i18n="auth_confirm_password">Confirm Password</label>
-            <input class="form-input" type="password" id="signup-confirm" name="confirm" data-i18n-placeholder="auth_confirm_placeholder" placeholder="Re-enter password" required>
-          </div>
-        </div>
 
-        <div class="auth-checkbox">
-          <input type="checkbox" id="terms-agree" name="terms" required>
-          <label for="terms-agree" data-i18n-html="auth_terms_agree">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms of use</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></label>
-        </div>
+          <button type="submit" class="auth-btn auth-btn-primary" id="su-phone-btn">Send verification code</button>
+        </form>
 
-        <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_join_free">
-          Join the Swap
+        <!-- ── Divider ─────────────────────────────────────────── -->
+        <div class="auth-divider">or</div>
+
+        <!-- ── Email signup toggle ─────────────────────────────── -->
+        <button type="button" class="auth-email-btn" id="su-email-toggle" onclick="toggleEmailSignup()">
+          <i class="fas fa-envelope"></i> Sign up with email
         </button>
-      </form>
+
+        <!-- ── Email signup form (initially hidden) ────────────── -->
+        <form class="auth-form" id="signup-email-form" onsubmit="handleEmailSignup(event)" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed #E5E7EB;">
+          <div class="form-group">
+            <label class="form-label" for="su-email-name">Full name</label>
+            <input class="form-input" type="text" id="su-email-name" placeholder="Ahmed Mohammed" required minlength="2" maxlength="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="su-email">Email address</label>
+            <input class="form-input" type="email" id="su-email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="su-email-password">Password</label>
+            <input class="form-input" type="password" id="su-email-password" placeholder="At least 8 characters" minlength="8" required>
+          </div>
+          <div class="auth-checkbox">
+            <input type="checkbox" id="su-email-terms" required>
+            <label for="su-email-terms">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></label>
+          </div>
+          <button type="submit" class="auth-btn auth-btn-primary">Create account</button>
+        </form>
+
+        <div class="auth-footer-link">
+          Already have an account? <a href="#" onclick="switchTab('login'); return false;">Log in</a>
+        </div>
+      </div>
+
+      <!-- ========== VIEW: LOGIN (Phone-first UAE) ========== -->
+      <div id="login" class="auth-tab-content">
+        <div class="auth-header">
+          <div class="logo-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><img src="../assets/brand/swappo-logo-teal.png" alt="Swappo" width="56" height="56"></div>
+          <h2>Welcome back</h2>
+        </div>
+
+        <!-- ── Phone login (primary) ──────────────────────────── -->
+        <form class="auth-form" id="login-phone-form" onsubmit="handlePhoneLogin(event)" style="margin-bottom:12px;">
+          <div class="form-group">
+            <label class="form-label" for="li-phone">Phone number</label>
+            <div class="phone-input-group">
+              <span class="phone-prefix">🇦🇪 +971</span>
+              <input class="form-input" type="tel" id="li-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required>
+            </div>
+          </div>
+
+          <div id="li-otp-section" style="display:none;">
+            <div class="form-group" style="margin-top:12px;">
+              <label class="form-label" for="li-otp-code">Verification code</label>
+              <input class="form-input code-input" type="text" id="li-otp-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$" inputmode="numeric" style="text-align:center;font-size:24px;letter-spacing:6px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                <span style="font-size:12px;color:#6B7280;">Code sent to <span id="li-otp-phone-display" style="font-weight:600;"></span></span>
+                <button type="button" onclick="resendLoginOtp()" style="background:none;border:none;color:var(--teal,#09B1BA);font-weight:600;font-size:12px;cursor:pointer;padding:0;">Resend</button>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="auth-btn auth-btn-primary" id="li-phone-btn">Send verification code</button>
+        </form>
+
+        <!-- ── Divider ─────────────────────────────────────────── -->
+        <div class="auth-divider">or</div>
+
+        <!-- ── Email login toggle ──────────────────────────────── -->
+        <button type="button" class="auth-email-btn" id="li-email-toggle" onclick="toggleEmailLogin()">
+          <i class="fas fa-envelope"></i> Log in with email
+        </button>
+
+        <!-- ── Email login form (initially hidden) ─────────────── -->
+        <form class="auth-form" id="login-email-form" onsubmit="handleLogin(event)" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed #E5E7EB;">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email address</label>
+            <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input class="form-input" type="password" id="login-password" name="password" placeholder="Your password" required>
+          </div>
+          <div class="auth-forgot">
+            <a href="#">Forgot password?</a>
+          </div>
+          <button type="submit" class="auth-btn auth-btn-primary">Log in</button>
+        </form>
+
+        <div class="auth-footer-link">
+          Don't have an account? <a href="#" onclick="switchTab('signup'); return false;">Sign up</a>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ========== AVATAR MODAL ========== -->
-  <div class="avatar-modal-overlay" id="avatar-modal">
-    <div class="avatar-modal">
-      <div class="avatar-modal-header">
-        <h3 data-i18n="avatar_modal_title">Choose your avatar</h3>
-        <button class="avatar-modal-close" onclick="closeAvatarModal()">&times;</button>
-      </div>
-      <div class="avatar-modal-body" id="avatar-modal-body">
-        <!-- Populated by JS -->
-      </div>
-      <div class="avatar-modal-footer">
-        <button class="avatar-modal-cancel" onclick="closeAvatarModal()" data-i18n="avatar_modal_cancel">Cancel</button>
-        <button class="avatar-modal-confirm" onclick="confirmAvatar()" data-i18n="avatar_modal_confirm">Confirm</button>
-      </div>
-    </div>
-  </div>
+  <!-- Signup modal + Avatar modal removed: signup is inline, pseudo + avatar
+       selection happens on /pages/onboarding.html after first login. -->
 
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
@@ -687,29 +628,8 @@
     }
 
     /* ========================
-       Signup Modal
+       Toast notification (shared)
        ======================== */
-    function openSignupModal() {
-      document.getElementById('signup-modal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeSignupModal() {
-      document.getElementById('signup-modal').classList.remove('active');
-      document.body.style.overflow = '';
-    }
-    // Close on overlay click
-    document.getElementById('signup-modal').addEventListener('click', function(e) {
-      if (e.target === this) closeSignupModal();
-    });
-    // Close on Escape
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeSignupModal();
-        closeAvatarModal();
-      }
-    });
-
-    // ---- Toast notification ----
     function showToast(message, type = 'info') {
       const existing = document.querySelector('.auth-toast');
       if (existing) existing.remove();
@@ -742,214 +662,248 @@
     }
 
     /* ========================
-       Avatar Modal
+       Phone-first signup flow
+       Step 1: name + phone + "Send verification code" → sends OTP SMS
+       Step 2: user enters 6-digit code → verifyOtp → account created
+       Profile completion (pseudo + avatar) happens on onboarding.html.
        ======================== */
-    let pendingAvatar = null;
+    const _PHONE_PREFIX = '+971';
+    function _uaePhone(input) { return _PHONE_PREFIX + String(input || '').replace(/\s+/g, ''); }
 
-    function openAvatarModal() {
-      const modal = document.getElementById('avatar-modal');
-      const body = document.getElementById('avatar-modal-body');
-      if (!window.getAvatarPairs) { showToast('Loading avatars...', 'info'); return; }
+    // Tracks whether we're in step 1 (send code) or step 2 (verify code).
+    let _signupPhoneSent = false;
+    let _loginPhoneSent = false;
 
-      const pairs = getAvatarPairs();
-      const currentAvatar = document.getElementById('signup-avatar').value;
-      pendingAvatar = currentAvatar || null;
-
-      body.innerHTML = pairs.map(pair =>
-        `<div class="avatar-pair-row">
-          <button type="button" class="avatar-option${currentAvatar === pair.left.key ? ' selected' : ''}" data-avatar="${pair.left.key}" onclick="selectModalAvatar(this, '${pair.left.key}')">
-            ${pair.left.svg}
-            <span class="avatar-name">${pair.left.name}</span>
-          </button>
-          <button type="button" class="avatar-option${currentAvatar === pair.right.key ? ' selected' : ''}" data-avatar="${pair.right.key}" onclick="selectModalAvatar(this, '${pair.right.key}')">
-            ${pair.right.svg}
-            <span class="avatar-name">${pair.right.name}</span>
-          </button>
-        </div>`
-      ).join('');
-
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeAvatarModal() {
-      document.getElementById('avatar-modal').classList.remove('active');
-      document.body.style.overflow = '';
-      pendingAvatar = null;
-    }
-
-    function selectModalAvatar(el, key) {
-      document.querySelectorAll('#avatar-modal-body .avatar-option').forEach(a => a.classList.remove('selected'));
-      el.classList.add('selected');
-      pendingAvatar = key;
-    }
-
-    function confirmAvatar() {
-      if (!pendingAvatar) { showToast('Please select an avatar', 'error'); return; }
-
-      document.getElementById('signup-avatar').value = pendingAvatar;
-
-      // Update the picker button
-      const btn = document.getElementById('avatar-picker-btn');
-      const preview = document.getElementById('avatar-preview');
-      const svg = getAvatarSVG(pendingAvatar);
-      const name = getAvatarName(pendingAvatar);
-
-      preview.outerHTML = svg;
-      btn.querySelector('.avatar-picker-text').textContent = name;
-      btn.classList.add('has-avatar');
-
-      closeAvatarModal();
-    }
-
-    // Close modal on overlay click
-    document.getElementById('avatar-modal').addEventListener('click', function(e) {
-      if (e.target === this) closeAvatarModal();
-    });
-
-    // (Escape key handled in switchTab section above)
-
-    /* ========================
-       Signup Handler
-       ======================== */
-    async function handleSignup(event) {
+    async function handlePhoneSignup(event) {
       event.preventDefault();
-      const name = document.getElementById('signup-name').value.trim();
-      const pseudo = document.getElementById('signup-pseudo').value.trim();
-      const avatar = document.getElementById('signup-avatar').value;
-      const email = document.getElementById('signup-email').value.trim();
-      const phone = document.getElementById('signup-phone').value.trim();
-      const password = document.getElementById('signup-password').value;
-      const confirm = document.getElementById('signup-confirm').value;
-      const terms = document.getElementById('terms-agree')?.checked;
+      var btn = document.getElementById('su-phone-btn');
+      var name = document.getElementById('su-phone-name').value.trim();
+      var rawPhone = document.getElementById('su-phone').value.trim();
+      var terms = document.getElementById('su-phone-terms').checked;
 
-      if (!name) { showToast('Please enter your name', 'error'); return; }
-      if (!pseudo || pseudo.length < 3) { showToast('Please choose a username (3+ characters)', 'error'); return; }
-      if (!/^[a-zA-Z0-9_]{3,20}$/.test(pseudo)) { showToast('Username: letters, numbers and underscores only (3-20 chars)', 'error'); return; }
-      if (!avatar) { showToast('Please select an avatar', 'error'); return; }
-      if (!phone || !/^5[0-9]{8}$/.test(phone)) { showToast('Please enter a valid UAE phone number', 'error'); return; }
-      if (password !== confirm) { showToast('Passwords do not match', 'error'); return; }
-      if (password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
-      if (!terms) { showToast('Please accept the terms', 'error'); return; }
+      if (name.length < 2) { showToast('Please enter your full name.', 'error'); return; }
+      if (!/^5[0-9]{8}$/.test(rawPhone)) { showToast('Please enter a valid UAE mobile number (5XXXXXXXX).', 'error'); return; }
+      if (!terms) { showToast('Please agree to Terms + Privacy.', 'error'); return; }
+      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
+        showToast('Auth service unavailable. Please refresh.', 'error');
+        return;
+      }
 
-      const btn = event.target.querySelector('button[type="submit"]');
+      var fullPhone = _uaePhone(rawPhone);
+
+      // Step 2: verify the OTP code
+      if (_signupPhoneSent) {
+        var code = document.getElementById('su-otp-code').value.trim();
+        if (!/^[0-9]{6}$/.test(code)) { showToast('Please enter the 6-digit code.', 'error'); return; }
+        setLoading(btn, true);
+        try {
+          var verify = await window.SwappoAuth.verifyPhoneOtp(fullPhone, code);
+          if (!verify.success) { showToast(verify.error || 'Invalid code.', 'error'); setLoading(btn, false); return; }
+          // Update the profile row with the full name from the form (trigger set it blank)
+          try { await window.SwappoAuth.updateProfile({ name: name, phone: fullPhone }); } catch (e) {}
+          showToast('Welcome to Swappo!', 'success');
+          // Phone-only users always need onboarding (pseudo + avatar)
+          setTimeout(function() { window.location.href = 'onboarding.html'; }, 900);
+        } catch (err) {
+          showToast(err.message || 'Verification failed.', 'error');
+          setLoading(btn, false);
+        }
+        return;
+      }
+
+      // Step 1: send OTP
       setLoading(btn, true);
-
-      // Demo mode: accept code 123456
-      const code = document.getElementById('phone-code')?.value;
-      if (code && code !== '123456') { showToast('Invalid verification code. Use 123456 for demo.', 'error'); setLoading(btn, false); return; }
-
       try {
-        // Primary path: Supabase Auth via SwappoAuth facade. Falls back to
-        // DemoAuth if the CDN lib didn't load (offline, CSP, etc.) so the
-        // demo still works.
-        let result;
-        if (window.SwappoAuth && window.SwappoAuth.isReady()) {
-          result = await window.SwappoAuth.signUp(email, password, name, { pseudo, avatar, phone });
-        } else {
-          result = DemoAuth.signUp(email, password, name, { pseudo, avatar, phone });
-        }
-
-        if (result.error || result.success === false) {
-          showToast(result.error || 'Signup failed', 'error');
+        var res = await window.SwappoAuth.signInWithPhone(fullPhone);
+        if (res.notConfigured) {
+          showToast(res.error || 'SMS verification coming soon — please use email for now.', 'info');
           setLoading(btn, false);
           return;
         }
-
-        // Email-verification flow (Supabase default when "Confirm email" is on)
-        if (result.needsVerification) {
-          showToast('Check your inbox to verify your email, then log in.', 'success');
+        if (!res.success) {
+          showToast(res.error || 'Could not send the verification code.', 'error');
           setLoading(btn, false);
-          // Switch to login tab after a beat
-          setTimeout(function() {
-            var loginTab = document.querySelector('[data-tab="login"]');
-            if (loginTab) loginTab.click();
-          }, 1600);
           return;
         }
-
-        showToast('Welcome to Swappo!', 'success');
-        setTimeout(() => {
-          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
-        }, 1200);
+        // Reveal OTP input + flip button label
+        document.getElementById('su-otp-section').style.display = '';
+        document.getElementById('su-otp-phone-display').textContent = fullPhone;
+        _signupPhoneSent = true;
+        btn.textContent = 'Verify & create account';
+        setLoading(btn, false);
+        setTimeout(function() { document.getElementById('su-otp-code').focus(); }, 50);
       } catch (err) {
-        showToast(err.message || 'Signup failed', 'error');
+        showToast(err.message || 'Could not send the code.', 'error');
         setLoading(btn, false);
       }
     }
+    window.handlePhoneSignup = handlePhoneSignup;
+
+    async function resendPhoneOtp() {
+      var rawPhone = document.getElementById('su-phone').value.trim();
+      if (!/^5[0-9]{8}$/.test(rawPhone)) return;
+      try {
+        var res = await window.SwappoAuth.signInWithPhone(_uaePhone(rawPhone));
+        if (res.success) showToast('Code resent.', 'info');
+        else if (res.error) showToast(res.error, 'error');
+      } catch (e) { showToast('Could not resend the code.', 'error'); }
+    }
+    window.resendPhoneOtp = resendPhoneOtp;
 
     /* ========================
-       Login Handler
+       Phone-first login flow (same 2-step pattern)
        ======================== */
+    async function handlePhoneLogin(event) {
+      event.preventDefault();
+      var btn = document.getElementById('li-phone-btn');
+      var rawPhone = document.getElementById('li-phone').value.trim();
+      if (!/^5[0-9]{8}$/.test(rawPhone)) { showToast('Please enter a valid UAE mobile number.', 'error'); return; }
+      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
+        showToast('Auth service unavailable. Please refresh.', 'error'); return;
+      }
+      var fullPhone = _uaePhone(rawPhone);
+
+      if (_loginPhoneSent) {
+        var code = document.getElementById('li-otp-code').value.trim();
+        if (!/^[0-9]{6}$/.test(code)) { showToast('Please enter the 6-digit code.', 'error'); return; }
+        setLoading(btn, true);
+        try {
+          var verify = await window.SwappoAuth.verifyPhoneOtp(fullPhone, code);
+          if (!verify.success) { showToast(verify.error || 'Invalid code.', 'error'); setLoading(btn, false); return; }
+          showToast('Welcome back!', 'success');
+          var needs = await window.SwappoAuth.needsOnboarding();
+          setTimeout(function() {
+            window.location.href = needs ? 'onboarding.html' : safeRedirect('../dev-a7f3k9mz2q.html');
+          }, 900);
+        } catch (err) {
+          showToast(err.message || 'Verification failed.', 'error');
+          setLoading(btn, false);
+        }
+        return;
+      }
+
+      setLoading(btn, true);
+      try {
+        var res = await window.SwappoAuth.signInWithPhone(fullPhone);
+        if (res.notConfigured) {
+          showToast(res.error || 'SMS verification coming soon — please use email for now.', 'info');
+          setLoading(btn, false);
+          return;
+        }
+        if (!res.success) {
+          showToast(res.error || 'Could not send the code.', 'error');
+          setLoading(btn, false);
+          return;
+        }
+        document.getElementById('li-otp-section').style.display = '';
+        document.getElementById('li-otp-phone-display').textContent = fullPhone;
+        _loginPhoneSent = true;
+        btn.textContent = 'Verify & log in';
+        setLoading(btn, false);
+        setTimeout(function() { document.getElementById('li-otp-code').focus(); }, 50);
+      } catch (err) {
+        showToast(err.message || 'Could not send the code.', 'error');
+        setLoading(btn, false);
+      }
+    }
+    window.handlePhoneLogin = handlePhoneLogin;
+
+    async function resendLoginOtp() {
+      var rawPhone = document.getElementById('li-phone').value.trim();
+      if (!/^5[0-9]{8}$/.test(rawPhone)) return;
+      try {
+        var res = await window.SwappoAuth.signInWithPhone(_uaePhone(rawPhone));
+        if (res.success) showToast('Code resent.', 'info');
+      } catch (e) {}
+    }
+    window.resendLoginOtp = resendLoginOtp;
+
+    /* ========================
+       Email signup (secondary, inline)
+       ======================== */
+    function toggleEmailSignup() {
+      var form = document.getElementById('signup-email-form');
+      var open = form.style.display !== 'none';
+      form.style.display = open ? 'none' : '';
+      document.getElementById('su-email-toggle').innerHTML = open
+        ? '<i class="fas fa-envelope"></i> Sign up with email'
+        : '<i class="fas fa-times"></i> Hide email signup';
+    }
+    window.toggleEmailSignup = toggleEmailSignup;
+
+    async function handleEmailSignup(event) {
+      event.preventDefault();
+      var btn = event.target.querySelector('button[type="submit"]');
+      var name = document.getElementById('su-email-name').value.trim();
+      var email = document.getElementById('su-email').value.trim();
+      var password = document.getElementById('su-email-password').value;
+      var terms = document.getElementById('su-email-terms').checked;
+
+      if (name.length < 2) { showToast('Please enter your full name.', 'error'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Please enter a valid email.', 'error'); return; }
+      if (password.length < 8) { showToast('Password must be at least 8 characters.', 'error'); return; }
+      if (!terms) { showToast('Please agree to Terms + Privacy.', 'error'); return; }
+
+      setLoading(btn, true);
+      try {
+        var res = await window.SwappoAuth.signUp(email, password, name, {});
+        if (!res.success) { showToast(res.error || 'Signup failed.', 'error'); setLoading(btn, false); return; }
+        if (res.needsVerification) {
+          showToast('Check your inbox — click the verification link to finish signup.', 'success');
+          setLoading(btn, false);
+          return;
+        }
+        // Auto-confirmed path — always send to onboarding first (pseudo + avatar)
+        showToast('Welcome to Swappo!', 'success');
+        setTimeout(function() { window.location.href = 'onboarding.html'; }, 900);
+      } catch (err) {
+        showToast(err.message || 'Signup failed.', 'error');
+        setLoading(btn, false);
+      }
+    }
+    window.handleEmailSignup = handleEmailSignup;
+
+    /* ========================
+       Email login (secondary, inline)
+       ======================== */
+    function toggleEmailLogin() {
+      var form = document.getElementById('login-email-form');
+      var open = form.style.display !== 'none';
+      form.style.display = open ? 'none' : '';
+      document.getElementById('li-email-toggle').innerHTML = open
+        ? '<i class="fas fa-envelope"></i> Log in with email'
+        : '<i class="fas fa-times"></i> Hide email login';
+    }
+    window.toggleEmailLogin = toggleEmailLogin;
+
     async function handleLogin(event) {
       event.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
       const btn = event.target.querySelector('button[type="submit"]');
-
       setLoading(btn, true);
       try {
-        // Try Supabase first, fall back to DemoAuth for the built-in demo
-        // accounts (pro@swappo.ae, free@swappo.ae) that only live in
-        // localStorage. This keeps the "quick demo" buttons working even
-        // before the SQL migration has been run.
-        let result;
-        if (window.SwappoAuth && window.SwappoAuth.isReady()) {
-          result = await window.SwappoAuth.signIn(email, password);
-          // Fallback: if Supabase rejects (unknown user) AND this email is a
-          // built-in demo account, try DemoAuth.
-          if ((!result.success) && /^(pro|free)@swappo\.ae$/i.test(email)) {
-            result = DemoAuth.signIn(email, password);
-          }
-        } else {
-          result = DemoAuth.signIn(email, password);
+        if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
+          showToast('Auth service unavailable. Please refresh.', 'error');
+          setLoading(btn, false); return;
         }
-
+        var result = await window.SwappoAuth.signIn(email, password);
         if (result.error || result.success === false) {
           showToast(result.error || 'Invalid credentials', 'error');
-          setLoading(btn, false);
-          return;
+          setLoading(btn, false); return;
         }
-
         showToast('Welcome back!', 'success');
-        setTimeout(() => {
-          window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
-        }, 1000);
+        // Route to onboarding if profile is incomplete
+        var needs = await window.SwappoAuth.needsOnboarding();
+        setTimeout(function() {
+          window.location.href = needs ? 'onboarding.html' : safeRedirect('../dev-a7f3k9mz2q.html');
+        }, 900);
       } catch (err) {
         showToast(err.message || 'Login failed', 'error');
         setLoading(btn, false);
       }
     }
-
-    /* ========================
-       OAuth Handlers (Supabase)
-       Google / Apple / Facebook — configured in Supabase Dashboard
-       (Authentication → Providers). If a provider isn't enabled,
-       Supabase returns an error which we show as a toast.
-       ======================== */
-    async function _startOAuth(provider) {
-      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
-        showToast('Auth service unavailable. Please refresh.', 'error');
-        return;
-      }
-      try {
-        // Respect the ?redirect= param from the original page the user came from.
-        // Default: after OAuth callback, land on the dev landing page.
-        var target = safeRedirect('../dev-a7f3k9mz2q.html');
-        var redirectUrl = new URL(target, window.location.origin).href;
-        var res = await window.SwappoAuth.signInWithOAuth(provider, redirectUrl);
-        if (res && res.success === false) {
-          showToast(res.error || ('Could not sign in with ' + provider + '.'), 'error');
-        }
-        // On success, the browser is redirected to the provider's consent page.
-        // After approval, the user comes back to redirectUrl with a session
-        // already restored by Supabase (detectSessionInUrl: true in config).
-      } catch (err) {
-        showToast(err.message || ('Sign-in with ' + provider + ' failed.'), 'error');
-      }
-    }
-    function handleSocialSignup(provider) { return _startOAuth(provider); }
-    function handleSocialLogin(provider) { return _startOAuth(provider); }
+    window.handleLogin = handleLogin;
 
     /* ========================
        Forgot Password (Supabase)
@@ -1023,81 +977,41 @@
     window.quickDemoFree = freshDemoFree;
 
     /* ========================
-       Pseudo Validation (debounced)
+       Forgot password (email flow)
        ======================== */
-    let pseudoTimeout;
-    document.getElementById('signup-pseudo').addEventListener('input', function() {
-      clearTimeout(pseudoTimeout);
-      const val = this.value.trim();
-      const fb = document.getElementById('pseudo-feedback');
-      if (val.length < 3) {
-        fb.textContent = val.length > 0 ? '3 characters minimum' : '';
-        fb.className = 'pseudo-feedback invalid';
-        return;
-      }
-      if (!/^[a-zA-Z0-9_]+$/.test(val)) {
-        fb.textContent = 'Letters, numbers and underscores only';
-        fb.className = 'pseudo-feedback invalid';
-        return;
-      }
-      pseudoTimeout = setTimeout(() => {
-        const taken = (window.MOCK_USERS || []).some(u => u.pseudo === val.toLowerCase()) || val.toLowerCase() === 'demo_swapper';
-        fb.textContent = taken ? 'This username is already taken' : 'Username available!';
-        fb.className = 'pseudo-feedback ' + (taken ? 'taken' : 'available');
-      }, 300);
+    document.querySelectorAll('.auth-forgot a').forEach(function(a) {
+      a.addEventListener('click', async function(e) {
+        e.preventDefault();
+        var email = (document.getElementById('login-email').value || '').trim();
+        if (!email) { showToast('Enter your email above first, then tap Forgot password.', 'info'); return; }
+        if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
+          showToast('Auth service unavailable. Please refresh.', 'error'); return;
+        }
+        try {
+          var redirect = window.location.origin + '/pages/login.html?reset=true';
+          var res = await window.SwappoAuth.resetPassword(email, redirect);
+          if (res && res.success === false) showToast(res.error || 'Could not send reset email.', 'error');
+          else showToast('Reset link sent to ' + email + '. Check your inbox.', 'success');
+        } catch (err) { showToast(err.message || 'Reset failed.', 'error'); }
+      });
     });
 
     /* ========================
-       Phone Verification (Demo)
-       ======================== */
-    function sendPhoneCode() {
-      const phone = document.getElementById('signup-phone').value;
-      if (!/^5[0-9]{8}$/.test(phone)) {
-        showToast('Please enter a valid UAE mobile number', 'error');
-        return;
-      }
-      document.getElementById('phone-verify-step').classList.add('active');
-      showToast('Demo mode: verification code is 123456', 'info');
-      startResendTimer();
-    }
-
-    function resendCode() {
-      showToast('Demo mode: code resent — use 123456', 'info');
-      startResendTimer();
-    }
-
-    function startResendTimer() {
-      const link = document.getElementById('resend-code');
-      const timer = document.getElementById('resend-timer');
-      link.classList.add('disabled');
-      let seconds = 60;
-      timer.textContent = `(${seconds}s)`;
-      const interval = setInterval(() => {
-        seconds--;
-        timer.textContent = `(${seconds}s)`;
-        if (seconds <= 0) {
-          clearInterval(interval);
-          link.classList.remove('disabled');
-          timer.textContent = '';
-        }
-      }, 1000);
-    }
-
-    /* ========================
        Redirect if already logged in
-       (checks Supabase session first, then DemoAuth for the demo accounts)
+       If profile is incomplete (no pseudo), go to onboarding.
        ======================== */
     (async function() {
       try {
-        if (window.SwappoAuth && window.SwappoAuth.isReady()) {
+        if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
           const supaUser = await window.SwappoAuth.getCurrentUser();
           if (supaUser) {
-            window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
+            const needs = await window.SwappoAuth.needsOnboarding();
+            window.location.href = needs ? 'onboarding.html' : safeRedirect('../dev-a7f3k9mz2q.html');
             return;
           }
         }
       } catch (e) { /* ignore and fall through to DemoAuth */ }
-      if (DemoAuth.isLoggedIn()) {
+      if (window.DemoAuth && DemoAuth.isLoggedIn && DemoAuth.isLoggedIn()) {
         window.location.href = safeRedirect('../dev-a7f3k9mz2q.html');
       }
     })();

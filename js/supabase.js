@@ -198,13 +198,118 @@ const SwappoAuth = {
   },
 
   /**
+   * Send an OTP SMS to a UAE phone (signup OR login — Supabase handles both).
+   * @param {string} phone — E.164 format, e.g. '+971501234567'
+   * @returns {Promise<{success:boolean, error?:string, notConfigured?:boolean}>}
+   *   notConfigured=true when Supabase has no SMS provider set up yet (expected
+   *   in dev; UI should show "SMS verification coming soon" instead of erroring).
+   */
+  signInWithPhone: async function (phone) {
+    if (!db) return { success: false, error: 'Auth service unavailable.' };
+    if (!phone) return { success: false, error: 'Phone number required.' };
+    try {
+      const { error } = await db.auth.signInWithOtp({ phone: phone });
+      if (error) {
+        // Detect "SMS provider not configured" — Supabase returns a specific
+        // message when no Twilio/MessageBird credentials are set.
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('sms') && (msg.includes('provider') || msg.includes('not configured') || msg.includes('not enabled'))) {
+          return { success: false, notConfigured: true, error: 'SMS verification coming soon — please use email for now.' };
+        }
+        return { success: false, error: error.message || 'Could not send OTP.' };
+      }
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message || 'OTP send failed.' };
+    }
+  },
+
+  /**
+   * Verify the 6-digit OTP code for a phone sign-in.
+   * @param {string} phone — E.164
+   * @param {string} token — 6-digit code from SMS
+   */
+  verifyPhoneOtp: async function (phone, token) {
+    if (!db) return { success: false, error: 'Auth service unavailable.' };
+    if (!phone || !token) return { success: false, error: 'Phone and code required.' };
+    try {
+      const { data, error } = await db.auth.verifyOtp({
+        phone: phone,
+        token: token,
+        type: 'sms'
+      });
+      if (error) return { success: false, error: error.message || 'Invalid code.' };
+      // Mirror session user (profile fetch non-blocking — pseudo may be null at
+      // this point since phone-only users set it during onboarding).
+      try {
+        const profile = await Promise.race([
+          _fetchProfile(data.user.id),
+          new Promise((r) => setTimeout(() => r(null), 3000))
+        ]);
+        _mirrorFromSupabase(data.user, profile);
+      } catch (e) { _mirrorFromSupabase(data.user, null); }
+      return { success: true, user: data.user };
+    } catch (e) {
+      return { success: false, error: e.message || 'OTP verification failed.' };
+    }
+  },
+
+  /**
+   * Check if a pseudo is available (case-insensitive, strict charset).
+   * Uses RPC is_pseudo_available which is SECURITY DEFINER so any client
+   * can check without leaking the full users table via SELECT.
+   */
+  isPseudoAvailable: async function (candidate) {
+    if (!db || !candidate) return false;
+    try {
+      const { data, error } = await db.rpc('is_pseudo_available', { candidate: candidate });
+      if (error) { console.warn('[isPseudoAvailable]', error.message); return false; }
+      return data === true;
+    } catch (e) { return false; }
+  },
+
+  /**
+   * Update the current user's profile (pseudo / avatar / name / city / bio).
+   * Uses RLS policy users_update_self — will fail for other users' rows.
+   * Returns the updated profile row on success.
+   */
+  updateProfile: async function (updates) {
+    if (!db) return { success: false, error: 'Auth service unavailable.' };
+    const u = await SwappoAuth.getCurrentUser();
+    if (!u) return { success: false, error: 'Not signed in.' };
+    const payload = {};
+    ['pseudo', 'avatar', 'name', 'city', 'bio', 'phone'].forEach((k) => {
+      if (typeof updates[k] !== 'undefined') payload[k] = updates[k];
+    });
+    if (!Object.keys(payload).length) return { success: false, error: 'Nothing to update.' };
+    try {
+      const { data, error } = await db.from('users').update(payload).eq('id', u.id).select('*').single();
+      if (error) return { success: false, error: error.message || 'Update failed.' };
+      // Refresh mirror so navbar/dashboard reflect new pseudo/avatar immediately.
+      _mirrorFromSupabase(u, data);
+      return { success: true, profile: data };
+    } catch (e) {
+      return { success: false, error: e.message || 'Update failed.' };
+    }
+  },
+
+  /**
+   * Returns true if the current user must be redirected to onboarding.html
+   * (i.e., signed in but no pseudo yet).
+   */
+  needsOnboarding: async function () {
+    const u = await SwappoAuth.getCurrentUser();
+    if (!u) return false;
+    const profile = await _fetchProfile(u.id);
+    return !profile || !profile.pseudo;
+  },
+
+  /**
    * OAuth sign-in via a third-party provider (google / apple / facebook).
-   * The browser is redirected to the provider's consent page and comes back
-   * to `redirectTo` with the session already restored (detectSessionInUrl).
+   * Deprecated for Swappo launch — kept in code in case providers are added later.
    *
    * @param {'google'|'apple'|'facebook'} provider
    * @param {string} redirectTo — absolute URL to land on after approval
-   * @returns {Promise<{success:boolean, error?:string}>}
    */
   signInWithOAuth: async function (provider, redirectTo) {
     if (!db) return { success: false, error: 'Auth service unavailable.' };
