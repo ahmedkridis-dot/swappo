@@ -1504,16 +1504,17 @@
           '<div class="sc-option-text"><div class="sc-option-label">Meet in Person</div><div class="sc-option-desc">Pick a safe public spot nearby</div></div>' +
           '<span class="sc-option-price free">FREE</span>' +
         '</div>' +
-        '<div class="sc-option" onclick="chooseExchangeMethod(\'' + convId + '\', \'delivery\')">' +
+        // DELIVERY: Coming Soon (Phase 2 — logistics partnerships not live yet)
+        '<div class="sc-option" onclick="DemoNotifications && DemoNotifications.showToast && DemoNotifications.showToast(\'Delivery launches soon — for now, arrange the hand-off in person via chat.\', \'info\')" style="opacity:0.7;cursor:default;">' +
           '<span class="sc-option-icon">🚚</span>' +
-          '<div class="sc-option-text"><div class="sc-option-label">Swappo Delivery</div><div class="sc-option-desc">We pick up & deliver · ' + feeText + '</div></div>' +
-          '<span class="sc-option-price">from 25 AED</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Swappo Delivery <span style="font-size:10px;background:#F59E0B;color:white;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;">SOON</span></div><div class="sc-option-desc">We pick up & deliver · Coming soon</div></div>' +
+          '<span class="sc-option-price" style="color:#9CA3AF;">~25 AED</span>' +
         '</div>' +
         (isLargeItem ?
-        '<div class="sc-option" onclick="chooseExchangeMethod(\'' + convId + '\', \'truck\')">' +
+        '<div class="sc-option" onclick="DemoNotifications && DemoNotifications.showToast && DemoNotifications.showToast(\'Find a Truck launches soon — Phase 2 partnership pending.\', \'info\')" style="opacity:0.7;cursor:default;">' +
           '<span class="sc-option-icon">🚛</span>' +
-          '<div class="sc-option-text"><div class="sc-option-label">Find a Truck</div><div class="sc-option-desc">For furniture & large items</div></div>' +
-          '<span class="sc-option-price">from 80 AED</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Find a Truck <span style="font-size:10px;background:#F59E0B;color:white;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;">SOON</span></div><div class="sc-option-desc">For furniture & large items · Coming soon</div></div>' +
+          '<span class="sc-option-price" style="color:#9CA3AF;">~80 AED</span>' +
         '</div>' : '') +
       '</div>';
     return div;
