@@ -1568,8 +1568,13 @@
             userItems.forEach(item => {
                 const title = (item.brand + ' ' + item.model).trim() || item.type;
                 const photo = (item.photos && item.photos[0]) || '';
-                const statusClass = item.status === 'active' ? 'active' : item.status === 'pending' ? 'pending' : 'swapped';
-                const statusLabel = item.status.charAt(0).toUpperCase() + item.status.slice(1);
+                // Supabase statuses: available/reserved/swapped/sold/removed
+                // DemoItems legacy: active/pending/swapped
+                const itemStatus = item.status || 'available';
+                const statusClass = (itemStatus === 'active' || itemStatus === 'available') ? 'active'
+                                   : (itemStatus === 'pending' || itemStatus === 'reserved') ? 'pending'
+                                   : 'swapped';
+                const statusLabel = itemStatus.charAt(0).toUpperCase() + itemStatus.slice(1);
 
                 itemsHTML += '<div class="product-card">' +
                     '<div class="product-image">' +

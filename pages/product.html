@@ -600,15 +600,21 @@
     if (window.db) {
       try {
         var res = await window.db.from('users')
-          .select('id,pseudo,name,avatar,plan,swap_count,badge').eq('id', userId).maybeSingle();
+          .select('id,pseudo,name,avatar,plan,swap_count,badge,created_at').eq('id', userId).maybeSingle();
         if (res && res.data) {
           return Object.assign({}, res.data, {
             avatar_color: '#09B1BA',
             badge_emoji: { newcomer: '\u{1F331}', swapper: '\u{2B50}', active: '\u{1F525}', pro: '\u{1F48E}', elite: '\u{1F3C6}', legend: '\u{1F451}' }[res.data.badge] || '\u{1F331}',
-            badge_tier: res.data.badge || 'newcomer'
+            badge_tier: res.data.badge || 'newcomer',
+            // created_at from public.users is set on INSERT (trigger); fall back
+            // to today's ISO string so downstream slice(0,7) never crashes.
+            created_at: res.data.created_at || new Date().toISOString(),
+            city: res.data.city || 'UAE'
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('[_resolveOwner] query failed:', e.message || e);
+      }
     }
     return window.getMockUserById ? getMockUserById(userId) : null;
   }
@@ -877,7 +883,8 @@
       }
       sellerHTML += '<div class="seller-info">';
       sellerHTML += '<div class="seller-info-item"><span>' + t('seller_location') + ':</span><strong>' + (owner.city || 'UAE') + '</strong></div>';
-      sellerHTML += '<div class="seller-info-item"><span>' + t('seller_member_since') + ':</span><strong>' + owner.created_at.slice(0, 7).replace('-', '/') + '</strong></div>';
+      var memberSince = (owner.created_at ? String(owner.created_at).slice(0, 7).replace('-', '/') : '—');
+      sellerHTML += '<div class="seller-info-item"><span>' + t('seller_member_since') + ':</span><strong>' + memberSince + '</strong></div>';
       sellerHTML += '</div>';
     }
     sellerHTML += '<p class="seller-disclaimer">' + t('seller_disclaimer') + '</p>';
