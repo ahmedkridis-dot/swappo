@@ -34,6 +34,23 @@ let db = null;
 // Expose for other scripts
 try { window.db = db; } catch (e) {}
 
+// ---- Auth-ready gate ------------------------------------------------------
+// The Supabase JS SDK restores persisted sessions asynchronously AFTER
+// createClient returns. If any page calls SwappoAuth.getCurrentUser() before
+// that restoration finishes, getSession() returns null and the page wrongly
+// redirects the user to login. Symptom: "site jumps from profile → login →
+// home → profile → login ..." as each page hits the race.
+//
+// Fix: expose a promise that resolves as soon as the SDK has emitted its
+// first auth-state event (INITIAL_SESSION / SIGNED_IN / SIGNED_OUT). Callers
+// that need a reliable session read should `await _authReady` first.
+let _authReadyResolve = null;
+const _authReady = new Promise((resolve) => { _authReadyResolve = resolve; });
+// Safety: resolve after 1.5s even if no event arrives (some browsers skip
+// INITIAL_SESSION when storage is empty). 1.5s is far below the per-query
+// getSession timeout of 3s, so total worst-case latency stays < 5s.
+setTimeout(() => { if (_authReadyResolve) { _authReadyResolve(null); _authReadyResolve = null; } }, 1500);
+
 // ---- DemoAuth mirror helpers ----
 // SwappoAuth writes the authenticated user into localStorage.swappo_current_user
 // in the shape that existing DemoAuth consumers expect. This lets the rest of
@@ -189,6 +206,10 @@ const SwappoAuth = {
    */
   getCurrentUser: async function () {
     if (!db) return null;
+    // Wait for the SDK to finish its initial session restoration before
+    // asking for the session — this eliminates the "page jumps to login"
+    // race that happens on cold page loads.
+    try { await _authReady; } catch (e) {}
     try {
       const res = await Promise.race([
         db.auth.getSession(),
@@ -206,6 +227,7 @@ const SwappoAuth = {
   /** Sync current session into the DemoAuth mirror. Call once on page load. */
   syncMirror: async function () {
     if (!db) return null;
+    try { await _authReady; } catch (e) {}
     try {
       const res = await Promise.race([
         db.auth.getSession(),
@@ -232,6 +254,7 @@ try { window.SwappoAuth = SwappoAuth; } catch (e) {}
 
 async function getCurrentUser() {
   if (!db) return null;
+  try { await _authReady; } catch (e) {}
   try {
     const res = await Promise.race([
       db.auth.getSession(),
@@ -248,6 +271,7 @@ async function getCurrentUser() {
 
 async function getCurrentSession() {
   if (!db) return null;
+  try { await _authReady; } catch (e) {}
   try {
     const res = await Promise.race([
       db.auth.getSession(),
@@ -327,7 +351,14 @@ async function updateNavbarAuth() {
 
 if (db) {
   db.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+    // Resolve the auth-ready gate on the first event we see from the SDK.
+    // INITIAL_SESSION fires once persisted-session restoration is complete;
+    // SIGNED_IN / SIGNED_OUT cover the other possible first events.
+    if (_authReadyResolve) {
+      _authReadyResolve(session || null);
+      _authReadyResolve = null;
+    }
+    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
       if (session && session.user) {
         const profile = await _fetchProfile(session.user.id);
         _mirrorFromSupabase(session.user, profile);
