@@ -593,7 +593,7 @@
         return Object.assign({}, mirror || {}, { id: u.id, email: u.email });
       }
     }
-    return (window.DemoAuth && DemoAuth.getCurrentUser()) || null;
+    return null;
   }
   async function _resolveOwner(userId) {
     if (!userId) return null;
@@ -619,11 +619,8 @@
     return window.getMockUserById ? getMockUserById(userId) : null;
   }
   async function _resolveItem(itemId) {
-    if (window.SwappoItems && window.db) {
-      var it = await window.SwappoItems.getById(itemId);
-      if (it) return it;
-    }
-    return window.DemoItems ? DemoItems.getById(itemId) : null;
+    if (!(window.SwappoItems && window.db)) return null;
+    try { return await window.SwappoItems.getById(itemId); } catch (e) { return null; }
   }
 
   // ============ MAIN INIT ============
@@ -708,7 +705,7 @@
 
     // ── Price display + swap info (v5 marketplace) ──
     var swapInfoHTML = '';
-    var user = DemoAuth.getCurrentUser();
+    var user = currentUser;  // already resolved via SwappoAuth above
     if (item.is_giveaway) {
       swapInfoHTML = '<div class="swap-info-icon"><i class="fas fa-gift"></i></div>' +
         '<div class="swap-info-text"><strong>' + t('free_item') + '</strong><br>' + t('use_1_claim') + '</div>';
@@ -782,7 +779,7 @@
     // ── Action buttons ──
     var isFav = (window.SwappoItems && window.SwappoItems.isFavoritedSync)
       ? SwappoItems.isFavoritedSync(item.id)
-      : DemoItems.isFavorited(item.id);
+      : false;
     var actionsHTML = '';
 
     // Item + Cash section — NEGOTIATION TOOL ONLY
@@ -861,7 +858,8 @@
 
     // v5: Delivery option card
     if (!item.is_giveaway) {
-      var isPro = user && DemoSubscription.getPlan(user.id).plan === 'pro';
+      // Pro plan = 0% delivery fee. Read user.plan from the mirrored row.
+      var isPro = user && String(user.plan || '').toLowerCase() === 'pro';
       var feeText = isPro ? '<span style="text-decoration:line-through;color:#9CA3AF;">5%</span> <span style="color:#10B981;font-weight:700;">0% (Pro)</span>' : '5%';
       actionsHTML += '<div style="background:linear-gradient(135deg,#F0FDFA,#F0F9FF);border:1px solid rgba(9,177,186,0.15);border-radius:16px;padding:18px 20px;margin-top:16px;">';
       actionsHTML += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
@@ -887,13 +885,9 @@
     sellerHTML += '<div class="seller-name">' + sellerName + '</div>';
     if (owner) {
       sellerHTML += '<div class="seller-badge">' + owner.badge_emoji + ' ' + capitalizeFirst(owner.badge_tier) + '</div>';
-      if (window.DemoBadges && owner) {
-        var ownerBadges = DemoBadges.getAllBadges(owner.id, owner.swap_count || 0);
-        sellerHTML += '<div style="display:flex;gap:4px;justify-content:center;margin-top:4px;flex-wrap:wrap;">';
-        sellerHTML += DemoBadges.renderBadge(ownerBadges.level);
-        ownerBadges.specials.forEach(function(b) { sellerHTML += DemoBadges.renderBadge(b); });
-        sellerHTML += '</div>';
-      }
+      // NOTE: "special badges" (Generous Heart etc.) require aggregate queries
+      // across giveaways/swaps — will be wired in the dashboard pass. For now
+      // the seller card just shows the tier badge.
       sellerHTML += '<div class="seller-info">';
       sellerHTML += '<div class="seller-info-item"><span>' + t('seller_location') + ':</span><strong>' + (owner.city || 'UAE') + '</strong></div>';
       var memberSince = (owner.created_at ? String(owner.created_at).slice(0, 7).replace('-', '/') : '—');
@@ -904,9 +898,10 @@
     document.getElementById('seller-card').innerHTML = sellerHTML;
 
     // ── Similar items ──
-    var similar = (window.SwappoItems && window.db)
-      ? await window.SwappoItems.getSimilar(itemId, 4)
-      : DemoItems.getSimilar(itemId, 4);
+    var similar = [];
+    if (window.SwappoItems && window.db) {
+      try { similar = await window.SwappoItems.getSimilar(itemId, 4); } catch (e) { similar = []; }
+    }
     if (similar.length > 0) {
       document.getElementById('similar-section').style.display = '';
       var simGrid = document.getElementById('similar-grid');
@@ -969,12 +964,12 @@
       return;
     }
     var nowFav;
-    if (window.SwappoItems && window.db) {
-      var res = await window.SwappoItems.toggleFavorite(currentItem.id);
-      nowFav = !!res.favorited;
-    } else {
-      nowFav = DemoItems.toggleFavorite(currentItem.id);
+    if (!(window.SwappoItems && window.db)) {
+      showToast('Service unavailable — please refresh.');
+      return;
     }
+    var res = await window.SwappoItems.toggleFavorite(currentItem.id);
+    nowFav = !!res.favorited;
     var btn = document.getElementById('saveBtn');
     if (nowFav) {
       btn.innerHTML = '<i class="fas fa-heart"></i> Saved';
@@ -1002,16 +997,16 @@
     document.body.appendChild(overlay);
   }
 
-  function claimGiveaway() {
+  async function claimGiveaway() {
     if (!currentItem) return;
-    // STEP 1 — Not logged in
     if (!currentUser) { window.location.href = 'login.html'; return; }
+    if (!(window.db && window.SwappoAuth)) { showToast('Service unavailable'); return; }
 
-    var result = DemoGiveaway.claim(currentItem.id);
-
-    if (!result.success) {
-      // STEP 2 — Needs to list an item first
-      if (result.code === 'needs_listing') {
+    try {
+      // STEP 2 — User must have published at least 1 item
+      var { count: hasItems } = await window.db.from('items')
+        .select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+      if (!hasItems || hasItems === 0) {
         _productBuildModal(
           '<div style="font-size:52px;margin-bottom:14px;">🎁</div>' +
           '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">Almost there!</h3>' +
@@ -1024,13 +1019,21 @@
         );
         return;
       }
-      // STEP 4 & 5 — Quota reached
-      if (result.code === 'quota_reached') {
-        if (result.plan === 'pro') {
+
+      // STEP 3 — Monthly quota (1 free, 5 pro)
+      var plan = String(currentUser.plan || 'free').toLowerCase();
+      var limit = plan === 'pro' ? 5 : 1;
+      var monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+      var { count: claimedThisMonth } = await window.db.from('swaps')
+        .select('id', { count: 'exact', head: true })
+        .eq('proposer_id', currentUser.id).eq('is_giveaway_claim', true)
+        .gte('created_at', monthStart.toISOString());
+      if ((claimedThisMonth || 0) >= limit) {
+        if (plan === 'pro') {
           _productBuildModal(
             '<div style="font-size:52px;margin-bottom:14px;">👑</div>' +
             '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">All Pro claims used</h3>' +
-            '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">You\'ve used all ' + (result.limit || 5) + ' Pro claims this month. Come back next month for ' + (result.limit || 5) + ' more!</p>' +
+            '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">You\'ve used all ' + limit + ' Pro claims this month. Come back next month for ' + limit + ' more!</p>' +
             '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:#09B1BA;color:white;border:none;padding:12px 28px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;">Got it</button>'
           );
         } else {
@@ -1047,21 +1050,41 @@
         }
         return;
       }
-      // Other (category lock, etc.)
-      showToast(result.error || 'Could not claim item');
-      return;
-    }
 
-    // STEP 3 — Success
-    showToast('🎁 Gift claimed! The giver will contact you soon.');
-    var btn = document.getElementById('claim-btn');
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-check"></i> Claimed';
-      btn.style.opacity = '0.6';
-      btn.style.cursor = 'not-allowed';
+      // STEP 4 — Insert swap giveaway_claim + notification
+      if (currentItem.user_id === currentUser.id) { showToast("You can't claim your own gift"); return; }
+      var { data: swap, error: swErr } = await window.db.from('swaps').insert({
+        proposer_id: currentUser.id,
+        receiver_id: currentItem.user_id,
+        receiver_item_id: currentItem.id,
+        is_giveaway_claim: true,
+        cash_direction: 'none',
+        cash_amount: 0,
+        status: 'pending'
+      }).select('*').single();
+      if (swErr) { showToast(swErr.message || 'Could not claim'); return; }
+
+      try {
+        await window.db.from('notifications').insert({
+          user_id: currentItem.user_id,
+          kind: 'gift_claimed',
+          payload: { swap_id: swap.id, item_id: currentItem.id, claimer_id: currentUser.id }
+        });
+      } catch (nErr) { /* non-blocking */ }
+
+      // STEP 5 — Success UI
+      showToast('🎁 Gift claimed! The giver will contact you soon.');
+      var btn = document.getElementById('claim-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-check"></i> Claimed';
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+      }
+    } catch (err) {
+      console.error('[claimGiveaway]', err);
+      showToast(err.message || 'Could not claim');
     }
-    updateNavbarForDemo();
   }
 
   // ============ ITEM + CASH ============
@@ -1135,8 +1158,8 @@
         cashDirection: 'proposer_pays',
         isPurchase: true
       });
-    } else if (window.DemoSwaps && DemoSwaps.propose) {
-      res = DemoSwaps.propose(null, currentItem.id, { type: 'buy', amount: price });
+    } else {
+      res = { success: false, error: 'Service unavailable — please refresh.' };
     }
     if (res && res.success === false) {
       DemoNotifications.showToast(res.error || 'Could not send offer.', 'error');
@@ -1197,8 +1220,8 @@
           cashDirection: 'proposer_pays',
           isPurchase: true
         });
-      } else if (window.DemoSwaps && DemoSwaps.propose) {
-        res = DemoSwaps.propose(null, currentItem.id, { type: 'offer', amount: amount });
+      } else {
+        res = { success: false, error: 'Service unavailable — please refresh.' };
       }
     } catch (e) {
       console.error('submitOffer error', e);
@@ -1286,8 +1309,6 @@
     try {
       if (window.SwappoItems && window.db) {
         myItems = await window.SwappoItems.getByUser(currentUser.id);
-      } else if (window.DemoItems && DemoItems.getByUser) {
-        myItems = DemoItems.getByUser(currentUser.id);
       }
     } catch (e) {
       console.error('loadMyItemsInModal error', e);
@@ -1363,8 +1384,8 @@
           payload.cashDirection = 'proposer_pays';
         }
         result = await window.SwappoSwaps.propose(payload);
-      } else if (window.DemoSwaps && DemoSwaps.propose) {
-        result = DemoSwaps.propose(selectedSwapItemId, currentItem.id);
+      } else {
+        result = { success: false, error: 'Service unavailable — please refresh.' };
       }
     } catch (e) {
       console.error('confirmSwap error', e);
