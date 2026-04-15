@@ -198,6 +198,50 @@ const SwappoAuth = {
   },
 
   /**
+   * OAuth sign-in via a third-party provider (google / apple / facebook).
+   * The browser is redirected to the provider's consent page and comes back
+   * to `redirectTo` with the session already restored (detectSessionInUrl).
+   *
+   * @param {'google'|'apple'|'facebook'} provider
+   * @param {string} redirectTo — absolute URL to land on after approval
+   * @returns {Promise<{success:boolean, error?:string}>}
+   */
+  signInWithOAuth: async function (provider, redirectTo) {
+    if (!db) return { success: false, error: 'Auth service unavailable.' };
+    if (!provider) return { success: false, error: 'Provider required.' };
+    try {
+      const { error } = await db.auth.signInWithOAuth({
+        provider: provider,
+        options: redirectTo ? { redirectTo: redirectTo } : {}
+      });
+      if (error) return { success: false, error: error.message || 'OAuth failed.' };
+      // On success the browser navigates away — caller will not run further code.
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message || 'OAuth failed.' };
+    }
+  },
+
+  /**
+   * Send a password reset email. User clicks the link and lands on the
+   * redirect URL with `type=recovery` in the hash — Supabase auto-sets
+   * a one-time session allowing updateUser({ password: ... }).
+   */
+  resetPassword: async function (email, redirectTo) {
+    if (!db) return { success: false, error: 'Auth service unavailable.' };
+    if (!email) return { success: false, error: 'Email required.' };
+    try {
+      const { error } = await db.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectTo || (window.location.origin + '/pages/login.html?reset=true')
+      });
+      if (error) return { success: false, error: error.message || 'Reset email failed.' };
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message || 'Reset email failed.' };
+    }
+  },
+
+  /**
    * Returns the currently authenticated Supabase user, or null.
    * Uses getSession() (local read of cached JWT) rather than getUser()
    * which makes a network roundtrip and can hang indefinitely if the

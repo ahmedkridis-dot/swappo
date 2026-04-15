@@ -922,21 +922,62 @@
     }
 
     /* ========================
-       OAuth Handlers (Demo)
+       OAuth Handlers (Supabase)
+       Google / Apple / Facebook — configured in Supabase Dashboard
+       (Authentication → Providers). If a provider isn't enabled,
+       Supabase returns an error which we show as a toast.
        ======================== */
-    function handleSocialSignup(provider) {
-      showToast('OAuth with ' + provider + ' coming soon! Use email for the demo.', 'info');
+    async function _startOAuth(provider) {
+      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
+        showToast('Auth service unavailable. Please refresh.', 'error');
+        return;
+      }
+      try {
+        // Respect the ?redirect= param from the original page the user came from.
+        // Default: after OAuth callback, land on the dev landing page.
+        var target = safeRedirect('../dev-a7f3k9mz2q.html');
+        var redirectUrl = new URL(target, window.location.origin).href;
+        var res = await window.SwappoAuth.signInWithOAuth(provider, redirectUrl);
+        if (res && res.success === false) {
+          showToast(res.error || ('Could not sign in with ' + provider + '.'), 'error');
+        }
+        // On success, the browser is redirected to the provider's consent page.
+        // After approval, the user comes back to redirectUrl with a session
+        // already restored by Supabase (detectSessionInUrl: true in config).
+      } catch (err) {
+        showToast(err.message || ('Sign-in with ' + provider + ' failed.'), 'error');
+      }
     }
-    function handleSocialLogin(provider) {
-      showToast('OAuth with ' + provider + ' coming soon! Use email for the demo.', 'info');
-    }
+    function handleSocialSignup(provider) { return _startOAuth(provider); }
+    function handleSocialLogin(provider) { return _startOAuth(provider); }
 
     /* ========================
-       Forgot Password (Demo)
+       Forgot Password (Supabase)
+       Uses db.auth.resetPasswordForEmail — Supabase sends a recovery link
+       that lands back on login.html?reset=true with a one-time session.
        ======================== */
-    document.querySelector('.auth-forgot a').addEventListener('click', (e) => {
+    document.querySelector('.auth-forgot a').addEventListener('click', async (e) => {
       e.preventDefault();
-      showToast('Password reset is not available in demo mode. Use pro@swappo.ae / pro123', 'info');
+      var email = (document.getElementById('login-email').value || '').trim();
+      if (!email) {
+        showToast('Enter your email above first, then tap Forgot password.', 'info');
+        return;
+      }
+      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
+        showToast('Auth service unavailable. Please refresh.', 'error');
+        return;
+      }
+      try {
+        var redirect = window.location.origin + '/pages/login.html?reset=true';
+        var res = await window.SwappoAuth.resetPassword(email, redirect);
+        if (res && res.success === false) {
+          showToast(res.error || 'Could not send reset email.', 'error');
+        } else {
+          showToast('Reset link sent to ' + email + '. Check your inbox.', 'success');
+        }
+      } catch (err) {
+        showToast(err.message || 'Reset failed.', 'error');
+      }
     });
 
     /* ========================
