@@ -1446,28 +1446,56 @@ function updateNavbarForDemo() {
   });
 
   // ── Chat badge ────────────────────────────────────────────────────────
+  // Count = unread chat messages (Supabase) + unread notifications.
+  // Supabase path runs async and mutates the badge when the result is back;
+  // DemoChat provides an immediate fallback for the demo mode.
   const chatLinks = document.querySelectorAll('a[href*="chat"]');
   chatLinks.forEach(link => {
-    // Remove old dynamic badge
     const oldBadge = link.querySelector('.chat-badge');
     if (oldBadge) oldBadge.remove();
-    // Remove static placeholder badge (hardcoded in some page templates)
     const staticBadge = link.querySelector('.badge-count');
     if (staticBadge) staticBadge.remove();
 
-    if (user) {
-      const unread = DemoChat.getUnreadCount();
-      if (unread > 0) {
-        const badge = document.createElement('span');
-        badge.className = 'chat-badge';
-        badge.textContent = unread;
-        badge.style.cssText =
-          'position:absolute;top:-4px;right:-8px;background:#FF4B55;color:#fff;' +
-          'font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;' +
-          'display:flex;align-items:center;justify-content:center;';
-        link.style.position = 'relative';
-        link.appendChild(badge);
+    if (!user) return;
+
+    function _paint(count) {
+      // Remove any previously painted badge first (idempotent)
+      const prev = link.querySelector('.chat-badge');
+      if (prev) prev.remove();
+      if (!count || count < 1) return;
+      const badge = document.createElement('span');
+      badge.className = 'chat-badge';
+      badge.textContent = count > 99 ? '99+' : String(count);
+      badge.style.cssText =
+        'position:absolute;top:-4px;right:-8px;background:#FF4B55;color:#fff;' +
+        'font-size:10px;font-weight:700;min-width:18px;height:18px;padding:0 5px;border-radius:9px;' +
+        'display:flex;align-items:center;justify-content:center;';
+      link.style.position = 'relative';
+      link.appendChild(badge);
+    }
+
+    // Immediate paint from DemoChat (might be 0 if we're 100% on Supabase)
+    try {
+      if (window.DemoChat && DemoChat.getUnreadCount) {
+        _paint(DemoChat.getUnreadCount());
       }
+    } catch (e) {}
+
+    // Then async refresh from Supabase (unread messages + unread notifications)
+    if (window.SwappoChat && window.db) {
+      (async function() {
+        try {
+          const chatCount = await (window.SwappoChat.getUnreadCount ? window.SwappoChat.getUnreadCount() : 0);
+          let notifCount = 0;
+          try {
+            const { count } = await window.db.from('notifications')
+              .select('id', { count: 'exact', head: true })
+              .eq('is_read', false);
+            notifCount = count || 0;
+          } catch (e) { /* notifications table may not exist yet */ }
+          _paint((chatCount || 0) + (notifCount || 0));
+        } catch (e) { /* keep whatever DemoChat painted */ }
+      })();
     }
   });
 }
