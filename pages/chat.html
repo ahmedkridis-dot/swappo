@@ -1160,7 +1160,7 @@
         return [];
       }
     }
-    return (window.DemoChat && DemoChat.getConversations) ? DemoChat.getConversations() : [];
+    return [];
   }
 
   async function fetchMessages(convId) {
@@ -1174,7 +1174,7 @@
         return [];
       }
     }
-    return (window.DemoChat && DemoChat.getMessages) ? DemoChat.getMessages(convId) : [];
+    return [];
   }
 
   async function sendChatMessage(convId, text) {
@@ -1189,11 +1189,7 @@
         return { success: false, error: e.message };
       }
     }
-    if (window.DemoChat && DemoChat.sendMessage) {
-      DemoChat.sendMessage(convId, text);
-      return { success: true };
-    }
-    return { success: false, error: 'No chat backend' };
+    return { success: false, error: 'Chat service unavailable — please refresh.' };
   }
 
   function attachRealtime(convId) {
@@ -1318,8 +1314,9 @@
     list.innerHTML = filtered.map(function(c) {
       var o = c.other_user || {};
       var map = CONV_ITEM_MAP[c.id] || {};
-      // Prefer item from SwappoChat response; fallback to Demo lookup
-      var item = c.item || (map.my_item_id && window.DemoItems ? DemoItems.getById(map.my_item_id) : null);
+      // Item comes from the conversation's joined `item` relation (SwappoChat
+      // embeds it via the Supabase select). No DemoItems fallback.
+      var item = c.item || null;
       var photo = item && item.photos ? item.photos[0] : '';
       var status = map.status || 'accepted';
       var dealType = map.type || 'swap';
@@ -1783,9 +1780,11 @@
   function renderDealPanel(convId) {
     var map = CONV_ITEM_MAP[convId] || {};
     var conv = _convCache.find(function(c) { return c.id === convId; }) || {};
-    // Phase 2: prefer conversation's item (from Supabase); Demo fallback uses map
-    var theirItem = (conv.item) || (map.their_item_id && window.DemoItems ? DemoItems.getById(map.their_item_id) : null);
-    var myItem = map.my_item_id && window.DemoItems ? DemoItems.getById(map.my_item_id) : null;
+    // Items come from the conversation's embedded Supabase rows.
+    // (A proposer_item ref would come from the linked swap — we don't
+    // display it separately here, Deal Panel shows the receiver item.)
+    var theirItem = conv.item || null;
+    var myItem = null;
     var status = map.status || (conv.identity_revealed ? 'accepted' : 'pending');
     var cash = map.cash || 0;
     dealCashAmount = cash;
@@ -2080,14 +2079,12 @@
 
   // ═══ INIT ═══
   async function chatInit() {
-    // Prefer SwappoAuth (Supabase session); fallback to DemoAuth.
-    // Retry once after a brief wait to survive the Supabase session-restore
-    // race (SDK may still be decoding the cached JWT on cold page load).
+    // Resolve via SwappoAuth (Supabase session). No DemoAuth fallback.
+    // Retry once after 600ms to survive the session-restore race on cold
+    // page load.
     async function _resolve() {
-      if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
-        try { var u = await window.SwappoAuth.getCurrentUser(); if (u) return u; } catch (e) {}
-      }
-      return (window.DemoAuth && DemoAuth.getCurrentUser) ? DemoAuth.getCurrentUser() : null;
+      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return null;
+      try { return await window.SwappoAuth.getCurrentUser(); } catch (e) { return null; }
     }
     currentUser = await _resolve();
     if (!currentUser) {
