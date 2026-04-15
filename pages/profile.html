@@ -1356,13 +1356,13 @@
             if (window.SwappoItems && _useSwappoProfile()) {
                 try { return (await window.SwappoItems.getByUser(userId)) || []; } catch (e) { console.error(e); return []; }
             }
-            return (window.DemoItems && DemoItems.getByUser) ? DemoItems.getByUser(userId) : [];
+            return [];
         }
         async function _getFavoriteItems() {
             if (window.SwappoItems && _useSwappoProfile()) {
                 try { return (await window.SwappoItems.getFavorites()) || []; } catch (e) { console.error(e); return []; }
             }
-            return (window.DemoItems && DemoItems.getFavorites) ? DemoItems.getFavorites().map(function(id) { return DemoItems.getById(id); }).filter(Boolean) : [];
+            return [];
         }
         async function _getSwaps(userId) {
             if (window.SwappoSwaps && _useSwappoProfile()) {
@@ -1375,20 +1375,11 @@
                     return { sent: sent || [], received: received || [], history: history || [] };
                 } catch (e) { console.error(e); return { sent: [], received: [], history: [] }; }
             }
-            return {
-                sent: (window.DemoSwaps && DemoSwaps.getSent) ? DemoSwaps.getSent(userId) : [],
-                received: (window.DemoSwaps && DemoSwaps.getReceived) ? DemoSwaps.getReceived(userId) : [],
-                history: (window.DemoSwaps && DemoSwaps.getHistory) ? DemoSwaps.getHistory(userId) : []
-            };
+            return { sent: [], received: [], history: [] };
         }
         async function _getCurrentUser() {
-            if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
-                try {
-                    const u = await window.SwappoAuth.getCurrentUser();
-                    if (u) return u;
-                } catch (e) {}
-            }
-            return (window.DemoAuth && DemoAuth.getCurrentUser) ? DemoAuth.getCurrentUser() : null;
+            if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return null;
+            try { return await window.SwappoAuth.getCurrentUser(); } catch (e) { return null; }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1467,50 +1458,60 @@
                 return '<div class="badge-icon ' + (earned ? 'earned' : 'locked') + '" title="' + b.label + ' (' + b.min_swaps + ' swaps)">' + b.emoji + '</div>';
             }).join('');
 
-            // ── DemoBadges enhanced display ─────────────────────────────
-            if (window.DemoBadges) {
-              var badgeInfo = DemoBadges.getAllBadges(user.id, user.swap_count || 0);
+            // ── Badge tier display (pure helpers, no DemoBadges dependency) ──
+            var _BADGE_TIERS_LEVEL = [
+              { tier: 'newcomer', min: 0,  emoji: '🌱', name: 'Newcomer', color: '#10B981' },
+              { tier: 'swapper',  min: 1,  emoji: '⭐', name: 'Swapper',  color: '#F59E0B' },
+              { tier: 'active',   min: 5,  emoji: '🔥', name: 'Active',   color: '#EF4444' },
+              { tier: 'pro',      min: 15, emoji: '💎', name: 'Pro',      color: '#8B5CF6' },
+              { tier: 'elite',    min: 30, emoji: '🏆', name: 'Elite',    color: '#F59E0B' },
+              { tier: 'legend',   min: 75, emoji: '👑', name: 'Legend',   color: '#DC2626' }
+            ];
+            function _currentTier(swapCount) {
+              for (var i = _BADGE_TIERS_LEVEL.length - 1; i >= 0; i--) {
+                if ((swapCount || 0) >= _BADGE_TIERS_LEVEL[i].min) return _BADGE_TIERS_LEVEL[i];
+              }
+              return _BADGE_TIERS_LEVEL[0];
+            }
+            function _nextTier(swapCount) {
+              for (var i = 0; i < _BADGE_TIERS_LEVEL.length; i++) {
+                if (_BADGE_TIERS_LEVEL[i].min > (swapCount || 0)) return _BADGE_TIERS_LEVEL[i];
+              }
+              return null;
+            }
+            (function renderTierBadge() {
+              var swapCountVal = user.swap_count || 0;
+              var lvl = _currentTier(swapCountVal);
               var tierBadgeEl = document.getElementById('tier-badge');
               if (tierBadgeEl) {
-                tierBadgeEl.innerHTML = badgeInfo.level.emoji + ' ' + badgeInfo.level.name;
-                tierBadgeEl.style.color = badgeInfo.level.color;
+                tierBadgeEl.innerHTML = lvl.emoji + ' ' + lvl.name;
+                tierBadgeEl.style.color = lvl.color;
               }
-
-              // Special badges row
-              if (badgesRow && badgeInfo.specials.length > 0) {
-                var specialsHTML = badgeInfo.specials.map(function(b) {
-                  return DemoBadges.renderBadge(b);
-                }).join(' ');
-                badgesRow.insertAdjacentHTML('afterend', '<div id="special-badges-row" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">' + specialsHTML + '</div>');
-              }
-
-              // Next level progress
-              var nextLevel = DemoBadges.getNextLevel(user.swap_count || 0);
+              var nxt = _nextTier(swapCountVal);
               var progressEl = document.getElementById('tier-progress');
-              if (progressEl && nextLevel) {
-                var current = user.swap_count || 0;
-                var prevMin = badgeInfo.level.min;
-                var pctBadge = Math.round(((current - prevMin) / (nextLevel.min - prevMin)) * 100);
-                progressEl.innerHTML = '<div style="font-size:12px;color:#777;margin-bottom:4px;">' + current + ' / ' + nextLevel.min + ' swaps to ' + nextLevel.emoji + ' ' + nextLevel.name + '</div>' +
-                  '<div style="height:6px;background:#EEE;border-radius:3px;overflow:hidden;"><div style="height:100%;width:' + pctBadge + '%;background:' + badgeInfo.level.color + ';border-radius:3px;transition:width 0.5s;"></div></div>';
+              if (progressEl && nxt) {
+                var pct = Math.round(((swapCountVal - lvl.min) / (nxt.min - lvl.min)) * 100);
+                progressEl.innerHTML = '<div style="font-size:12px;color:#777;margin-bottom:4px;">' + swapCountVal + ' / ' + nxt.min + ' swaps to ' + nxt.emoji + ' ' + nxt.name + '</div>' +
+                  '<div style="height:6px;background:#EEE;border-radius:3px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:' + lvl.color + ';border-radius:3px;transition:width 0.5s;"></div></div>';
               }
-
-              // Monthly streak
-              var streakCount = DemoBadges.getMonthlyStreak(user.id);
-              if (streakCount >= 3) {
-                var streakHTML = '<div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13px;">';
-                streakHTML += '🔥 <strong>' + streakCount + ' swaps this month!</strong> ';
-                if (streakCount >= 5) streakHTML += '— Hot Swapper badge earned!';
-                else streakHTML += '— ' + (5 - streakCount) + ' more for Hot Swapper badge';
-                streakHTML += '</div>';
-                var specialRow = document.getElementById('special-badges-row');
-                if (specialRow) specialRow.insertAdjacentHTML('afterend', streakHTML);
-                else if (badgesRow) badgesRow.insertAdjacentHTML('afterend', streakHTML);
-              }
-            }
+            })();
 
             // ── Stats ────────────────────────────────────────────────────
-            const planInfo = DemoSubscription.getPlan(user.id);
+            // Derive planInfo inline from public.users.plan (Supabase) instead
+            // of DemoSubscription.getPlan() which was localStorage-backed.
+            var _planKey = (user.plan || 'free').toLowerCase();
+            var _tierByPlan = {
+              free:    { name: 'Free',    badge: '🌱', price: 0 },
+              bronze:  { name: 'Bronze',  badge: '🥉', price: 19 },
+              silver:  { name: 'Silver',  badge: '🥈', price: 39 },
+              pro:     { name: 'Pro',     badge: '👑', price: 29 },
+              premium: { name: 'Premium', badge: '💎', price: 69 }
+            };
+            const planInfo = {
+              plan: _planKey,
+              tier: _tierByPlan[_planKey] || _tierByPlan.free,
+              swaps_used: user.swap_count || 0
+            };
             const tierInfo = planInfo.tier;
             const userItems = await _getItemsByUser(user.id);
             const favoriteItems = await _getFavoriteItems();
@@ -1522,10 +1523,8 @@
             document.getElementById('stat-swaps').textContent = userItems.filter(function(i){return i.status==='active';}).length;
             // Unread count — async via SwappoChat if available; Demo fallback otherwise
             let _unread = 0;
-            if (window.SwappoChat && _useSwappoProfile()) {
+            if (window.SwappoChat && window.SwappoChat.getUnreadCount) {
                 try { _unread = await window.SwappoChat.getUnreadCount(); } catch (e) { _unread = 0; }
-            } else if (window.DemoChat && DemoChat.getUnreadCount) {
-                _unread = DemoChat.getUnreadCount();
             }
             document.getElementById('stat-donated').textContent = _unread;
             var chatBadge = document.getElementById('chat-badge-count');
@@ -1709,11 +1708,9 @@
             }
 
             // ── TAB: SWAP DASHBOARD ────────────────────────────────────────
-            // Check expired swaps first (async for Swappo; sync for Demo)
-            if (window.SwappoSwaps && _useSwappoProfile() && window.SwappoSwaps.checkExpired) {
+            // Check expired swaps via SwappoSwaps (Supabase). No Demo path.
+            if (window.SwappoSwaps && window.SwappoSwaps.checkExpired) {
                 try { await window.SwappoSwaps.checkExpired(); } catch (e) {}
-            } else if (window.DemoSwaps && DemoSwaps.checkExpired) {
-                DemoSwaps.checkExpired();
             }
 
             function switchSwapTab(tab, btn) {
@@ -1854,64 +1851,40 @@
 
             async function cancelSwap(swapId) {
                 if (!confirm('Cancel this swap request?')) return;
-                var result;
-                if (window.SwappoSwaps && _useSwappoProfile()) {
-                    result = await window.SwappoSwaps.cancel(swapId);
-                } else {
-                    result = DemoSwaps.cancel(swapId);
+                if (!(window.SwappoSwaps && window.SwappoSwaps.cancel)) {
+                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
                 }
-                if (result && result.success) {
-                    DemoNotifications.showToast('Swap cancelled', 'info');
-                    renderSwapDashboard();
-                } else {
-                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
-                }
+                var result = await window.SwappoSwaps.cancel(swapId);
+                if (result && result.success) { DemoNotifications.showToast('Swap cancelled', 'info'); renderSwapDashboard(); }
+                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
             }
 
             async function acceptSwap(swapId) {
-                var result;
-                if (window.SwappoSwaps && _useSwappoProfile()) {
-                    result = await window.SwappoSwaps.respond(swapId, true);
-                } else {
-                    result = DemoSwaps.respond(swapId, true);
+                if (!(window.SwappoSwaps && window.SwappoSwaps.respond)) {
+                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
                 }
-                if (result && result.success) {
-                    DemoNotifications.showToast('Swap accepted! Identities revealed.', 'success');
-                    renderSwapDashboard();
-                } else {
-                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
-                }
+                var result = await window.SwappoSwaps.respond(swapId, true);
+                if (result && result.success) { DemoNotifications.showToast('Swap accepted! Identities revealed.', 'success'); renderSwapDashboard(); }
+                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
             }
 
             async function rejectSwap(swapId) {
                 if (!confirm('Decline this swap request?')) return;
-                var result;
-                if (window.SwappoSwaps && _useSwappoProfile()) {
-                    result = await window.SwappoSwaps.respond(swapId, false);
-                } else {
-                    result = DemoSwaps.respond(swapId, false);
+                if (!(window.SwappoSwaps && window.SwappoSwaps.respond)) {
+                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
                 }
-                if (result && result.success) {
-                    DemoNotifications.showToast('Swap declined', 'info');
-                    renderSwapDashboard();
-                } else {
-                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
-                }
+                var result = await window.SwappoSwaps.respond(swapId, false);
+                if (result && result.success) { DemoNotifications.showToast('Swap declined', 'info'); renderSwapDashboard(); }
+                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
             }
 
             async function rateSwap(swapId, stars) {
-                var result;
-                if (window.SwappoSwaps && _useSwappoProfile()) {
-                    result = await window.SwappoSwaps.rate(swapId, stars);
-                } else {
-                    result = DemoSwaps.rate(swapId, stars);
+                if (!(window.SwappoSwaps && window.SwappoSwaps.rate)) {
+                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
                 }
-                if (result && result.success) {
-                    DemoNotifications.showToast('Thanks for rating!', 'success');
-                    renderSwapDashboard();
-                } else {
-                    DemoNotifications.showToast((result && result.error) || 'Error', 'error');
-                }
+                var result = await window.SwappoSwaps.rate(swapId, stars);
+                if (result && result.success) { DemoNotifications.showToast('Thanks for rating!', 'success'); renderSwapDashboard(); }
+                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
             }
 
             // Expose to inline onclick handlers
@@ -2171,13 +2144,9 @@
                   const locEl = document.querySelector('#profile-location span');
                   if (locEl) locEl.textContent = newCity || 'UAE';
                 } else {
-                  // Demo fallback
-                  if (window.DemoAuth && DemoAuth.updateProfile) {
-                    DemoAuth.updateProfile(user.id, { name: newName, city: newCity });
-                  }
                   btn.disabled = false;
                   btn.innerHTML = origLabel;
-                  DemoNotifications.showToast('Settings saved (local only).', 'success');
+                  DemoNotifications.showToast('Auth service unavailable — please refresh.', 'error');
                 }
               });
             })();
@@ -2189,7 +2158,8 @@
                         await window.SwappoAuth.signOut();
                     }
                 } catch (e) { /* ignore */ }
-                DemoAuth.signOut();
+                // Belt-and-braces: clear the localStorage mirror too
+                try { localStorage.removeItem('swappo_current_user'); } catch (e) {}
                 window.location.href = 'login.html';
             });
 
@@ -2255,10 +2225,10 @@
             // Find the from_user
             var fromUser = (window.MOCK_USERS || []).find(function(u) { return u.id === offer.from_user_id; });
             var fromName = fromUser ? fromUser.name : 'the other party';
-            // Create chat conversation
-            if (window.DemoChat && DemoChat.send) {
-              DemoChat.send(offer.to_user_id, offer.from_user_id, '\u{1F91D} Deal accepted! You can now chat. Meet in a safe public place.');
-            }
+            // NOTE: the real Offer Accept flow is wired via acceptSwap() above
+            // which writes the swap row and the conversation via SwappoSwaps.
+            // This legacy DemoChat path is kept as a no-op placeholder for any
+            // remaining calls from the MOCK_OFFERS fixtures.
             DemoNotifications.showToast('\u{1F91D} Offer accepted! Chat opened with ' + fromName + '.', 'success');
             setTimeout(function() { window.location.href = 'chat.html?user=' + offer.from_user_id; }, 1200);
         }
@@ -2294,21 +2264,23 @@
                     return;
                 }
             } else {
-                // Demo fallback
-                const key = 'swappo_user_items';
-                let items = JSON.parse(localStorage.getItem(key) || '[]');
-                items = items.filter(i => i.id !== itemId);
-                localStorage.setItem(key, JSON.stringify(items));
+                DemoNotifications.showToast('Service unavailable — please refresh.', 'error');
+                return;
             }
             DemoNotifications.showToast('Item deleted.', 'success');
             location.reload();
         }
 
         async function unfavorite(itemId) {
-            if (window.SwappoItems && window.db) {
-                try { await window.SwappoItems.toggleFavorite(itemId); } catch (e) { console.error(e); }
-            } else if (window.DemoItems && DemoItems.toggleFavorite) {
-                DemoItems.toggleFavorite(itemId);
+            if (!(window.SwappoItems && window.db)) {
+                DemoNotifications.showToast('Service unavailable — please refresh.', 'error');
+                return;
+            }
+            try { await window.SwappoItems.toggleFavorite(itemId); }
+            catch (e) {
+                console.error(e);
+                DemoNotifications.showToast('Could not remove favorite.', 'error');
+                return;
             }
             DemoNotifications.showToast('Removed from saved items.', 'info');
             location.reload();
