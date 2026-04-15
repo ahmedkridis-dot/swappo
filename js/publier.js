@@ -9,11 +9,14 @@ function _pubEsc(s) {
     return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
   });
 }
-// SAFE — only allow http(s), data:image, and relative URLs in image sources
+// SAFE — only allow http(s), blob:, data:image, and relative URLs in image sources.
+// blob: is needed for local preview thumbnails after client-side photo processing
+// (URL.createObjectURL produces "blob:http://..." URLs).
 function _pubSafeUrl(u) {
   if (!u) return '';
   var s = String(u).trim();
   if (/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(s)) return _pubEsc(s);
+  if (/^blob:https?:\/\//i.test(s)) return _pubEsc(s);
   if (/^data:image\//i.test(s)) return _pubEsc(s);
   return '';
 }
@@ -523,6 +526,20 @@ window.populateReview = function() {
     }
   });
   document.getElementById('reviewDetails').innerHTML = detailsHtml;
+
+  // Price — read from #item-price input and reflect in review
+  var priceInput = document.getElementById('item-price');
+  var priceValue = priceInput ? parseInt(priceInput.value) || 0 : 0;
+  var priceEl = document.getElementById('reviewPriceValue');
+  if (priceEl) {
+    if (formState.isGiveaway) {
+      priceEl.textContent = 'Free (Giveaway)';
+    } else if (priceValue > 0) {
+      priceEl.textContent = priceValue + ' AED';
+    } else {
+      priceEl.textContent = '— AED';
+    }
+  }
 }
 
 // ========================
