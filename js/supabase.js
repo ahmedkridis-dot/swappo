@@ -507,12 +507,23 @@ if (db) {
       _authReadyResolve(session || null);
       _authReadyResolve = null;
     }
-    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+    // IMPORTANT: only re-fetch the profile on events that can actually CHANGE
+    // the profile state — SIGNED_IN (fresh login) and INITIAL_SESSION (cold
+    // page load with a restored session). We deliberately DO NOT re-fetch on
+    // TOKEN_REFRESHED because the Supabase SDK fires that event every ~3s
+    // while a token is live, which caused a GET /rest/v1/users polling loop
+    // (reported by Cowork 2026-04-15). The JWT refresh does not touch the
+    // users table, so mirroring stays valid across refreshes.
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
       if (session && session.user) {
         const profile = await _fetchProfile(session.user.id);
         _mirrorFromSupabase(session.user, profile);
       }
       updateNavbarAuth();
+    } else if (event === 'TOKEN_REFRESHED') {
+      // No profile fetch. The mirrored user stays valid because the
+      // underlying profile row hasn't changed; only the JWT was rotated.
+      // Navbar also doesn't need a refresh on token rotation.
     } else if (event === 'SIGNED_OUT') {
       _clearMirror();
       updateNavbarAuth();
