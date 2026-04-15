@@ -281,8 +281,10 @@ function getCategoryCost(category) {
 }
 
 // ---- Badge tier thresholds ----
+// Renamed from BADGE_TIERS to _SWAPPO_BADGE_TIERS to avoid collision with
+// mock-data.js which also declares a (different-shape) BADGE_TIERS const.
 
-const BADGE_TIERS = [
+const _SWAPPO_BADGE_TIERS = [
   { tier: 'legend',   min: 75, emoji: '👑' },
   { tier: 'elite',    min: 30, emoji: '🏆' },
   { tier: 'pro',      min: 15, emoji: '💎' },
@@ -292,13 +294,13 @@ const BADGE_TIERS = [
 ];
 
 function getBadgeEmoji(tier) {
-  const badge = BADGE_TIERS.find(b => b.tier === tier);
+  const badge = _SWAPPO_BADGE_TIERS.find(b => b.tier === tier);
   return badge ? badge.emoji : '🌱';
 }
 
 function getTierForCount(swapCount) {
-  for (const b of BADGE_TIERS) {
+  for (const b of _SWAPPO_BADGE_TIERS) {
     if (swapCount >= b.min) return b;
   }
-  return BADGE_TIERS[BADGE_TIERS.length - 1];
+  return _SWAPPO_BADGE_TIERS[_SWAPPO_BADGE_TIERS.length - 1];
 }
