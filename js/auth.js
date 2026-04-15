@@ -57,7 +57,10 @@ const SwappoAuth = {
   async signOut() {
     const { error } = await db.auth.signOut();
     if (error) throw error;
-    window.location.href = '/index.html';
+    // Coming Soon phase: index.html is the public landing; redirect to the
+    // functional dev landing so authenticated users don't end up stuck on
+    // a page they can't use. Change to '/' once Coming Soon is lifted.
+    window.location.href = '/dev-a7f3k9mz2q.html';
   },
 
   // ---- Referral handling ----

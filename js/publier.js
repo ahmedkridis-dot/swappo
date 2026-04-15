@@ -584,13 +584,18 @@ window.publishItem = async function(e) {
         console.warn('[publish] getSession error:', e.message);
       }
     }
-    if (!user && window.DemoAuth) {
-      user = window.DemoAuth.getCurrentUser();
-      console.log('[publish] demo user fallback:', user ? user.email : 'null');
-    }
+    // NOTE: intentionally NO fallback to DemoAuth here. DemoAuth stores a
+    // fake/mirrored user in localStorage whose id may not match any
+    // auth.users row. Using it for RLS-gated writes (Storage upload,
+    // items.insert) will be rejected by Postgres anyway ("new row violates
+    // row-level security policy"), but the request will first hit the network
+    // and fail silently. Safer to require a real Supabase session.
     if (!user) {
-      console.warn('[publish] no user → redirecting to login');
-      window.location.href = 'login.html?redirect=/pages/publier.html';
+      console.warn('[publish] no Supabase session → redirecting to login');
+      DemoNotifications.showToast('Please sign in to publish.', 'warning');
+      setTimeout(function() {
+        window.location.href = 'login.html?redirect=/pages/publier.html';
+      }, 800);
       return;
     }
 

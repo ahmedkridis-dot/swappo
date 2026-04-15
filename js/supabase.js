@@ -176,7 +176,10 @@ const SwappoAuth = {
         ))
       ]);
       return res && res.data && res.data.session ? res.data.session.user : null;
-    } catch (e) { return null; }
+    } catch (e) {
+      console.warn('[SwappoAuth.getCurrentUser] error (returning null):', e.message || e);
+      return null;
+    }
   },
 
   /** Sync current session into the DemoAuth mirror. Call once on page load. */
@@ -193,38 +196,75 @@ const SwappoAuth = {
       if (!sessionUser) { _clearMirror(); return null; }
       const profile = await _fetchProfile(sessionUser.id);
       return _mirrorFromSupabase(sessionUser, profile);
-    } catch (e) { return null; }
+    } catch (e) {
+      console.warn('[SwappoAuth.syncMirror] error (returning null):', e.message || e);
+      return null;
+    }
   }
 };
 try { window.SwappoAuth = SwappoAuth; } catch (e) {}
 
 // ---- Session helpers (kept for backwards compat) ----
+// NOTE: these use getSession() (local read) with a 3s Promise.race guard,
+// matching SwappoAuth.getCurrentUser(). Never getUser() — that endpoint
+// makes a network call and can hang indefinitely.
 
 async function getCurrentUser() {
   if (!db) return null;
-  const { data: { user } } = await db.auth.getUser();
-  return user;
+  try {
+    const res = await Promise.race([
+      db.auth.getSession(),
+      new Promise((resolve) => setTimeout(
+        () => resolve({ data: { session: null } }), 3000
+      ))
+    ]);
+    return res && res.data && res.data.session ? res.data.session.user : null;
+  } catch (e) {
+    console.warn('[getCurrentUser] error (returning null):', e.message || e);
+    return null;
+  }
 }
 
 async function getCurrentSession() {
   if (!db) return null;
-  const { data: { session } } = await db.auth.getSession();
-  return session;
+  try {
+    const res = await Promise.race([
+      db.auth.getSession(),
+      new Promise((resolve) => setTimeout(
+        () => resolve({ data: { session: null } }), 3000
+      ))
+    ]);
+    return res && res.data ? res.data.session : null;
+  } catch (e) {
+    console.warn('[getCurrentSession] error:', e.message || e);
+    return null;
+  }
 }
 
 async function _fetchProfile(userId) {
   if (!db || !userId) return null;
   try {
     const { data, error } = await db.from('users').select('*').eq('id', userId).single();
-    if (error) return null;
+    if (error) {
+      console.warn('[_fetchProfile] supabase error:', error.message || error);
+      return null;
+    }
     return data;
-  } catch (e) { return null; }
+  } catch (e) {
+    console.warn('[_fetchProfile] exception:', e.message || e);
+    return null;
+  }
 }
 
 async function getUserProfile(userId) {
-  const uid = userId || (await getCurrentUser())?.id;
-  if (!uid) return null;
-  return _fetchProfile(uid);
+  try {
+    const uid = userId || (await getCurrentUser())?.id;
+    if (!uid) return null;
+    return _fetchProfile(uid);
+  } catch (e) {
+    console.warn('[getUserProfile] error:', e.message || e);
+    return null;
+  }
 }
 
 function isLoggedIn() {

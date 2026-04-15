@@ -622,6 +622,7 @@
 
   // ============ MAIN INIT ============
   document.addEventListener('DOMContentLoaded', async function() {
+    try {
     initDemoMode();
 
     var params = new URLSearchParams(window.location.search);
@@ -913,6 +914,17 @@
     document.getElementById('swapModal').addEventListener('click', function(event) {
       if (event.target === this) closeSwapModal();
     });
+    } catch (err) {
+      console.error('[product] init failed:', err);
+      try {
+        document.getElementById('product-container').innerHTML =
+          '<div style="text-align:center;padding:80px;">' +
+            '<h2 style="margin-bottom:16px;">Something went wrong</h2>' +
+            '<p style="color:#666;margin-bottom:24px;">' + (err.message || 'Please try again.') + '</p>' +
+            '<a href="catalogue.html" style="color:var(--primary);font-weight:600;">Back to Swap Market</a>' +
+          '</div>';
+      } catch (e) {}
+    }
   });
 
   // ============ PHOTO GALLERY ============

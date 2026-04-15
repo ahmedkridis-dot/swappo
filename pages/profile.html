@@ -1366,6 +1366,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+          try {
             // ── Auth check ───────────────────────────────────────────────
             const user = await _getCurrentUser();
             if (!user) {
@@ -2024,6 +2025,14 @@
                 navProfile.style.background = user.avatar_color || 'var(--primary)';
                 navProfile.style.borderColor = user.avatar_color || 'var(--primary)';
             }
+          } catch (err) {
+            console.error('[profile] init failed:', err);
+            try {
+              if (window.DemoNotifications && DemoNotifications.showToast) {
+                DemoNotifications.showToast('Could not load profile: ' + (err.message || 'unknown error'), 'error');
+              }
+            } catch (e) {}
+          }
         });
 
         function showBoostPicker(itemId) {
