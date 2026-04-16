@@ -1369,6 +1369,8 @@
     <script src="../js/swappo-items.js"></script>
     <script src="../js/swappo-swaps.js"></script>
     <script src="../js/swappo-chat.js"></script>
+    <script src="../js/toast.js"></script>
+    <script src="../js/notifications-bell.js"></script>
     <script src="../js/app.js"></script>
     <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -1420,6 +1422,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+          // B-022: wrap the full profile render in try/catch so failures are
+          // logged and surfaced via toast instead of leaving a blank page.
           try {
             // ── Auth check (retry once to beat the Supabase restore race) ──
             let user = await _getCurrentUser();
@@ -1439,14 +1443,20 @@
               avatarEl.innerHTML = getAvatarSVG(user.avatar);
               avatarEl.style.background = 'none';
             } else {
-              const initials = (user.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+              // B-014: build initials from display_name / pseudo / swapper-id (never leak raw user.name).
+              var _fallbackLabel = user.display_name || user.pseudo || ('Swapper#' + ((user.id||'').replace(/-/g,'').slice(0,4).toUpperCase() || 'USER'));
+              const initials = _fallbackLabel.split(/[\s#]+/).filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'S';
               avatarEl.textContent = initials;
               avatarEl.style.background = user.avatar_color || 'var(--primary)';
             }
 
-            document.getElementById('profile-name').textContent = user.pseudo || user.name || 'User';
+            // B-014: Never fall back to raw user.name (may be null/PII).
+            // Priority: profiles.display_name > pseudo > Swapper#XXXX hashed from user_id.
+            var swapperId = (user.id || '').replace(/-/g,'').slice(0,4).toUpperCase() || 'USER';
+            var displayName = user.display_name || user.pseudo || ('Swapper#' + swapperId);
+            document.getElementById('profile-name').textContent = displayName;
             var welcomeEl = document.getElementById('dashboard-welcome');
-            if (welcomeEl) welcomeEl.textContent = 'Welcome back, ' + (user.pseudo || user.name || 'Swapper');
+            if (welcomeEl) welcomeEl.textContent = (typeof t === 'function' ? t('welcome_back') : 'Welcome back') + ', ' + displayName;
             document.querySelector('#profile-location span').textContent = user.city || 'UAE';
             document.getElementById('profile-email').textContent = user.email || '';
 
@@ -2384,14 +2394,13 @@
                 navProfile.style.borderColor = user.avatar_color || 'var(--primary)';
             }
           } catch (err) {
-            // Dump full stack to the console so we can see exactly which
-            // DOM write blew up. Toast stays short for the UI.
+            // B-022: dump full stack to console, show a concise localised toast.
             console.error('[profile] init failed —', err && err.stack ? err.stack : err);
-            try {
-              if (window.DemoNotifications && DemoNotifications.showToast) {
-                DemoNotifications.showToast('Could not load profile: ' + (err.message || 'unknown error') + ' (see console)', 'error');
-              }
-            } catch (e) {}
+            var _msg = (typeof t === 'function') ? t('err_load_profile') : 'Failed to load your profile. Please refresh.';
+            if (window.Toast) Toast.error(_msg);
+            else if (window.DemoNotifications && DemoNotifications.showToast) {
+              try { DemoNotifications.showToast(_msg + ' (see console)', 'error'); } catch (e) {}
+            }
           }
         });
 

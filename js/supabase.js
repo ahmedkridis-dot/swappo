@@ -61,16 +61,23 @@ setTimeout(() => { if (_authReadyResolve) { _authReadyResolve(null); _authReadyR
 function _mirrorFromSupabase(user, profile) {
   if (!user) return null;
   const meta = user.user_metadata || {};
+  // B-016: NEVER mirror PII (email, phone, raw name) into localStorage — XSS risk.
+  // Sensitive fields must be read fresh from Supabase each session via getCurrentUser()
+  // and getUserProfile(). The mirror is strictly for non-PII display state.
+  const swapperId = (user.id || '').replace(/-/g,'').slice(0,4).toUpperCase() || 'USER';
+  const displayName = (profile && profile.display_name) || (profile && profile.pseudo) || meta.pseudo || ('Swapper#' + swapperId);
   const mirrored = {
     id: user.id,
-    email: user.email,
-    name: (profile && profile.name) || meta.name || '',
+    display_name: displayName,
     pseudo: (profile && profile.pseudo) || meta.pseudo || '',
+    swapper_id: swapperId,
     avatar: (profile && profile.avatar) || meta.avatar || '',
-    phone: (profile && profile.phone) || meta.phone || user.phone || '',
     plan: (profile && profile.plan) || 'free',
     swap_count: (profile && profile.swap_count) || 0,
     badge: (profile && profile.badge) || 'newcomer',
+    is_pro: !!(profile && profile.is_pro),
+    rating_avg: (profile && profile.rating_avg) || 0,
+    rating_count: (profile && profile.rating_count) || 0,
     created_at: user.created_at || new Date().toISOString()
   };
   try {
@@ -78,6 +85,17 @@ function _mirrorFromSupabase(user, profile) {
   } catch (e) { /* quota — ignore */ }
   return mirrored;
 }
+
+// PII accessors — always hit Supabase, never cache email/phone.
+async function getAuthPII() {
+  if (!db) return { email: '', phone: '' };
+  try {
+    const { data } = await db.auth.getUser();
+    if (!data || !data.user) return { email: '', phone: '' };
+    return { email: data.user.email || '', phone: data.user.phone || '' };
+  } catch (e) { return { email: '', phone: '' }; }
+}
+try { window.getAuthPII = getAuthPII; } catch (e) {}
 
 function _clearMirror() {
   try { localStorage.removeItem('swappo_current_user'); } catch (e) {}

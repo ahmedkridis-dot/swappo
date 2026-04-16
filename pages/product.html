@@ -543,6 +543,8 @@
 <script src="../js/swappo-items.js"></script>
 <script src="../js/swappo-swaps.js"></script>
 <script src="../js/swappo-chat.js"></script>
+<script src="../js/toast.js"></script>
+<script src="../js/notifications-bell.js"></script>
 <script src="../js/app.js"></script>
 <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -1302,46 +1304,59 @@
     btn.style.cursor = 'not-allowed';
   }
 
+  // B-021: async Supabase-first load with loud error surfacing.
   async function loadMyItemsInModal() {
     var grid = document.getElementById('my-items-grid');
     var emptyState = document.getElementById('emptyState');
-    var myItems = [];
     try {
+      if (!grid || !emptyState) throw new Error('swap-modal DOM missing (grid/empty state)');
+      if (!currentUser || !currentUser.id) throw new Error('Not authenticated');
+
+      var myItems = [];
       if (window.SwappoItems && window.db) {
         myItems = await window.SwappoItems.getByUser(currentUser.id);
+      } else if (window.DemoItems && typeof DemoItems.getByUser === 'function') {
+        myItems = DemoItems.getByUser(currentUser.id);
+      } else {
+        throw new Error('Items service unavailable');
       }
-    } catch (e) {
-      console.error('loadMyItemsInModal error', e);
-      myItems = [];
+
+      // Accept 'available' (Supabase) and 'active' (legacy Demo). Exclude
+      // 'reserved' / 'swapped' / 'sold' / 'removed' / 'pending'.
+      myItems = (myItems || []).filter(function (i) {
+        var s = i.status || 'available';
+        return s === 'available' || s === 'active';
+      });
+
+      if (myItems.length === 0) {
+        grid.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = '';
+      emptyState.style.display = 'none';
+
+      grid.innerHTML = myItems.map(function(mi) {
+        var photo = (mi.photos && mi.photos[0]) || '';
+        var miTitle = ((mi.brand || '') + ' ' + (mi.model || '')).trim() || mi.type;
+        return '<div class="user-item" data-item="' + mi.id + '" onclick="toggleItemSelection(this)">' +
+          '<div class="user-item-image">' +
+            (photo ? '<img src="' + photo + '" alt="' + miTitle + '">'
+                   : '<div style="width:100%;height:100%;background:var(--bg-light);display:flex;align-items:center;justify-content:center;font-size:2rem;">📦</div>') +
+          '</div>' +
+          '<div class="user-item-checkbox">\u2610</div>' +
+          '<div class="user-item-title">' + miTitle + '</div>' +
+        '</div>';
+      }).join('');
+    } catch (err) {
+      console.error('[product.loadMyItemsInModal]', err);
+      if (grid) grid.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'block';
+      var msg = (typeof t === 'function') ? t('err_load_items') : 'Failed to load your items. Please try again.';
+      if (window.Toast) Toast.error(msg);
+      else if (window.DemoNotifications) DemoNotifications.showToast(msg, 'error');
     }
-    // Accept legacy Demo 'active' AND Supabase 'available' as listable items.
-    // Exclude 'reserved' (already in a pending swap), 'swapped', 'sold', 'removed', 'pending'.
-    myItems = (myItems || []).filter(function(i) {
-      var s = i.status || 'available';
-      return s === 'available' || s === 'active';
-    });
-
-    if (myItems.length === 0) {
-      grid.style.display = 'none';
-      emptyState.style.display = 'block';
-      return;
-    }
-
-    grid.style.display = '';
-    emptyState.style.display = 'none';
-
-    grid.innerHTML = myItems.map(function(mi) {
-      var photo = (mi.photos && mi.photos[0]) || '';
-      var miTitle = ((mi.brand || '') + ' ' + (mi.model || '')).trim() || mi.type;
-      return '<div class="user-item" data-item="' + mi.id + '" onclick="toggleItemSelection(this)">' +
-        '<div class="user-item-image">' +
-          (photo ? '<img src="' + photo + '" alt="' + miTitle + '">'
-                 : '<div style="width:100%;height:100%;background:var(--bg-light);display:flex;align-items:center;justify-content:center;font-size:2rem;">📦</div>') +
-        '</div>' +
-        '<div class="user-item-checkbox">\u2610</div>' +
-        '<div class="user-item-title">' + miTitle + '</div>' +
-      '</div>';
-    }).join('');
   }
 
   function toggleItemSelection(element) {
