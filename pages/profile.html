@@ -1031,18 +1031,17 @@
         <div style="display: flex; gap: 24px; align-items: flex-start;">
             <div style="flex: 1; min-width: 0;">
                 <!-- ========== TAB NAVIGATION ========== -->
+                <!-- NOTE: legacy "Offers Received / Offers Sent" tabs removed
+                     2026-04-16 (DEMO-PURGE). Their content was rendered from
+                     MOCK_OFFERS fixtures and was duplicating the Swaps tab's
+                     Sent/Received/History view. Single source of truth now:
+                     public.swaps via SwappoSwaps (Supabase). -->
                 <div class="tabs-nav">
                     <button class="tab-btn active" data-tab="my-items">
                         <i class="fas fa-box"></i> My Items
                     </button>
-                    <button class="tab-btn" data-tab="offers-received">
-                        <i class="fas fa-inbox"></i> Offers Received <span class="offer-badge" id="offers-badge" style="background:#FF4B55;color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;margin-left:4px;"></span>
-                    </button>
-                    <button class="tab-btn" data-tab="offers-sent">
-                        <i class="fas fa-paper-plane"></i> Offers Sent
-                    </button>
                     <button class="tab-btn" data-tab="swap-dashboard">
-                        <i class="fas fa-exchange-alt"></i> History
+                        <i class="fas fa-exchange-alt"></i> Swaps
                     </button>
                     <button class="tab-btn" data-tab="saved-items">
                         <i class="fas fa-heart"></i> Saved
@@ -1055,20 +1054,6 @@
                 <!-- ========== TAB: MY ITEMS ========== -->
                 <div class="tab-content active" id="my-items">
                     <div class="items-grid reveal" id="my-items-grid">
-                        <!-- Dynamically populated -->
-                    </div>
-                </div>
-
-                <!-- ========== TAB: OFFERS RECEIVED ========== -->
-                <div class="tab-content" id="offers-received">
-                    <div id="offers-received-list" style="display:flex;flex-direction:column;gap:16px;">
-                        <!-- Dynamically populated -->
-                    </div>
-                </div>
-
-                <!-- ========== TAB: OFFERS SENT ========== -->
-                <div class="tab-content" id="offers-sent">
-                    <div id="offers-sent-list" style="display:flex;flex-direction:column;gap:16px;">
                         <!-- Dynamically populated -->
                     </div>
                 </div>
@@ -1631,83 +1616,11 @@
             '</div>';
             itemsGrid.innerHTML = itemsHTML;
 
-            // ── TAB: OFFERS RECEIVED + SENT ─────────────────────────────────
-            var allOffers = window.MOCK_OFFERS || [];
-            var receivedOffers = allOffers.filter(function(o) { return o.to_user_id === user.id && o.status === 'pending'; });
-            var sentOffers = allOffers.filter(function(o) { return o.from_user_id === user.id && o.status === 'pending'; });
-
-            // Badge count
-            var offersBadge = document.getElementById('offers-badge');
-            if (offersBadge) offersBadge.textContent = receivedOffers.length || '';
-            if (offersBadge && !receivedOffers.length) offersBadge.style.display = 'none';
-
-            // Render received offers
-            var recvList = document.getElementById('offers-received-list');
-            if (recvList) {
-              if (receivedOffers.length === 0) {
-                recvList.innerHTML = '<div style="text-align:center;padding:48px;color:#9CA3AF;"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:12px;display:block;"></i>No offers received yet</div>';
-              } else {
-                recvList.innerHTML = receivedOffers.map(function(o) {
-                  var fromPhoto = (o.from_item && o.from_item.photos && o.from_item.photos[0]) || '';
-                  var toPhoto = (o.to_item && o.to_item.photos && o.to_item.photos[0]) || '';
-                  var cashHTML = o.cash_amount > 0 ? '<div style="text-align:center;font-size:14px;font-weight:700;color:#D97706;margin:8px 0;">+ ' + o.cash_amount.toLocaleString() + ' AED cash</div>' : '';
-                  var typeIcon = o.type === 'buy' ? '💰' : (o.type === 'swap_cash' ? '🔄💵' : '🔄');
-                  var typeLabel = o.type === 'buy' ? 'Cash offer' : (o.type === 'swap_cash' ? 'Swap + Cash' : 'Swap offer');
-
-                  return '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">' +
-                    '<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">' +
-                      '<span style="font-size:18px;">' + typeIcon + '</span>' +
-                      '<span style="font-size:13px;font-weight:600;color:#1A1A2E;">' + typeLabel + '</span>' +
-                      '<span style="margin-left:auto;font-size:11px;color:#9CA3AF;">' + (o.from_badge || '') + ' · ' + (o.from_rating > 0 ? o.from_rating + '/5 ⭐' : 'No rating') + '</span>' +
-                    '</div>' +
-                    '<div style="background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:12px;">' +
-                      '<p style="font-size:13px;color:#4B5563;margin:0 0 10px;font-style:italic;">"' + o.message + '"</p>' +
-                      (o.from_item ? '<div style="display:flex;gap:12px;align-items:center;">' +
-                        '<img src="' + fromPhoto + '" style="width:60px;height:60px;border-radius:10px;object-fit:cover;">' +
-                        '<div><div style="font-size:13px;font-weight:600;">' + o.from_item.brand + ' ' + o.from_item.model + '</div><div style="font-size:12px;color:#6B7280;">' + o.from_item.price.toLocaleString() + ' AED · ' + o.from_item.condition + '</div></div>' +
-                      '</div>' : '') +
-                      cashHTML +
-                      '<div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed #E5E7EB;">' +
-                        '<span style="font-size:11px;color:#9CA3AF;">FOR YOUR:</span>' +
-                        '<img src="' + toPhoto + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">' +
-                        '<span style="font-size:13px;font-weight:600;">' + o.to_item.brand + ' ' + o.to_item.model + ' — ' + o.to_item.price.toLocaleString() + ' AED</span>' +
-                      '</div>' +
-                    '</div>' +
-                    '<div style="display:flex;gap:10px;">' +
-                      '<button onclick="acceptOffer(\'' + o.id + '\')" style="flex:1;padding:12px;border:none;border-radius:12px;background:#10B981;color:#fff;font-weight:700;cursor:pointer;font-size:14px;">✅ Accept</button>' +
-                      '<button onclick="declineOffer(\'' + o.id + '\')" style="flex:1;padding:12px;border:1px solid #EF4444;border-radius:12px;background:#fff;color:#EF4444;font-weight:600;cursor:pointer;font-size:14px;">❌ Decline</button>' +
-                      '<button onclick="counterOffer(\'' + o.id + '\')" style="flex:1;padding:12px;border:1px solid #D97706;border-radius:12px;background:#fff;color:#D97706;font-weight:600;cursor:pointer;font-size:14px;">🔄 Counter</button>' +
-                    '</div>' +
-                  '</div>';
-                }).join('');
-              }
-            }
-
-            // Render sent offers
-            var sentList2 = document.getElementById('offers-sent-list');
-            if (sentList2) {
-              if (sentOffers.length === 0) {
-                sentList2.innerHTML = '<div style="text-align:center;padding:48px;color:#9CA3AF;"><i class="fas fa-paper-plane" style="font-size:2rem;margin-bottom:12px;display:block;"></i>No offers sent yet</div>';
-              } else {
-                sentList2.innerHTML = sentOffers.map(function(o) {
-                  var toPhoto = (o.to_item && o.to_item.photos && o.to_item.photos[0]) || '';
-                  return '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">' +
-                    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
-                      '<span style="background:#FEF3C7;color:#92400E;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;">⏳ Pending</span>' +
-                    '</div>' +
-                    '<div style="background:#F9FAFB;border-radius:12px;padding:14px;">' +
-                      '<p style="font-size:13px;color:#4B5563;margin:0 0 10px;font-style:italic;">"' + o.message + '"</p>' +
-                      '<div style="display:flex;gap:12px;align-items:center;">' +
-                        '<img src="' + toPhoto + '" style="width:60px;height:60px;border-radius:10px;object-fit:cover;">' +
-                        '<div><div style="font-size:13px;font-weight:600;">' + o.to_item.brand + ' ' + o.to_item.model + '</div><div style="font-size:12px;color:#6B7280;">' + o.to_item.price.toLocaleString() + ' AED</div></div>' +
-                      '</div>' +
-                    '</div>' +
-                  '</div>';
-                }).join('');
-              }
-            }
-
             // ── TAB: SWAP DASHBOARD ────────────────────────────────────────
+            // (Legacy "Offers Received / Offers Sent" tab rendering removed
+            // 2026-04-16 — it was duplicating the Swaps tab and reading from
+            // the MOCK_OFFERS fixtures. The Swaps tab below is the single
+            // source of truth, reading from public.swaps via SwappoSwaps.)
             // Check expired swaps via SwappoSwaps (Supabase). No Demo path.
             if (window.SwappoSwaps && window.SwappoSwaps.checkExpired) {
                 try { await window.SwappoSwaps.checkExpired(); } catch (e) {}
@@ -1724,21 +1637,18 @@
             const _itemsCache = new Map();
             const _usersCache = new Map();
 
+            // Items + users are resolved ONLY from the Supabase caches that
+            // _hydrateSwaps pre-fills via a batched SELECT .in('id', ids) call
+            // before rendering. No MOCK_ITEMS / MOCK_USERS / localStorage
+            // fallback — a cache miss returns a safe placeholder.
             function findItem(itemId) {
                 if (!itemId) return null;
-                if (_itemsCache.has(itemId)) return _itemsCache.get(itemId);
-                const allItems = [...(window.MOCK_ITEMS || []), ...(JSON.parse(localStorage.getItem('swappo_user_items') || '[]'))];
-                return allItems.find(i => i.id === itemId);
+                return _itemsCache.get(itemId) || null;
             }
 
             function findUser(userId) {
                 if (!userId) return { pseudo: 'Unknown', avatar: null };
-                if (_usersCache.has(userId)) return _usersCache.get(userId);
-                if (userId === 'user-demo') return window.DEMO_USER;
-                const mockUser = (window.MOCK_USERS || []).find(u => u.id === userId);
-                if (mockUser) return mockUser;
-                const localUsers = JSON.parse(localStorage.getItem('swappo_users') || '[]');
-                return localUsers.find(u => u.id === userId) || { pseudo: 'Unknown', avatar: null };
+                return _usersCache.get(userId) || { pseudo: 'Unknown', avatar: null };
             }
 
             async function _hydrateSwaps(swapsArr) {
@@ -2218,36 +2128,11 @@
             o.addEventListener('click', function(e) { if (e.target === o) o.remove(); });
         }
 
-        function acceptOffer(offerId) {
-            var offer = (window.MOCK_OFFERS || []).find(function(o) { return o.id === offerId; });
-            if (!offer) return;
-            offer.status = 'accepted';
-            // Find the from_user
-            var fromUser = (window.MOCK_USERS || []).find(function(u) { return u.id === offer.from_user_id; });
-            var fromName = fromUser ? fromUser.name : 'the other party';
-            // NOTE: the real Offer Accept flow is wired via acceptSwap() above
-            // which writes the swap row and the conversation via SwappoSwaps.
-            // This legacy DemoChat path is kept as a no-op placeholder for any
-            // remaining calls from the MOCK_OFFERS fixtures.
-            DemoNotifications.showToast('\u{1F91D} Offer accepted! Chat opened with ' + fromName + '.', 'success');
-            setTimeout(function() { window.location.href = 'chat.html?user=' + offer.from_user_id; }, 1200);
-        }
-
-        function declineOffer(offerId) {
-            var offer = (window.MOCK_OFFERS || []).find(function(o) { return o.id === offerId; });
-            if (!offer) return;
-            offer.status = 'declined';
-            DemoNotifications.showToast('Offer declined.', 'info');
-            setTimeout(function() { location.reload(); }, 600);
-        }
-
-        function counterOffer(offerId) {
-            var offer = (window.MOCK_OFFERS || []).find(function(o) { return o.id === offerId; });
-            if (!offer) return;
-            var newAmount = prompt('Enter your counter-offer amount (AED):', offer.to_item ? offer.to_item.price : '');
-            if (!newAmount) return;
-            DemoNotifications.showToast('Counter-offer of ' + parseInt(newAmount).toLocaleString() + ' AED sent!', 'success');
-        }
+        // Legacy acceptOffer / declineOffer / counterOffer removed 2026-04-16.
+        // They were tied to the MOCK_OFFERS fixtures used by the old Offers
+        // Received / Offers Sent tabs which were themselves removed. The
+        // real flow for accepting/declining a swap lives in the Swaps tab
+        // above (acceptSwap / rejectSwap / cancelSwap → SwappoSwaps).
 
         async function deleteItem(itemId) {
             if (!confirm('Delete this item?')) return;
