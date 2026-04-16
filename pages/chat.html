@@ -1129,7 +1129,16 @@
   let currentUser = null;
   let dealCashAmount = 0;
   let currentSbFilter = 'all';
-  let deliveryChoice = {}; // track each party's delivery preference per conv
+  // Persist delivery choice in localStorage so it survives page refreshes.
+  // Once "Meet in Person" / "Delivery" / "Truck" is chosen, the user should
+  // NOT see the exchange-method card again on every reload.
+  let deliveryChoice = {};
+  try {
+    deliveryChoice = JSON.parse(localStorage.getItem('swappo_delivery_choice') || '{}');
+  } catch (e) { deliveryChoice = {}; }
+  function _saveDeliveryChoice() {
+    try { localStorage.setItem('swappo_delivery_choice', JSON.stringify(deliveryChoice)); } catch (e) {}
+  }
   let qrTimerInterval = null;
   let _rtUnsub = null; // Realtime unsubscribe fn for current conv
   let _convCache = []; // last fetched conversations (Swappo or Demo shape)
@@ -1641,6 +1650,7 @@
   // ═══ EXCHANGE METHOD ACTIONS ═══
   function chooseExchangeMethod(convId, method) {
     deliveryChoice[convId] = { me: method };
+    _saveDeliveryChoice();
 
     if (method === 'meet') {
       sendChatMessage(convId, '📍 I\'d like to meet in person for this exchange!');
@@ -1674,6 +1684,7 @@
 
   function acceptDelivery(convId) {
     deliveryChoice[convId] = { me: 'delivery', resolved: true };
+    _saveDeliveryChoice();
     sendChatMessage(convId, '✅ OK, let\'s go with Swappo Delivery!');
     DemoNotifications.showToast('Both parties agreed on delivery!', 'success');
     loadMessages(convId);
@@ -1689,6 +1700,7 @@
 
   function keepMeetup(convId) {
     deliveryChoice[convId] = { me: 'meet', resolved: true };
+    _saveDeliveryChoice();
     sendChatMessage(convId, '📍 No worries, let\'s meet in person instead!');
     DemoNotifications.showToast('Meeting in person it is!', 'info');
     loadMessages(convId);
