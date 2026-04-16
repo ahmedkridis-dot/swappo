@@ -1644,12 +1644,12 @@
 
     if (method === 'meet') {
       sendChatMessage(convId, '📍 I\'d like to meet in person for this exchange!');
-      DemoNotifications.showToast('Great! Choose a safe meetup spot.', 'success');
-      // NOTE: the old Demo path here injected a fake "other party prefers
-      // delivery" reply into MOCK_CONVERSATIONS to showcase the conflict
-      // card. Now that chat is 100% Supabase, the conflict card renders
-      // naturally when the other party's message arrives via the realtime
-      // channel (no client-side simulation needed).
+      DemoNotifications.showToast('Great! Choose a safe meetup spot below.', 'success');
+      // Refresh the chat area (removes the exchange-method card since
+      // deliveryChoice is now set) and the Deal Panel (shows Safe Spots
+      // picker so the user can pick a meeting point).
+      loadMessages(convId);
+      renderDealPanel(convId);
     } else if (method === 'delivery') {
       sendChatMessage(convId, '🚚 I\'d like Swappo Delivery for this exchange!');
       DemoNotifications.showToast('Swappo Delivery selected! Estimated 25-40 AED.', 'success');
