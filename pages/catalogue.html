@@ -1145,14 +1145,26 @@
       }
       items = (result && result.items) || [];
 
-      // Place markers with jitter to avoid overlap
+      // Place markers using the real GPS coords captured when the item was
+      // published. Fall back to the emirate center (+ jitter) only when no
+      // lat/lng was recorded — that happens when the user declined the
+      // browser geolocation prompt at drop time.
       items.forEach(function(item, i) {
-        var emirate = item.emirate || 'Dubai';
-        var base = emirateCoords[emirate] || emirateCoords['Dubai'];
-        var jitterLat = (Math.random() - 0.5) * 0.06;
-        var jitterLng = (Math.random() - 0.5) * 0.06;
-        var lat = base.lat + jitterLat;
-        var lng = base.lng + jitterLng;
+        var lat, lng;
+        var hasCoords = typeof item.lat === 'number' && typeof item.lng === 'number'
+          && !isNaN(item.lat) && !isNaN(item.lng) && item.lat !== 0 && item.lng !== 0;
+        if (hasCoords) {
+          // Tiny jitter (≈ 40–50 m) so stacked items at the same address
+          // don't render on top of each other — not enough to reveal a
+          // precise home location (privacy: never show exact coords).
+          lat = item.lat + (Math.random() - 0.5) * 0.0008;
+          lng = item.lng + (Math.random() - 0.5) * 0.0008;
+        } else {
+          var emirate = item.emirate || 'Dubai';
+          var base = emirateCoords[emirate] || emirateCoords['Dubai'];
+          lat = base.lat + (Math.random() - 0.5) * 0.06;
+          lng = base.lng + (Math.random() - 0.5) * 0.06;
+        }
 
         var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type || 'Item';
         var price = item.is_giveaway ? 'FREE' : (item.price || 0).toLocaleString() + ' AED';

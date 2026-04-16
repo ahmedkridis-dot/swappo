@@ -648,6 +648,25 @@ window.publishItem = async function(e) {
     var priceEl = document.getElementById('item-price');
     var emirateEl = document.getElementById('item-emirate');
 
+    // Record coordinates: prefer the user's live GPS; fall back to the
+    // center of the chosen emirate so the map always has something to plot.
+    // Never store 0/0 (that's the Atlantic).
+    var emirateChoice = (emirateEl && emirateEl.value) || user.emirate || 'Dubai';
+    var EMIRATE_CENTERS = {
+      'Dubai':     { lat: 25.2048, lng: 55.2708 },
+      'Abu Dhabi': { lat: 24.4539, lng: 54.3773 },
+      'Sharjah':   { lat: 25.3463, lng: 55.4209 },
+      'Ajman':     { lat: 25.4052, lng: 55.5136 },
+      'RAK':       { lat: 25.7895, lng: 55.9432 },
+      'Fujairah':  { lat: 25.1288, lng: 56.3264 },
+      'UAQ':       { lat: 25.5647, lng: 55.5553 }
+    };
+    var liveLat = window.Swappo && Number(Swappo.userLat);
+    var liveLng = window.Swappo && Number(Swappo.userLng);
+    var fallback = EMIRATE_CENTERS[emirateChoice] || EMIRATE_CENTERS['Dubai'];
+    var finalLat = (liveLat && !isNaN(liveLat)) ? liveLat : fallback.lat;
+    var finalLng = (liveLng && !isNaN(liveLng)) ? liveLng : fallback.lng;
+
     var itemData = {
       category: formState.category,
       subcategory: formState.details.subcategory || '',
@@ -661,10 +680,10 @@ window.publishItem = async function(e) {
       photos: photoUrls,
       is_giveaway: !!formState.isGiveaway,
       price: parseInt(priceEl ? priceEl.value : '0') || 0,
-      emirate: (emirateEl && emirateEl.value) || user.emirate || 'Dubai',
+      emirate: emirateChoice,
       city: user.city || 'Dubai',
-      lat: (window.Swappo && Swappo.userLat) || null,
-      lng: (window.Swappo && Swappo.userLng) || null
+      lat: finalLat,
+      lng: finalLng
     };
     console.log('[publish] item payload built:', itemData);
 
