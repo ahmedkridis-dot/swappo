@@ -965,6 +965,34 @@
   .dp-pro-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
 
   /* ═══════════════════════════════════════════
+     P3 — PAYMENT SELECTOR
+     ═══════════════════════════════════════════ */
+  .dp-payment { padding: 16px; border-top: 1px solid #F3F4F6; }
+  .dp-payment h4 { font-size: 13px; font-weight: 700; color: #1A1A2E; margin: 0 0 10px; }
+  .dp-pay-opts { display: grid; gap: 8px; }
+  .dp-pay-opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid #E5E7EB; border-radius: 10px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .dp-pay-opt:hover { border-color: #09B1BA; background: #E6F7F8; }
+  .dp-pay-opt.selected { border-color: #09B1BA; background: #E6F7F8; }
+  .dp-pay-opt input[type="radio"] { accent-color: #09B1BA; }
+  .dp-pay-opt-label { flex: 1; font-size: 13px; color: #1A1A2E; font-weight: 600; }
+  .dp-pay-opt-hint { font-size: 11px; color: #6B7280; font-weight: 400; margin-top: 2px; }
+  .dp-pay-confirm { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .dp-pay-btn { padding: 10px; border: 1px solid #09B1BA; background: #fff; color: #09B1BA; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .dp-pay-btn.active { background: #09B1BA; color: #fff; cursor: default; }
+  .dp-pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .dp-pay-notice { font-size: 11px; color: #6B7280; margin-top: 10px; line-height: 1.4; font-style: italic; }
+  .dp-pay-aani-cta { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; background: linear-gradient(135deg, #7C3AED, #C084FC); color: #fff; font-weight: 700; font-size: 12px; text-decoration: none; margin-top: 8px; border: 0; cursor: pointer; font-family: inherit; }
+
+  /* P3 — TRUCK CTA permanent card in Deal Tracker */
+  .dp-truck-cta { padding: 14px 16px; border-top: 1px solid #F3F4F6; }
+  .dp-truck-card { display: flex; align-items: center; gap: 10px; background: #FDF2F8; border: 1px solid #F9A8D4; border-radius: 12px; padding: 12px; text-decoration: none; color: inherit; transition: transform 0.1s; }
+  .dp-truck-card:hover { transform: translateY(-1px); }
+  .dp-truck-icon { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 10px; font-size: 22px; }
+  .dp-truck-text { flex: 1; }
+  .dp-truck-title { font-size: 13px; font-weight: 700; color: #831843; }
+  .dp-truck-body  { font-size: 11px; color: #9F1239; margin-top: 2px; }
+
+  /* ═══════════════════════════════════════════
      RESPONSIVE
      ═══════════════════════════════════════════ */
   @media (max-width: 1100px) {
@@ -1162,6 +1190,8 @@
         <div id="dpActions"></div>
         <div id="dpServices"></div>
         <div id="dpMeetup"></div>
+        <div id="dpPayment"></div>
+        <div id="dpTruckCta"></div>
         <div id="dpProBanner"></div>
       </div>
     </aside>
@@ -1178,6 +1208,8 @@
   <script src="../js/swappo-chat.js"></script>
   <script src="../js/toast.js"></script>
   <script src="../js/notifications-bell.js"></script>
+  <script src="../js/truck-link.js"></script>
+  <script src="../js/identity-card.js"></script>
   <script src="../js/mega-menu.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script>
@@ -1589,10 +1621,10 @@
           '<span class="sc-option-price" style="color:#9CA3AF;">~25 AED</span>' +
         '</div>' +
         (isLargeItem ?
-        '<div class="sc-option" onclick="Toast.show(\'Find a Truck launches soon — Phase 2 partnership pending.\', \'info\')" style="opacity:0.7;cursor:default;">' +
+        '<div class="sc-option" onclick="window.location.href=\'transport.html\'" style="cursor:pointer;">' +
           '<span class="sc-option-icon">🚛</span>' +
-          '<div class="sc-option-text"><div class="sc-option-label">Find a Truck <span style="font-size:10px;background:#F59E0B;color:white;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;">SOON</span></div><div class="sc-option-desc">For furniture & large items · Coming soon</div></div>' +
-          '<span class="sc-option-price" style="color:#9CA3AF;">~80 AED</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Find a Truck</div><div class="sc-option-desc">For furniture &amp; large items — 5 UAE partners online</div></div>' +
+          '<span class="sc-option-price">from 80 AED</span>' +
         '</div>' : '') +
       '</div>';
     return div;
@@ -1997,6 +2029,110 @@
       '</div>';
     }
     document.getElementById('dpProBanner').innerHTML = proHTML;
+
+    // ═══ P3 — PAYMENT SELECTOR (only when cash > 0 and deal is accepted/completed) ═══
+    renderPaymentSelector(convId, map, status);
+
+    // ═══ P3 — FIND A TRUCK permanent CTA in Deal Tracker ═══
+    renderTruckCta();
+  }
+
+  // Payment selector state: memorised per conversation.
+  var paymentState = window.__dpPaymentState || (window.__dpPaymentState = {});
+
+  function _trP(key, fallback) { return (typeof t === 'function') ? t(key) : fallback; }
+
+  function renderPaymentSelector(convId, map, status) {
+    var container = document.getElementById('dpPayment');
+    if (!container) return;
+    var cash = Number(map && map.cash_amount || dealCashAmount || 0);
+    if (status !== 'accepted' && status !== 'completed') { container.innerHTML = ''; return; }
+    if (cash <= 0) { container.innerHTML = ''; return; }
+
+    var state = paymentState[convId] || (paymentState[convId] = {
+      method: (map && map.payment_method) || (deliveryChoice[convId] && deliveryChoice[convId].me === 'meet' ? 'cash_meetup' : 'aani'),
+      payerConfirmed: !!(map && map.payer_confirmed_at),
+      payeeConfirmed: !!(map && map.payee_confirmed_at)
+    });
+
+    // The proposer is the one paying (cash_direction = 'proposer_pays').
+    var me = currentUser && currentUser.id;
+    var isPayer = me && map && map.proposer_id === me;
+
+    var aaniDeeplink = 'aani://send?amount=' + encodeURIComponent(cash) + '&ref=SWP-' + (map && map.swap_id ? String(map.swap_id).slice(0,8) : 'deal');
+
+    container.innerHTML =
+      '<div class="dp-payment">' +
+        '<h4>💳 ' + _trP('payment_method_title', 'Payment method') + ' · ' + cash + ' AED</h4>' +
+        '<div class="dp-pay-opts">' +
+          payOpt(convId, 'cash_meetup', '🤝', _trP('payment_cash_meetup', 'Cash at meetup'), '', state.method) +
+          payOpt(convId, 'aani',        '📱', _trP('payment_aani', 'Aani Instant Transfer'), _trP('payment_aani_cta', 'Pay via Aani'), state.method) +
+          payOpt(convId, 'cod',         '🚚', _trP('payment_cod', 'Cash on Delivery (+5 AED)'), _trP('payment_cod_fee', 'Courier collects cash (+5 AED)'), state.method) +
+        '</div>' +
+        (state.method === 'aani' ? '<a href="' + aaniDeeplink + '" class="dp-pay-aani-cta" id="aaniOpenBtn">💸 ' + _trP('payment_aani_cta', 'Pay via Aani') + ' · ' + cash + ' AED</a>' : '') +
+        '<div class="dp-pay-confirm">' +
+          (isPayer ? '<button id="payIPaid" class="dp-pay-btn' + (state.payerConfirmed ? ' active' : '') + '" onclick="confirmPayment(\'' + convId + '\', \'payer\')"' + (state.payerConfirmed ? ' disabled' : '') + '>✅ ' + _trP('payment_i_paid', 'I paid') + '</button>'
+                    : '<button class="dp-pay-btn" disabled>' + (state.payerConfirmed ? '✅ ' + _trP('payment_i_paid', 'I paid') : '⏳ ' + _trP('offer_awaiting', 'Awaiting payer')) + '</button>') +
+          (!isPayer ? '<button id="payIReceived" class="dp-pay-btn' + (state.payeeConfirmed ? ' active' : '') + '" onclick="confirmPayment(\'' + convId + '\', \'payee\')"' + (state.payeeConfirmed ? ' disabled' : '') + '>✅ ' + _trP('payment_i_received', 'I received') + '</button>'
+                    : '<button class="dp-pay-btn" disabled>' + (state.payeeConfirmed ? '✅ ' + _trP('payment_i_received', 'I received') : '⏳ ' + _trP('offer_awaiting', 'Awaiting receiver')) + '</button>') +
+        '</div>' +
+        '<div class="dp-pay-notice">' + _trP('payment_no_handling_notice', 'Swappo never processes user-to-user cash — you settle directly.') + '</div>' +
+      '</div>';
+  }
+
+  function payOpt(convId, key, icon, label, hint, selectedKey) {
+    var sel = (key === selectedKey);
+    return '<label class="dp-pay-opt' + (sel ? ' selected' : '') + '">' +
+             '<input type="radio" name="pay-' + convId + '" value="' + key + '" ' + (sel ? 'checked' : '') + ' onchange="setPaymentMethod(\'' + convId + '\', \'' + key + '\')">' +
+             '<span style="font-size:18px;">' + icon + '</span>' +
+             '<div class="dp-pay-opt-label">' + label + (hint ? '<div class="dp-pay-opt-hint">' + hint + '</div>' : '') + '</div>' +
+           '</label>';
+  }
+
+  window.setPaymentMethod = async function (convId, method) {
+    paymentState[convId] = paymentState[convId] || {};
+    paymentState[convId].method = method;
+    var map = CONV_ITEM_MAP[convId] || {};
+    map.payment_method = method;
+    // Best-effort DB persist if we have a real swap.
+    if (map.swap_id && window.db) {
+      try { await window.db.from('swaps').update({ payment_method: method }).eq('id', map.swap_id); } catch (e) {}
+    }
+    renderDealPanel(convId);
+  };
+
+  window.confirmPayment = async function (convId, side) {
+    var state = paymentState[convId] || (paymentState[convId] = {});
+    var map = CONV_ITEM_MAP[convId] || {};
+    var now = new Date().toISOString();
+    if (side === 'payer') { state.payerConfirmed = true; map.payer_confirmed_at = now; }
+    if (side === 'payee') { state.payeeConfirmed = true; map.payee_confirmed_at = now; }
+    if (map.swap_id && window.db) {
+      try {
+        var patch = {};
+        if (side === 'payer') patch.payer_confirmed_at = now;
+        if (side === 'payee') patch.payee_confirmed_at = now;
+        await window.db.from('swaps').update(patch).eq('id', map.swap_id);
+      } catch (e) { console.warn('[confirmPayment]', e.message || e); }
+    }
+    if (window.Toast) Toast.success(_trP('payment_confirmed', 'Payment confirmed'));
+    renderDealPanel(convId);
+  };
+
+  function renderTruckCta() {
+    var container = document.getElementById('dpTruckCta');
+    if (!container) return;
+    container.innerHTML =
+      '<div class="dp-truck-cta">' +
+        '<a href="transport.html" class="dp-truck-card">' +
+          '<div class="dp-truck-icon">🚛</div>' +
+          '<div class="dp-truck-text">' +
+            '<div class="dp-truck-title">' + _trP('truck_deal_cta', 'Need help moving?') + '</div>' +
+            '<div class="dp-truck-body">' + _trP('truck_deal_body', 'Book a truck for large items') + '</div>' +
+          '</div>' +
+          '<div style="color:#9F1239;font-weight:700;">→</div>' +
+        '</a>' +
+      '</div>';
   }
 
   // ═══ CASH CONTROLS ═══

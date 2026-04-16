@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
+  <title>Public profile — Swappo</title>
+  <meta name="description" content="Public profile page — items, reviews and badges. No personal contact details shown.">
+  <link rel="canonical" href="https://swappo.ae/pages/profile-public.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/swappo-visual.css">
+  <link rel="stylesheet" href="../css/swappo-modern-2026.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { background: var(--gray-bg, #F8F9FA); font-family: Inter, sans-serif; }
+    .pp-wrap { max-width: 960px; margin: 28px auto; padding: 0 16px; }
+    .pp-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 20px; padding: 24px; margin-bottom: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+    .pp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .pp-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .pp-actions button { background: transparent; border: 1px solid #EBEBEB; color: #555; padding: 8px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .pp-actions button:hover { border-color: #DC2626; color: #DC2626; }
+    h2 { font-size: 1.15rem; margin: 0 0 14px; color: #171717; display: flex; align-items: center; gap: 8px; }
+    h2 i { color: #09B1BA; }
+    .pp-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .pp-item { background: #F8F9FA; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: 1px solid #EBEBEB; }
+    .pp-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .pp-item img { width: 100%; height: 140px; object-fit: cover; display: block; background: #E5E7EB; }
+    .pp-item-body { padding: 10px 12px; }
+    .pp-item-title { font-size: 0.85rem; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+    .pp-item-price { font-size: 0.8rem; color: #09B1BA; font-weight: 700; margin-top: 2px; }
+    .pp-review { border-bottom: 1px solid #F3F4F6; padding: 14px 0; }
+    .pp-review:last-child { border-bottom: none; }
+    .pp-review-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; font-size: 0.88rem; }
+    .pp-review-rating { color: #F59E0B; font-weight: 700; }
+    .pp-review-author { color: #555; }
+    .pp-review-date { color: #999; margin-left: auto; font-size: 0.8rem; }
+    .pp-review-text { color: #333; font-size: 0.9rem; line-height: 1.45; margin: 0; }
+    .pp-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pp-badge { background: #FEF3C7; color: #92400E; padding: 6px 12px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; }
+    .pp-empty { color: #999; font-size: 0.9rem; text-align: center; padding: 24px 12px; }
+    .pp-back { color: #09B1BA; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; }
+    .pp-back:hover { text-decoration: underline; }
+    #identity-host { max-width: none; }
+    .pp-card #identity-host.swp-identity { background: transparent; border: none; padding: 0; }
+  </style>
+</head>
+<body>
+  <main class="pp-wrap">
+    <a href="catalogue.html" class="pp-back"><i class="fas fa-arrow-left"></i> <span data-i18n="back_home">Back</span></a>
+
+    <section class="pp-card">
+      <div class="pp-header">
+        <div id="identity-host" style="flex:1;min-width:260px;"></div>
+        <div class="pp-actions">
+          <button id="report-btn" type="button"><i class="fas fa-flag"></i> <span data-i18n="profile_public_report">Report</span></button>
+          <button id="block-btn" type="button"><i class="fas fa-ban"></i> <span data-i18n="profile_public_block">Block</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="pp-card" id="items-card">
+      <h2><i class="fas fa-box"></i> <span data-i18n="profile_public_items">Active items</span></h2>
+      <div id="items-grid" class="pp-items"></div>
+    </section>
+
+    <section class="pp-card" id="reviews-card">
+      <h2><i class="fas fa-star"></i> <span data-i18n="profile_public_reviews">Recent reviews</span></h2>
+      <div id="reviews-list"></div>
+    </section>
+
+    <section class="pp-card" id="badges-card">
+      <h2><i class="fas fa-award"></i> <span data-i18n="profile_public_badges">Badges</span></h2>
+      <div id="badges-row" class="pp-badges"></div>
+    </section>
+
+    <div id="not-found-banner" style="display:none;padding:28px;text-align:center;color:#999;">
+      <i class="fas fa-user-slash" style="font-size:36px;margin-bottom:10px;display:block;"></i>
+      <span data-i18n="profile_public_not_found">This profile is not available.</span>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/notifications-bell.js"></script>
+  <script src="../js/truck-link.js"></script>
+  <script src="../js/identity-card.js"></script>
+  <script>
+    (function () {
+      const qs = new URLSearchParams(location.search);
+      const userId = qs.get('id');
+      const wrap = document.querySelector('.pp-wrap');
+      if (!userId) {
+        document.getElementById('items-card').style.display = 'none';
+        document.getElementById('reviews-card').style.display = 'none';
+        document.getElementById('badges-card').style.display = 'none';
+        document.getElementById('not-found-banner').style.display = 'block';
+        return;
+      }
+
+      async function load() {
+        if (!window.db || !window.SwappoIdentityCard) return;
+        const profile = await window.SwappoIdentityCard.fetchPublicProfile(userId);
+        if (!profile) {
+          document.querySelectorAll('.pp-card').forEach(function (c) { c.style.display = 'none'; });
+          document.getElementById('not-found-banner').style.display = 'block';
+          return;
+        }
+
+        // Identity card — visible + revealed (public profile = public identity).
+        await window.SwappoIdentityCard.render('#identity-host', userId, { isRevealed: true, showViewLink: false, profile: profile });
+
+        // 6 most recent active items
+        const itemsGrid = document.getElementById('items-grid');
+        const itemsRes = await window.db.from('items')
+          .select('id,brand,model,type,price,photos')
+          .eq('user_id', userId).eq('status', 'available')
+          .order('created_at', { ascending: false }).limit(6);
+        if (itemsRes.data && itemsRes.data.length) {
+          itemsGrid.innerHTML = itemsRes.data.map(function (it) {
+            const photo = (it.photos && it.photos[0]) || '';
+            const title = ((it.brand || '') + ' ' + (it.model || '')).trim() || it.type || 'Item';
+            return '<a class="pp-item" href="product.html?id=' + it.id + '">' +
+                     '<img src="' + photo + '" alt="" onerror="this.style.background=\'#E5E7EB\';this.style.opacity=\'0\';">' +
+                     '<div class="pp-item-body">' +
+                       '<p class="pp-item-title"></p>' +
+                       '<div class="pp-item-price">' + (Number(it.price || 0).toLocaleString()) + ' AED</div>' +
+                     '</div>' +
+                   '</a>';
+          }).join('');
+          Array.prototype.forEach.call(itemsGrid.querySelectorAll('.pp-item'), function (el, i) {
+            el.querySelector('.pp-item-title').textContent = ((itemsRes.data[i].brand || '') + ' ' + (itemsRes.data[i].model || '')).trim() || itemsRes.data[i].type || 'Item';
+          });
+        } else {
+          itemsGrid.innerHTML = '<div class="pp-empty">No active items yet.</div>';
+        }
+
+        // 10 most recent reviews
+        const reviewsEl = document.getElementById('reviews-list');
+        const reviewsRes = await window.db.from('reviews')
+          .select('rating,comment,created_at,reviewer_id')
+          .eq('target_id', userId)
+          .order('created_at', { ascending: false }).limit(10);
+        if (reviewsRes.data && reviewsRes.data.length) {
+          reviewsEl.innerHTML = reviewsRes.data.map(function (r) {
+            const anonId = window.SwappoIdentityCard.hashLabel(r.reviewer_id);
+            const when = new Date(r.created_at).toLocaleDateString();
+            return '<div class="pp-review">' +
+                     '<div class="pp-review-head">' +
+                       '<span class="pp-review-rating">★ ' + r.rating + '</span>' +
+                       '<span class="pp-review-author">' + anonId + '</span>' +
+                       '<span class="pp-review-date">' + when + '</span>' +
+                     '</div>' +
+                     '<p class="pp-review-text"></p>' +
+                   '</div>';
+          }).join('');
+          Array.prototype.forEach.call(reviewsEl.querySelectorAll('.pp-review-text'), function (p, i) {
+            p.textContent = reviewsRes.data[i].comment || '';
+          });
+        } else {
+          reviewsEl.innerHTML = '<div class="pp-empty">No reviews yet.</div>';
+        }
+
+        // Badges — tier + is_pro + generous heart (≥5 gifts given eventually)
+        const badgesRow = document.getElementById('badges-row');
+        const tiers = { newcomer: '🌱 Newcomer', swapper: '⭐ Swapper', active: '🔥 Active', pro: '💎 Pro', elite: '🏆 Elite', legend: '👑 Legend' };
+        const chips = [];
+        if (tiers[profile.badge]) chips.push(tiers[profile.badge]);
+        if (profile.is_pro) chips.push('💎 Swappo Pro');
+        badgesRow.innerHTML = chips.length
+          ? chips.map(function (c) { return '<span class="pp-badge">' + c + '</span>'; }).join('')
+          : '<div class="pp-empty">No badges yet.</div>';
+      }
+
+      document.getElementById('report-btn').addEventListener('click', async function () {
+        if (!window.db) return Toast.error('Service unavailable.');
+        const reason = prompt('Why are you reporting this profile?');
+        if (!reason) return;
+        try {
+          const u = await window.db.auth.getUser();
+          const rid = u && u.data && u.data.user ? u.data.user.id : null;
+          if (!rid) return Toast.error('Please sign in first.');
+          const res = await window.db.from('reports').insert({
+            reporter_id: rid, target_user: userId, reason: reason.slice(0, 50), details: reason
+          });
+          if (res.error) throw res.error;
+          Toast.success('Report sent — our team will review it.');
+        } catch (err) {
+          console.error('[pp.report]', err);
+          Toast.error(err.message || 'Failed to send report.');
+        }
+      });
+
+      document.getElementById('block-btn').addEventListener('click', function () {
+        // Local-only block for now. A future sprint wires this to a blocks table.
+        try {
+          const raw = JSON.parse(localStorage.getItem('swappo_blocked') || '[]');
+          if (raw.indexOf(userId) === -1) raw.push(userId);
+          localStorage.setItem('swappo_blocked', JSON.stringify(raw));
+          Toast.success('Blocked. You will not see their items in your feed.');
+        } catch (e) {
+          Toast.error('Failed to block.');
+        }
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', load);
+      } else {
+        load();
+      }
+    })();
+  </script>
+</body>
+</html>
