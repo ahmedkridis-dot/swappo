@@ -318,6 +318,11 @@
     <section id="stories-bar" class="swp-stories-host" style="margin-top:10px;"></section>
   </div>
 
+  <!-- ========== P4B — Facebook-style feed tabs ========== -->
+  <div class="container">
+    <nav id="feed-tabs" aria-label="Feed tabs"></nav>
+  </div>
+
   <!-- ========== FILTER BAR (Vinted-style horizontal) ========== -->
   <div class="container">
     <div class="filter-bar">
@@ -521,6 +526,7 @@
   <script src="../js/notifications-bell.js"></script>
   <script src="../js/truck-link.js"></script>
   <script src="../js/stories.js"></script>
+  <script src="../js/feed-tabs.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -529,6 +535,16 @@
       // P4A — Depop stories bar
       if (window.SwappoStories && window.db) {
         window.SwappoStories.renderBar('#stories-bar');
+      }
+
+      // P4B — Neighborhood feed tabs. When the user switches tabs we re-run
+      // renderProducts() (defined below) which asks SwappoFeedTabs.applyFilter
+      // for the current ordering/filter. Tabs are idempotent.
+      if (window.SwappoFeedTabs) {
+        window.SwappoFeedTabs.render('#feed-tabs');
+        window.SwappoFeedTabs.onChange(function () {
+          if (typeof renderCatalogue === 'function') renderCatalogue();
+        });
       }
 
       const params = new URLSearchParams(window.location.search);
@@ -653,6 +669,11 @@
             var priority = (bBoost + bPro) - (aBoost + aPro);
             return priority !== 0 ? priority : 0; // keep original sub-order
           });
+        }
+
+        // P4B — feed-tabs sort/filter (Trending / Around You / Latest / For You)
+        if (window.SwappoFeedTabs) {
+          items = window.SwappoFeedTabs.applyFilter(items);
         }
 
         const grid = document.getElementById('catalogue-grid');

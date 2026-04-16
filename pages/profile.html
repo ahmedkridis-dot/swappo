@@ -1020,6 +1020,8 @@
             <div id="tier-progress"></div>
             <div class="progress-fill" id="progress-fill"></div>
             <div id="tier-badges-row"></div>
+            <!-- P4B — Airbnb-style badge decay countdown / warning -->
+            <div id="badge-decay-host"></div>
         </div>
 
         <!-- ========== 4 STAT CARDS (Figma layout) ========== -->
@@ -1400,6 +1402,8 @@
   <script src="../js/truck-link.js"></script>
   <script src="../js/identity-card.js"></script>
   <script src="../js/offer-threading.js"></script>
+  <script src="../js/auto-decline.js"></script>
+  <script src="../js/badge-decay.js"></script>
     <script src="../js/app.js"></script>
     <script src="../js/swappo-animations.js"></script>
   <script src="../js/swappo-modern-2026.js"></script>
@@ -1760,7 +1764,7 @@
                     ? '<span class="pending-offer-badge" onclick="event.stopPropagation(); document.querySelector(\'[data-tab=swap-dashboard]\').click(); setTimeout(function(){var b=document.querySelector(\'[data-swap-tab=received]\');if(b)b.click();},50);">🔔 ' + pendingCount + ' pending offer' + (pendingCount > 1 ? 's' : '') + '</span>'
                     : '';
 
-                itemsHTML += '<div class="product-card">' +
+                itemsHTML += '<div class="product-card" data-my-item-id="' + item.id + '">' +
                     '<div class="product-image">' +
                         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '') +
                         '<span class="product-status ' + statusClass + '">' + statusLabel + '</span>' +
@@ -1775,6 +1779,7 @@
                             '<button class="product-action-btn" style="color:#F59E0B;border-color:#F59E0B;" onclick="showBoostPicker(\'' + item.id + '\')"><i class="fas fa-rocket"></i> Boost</button>' +
                             '<button class="product-action-btn" onclick="deleteItem(\'' + item.id + '\')"><i class="fas fa-trash"></i> Delete</button>' +
                         '</div>' +
+                        '<div class="my-auto-decline-host" data-item-id="' + item.id + '"></div>' +
                     '</div>' +
                 '</div>';
             });
@@ -1785,6 +1790,17 @@
                 '<p>Drop a new item</p>' +
             '</div>';
             itemsGrid.innerHTML = itemsHTML;  // replaces the skeleton
+
+            // P4B — Auto-decline control per item. Pro users get a live toggle;
+            // Free users see a greyed-out "Pro feature" pill.
+            if (window.SwappoAutoDecline) {
+              var _isPro = !!(user.is_pro || String(user.plan || '').toLowerCase() === 'pro');
+              Array.prototype.forEach.call(document.querySelectorAll('.my-auto-decline-host'), function (host) {
+                var itemId = host.getAttribute('data-item-id');
+                var match = userItems.find(function (i) { return i.id === itemId; });
+                if (match) window.SwappoAutoDecline.render(host, match, _isPro);
+              });
+            }
 
             // ── TAB: SWAP DASHBOARD ────────────────────────────────────────
             // (Legacy "Offers Received / Offers Sent" tab rendering removed
@@ -2584,6 +2600,21 @@
                 navProfile.style.background = user.avatar_color || 'var(--primary)';
                 navProfile.style.borderColor = user.avatar_color || 'var(--primary)';
             }
+
+            // ── P4B: Badge decay banner + activity ping ─────────────────
+            try {
+              if (window.SwappoBadgeDecay && window.db) {
+                // Read latest users row with badge_last_activity_at.
+                const _dbUser = await window.db.from('users')
+                  .select('badge,badge_last_activity_at')
+                  .eq('id', user.id).single();
+                if (_dbUser.data) {
+                  window.SwappoBadgeDecay.render('#badge-decay-host', _dbUser.data);
+                }
+                // Ping activity (viewing dashboard counts).
+                window.SwappoBadgeDecay.ping();
+              }
+            } catch (e) { console.warn('[profile.badgeDecay]', e); }
           } catch (err) {
             // B-022: dump full stack to console, show a concise localised toast.
             console.error('[profile] init failed —', err && err.stack ? err.stack : err);

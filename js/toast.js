@@ -1,6 +1,6 @@
 /* ============================================
    Swappo — Toast notifications (standalone)
-   Extracted from demo-engine.js so non-demo code can use it.
+   Extracted from the legacy demo runtime so shared code can use it.
    Usage: Toast.show('Saved!', 'success'); Toast.show('Oops', 'error');
    ============================================ */
 (function () {

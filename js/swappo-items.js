@@ -307,8 +307,13 @@
     const citySafe = _esc(item.city || '');
     const dataAttrs = ' data-lat="' + latSafe + '" data-lng="' + lngSafe + '" data-city="' + citySafe + '" data-item-id="' + itemIdAttr + '"';
 
+    // P4B — distance badge when feed-tabs is on "Around You"
+    const distBadge = (item._distance_km != null)
+      ? '<div class="swp-distance-badge">📍 ' + item._distance_km.toFixed(1) + ' km</div>'
+      : '';
     return '<div class="product-card"' + dataAttrs + ' data-href="' + href + '" onclick="if(!event.target.closest(\'.product-fav\'))window.location.href=this.dataset.href" style="cursor:pointer">' +
-      '<div class="product-img">' +
+      '<div class="product-img" style="position:relative;">' +
+        distBadge +
         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '<div style="width:100%;height:100%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:28px;">\u{1F4E6}</div>') +
         '<button class="product-fav" type="button" style="top:8px; bottom:auto;" data-fav-id="' + itemIdAttr + '" onclick="event.stopPropagation(); SwappoItems.toggleFavorite(this.dataset.favId).then(r => { this.querySelector(\'i\').className = r.favorited ? \'fas fa-heart\' : \'far fa-heart\'; });">' +
           '<i class="' + (fav ? 'fas fa-heart' : 'far fa-heart') + '"></i>' +

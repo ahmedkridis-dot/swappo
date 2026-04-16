@@ -1,6 +1,6 @@
 /* ============================================
    Swappo — Shared constants (taxonomy, tiers, badges)
-   Extracted from mock-data.js so consumer pages no longer need
+   Extracted from legacy mock data so consumer pages no longer need
    the demo runtime. All values are pure data — zero Demo state.
    ============================================ */
 

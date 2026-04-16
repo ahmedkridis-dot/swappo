@@ -575,7 +575,7 @@ function getCategoryCost(category) {
 
 // ---- Badge tier thresholds ----
 // Renamed from BADGE_TIERS to _SWAPPO_BADGE_TIERS to avoid collision with
-// mock-data.js which also declares a (different-shape) BADGE_TIERS const.
+// the legacy fixtures file which also declares a (different-shape) BADGE_TIERS const.
 
 const _SWAPPO_BADGE_TIERS = [
   { tier: 'legend',   min: 75, emoji: '👑' },
