@@ -1293,7 +1293,11 @@ const translations = {
     seller_disclaimer: "Identity revealed after both parties accept the swap.",
     boosted: "Boosted",
     free_giveaway: "Free Giveaway",
-  },
+  
+    radius_5km: '5 km',
+    radius_10km: '10 km',
+    radius_25km: '25 km',
+    },
 
   fr: {
     pricing_hero_title: "Publiez gratuitement. Passez Pro pour économiser.",
@@ -2550,6 +2554,10 @@ const translations = {
     wizard_confirm_btn: 'Confirmer le swap',
     wizard_free_chat: 'Revenir au chat libre',
     wizard_completed: 'Swap confirmé !',
+    
+    radius_5km: '5 km',
+    radius_10km: '10 km',
+    radius_25km: '25 km',
     },
 
   ar: {
@@ -3810,6 +3818,10 @@ const translations = {
     wizard_confirm_btn: 'تأكيد التبادل',
     wizard_free_chat: 'التبديل إلى الدردشة المجانية',
     wizard_completed: 'تم تأكيد التبادل!',
+    
+    radius_5km: '5 كم',
+    radius_10km: '10 كم',
+    radius_25km: '25 كم',
     },
 
   ur: {
@@ -5069,6 +5081,10 @@ const translations = {
     wizard_confirm_btn: 'سویپ کی تصدیق',
     wizard_free_chat: 'فری چیٹ پر جائیں',
     wizard_completed: 'سویپ تصدیق شدہ!',
+    
+    radius_5km: '5 کلومیٹر',
+    radius_10km: '10 کلومیٹر',
+    radius_25km: '25 کلومیٹر',
     },
 
   ru: {
@@ -6326,6 +6342,10 @@ const translations = {
     step3_title_v5: 'Обменяйтесь',
     step4_desc_v5: 'Оцените друг друга и нарабатывайте репутацию.',
     step4_title_v5: 'Готово!',
+    
+    radius_5km: '5 км',
+    radius_10km: '10 км',
+    radius_25km: '25 км',
     },
 };
 
