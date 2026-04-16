@@ -320,6 +320,7 @@
         priceHTML +
         (locSafe ? '<div class="product-location" style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:#6B7280;margin-top:4px;font-weight:500;"><i class="fas fa-map-marker-alt" style="color:#09B1BA;font-size:0.7rem;"></i> ' + locSafe + '</div>' : '') +
         '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">' + modesHTML +
+          (item.shipping_enabled ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E0F2FE;color:#075985;">\u{1F69A} Delivery</span>' : '') +
           (['furniture', 'vehicles', 'sports'].includes(item.category) ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FDF2F8;color:#9D174D;">\u{1F69B} Truck</span>' : '') +
         '</div>' +
       '</div>' +

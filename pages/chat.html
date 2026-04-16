@@ -1210,6 +1210,7 @@
   <script src="../js/notifications-bell.js"></script>
   <script src="../js/truck-link.js"></script>
   <script src="../js/identity-card.js"></script>
+  <script src="../js/offer-threading.js"></script>
   <script src="../js/mega-menu.js"></script>
   <script src="../js/swappo-animations.js"></script>
   <script>
@@ -1983,16 +1984,32 @@
         '<div class="dp-section-title"><i class="fas fa-concierge-bell" style="color:#09B1BA;"></i> Services</div>';
 
       if (!deliveryChoice[convId] || !deliveryChoice[convId].resolved) {
+        // P4A — Vinted Delivery-First: the delivery card is the dominant option.
+        // It takes the full width with a teal gradient background + "Fastest +
+        // Safest" badge and a pre-filled fee estimate. Meet-in-person + truck
+        // sit below as smaller outline options.
+        var feeEstimate = '25-40 AED';
         servicesHTML +=
-          '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'delivery\')">' +
-            '<div class="dp-service-icon" style="background:#FEF3C7;">🚚</div>' +
-            '<div class="dp-service-text"><div class="dp-service-label">Swappo Delivery</div><div class="dp-service-desc">We handle pickup & delivery</div></div>' +
-            '<span class="dp-service-price">from 25 AED</span>' +
+          '<div class="dp-service-card dp-primary" onclick="chooseExchangeMethod(\'' + convId + '\', \'delivery\')" ' +
+            'style="background:linear-gradient(135deg,#09B1BA,#0891B2);color:#fff;border:0;padding:18px;margin-bottom:8px;position:relative;">' +
+            '<div class="dp-service-icon" style="background:rgba(255,255,255,0.18);color:#fff;">🚚</div>' +
+            '<div class="dp-service-text">' +
+              '<div class="dp-service-label" style="color:#fff;font-size:15px;">' + _trP('mode_delivery_recommended','Swappo Delivery') + '</div>' +
+              '<div class="dp-service-desc" style="color:rgba(255,255,255,0.85);">' + _trP('mode_delivery_fastest','⚡ Fastest + Safest') + ' · ' + _trP('mode_delivery_fee_hint','Estimated fee') + ' ' + feeEstimate + '</div>' +
+            '</div>' +
+            '<span class="dp-service-price" style="color:#fff;font-weight:800;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:999px;">' + feeEstimate + '</span>' +
           '</div>';
         servicesHTML +=
-            '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'truck\')">' +
+          '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'meet\')" ' +
+            'style="border:1.5px solid #E5E7EB;background:#fff;">' +
+            '<div class="dp-service-icon" style="background:#F3F4F6;">📍</div>' +
+            '<div class="dp-service-text"><div class="dp-service-label">' + _trP('mode_meeting_alt','Meet in person') + '</div><div class="dp-service-desc">Free · pick a safe spot</div></div>' +
+            '<span class="dp-service-price">FREE</span>' +
+          '</div>';
+        servicesHTML +=
+            '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'truck\')" style="border:1.5px solid #F9A8D4;">' +
               '<div class="dp-service-icon" style="background:#FDF2F8;">🚛</div>' +
-              '<div class="dp-service-text"><div class="dp-service-label">Find a Truck</div><div class="dp-service-desc">Large items · furniture · heavy</div></div>' +
+              '<div class="dp-service-text"><div class="dp-service-label">' + _trP('truck_nav_link','Find a Truck').replace(/^🚛\s*/, '') + '</div><div class="dp-service-desc">Large items · furniture · heavy</div></div>' +
               '<span class="dp-service-price">from 80 AED</span>' +
             '</div>';
       }
