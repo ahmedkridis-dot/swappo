@@ -1546,27 +1546,42 @@
               premium: { name: 'Premium', badge: '💎', price: 69, claims: 5, boosts: 4 }
             };
             var _tierForPlan = _tierByPlan[_planKey] || _tierByPlan.free;
-            // Count this month's claims + boosts from Supabase. Failures
-            // fall back to 0 so the sidebar never shows undefined/NaN.
+
+            // ── PARALLEL FETCH BLOCK (perf fix) ────────────────────────
+            // The dashboard used to do 5 sequential awaits here (claims count,
+            // boosts count, items.getByUser, getFavoriteItems, chat.getUnreadCount)
+            // stacking to ~1.5–2 s of perceived latency. Now they all fire in
+            // parallel with Promise.all. Each is still individually try/catch-
+            // wrapped so a slow/failing query can't drag the others down.
             var _monthStart = new Date(); _monthStart.setDate(1); _monthStart.setHours(0,0,0,0);
-            var _claimsUsed = 0;
-            var _boostsUsed = 0;
-            try {
-              const { count } = await window.db.from('swaps')
-                .select('id', { count: 'exact', head: true })
+            var _monthStartISO = _monthStart.toISOString();
+
+            const [
+              claimsRes,
+              boostsRes,
+              userItems,
+              favoriteItems,
+              unreadChat
+            ] = await Promise.all([
+              window.db.from('swaps').select('id', { count: 'exact', head: true })
                 .eq('proposer_id', user.id).eq('is_giveaway_claim', true)
-                .gte('created_at', _monthStart.toISOString());
-              _claimsUsed = count || 0;
-            } catch (e) {}
-            try {
-              const { count } = await window.db.from('items')
-                .select('id', { count: 'exact', head: true })
+                .gte('created_at', _monthStartISO)
+                .then(function(r) { return r.count || 0; }).catch(function() { return 0; }),
+              window.db.from('items').select('id', { count: 'exact', head: true })
                 .eq('user_id', user.id).eq('is_boosted', true)
-                .gte('boost_expires_at', new Date().toISOString());
-              _boostsUsed = count || 0;
-            } catch (e) {}
-            // Renewal date: for paid plans, the end of the current billing month.
-            // For free, we just show "—" instead of a date.
+                .gte('boost_expires_at', new Date().toISOString())
+                .then(function(r) { return r.count || 0; }).catch(function() { return 0; }),
+              _getItemsByUser(user.id).catch(function() { return []; }),
+              _getFavoriteItems().catch(function() { return []; }),
+              (window.SwappoChat && window.SwappoChat.getUnreadCount)
+                ? window.SwappoChat.getUnreadCount().catch(function() { return 0; })
+                : Promise.resolve(0)
+            ]);
+            var _claimsUsed = claimsRes;
+            var _boostsUsed = boostsRes;
+            let _unread = unreadChat;
+
+            // Renewal date: for paid plans, the 1st of next month. Free = null.
             var _nextRenewal = null;
             if (_planKey !== 'free') {
               var d = new Date(); d.setMonth(d.getMonth() + 1); d.setDate(1); d.setHours(0,0,0,0);
@@ -1583,9 +1598,7 @@
               next_renewal: _nextRenewal
             };
             const tierInfo = planInfo.tier;
-            const userItems = await _getItemsByUser(user.id);
-            const favoriteItems = await _getFavoriteItems();
-            // Preserve legacy `favorites` name as a list of ids (used only for length check later)
+            // Preserve legacy `favorites` name as a list of ids.
             const favorites = favoriteItems.map(function(it) { return it.id; });
             const donatedCount = userItems.filter(i => i.is_giveaway).length;
 
@@ -1595,11 +1608,6 @@
               var s = i.status || 'available';
               return s === 'available' || s === 'active';
             }).length;
-            // Unread count — async via SwappoChat if available; Demo fallback otherwise
-            let _unread = 0;
-            if (window.SwappoChat && window.SwappoChat.getUnreadCount) {
-                try { _unread = await window.SwappoChat.getUnreadCount(); } catch (e) { _unread = 0; }
-            }
             document.getElementById('stat-donated').textContent = _unread;
             var chatBadge = document.getElementById('chat-badge-count');
             if (chatBadge) chatBadge.textContent = _unread;

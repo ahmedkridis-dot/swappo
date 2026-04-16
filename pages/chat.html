@@ -1468,8 +1468,11 @@
       area.appendChild(div);
     });
 
-    // Add smart cards based on deal status
-    if (map.status === 'accepted' && !deliveryChoice[convId]) {
+    // Show the exchange-method choice card once the swap is accepted
+    // (identity_revealed on the Supabase conversation row is the source of
+    // truth; the legacy CONV_ITEM_MAP.status is kept as a fallback).
+    var isAcceptedDeal = (conv && conv.identity_revealed === true) || map.status === 'accepted';
+    if (isAcceptedDeal && !deliveryChoice[convId]) {
       area.appendChild(createExchangeMethodCard(convId));
     }
 
@@ -1480,10 +1483,18 @@
 
   // ═══ SMART CARDS ═══
 
-  // Exchange Method Card — appears after deal is accepted
+  // Exchange Method Card — appears after deal is accepted.
+  // Shows 3 options: Meet in Person (free, live), Swappo Delivery (Coming Soon),
+  // Find a Truck (Coming Soon). Both last are shown by default so users see the
+  // roadmap — they're visibly gated as SOON badges + clicks show an info toast.
   function createExchangeMethodCard(convId) {
     var map = CONV_ITEM_MAP[convId] || {};
-    var isLargeItem = (map.category === 'furniture' || map.category === 'sports' || map.category === 'vehicles');
+    // Pull category from the conversation's embedded item if available, else
+    // fall back to CONV_ITEM_MAP. Find a Truck is shown for any item now so
+    // users can see the option (visually gated Coming Soon).
+    var conv = _convCache.find(function(c) { return c.id === convId; });
+    var itemCategory = (conv && conv.item && conv.item.category) || map.category || '';
+    var isLargeItem = true; // always teased in Coming Soon phase
     var isFree = currentUser && currentUser.plan === 'free';
     var feeText = isFree ? '5% fee' : '0% fee';
 
