@@ -1482,20 +1482,53 @@
             })();
 
             // ── Stats ────────────────────────────────────────────────────
-            // Derive planInfo inline from public.users.plan (Supabase) instead
-            // of DemoSubscription.getPlan() which was localStorage-backed.
+            // Derive planInfo inline from public.users.plan (Supabase) +
+            // current-month counters from swaps + items. CLAUDE.md business
+            // rules dictate the limits per tier.
             var _planKey = (user.plan || 'free').toLowerCase();
             var _tierByPlan = {
-              free:    { name: 'Free',    badge: '🌱', price: 0 },
-              bronze:  { name: 'Bronze',  badge: '🥉', price: 19 },
-              silver:  { name: 'Silver',  badge: '🥈', price: 39 },
-              pro:     { name: 'Pro',     badge: '👑', price: 29 },
-              premium: { name: 'Premium', badge: '💎', price: 69 }
+              free:    { name: 'Free',    badge: '🌱', price: 0,  claims: 1, boosts: 0 },
+              bronze:  { name: 'Bronze',  badge: '🥉', price: 19, claims: 2, boosts: 1 },
+              silver:  { name: 'Silver',  badge: '🥈', price: 39, claims: 3, boosts: 2 },
+              pro:     { name: 'Pro',     badge: '👑', price: 29, claims: 5, boosts: 4 },
+              premium: { name: 'Premium', badge: '💎', price: 69, claims: 5, boosts: 4 }
             };
+            var _tierForPlan = _tierByPlan[_planKey] || _tierByPlan.free;
+            // Count this month's claims + boosts from Supabase. Failures
+            // fall back to 0 so the sidebar never shows undefined/NaN.
+            var _monthStart = new Date(); _monthStart.setDate(1); _monthStart.setHours(0,0,0,0);
+            var _claimsUsed = 0;
+            var _boostsUsed = 0;
+            try {
+              const { count } = await window.db.from('swaps')
+                .select('id', { count: 'exact', head: true })
+                .eq('proposer_id', user.id).eq('is_giveaway_claim', true)
+                .gte('created_at', _monthStart.toISOString());
+              _claimsUsed = count || 0;
+            } catch (e) {}
+            try {
+              const { count } = await window.db.from('items')
+                .select('id', { count: 'exact', head: true })
+                .eq('user_id', user.id).eq('is_boosted', true)
+                .gte('boost_expires_at', new Date().toISOString());
+              _boostsUsed = count || 0;
+            } catch (e) {}
+            // Renewal date: for paid plans, the end of the current billing month.
+            // For free, we just show "—" instead of a date.
+            var _nextRenewal = null;
+            if (_planKey !== 'free') {
+              var d = new Date(); d.setMonth(d.getMonth() + 1); d.setDate(1); d.setHours(0,0,0,0);
+              _nextRenewal = d;
+            }
             const planInfo = {
               plan: _planKey,
-              tier: _tierByPlan[_planKey] || _tierByPlan.free,
-              swaps_used: user.swap_count || 0
+              tier: _tierForPlan,
+              swaps_used: user.swap_count || 0,
+              claims_used: _claimsUsed,
+              claims_limit: _tierForPlan.claims,
+              boosts_used: _boostsUsed,
+              boosts_limit: _tierForPlan.boosts,
+              next_renewal: _nextRenewal
             };
             const tierInfo = planInfo.tier;
             const userItems = await _getItemsByUser(user.id);
@@ -1505,7 +1538,11 @@
             const donatedCount = userItems.filter(i => i.is_giveaway).length;
 
             // Dashboard stats — all clickable
-            document.getElementById('stat-swaps').textContent = userItems.filter(function(i){return i.status==='active';}).length;
+            // "Active listings" = items with Supabase status='available' OR legacy 'active'
+            document.getElementById('stat-swaps').textContent = userItems.filter(function(i){
+              var s = i.status || 'available';
+              return s === 'available' || s === 'active';
+            }).length;
             // Unread count — async via SwappoChat if available; Demo fallback otherwise
             let _unread = 0;
             if (window.SwappoChat && window.SwappoChat.getUnreadCount) {
@@ -1556,15 +1593,22 @@
                     '<div class="sub-quota-bar"><div class="sub-quota-fill boosts" style="width:' + Math.min(100, boostsPct) + '%"></div></div>' +
                 '</div>';
 
-            // Renewal date
-            const renewalDate = new Date(planInfo.next_renewal);
-            document.getElementById('sidebar-renewal').innerHTML = '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-
-            // ── Give & Earn widget ───────────────────────────────
-            var geWidget = document.getElementById('give-earn-widget');
-            if (geWidget && window.DemoGiveEarn) {
-              geWidget.innerHTML = DemoGiveEarn.renderWidget();
+            // Renewal date — only shown on paid plans. Free tier shows "—".
+            const renewalDate = planInfo.next_renewal ? new Date(planInfo.next_renewal) : null;
+            const renewalStr = renewalDate && !isNaN(renewalDate.getTime())
+              ? renewalDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+              : '—';
+            const renewalEl = document.getElementById('sidebar-renewal');
+            if (renewalEl) {
+              renewalEl.innerHTML = planInfo.plan === 'free'
+                ? '<i class="fas fa-infinity" style="margin-right:4px;"></i> Free — no renewal'
+                : '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalStr;
             }
+
+            // "Give & Earn" widget was Demo-only (points/rewards fixtures).
+            // Left hidden until we spec a real earn mechanism on Supabase.
+            var geWidget = document.getElementById('give-earn-widget');
+            if (geWidget) geWidget.style.display = 'none';
 
             // ── Settings subscription card ───────────────────────────────
             const settingsSubCard = document.getElementById('settings-subscription-card');
@@ -1575,7 +1619,12 @@
                 '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;width:16px;"></i>' + swapsCompleted + ' swap' + (swapsCompleted === 1 ? '' : 's') + ' completed</div>' +
                 '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-gift" style="color:var(--accent);margin-right:6px;width:16px;"></i>' + planInfo.claims_used + '/' + planInfo.claims_limit + ' claims used</div>' +
                 '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-rocket" style="color:#FFB800;margin-right:6px;width:16px;"></i>' + planInfo.boosts_used + '/' + planInfo.boosts_limit + ' boosts used</div>';
-            document.getElementById('settings-sub-renewal').innerHTML = '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            const settingsRenewalEl = document.getElementById('settings-sub-renewal');
+            if (settingsRenewalEl) {
+              settingsRenewalEl.innerHTML = planInfo.plan === 'free'
+                ? '<i class="fas fa-infinity" style="margin-right:4px;"></i> Free — no renewal'
+                : '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalStr;
+            }
 
             // ── TAB: My Items ────────────────────────────────────────────
             const itemsGrid = document.getElementById('my-items-grid');
@@ -2100,10 +2149,12 @@
                 navProfile.style.borderColor = user.avatar_color || 'var(--primary)';
             }
           } catch (err) {
-            console.error('[profile] init failed:', err);
+            // Dump full stack to the console so we can see exactly which
+            // DOM write blew up. Toast stays short for the UI.
+            console.error('[profile] init failed —', err && err.stack ? err.stack : err);
             try {
               if (window.DemoNotifications && DemoNotifications.showToast) {
-                DemoNotifications.showToast('Could not load profile: ' + (err.message || 'unknown error'), 'error');
+                DemoNotifications.showToast('Could not load profile: ' + (err.message || 'unknown error') + ' (see console)', 'error');
               }
             } catch (e) {}
           }
