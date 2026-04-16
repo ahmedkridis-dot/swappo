@@ -250,8 +250,7 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="../js/mock-data.js"></script>
-  <script src="../js/demo-engine.js"></script>
+  <script src="../js/constants.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/register-sw.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -508,16 +507,16 @@
   function submitQuote(id) {
     // Phase 2: booking is not yet live — collect interest only
     var desc = document.getElementById('q-desc').value.trim();
-    if (!desc) { DemoNotifications.showToast('Please describe the item(s) to transport.', 'warning'); return; }
+    if (!desc) { Toast.show('Please describe the item(s) to transport.', 'warning'); return; }
     document.querySelector('.transport-modal-overlay').remove();
-    DemoNotifications.showToast('Thanks! Transport booking launches soon — we\'ll be in touch when it goes live. 🚛', 'info');
+    Toast.show('Thanks! Transport booking launches soon — we\'ll be in touch when it goes live. 🚛', 'info');
   }
 
   function submitNotify() {
     var email = document.getElementById('notify-email').value.trim();
-    if (!email || !email.includes('@')) { DemoNotifications.showToast('Please enter a valid email.', 'warning'); return; }
+    if (!email || !email.includes('@')) { Toast.show('Please enter a valid email.', 'warning'); return; }
     document.getElementById('notify-email').value = '';
-    DemoNotifications.showToast('You\'re on the list! We\'ll notify you when driver registration opens. 🚛', 'success');
+    Toast.show('You\'re on the list! We\'ll notify you when driver registration opens. 🚛', 'success');
   }
 
   // ═══ FILTERS ═══

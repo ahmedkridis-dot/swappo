@@ -25,7 +25,7 @@ function _pubSafeUrl(u) {
 // AUTH CHECK
 // ========================
 document.addEventListener('DOMContentLoaded', function() {
-  var user = DemoAuth.getCurrentUser();
+  var user = (JSON.parse(localStorage.getItem('swappo_current_user')||'null'));
   if (!user) {
     window.location.href = 'login.html?redirect=/pages/publier.html';
     return;
@@ -165,7 +165,7 @@ window.yearOptions = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
 // ========================
 window.nextStep = function() {
   if (formState.currentStep === 1 && !formState.category) {
-    DemoNotifications.showToast('Please select a category first.', 'warning');
+    Toast.show('Please select a category first.', 'warning');
     return;
   }
   if (formState.currentStep < 4) {
@@ -414,7 +414,7 @@ window.handlePhotoFiles = async function(e) {
   if (!files.length) return;
 
   if (!window.SwappoStorage) {
-    DemoNotifications.showToast('Photo module not loaded. Please refresh.', 'error');
+    Toast.show('Photo module not loaded. Please refresh.', 'error');
     return;
   }
 
@@ -432,7 +432,7 @@ window.handlePhotoFiles = async function(e) {
       }
     }
     if (slotIdx === -1) {
-      DemoNotifications.showToast('Max ' + maxSlots + ' photos reached.', 'warning');
+      Toast.show('Max ' + maxSlots + ' photos reached.', 'warning');
       break;
     }
     var slotEl = document.querySelector('.photo-slot[data-index="' + slotIdx + '"]');
@@ -445,7 +445,7 @@ window.handlePhotoFiles = async function(e) {
         uploadedUrl: null
       };
     } catch (err) {
-      DemoNotifications.showToast('Could not read ' + (files[i].name || 'image') + '.', 'error');
+      Toast.show('Could not read ' + (files[i].name || 'image') + '.', 'error');
     } finally {
       if (slotEl) slotEl.classList.remove('uploading');
     }
@@ -560,7 +560,7 @@ window.publishItem = async function(e) {
   if (e && e.preventDefault) e.preventDefault();
 
   try {
-    // Auth check — prefer Supabase, fall back to DemoAuth for dev
+    // Auth check — prefer Supabase, fall back to mirror for dev
     var user = null;
     var supabaseReady = !!(window.SwappoAuth && window.SwappoAuth.isReady());
     console.log('[publish] SwappoAuth ready?', supabaseReady);
@@ -584,7 +584,7 @@ window.publishItem = async function(e) {
         console.warn('[publish] getSession error:', e.message);
       }
     }
-    // NOTE: intentionally NO fallback to DemoAuth here. DemoAuth stores a
+    // NOTE: intentionally NO fallback to the mirror here. The mirror stores a
     // fake/mirrored user in localStorage whose id may not match any
     // auth.users row. Using it for RLS-gated writes (Storage upload,
     // items.insert) will be rejected by Postgres anyway ("new row violates
@@ -592,7 +592,7 @@ window.publishItem = async function(e) {
     // and fail silently. Safer to require a real Supabase session.
     if (!user) {
       console.warn('[publish] no Supabase session → redirecting to login');
-      DemoNotifications.showToast('Please sign in to publish.', 'warning');
+      Toast.show('Please sign in to publish.', 'warning');
       setTimeout(function() {
         window.location.href = 'login.html?redirect=/pages/publier.html';
       }, 800);
@@ -601,14 +601,14 @@ window.publishItem = async function(e) {
 
     if (!formState.category) {
       console.warn('[publish] no category selected');
-      DemoNotifications.showToast('Please select a category.', 'warning');
+      Toast.show('Please select a category.', 'warning');
       return;
     }
 
     var entries = (formState.photoBlobs || []).filter(function(p) { return p && p.processed; });
     console.log('[publish] photo entries count:', entries.length);
     if (!entries.length) {
-      DemoNotifications.showToast('Please add at least one photo.', 'warning');
+      Toast.show('Please add at least one photo.', 'warning');
       return;
     }
 
@@ -634,7 +634,7 @@ window.publishItem = async function(e) {
       }
     } catch (err) {
       console.error('[publish] upload failed:', err);
-      DemoNotifications.showToast('Upload failed: ' + (err.message || 'unknown error'), 'error');
+      Toast.show('Upload failed: ' + (err.message || 'unknown error'), 'error');
       btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
       btn.disabled = false;
       btn.style.opacity = '1';
@@ -692,27 +692,27 @@ window.publishItem = async function(e) {
     var result = null;
     if (window.SwappoItems) {
       result = await window.SwappoItems.create(itemData);
-    } else if (window.DemoItems) {
-      result = window.DemoItems.create(itemData);
+    } else if (window.SwappoItems) {
+      result = window.SwappoItems.create(itemData);
     }
     console.log('[publish] insert result:', result);
 
     if (!result || !result.success) {
-      DemoNotifications.showToast('Publish failed: ' + ((result && result.error) || 'unknown'), 'error');
+      Toast.show('Publish failed: ' + ((result && result.error) || 'unknown'), 'error');
       btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
       btn.disabled = false;
       btn.style.opacity = '1';
       return;
     }
 
-    DemoNotifications.showToast('Item published! \uD83C\uDF89', 'success');
+    Toast.show('Item published! \uD83C\uDF89', 'success');
     setTimeout(function() {
       window.location.href = 'catalogue.html';
     }, 1200);
 
   } catch (outerErr) {
     console.error('[publish] fatal error in publishItem:', outerErr);
-    try { DemoNotifications.showToast('Something went wrong: ' + (outerErr.message || outerErr), 'error'); } catch(e){}
+    try { Toast.show('Something went wrong: ' + (outerErr.message || outerErr), 'error'); } catch(e){}
     var btn = document.getElementById('btnPublish');
     if (btn) {
       btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';

@@ -20,7 +20,7 @@ let userArea = localStorage.getItem(LS_KEYS.AREA) || null;
 let currentRadius = parseInt(localStorage.getItem(LS_KEYS.RADIUS), 10);
 if (isNaN(currentRadius)) currentRadius = 5;
 
-// Public namespace so other scripts (DemoItems.renderCard etc) can reach helpers
+// Public namespace so other scripts (SwappoItems.renderCard etc) can reach helpers
 window.Swappo = window.Swappo || {};
 Swappo.userLat = () => userLat;
 Swappo.userLng = () => userLng;
@@ -355,24 +355,17 @@ function closeMobileMenu() {
 
 // ─── PUBLISH GATE MODAL ─────────────────────────────────────────────────────
 // Returns a PROMISE<boolean> — true means user needs to publish first.
-// Prefers SwappoItems (Supabase) and falls back to DemoItems (localStorage).
+// Supabase-only (no legacy mirror fallback).
 async function checkPublishGate() {
-  // Prefer Supabase if available
-  if (window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) {
-    try {
-      var u = await window.SwappoAuth.getCurrentUser();
-      if (u && window.SwappoItems && window.SwappoItems.hasActiveItems) {
-        var has = await window.SwappoItems.hasActiveItems(u.id);
-        return !has; // gate if NO active items
-      }
-    } catch (e) { /* fall through to DemoAuth */ }
-  }
-  // Demo fallback
-  if (!window.DemoAuth || !DemoAuth.isLoggedIn()) return false;
-  var user = DemoAuth.getCurrentUser();
-  if (!user) return false;
-  if (!window.DemoItems || !DemoItems.hasActiveItems) return false;
-  return !DemoItems.hasActiveItems(user.id);
+  if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return false;
+  try {
+    var u = await window.SwappoAuth.getCurrentUser();
+    if (u && window.SwappoItems && window.SwappoItems.hasActiveItems) {
+      var has = await window.SwappoItems.hasActiveItems(u.id);
+      return !has; // gate if NO active items
+    }
+  } catch (e) { console.warn('[publish-gate]', e.message || e); }
+  return false;
 }
 
 function showPublishGate() {

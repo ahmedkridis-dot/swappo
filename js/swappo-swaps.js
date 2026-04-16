@@ -115,14 +115,9 @@
       });
     } catch (e) { console.warn('[propose] notify receiver failed:', e.message || e); }
 
-    // Local toast for the proposer
-    if (global.DemoNotifications) {
-      global.DemoNotifications.add({
-        type: 'swap_proposed',
-        title: isPurchase ? 'Offer Sent!' : 'Swap Proposed!',
-        message: 'Your proposal is awaiting reply.',
-        created_at: new Date().toISOString()
-      });
+    // Local toast for the proposer — bell will pick up the notification row.
+    if (global.Toast) {
+      global.Toast.show(isPurchase ? 'Offer sent — awaiting reply.' : 'Swap proposed — awaiting reply.', 'success');
     }
     return { success: true, swap: data };
   }
@@ -195,13 +190,8 @@
       });
     } catch (e) { console.warn('[respond] notify proposer failed:', e.message || e); }
 
-    if (global.DemoNotifications) {
-      global.DemoNotifications.add({
-        type: 'swap_accepted',
-        title: 'Swap Accepted!',
-        message: 'Identities revealed — open the chat to arrange your meetup.',
-        created_at: new Date().toISOString()
-      });
+    if (global.Toast) {
+      global.Toast.show('Swap accepted — open the chat to arrange your meetup.', 'success');
     }
     return { success: true, swap: updated, conversationId };
   }

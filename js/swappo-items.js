@@ -148,14 +148,9 @@
     const { data, error } = await global.db.from(TABLE).insert(row).select('*').single();
     if (error) return { success: false, error: error.message };
 
-    // Fire-and-forget notification
-    if (global.DemoNotifications) {
-      global.DemoNotifications.add({
-        type: 'item_published',
-        title: 'Item Published!',
-        message: `${row.brand} ${row.model}`.trim() + ' is now live on Swap Market.',
-        created_at: new Date().toISOString()
-      });
+    // Fire-and-forget toast
+    if (global.Toast) {
+      global.Toast.show(`${row.brand} ${row.model}`.trim() + ' is now live on Swap Market.', 'success');
     }
     return { success: true, item: data };
   }

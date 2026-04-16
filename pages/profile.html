@@ -1274,17 +1274,44 @@
                                 </div>
                             </div>
 
-                            <!-- Account Section -->
+                            <!-- Account Section — Change Password -->
                             <div class="settings-section">
-                                <h3><i class="fas fa-lock"></i> Account</h3>
-                                <button class="account-btn" onclick="DemoNotifications.showToast('Password change coming soon! (Demo mode)', 'info');">
-                                    <i class="fas fa-key"></i> Change Password
-                                </button>
-                                <button class="account-btn" onclick="DemoNotifications.showToast('2FA coming soon! (Demo mode)', 'info');">
-                                    <i class="fas fa-shield-alt"></i> Two-Factor Authentication
-                                </button>
-                                <button class="account-btn danger" onclick="DemoNotifications.showToast('Contact support@swappo.ae to delete your account.', 'warning');">
-                                    <i class="fas fa-trash"></i> Delete Account
+                                <h3><i class="fas fa-key"></i> <span data-i18n="settings_change_pwd">Change password</span></h3>
+                                <div id="change-pwd-form" style="display:grid;gap:10px;max-width:420px;">
+                                    <label style="font-size:12px;color:var(--text-muted);" data-i18n="settings_current_pwd">Current password</label>
+                                    <input type="password" id="pwd-current" autocomplete="current-password" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                                    <label style="font-size:12px;color:var(--text-muted);" data-i18n="settings_new_pwd">New password</label>
+                                    <input type="password" id="pwd-new" autocomplete="new-password" minlength="8" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                                    <label style="font-size:12px;color:var(--text-muted);" data-i18n="settings_confirm_pwd">Confirm new password</label>
+                                    <input type="password" id="pwd-confirm" autocomplete="new-password" minlength="8" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                                    <button id="save-pwd-btn" type="button" class="account-btn" style="margin-top:6px;">
+                                        <i class="fas fa-key"></i> <span data-i18n="settings_change_pwd">Change password</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Recovery Contact Section -->
+                            <div class="settings-section">
+                                <h3><i class="fas fa-life-ring"></i> <span data-i18n="settings_recovery_title">Recovery contact</span></h3>
+                                <div id="recovery-form" style="display:grid;gap:10px;max-width:420px;">
+                                    <label style="font-size:12px;color:var(--text-muted);" data-i18n="settings_recovery_email">Recovery email</label>
+                                    <input type="email" id="recovery-email" placeholder="name@example.com" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                                    <label style="font-size:12px;color:var(--text-muted);" data-i18n="settings_recovery_phone">Recovery phone</label>
+                                    <input type="tel" id="recovery-phone" placeholder="+971 5X XXX XXXX" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                                    <button id="save-recovery-btn" type="button" class="account-btn" style="margin-top:6px;">
+                                        <i class="fas fa-save"></i> <span data-i18n="settings_save">Save</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Delete Account Section -->
+                            <div class="settings-section">
+                                <h3 style="color:#DC2626;"><i class="fas fa-trash"></i> <span data-i18n="settings_delete_account">Delete my account</span></h3>
+                                <p style="font-size:13px;color:var(--text-muted);max-width:520px;line-height:1.5;margin:0 0 12px;" data-i18n="settings_delete_warning">
+                                    This action is irreversible. Your items, offers and chats will be removed from public view.
+                                </p>
+                                <button id="delete-account-btn" type="button" class="account-btn danger">
+                                    <i class="fas fa-trash"></i> <span data-i18n="settings_delete_account">Delete my account</span>
                                 </button>
                             </div>
                         </div>
@@ -1357,9 +1384,8 @@
     </div>
 
     <!-- Demo Engine -->
-    <script src="../js/mock-data.js"></script>
+    <script src="../js/constants.js"></script>
     <script src="../js/avatars.js"></script>
-    <script src="../js/demo-engine.js"></script>
     <script src="../js/animations.js"></script>
     <script src="../js/cookie-consent.js"></script>
     <script src="../js/i18n.js"></script>
@@ -1480,7 +1506,7 @@
             document.getElementById('tier-badge').innerHTML = '<span>' + currentTier.emoji + ' ' + currentTier.label + '</span>';
 
             // Pioneer badge — first 500 users on Supabase. We read the profile
-            // order rank via a small helper; DemoEarlyAdopter (localStorage
+            // order rank via a small helper; Demo*earlyadopter (localStorage
             // fixture) is no longer consulted. If Supabase ever exposes a
             // rank column (e.g. users.pioneer_rank <= 500) wire it here.
             var _isPioneer = false;  // TODO: compute from Supabase user order
@@ -1509,7 +1535,7 @@
                 return '<div class="badge-icon ' + (earned ? 'earned' : 'locked') + '" title="' + b.label + ' (' + b.min_swaps + ' swaps)">' + b.emoji + '</div>';
             }).join('');
 
-            // ── Badge tier display (pure helpers, no DemoBadges dependency) ──
+            // ── Badge tier display (pure helpers, no Demo*badges dependency) ──
             var _BADGE_TIERS_LEVEL = [
               { tier: 'newcomer', min: 0,  emoji: '🌱', name: 'Newcomer', color: '#10B981' },
               { tier: 'swapper',  min: 1,  emoji: '⭐', name: 'Swapper',  color: '#F59E0B' },
@@ -1720,7 +1746,7 @@
                 const title = (item.brand + ' ' + item.model).trim() || item.type;
                 const photo = (item.photos && item.photos[0]) || '';
                 // Supabase statuses: available/reserved/swapped/sold/removed
-                // DemoItems legacy: active/pending/swapped
+                // Demo*items legacy: active/pending/swapped
                 const itemStatus = item.status || 'available';
                 const statusClass = (itemStatus === 'active' || itemStatus === 'available') ? 'active'
                                    : (itemStatus === 'pending' || itemStatus === 'reserved') ? 'pending'
@@ -1938,39 +1964,39 @@
             async function cancelSwap(swapId) {
                 if (!confirm('Cancel this swap request?')) return;
                 if (!(window.SwappoSwaps && window.SwappoSwaps.cancel)) {
-                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
+                    Toast.show('Service unavailable.', 'error'); return;
                 }
                 var result = await window.SwappoSwaps.cancel(swapId);
-                if (result && result.success) { DemoNotifications.showToast('Swap cancelled', 'info'); renderSwapDashboard(); }
-                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
+                if (result && result.success) { Toast.show('Swap cancelled', 'info'); renderSwapDashboard(); }
+                else Toast.show((result && result.error) || 'Error', 'error');
             }
 
             async function acceptSwap(swapId) {
                 if (!(window.SwappoSwaps && window.SwappoSwaps.respond)) {
-                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
+                    Toast.show('Service unavailable.', 'error'); return;
                 }
                 var result = await window.SwappoSwaps.respond(swapId, true);
-                if (result && result.success) { DemoNotifications.showToast('Swap accepted! Identities revealed.', 'success'); renderSwapDashboard(); }
-                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
+                if (result && result.success) { Toast.show('Swap accepted! Identities revealed.', 'success'); renderSwapDashboard(); }
+                else Toast.show((result && result.error) || 'Error', 'error');
             }
 
             async function rejectSwap(swapId) {
                 if (!confirm('Decline this swap request?')) return;
                 if (!(window.SwappoSwaps && window.SwappoSwaps.respond)) {
-                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
+                    Toast.show('Service unavailable.', 'error'); return;
                 }
                 var result = await window.SwappoSwaps.respond(swapId, false);
-                if (result && result.success) { DemoNotifications.showToast('Swap declined', 'info'); renderSwapDashboard(); }
-                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
+                if (result && result.success) { Toast.show('Swap declined', 'info'); renderSwapDashboard(); }
+                else Toast.show((result && result.error) || 'Error', 'error');
             }
 
             async function rateSwap(swapId, stars) {
                 if (!(window.SwappoSwaps && window.SwappoSwaps.rate)) {
-                    DemoNotifications.showToast('Service unavailable.', 'error'); return;
+                    Toast.show('Service unavailable.', 'error'); return;
                 }
                 var result = await window.SwappoSwaps.rate(swapId, stars);
-                if (result && result.success) { DemoNotifications.showToast('Thanks for rating!', 'success'); renderSwapDashboard(); }
-                else DemoNotifications.showToast((result && result.error) || 'Error', 'error');
+                if (result && result.success) { Toast.show('Thanks for rating!', 'success'); renderSwapDashboard(); }
+                else Toast.show((result && result.error) || 'Error', 'error');
             }
 
             // Expose to inline onclick handlers
@@ -2253,9 +2279,9 @@
                       first.style.borderColor = '#09B1BA';
                       first.innerHTML = '<img src="' + processed.preview + '" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">';
                     }
-                    DemoNotifications.showToast('Photo ready — click Save Settings to apply.', 'info');
+                    Toast.show('Photo ready — click Save Settings to apply.', 'info');
                   } catch (err) {
-                    DemoNotifications.showToast('Could not process photo: ' + (err.message || 'unknown'), 'error');
+                    Toast.show('Could not process photo: ' + (err.message || 'unknown'), 'error');
                   }
                 });
               }
@@ -2302,10 +2328,10 @@
                 const newPseudo = document.getElementById('settings-pseudo').value.trim().toLowerCase();
                 const newPhoneRaw = document.getElementById('settings-phone').value.trim();
 
-                if (!newPseudo) { DemoNotifications.showToast('Username cannot be empty.', 'error'); return; }
-                if (!_pseudoOk) { DemoNotifications.showToast('Please choose an available username first.', 'error'); return; }
+                if (!newPseudo) { Toast.show('Username cannot be empty.', 'error'); return; }
+                if (!_pseudoOk) { Toast.show('Please choose an available username first.', 'error'); return; }
                 if (newPhoneRaw && !/^5[0-9]{8}$/.test(newPhoneRaw)) {
-                  DemoNotifications.showToast('UAE phone must be 5XXXXXXXX (9 digits).', 'error');
+                  Toast.show('UAE phone must be 5XXXXXXXX (9 digits).', 'error');
                   return;
                 }
 
@@ -2323,7 +2349,7 @@
                     );
                     avatarValue = url;
                   } catch (upErr) {
-                    DemoNotifications.showToast('Avatar upload failed — saving other fields.', 'error');
+                    Toast.show('Avatar upload failed — saving other fields.', 'error');
                   }
                 }
 
@@ -2339,10 +2365,10 @@
                   btn.disabled = false;
                   btn.innerHTML = origLabel;
                   if (!res.success) {
-                    DemoNotifications.showToast(res.error || 'Could not save.', 'error');
+                    Toast.show(res.error || 'Could not save.', 'error');
                     return;
                   }
-                  DemoNotifications.showToast('Settings saved.', 'success');
+                  Toast.show('Settings saved.', 'success');
                   // Refresh visible header
                   document.getElementById('profile-name').textContent = newName || ('@' + newPseudo);
                   const locEl = document.querySelector('#profile-location span');
@@ -2350,7 +2376,7 @@
                 } else {
                   btn.disabled = false;
                   btn.innerHTML = origLabel;
-                  DemoNotifications.showToast('Auth service unavailable — please refresh.', 'error');
+                  Toast.show('Auth service unavailable — please refresh.', 'error');
                 }
               });
             })();
@@ -2367,6 +2393,168 @@
                 window.location.href = 'login.html';
             });
 
+            // ── P1B: Change Password ─────────────────────────────────────
+            (function setupChangePassword() {
+              var btn = document.getElementById('save-pwd-btn');
+              if (!btn) return;
+              btn.addEventListener('click', async function () {
+                var cur = document.getElementById('pwd-current').value;
+                var np  = document.getElementById('pwd-new').value;
+                var cf  = document.getElementById('pwd-confirm').value;
+                if (!np || np.length < 8) {
+                  return (window.Toast || {error: function(m){alert(m);}}).error(
+                    (typeof t === 'function') ? t('reset_pwd_too_short') : 'Password must be at least 8 characters.'
+                  );
+                }
+                if (np !== cf) {
+                  return (window.Toast || {error: function(m){alert(m);}}).error(
+                    (typeof t === 'function') ? t('reset_pwd_mismatch') : 'Passwords do not match.'
+                  );
+                }
+                if (!window.db) return Toast.error('Auth service unavailable.');
+                btn.disabled = true;
+                try {
+                  // If current password provided, reauthenticate first so
+                  // the user cannot silently escalate via an abandoned session.
+                  if (cur) {
+                    var u = await window.db.auth.getUser();
+                    var email = u && u.data && u.data.user ? u.data.user.email : null;
+                    if (email) {
+                      var rec = await window.db.auth.signInWithPassword({ email: email, password: cur });
+                      if (rec.error) throw new Error('Current password is incorrect.');
+                    }
+                  }
+                  var res = await window.db.auth.updateUser({ password: np });
+                  if (res.error) throw res.error;
+                  document.getElementById('pwd-current').value = '';
+                  document.getElementById('pwd-new').value = '';
+                  document.getElementById('pwd-confirm').value = '';
+                  Toast.success((typeof t === 'function') ? t('settings_pwd_updated') : 'Password updated.');
+                } catch (err) {
+                  console.error('[profile.changePassword]', err);
+                  Toast.error(err.message || 'Failed to update password.');
+                } finally {
+                  btn.disabled = false;
+                }
+              });
+            })();
+
+            // ── P1B: Recovery Email/Phone ────────────────────────────────
+            (function setupRecovery() {
+              var btn = document.getElementById('save-recovery-btn');
+              if (!btn) return;
+              var emailEl = document.getElementById('recovery-email');
+              var phoneEl = document.getElementById('recovery-phone');
+
+              // Pre-fill existing values
+              (async function preload() {
+                if (!window.db) return;
+                try {
+                  var u = await window.db.auth.getUser();
+                  var uid = u && u.data && u.data.user ? u.data.user.id : null;
+                  if (!uid) return;
+                  var res = await window.db.from('users')
+                    .select('recovery_email,recovery_phone')
+                    .eq('id', uid).single();
+                  if (res.data) {
+                    emailEl.value = res.data.recovery_email || '';
+                    phoneEl.value = res.data.recovery_phone || '';
+                  }
+                } catch (e) { /* column may not exist on very old schemas */ }
+              })();
+
+              btn.addEventListener('click', async function () {
+                var email = emailEl.value.trim();
+                var phone = phoneEl.value.trim();
+                if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                  return Toast.error('Please enter a valid email.');
+                }
+                if (!window.db) return Toast.error('Service unavailable.');
+                btn.disabled = true;
+                try {
+                  var u = await window.db.auth.getUser();
+                  var uid = u && u.data && u.data.user ? u.data.user.id : null;
+                  if (!uid) throw new Error('Not authenticated.');
+                  var res = await window.db.from('users').update({
+                    recovery_email: email || null,
+                    recovery_phone: phone || null
+                  }).eq('id', uid);
+                  if (res.error) throw res.error;
+                  Toast.success((typeof t === 'function') ? t('settings_recovery_saved') : 'Recovery contact saved.');
+                } catch (err) {
+                  console.error('[profile.saveRecovery]', err);
+                  Toast.error(err.message || 'Failed to save recovery contact.');
+                } finally {
+                  btn.disabled = false;
+                }
+              });
+            })();
+
+            // ── P1B: Delete Account ──────────────────────────────────────
+            (function setupDeleteAccount() {
+              var btn = document.getElementById('delete-account-btn');
+              if (!btn) return;
+              btn.addEventListener('click', function () {
+                var warnMsg = (typeof t === 'function') ? t('settings_delete_warning') : 'This action is irreversible. Your items, offers and chats will be removed from public view.';
+                var promptMsg = (typeof t === 'function') ? t('settings_delete_type_confirm') : 'Type "DELETE" to confirm.';
+                var overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
+                var modal = document.createElement('div');
+                modal.style.cssText = 'background:#fff;border-radius:16px;max-width:420px;width:100%;padding:28px;box-shadow:0 20px 50px rgba(0,0,0,0.25);';
+                modal.innerHTML =
+                  '<h3 style="margin:0 0 10px;color:#DC2626;font-size:1.2rem;"><i class="fas fa-exclamation-triangle"></i> <span></span></h3>' +
+                  '<p style="margin:0 0 12px;color:var(--text-secondary);font-size:14px;line-height:1.5;"></p>' +
+                  '<p style="margin:0 0 10px;color:var(--text);font-size:13px;font-weight:600;"></p>' +
+                  '<input type="text" id="delete-confirm-input" autocomplete="off" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:18px;" placeholder="DELETE">' +
+                  '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+                    '<button id="delete-cancel-btn" class="account-btn" type="button" style="background:#F3F4F6;color:#171717;"></button>' +
+                    '<button id="delete-confirm-btn" class="account-btn danger" type="button" disabled style="opacity:0.5;cursor:not-allowed;"></button>' +
+                  '</div>';
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+                modal.querySelector('h3 span').textContent = (typeof t === 'function') ? t('settings_delete_account') : 'Delete my account';
+                modal.querySelector('p:nth-of-type(1)').textContent = warnMsg;
+                modal.querySelector('p:nth-of-type(2)').textContent = promptMsg;
+                modal.querySelector('#delete-cancel-btn').textContent = (typeof t === 'function') ? t('settings_delete_cancel') : 'Cancel';
+                modal.querySelector('#delete-confirm-btn').textContent = (typeof t === 'function') ? t('settings_delete_confirm_btn') : 'Delete account';
+
+                var input = modal.querySelector('#delete-confirm-input');
+                var confirmBtn = modal.querySelector('#delete-confirm-btn');
+                input.addEventListener('input', function () {
+                  var ok = input.value.trim() === 'DELETE';
+                  confirmBtn.disabled = !ok;
+                  confirmBtn.style.opacity = ok ? '1' : '0.5';
+                  confirmBtn.style.cursor = ok ? 'pointer' : 'not-allowed';
+                });
+                modal.querySelector('#delete-cancel-btn').addEventListener('click', function () {
+                  overlay.remove();
+                });
+                confirmBtn.addEventListener('click', async function () {
+                  if (!window.db) return Toast.error('Service unavailable.');
+                  confirmBtn.disabled = true;
+                  try {
+                    var u = await window.db.auth.getUser();
+                    var uid = u && u.data && u.data.user ? u.data.user.id : null;
+                    if (!uid) throw new Error('Not authenticated.');
+                    var res = await window.db.from('users').update({
+                      is_deleted: true,
+                      deleted_at: new Date().toISOString()
+                    }).eq('id', uid);
+                    if (res.error) throw res.error;
+                    try { await window.db.auth.signOut(); } catch (e) {}
+                    try { localStorage.removeItem('swappo_current_user'); } catch (e) {}
+                    Toast.success((typeof t === 'function') ? t('settings_delete_done') : 'Your account has been deleted.');
+                    setTimeout(function () { window.location.href = '../index.html'; }, 900);
+                  } catch (err) {
+                    console.error('[profile.deleteAccount]', err);
+                    Toast.error(err.message || 'Failed to delete account.');
+                    confirmBtn.disabled = false;
+                  }
+                });
+                setTimeout(function () { input.focus(); }, 50);
+              });
+            })();
+
             // ── Share Impact ─────────────────────────────────────────────
             window.shareImpact = function() {
                 var donations = document.getElementById('generous-donations-count').textContent;
@@ -2374,10 +2562,10 @@
                 var text = "I've given " + donations + " items on Swappo and saved ~" + co2 + " kg of CO2! 🌿\nJoin the community: swappo.ae #Swappo #CircularEconomy #UAE";
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(text).then(function() {
-                        DemoNotifications.showToast('Impact copied to clipboard! Share it on social media 📤', 'success');
+                        Toast.show('Impact copied to clipboard! Share it on social media 📤', 'success');
                     });
                 } else {
-                    DemoNotifications.showToast('Share: ' + text, 'info');
+                    Toast.show('Share: ' + text, 'info');
                 }
             };
 
@@ -2398,8 +2586,8 @@
             console.error('[profile] init failed —', err && err.stack ? err.stack : err);
             var _msg = (typeof t === 'function') ? t('err_load_profile') : 'Failed to load your profile. Please refresh.';
             if (window.Toast) Toast.error(_msg);
-            else if (window.DemoNotifications && DemoNotifications.showToast) {
-              try { DemoNotifications.showToast(_msg + ' (see console)', 'error'); } catch (e) {}
+            else if (Toast.show) {
+              try { Toast.show(_msg + ' (see console)', 'error'); } catch (e) {}
             }
           }
         });
@@ -2432,7 +2620,7 @@
         async function deleteItem(itemId) {
             if (!confirm('Delete this item?')) return;
             if (!(window.SwappoItems && window.db)) {
-                DemoNotifications.showToast('Service unavailable — please refresh.', 'error');
+                Toast.show('Service unavailable — please refresh.', 'error');
                 return;
             }
             try {
@@ -2446,30 +2634,30 @@
                     if (/pending or accepted swap/i.test(msg)) {
                         msg = 'This item is locked — someone has a pending swap or gift claim on it. Cancel/decline the swap first to delete.';
                     }
-                    DemoNotifications.showToast(msg, 'error');
+                    Toast.show(msg, 'error');
                     return;
                 }
             } catch (e) {
                 console.error('deleteItem error', e);
-                DemoNotifications.showToast('Could not delete.', 'error');
+                Toast.show('Could not delete.', 'error');
                 return;
             }
-            DemoNotifications.showToast('Item deleted.', 'success');
+            Toast.show('Item deleted.', 'success');
             location.reload();
         }
 
         async function unfavorite(itemId) {
             if (!(window.SwappoItems && window.db)) {
-                DemoNotifications.showToast('Service unavailable — please refresh.', 'error');
+                Toast.show('Service unavailable — please refresh.', 'error');
                 return;
             }
             try { await window.SwappoItems.toggleFavorite(itemId); }
             catch (e) {
                 console.error(e);
-                DemoNotifications.showToast('Could not remove favorite.', 'error');
+                Toast.show('Could not remove favorite.', 'error');
                 return;
             }
-            DemoNotifications.showToast('Removed from saved items.', 'info');
+            Toast.show('Removed from saved items.', 'info');
             location.reload();
         }
     </script>

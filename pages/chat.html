@@ -1123,7 +1123,7 @@
         </div>
         <div class="ch-header-actions">
           <button class="ch-deal-btn" id="dealToggleBtn" onclick="toggleDealPanel()"><i class="fas fa-handshake"></i> Deal</button>
-          <button onclick="DemoNotifications.showToast('Report submitted.','info')"><i class="fas fa-flag"></i></button>
+          <button onclick="Toast.show('Report submitted.','info')"><i class="fas fa-flag"></i></button>
         </div>
       </div>
 
@@ -1168,8 +1168,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="../js/mock-data.js"></script>
-  <script src="../js/demo-engine.js"></script>
+  <script src="../js/constants.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/register-sw.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1386,7 +1385,7 @@
       var o = c.other_user || {};
       var map = CONV_ITEM_MAP[c.id] || {};
       // Item comes from the conversation's joined `item` relation (SwappoChat
-      // embeds it via the Supabase select). No DemoItems fallback.
+      // embeds it via the Supabase select). No legacy-items fallback.
       var item = c.item || null;
       var photo = item && item.photos ? item.photos[0] : '';
       var status = map.status || 'accepted';
@@ -1584,13 +1583,13 @@
           '<span class="sc-option-price free">FREE</span>' +
         '</div>' +
         // DELIVERY: Coming Soon (Phase 2 — logistics partnerships not live yet)
-        '<div class="sc-option" onclick="DemoNotifications && DemoNotifications.showToast && DemoNotifications.showToast(\'Delivery launches soon — for now, arrange the hand-off in person via chat.\', \'info\')" style="opacity:0.7;cursor:default;">' +
+        '<div class="sc-option" onclick="Toast.show(\'Delivery launches soon — for now, arrange the hand-off in person via chat.\', \'info\')" style="opacity:0.7;cursor:default;">' +
           '<span class="sc-option-icon">🚚</span>' +
           '<div class="sc-option-text"><div class="sc-option-label">Swappo Delivery <span style="font-size:10px;background:#F59E0B;color:white;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;">SOON</span></div><div class="sc-option-desc">We pick up & deliver · Coming soon</div></div>' +
           '<span class="sc-option-price" style="color:#9CA3AF;">~25 AED</span>' +
         '</div>' +
         (isLargeItem ?
-        '<div class="sc-option" onclick="DemoNotifications && DemoNotifications.showToast && DemoNotifications.showToast(\'Find a Truck launches soon — Phase 2 partnership pending.\', \'info\')" style="opacity:0.7;cursor:default;">' +
+        '<div class="sc-option" onclick="Toast.show(\'Find a Truck launches soon — Phase 2 partnership pending.\', \'info\')" style="opacity:0.7;cursor:default;">' +
           '<span class="sc-option-icon">🚛</span>' +
           '<div class="sc-option-text"><div class="sc-option-label">Find a Truck <span style="font-size:10px;background:#F59E0B;color:white;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;">SOON</span></div><div class="sc-option-desc">For furniture & large items · Coming soon</div></div>' +
           '<span class="sc-option-price" style="color:#9CA3AF;">~80 AED</span>' +
@@ -1636,8 +1635,8 @@
         '<div class="dt-row" style="margin-top:8px;"><span>Driver: <strong>Ahmed K.</strong> ⭐ 4.9</span></div>' +
       '</div>' +
       '<div style="display:flex;gap:8px;margin-top:12px;">' +
-        '<button class="sc-btn outline" style="flex:1;" onclick="DemoNotifications.showToast(\'Chat with driver opening...\',\'info\')"><i class="fas fa-comment"></i> Message</button>' +
-        '<button class="sc-btn outline" style="flex:1;" onclick="DemoNotifications.showToast(\'Live tracking map opening...\',\'info\')"><i class="fas fa-map-marker-alt"></i> Track</button>' +
+        '<button class="sc-btn outline" style="flex:1;" onclick="Toast.show(\'Chat with driver opening...\',\'info\')"><i class="fas fa-comment"></i> Message</button>' +
+        '<button class="sc-btn outline" style="flex:1;" onclick="Toast.show(\'Live tracking map opening...\',\'info\')"><i class="fas fa-map-marker-alt"></i> Track</button>' +
       '</div>';
     return div;
   }
@@ -1671,8 +1670,8 @@
       '</div>' +
       '<p style="font-size:12px;color:#4A4A5A;margin-bottom:12px;">This item hasn\'t had new offers recently. A boost puts it at the top of the catalogue.</p>' +
       '<div style="display:flex;gap:8px;">' +
-        '<button class="sc-btn outline" style="flex:1;" onclick="DemoNotifications.showToast(\'24h Boost activated!\',\'success\')">5 AED · 24h</button>' +
-        '<button class="sc-btn primary" style="flex:1;" onclick="DemoNotifications.showToast(\'7-day Featured Boost!\',\'success\')">25 AED · 7d ⭐</button>' +
+        '<button class="sc-btn outline" style="flex:1;" onclick="Toast.show(\'24h Boost activated!\',\'success\')">5 AED · 24h</button>' +
+        '<button class="sc-btn primary" style="flex:1;" onclick="Toast.show(\'7-day Featured Boost!\',\'success\')">25 AED · 7d ⭐</button>' +
       '</div>';
     return div;
   }
@@ -1716,7 +1715,7 @@
 
     if (method === 'meet') {
       sendChatMessage(convId, '📍 I\'d like to meet in person for this exchange!');
-      DemoNotifications.showToast('Great! Choose a safe meetup spot below.', 'success');
+      Toast.show('Great! Choose a safe meetup spot below.', 'success');
       // Refresh the chat area (removes the exchange-method card since
       // deliveryChoice is now set) and the Deal Panel (shows Safe Spots
       // picker so the user can pick a meeting point).
@@ -1724,7 +1723,7 @@
       renderDealPanel(convId);
     } else if (method === 'delivery') {
       sendChatMessage(convId, '🚚 I\'d like Swappo Delivery for this exchange!');
-      DemoNotifications.showToast('Swappo Delivery selected! Estimated 25-40 AED.', 'success');
+      Toast.show('Swappo Delivery selected! Estimated 25-40 AED.', 'success');
       loadMessages(convId);
       // Show delivery tracker after delay
       setTimeout(function() {
@@ -1737,7 +1736,7 @@
       }, 2000);
     } else if (method === 'truck') {
       sendChatMessage(convId, '🚛 I need a truck for this item. Checking transporters...');
-      DemoNotifications.showToast('Opening Find a Truck...', 'info');
+      Toast.show('Opening Find a Truck...', 'info');
       loadMessages(convId);
       setTimeout(function() { window.open('transport.html', '_blank'); }, 500);
     }
@@ -1748,7 +1747,7 @@
     deliveryChoice[convId] = { me: 'delivery', resolved: true };
     _saveDeliveryChoice();
     sendChatMessage(convId, '✅ OK, let\'s go with Swappo Delivery!');
-    DemoNotifications.showToast('Both parties agreed on delivery!', 'success');
+    Toast.show('Both parties agreed on delivery!', 'success');
     loadMessages(convId);
     setTimeout(function() {
       if (activeConvId === convId) {
@@ -1764,7 +1763,7 @@
     deliveryChoice[convId] = { me: 'meet', resolved: true };
     _saveDeliveryChoice();
     sendChatMessage(convId, '📍 No worries, let\'s meet in person instead!');
-    DemoNotifications.showToast('Meeting in person it is!', 'info');
+    Toast.show('Meeting in person it is!', 'info');
     loadMessages(convId);
     renderDealPanel(convId);
   }
@@ -1789,7 +1788,7 @@
       if (remaining <= 0) {
         clearInterval(qrTimerInterval);
         if (timerEl) timerEl.textContent = 'Expired';
-        DemoNotifications.showToast('QR expired. Generate a new one.', 'info');
+        Toast.show('QR expired. Generate a new one.', 'info');
       }
     }, 1000);
   }
@@ -1797,7 +1796,7 @@
   async function confirmExchange(convId) {
     if (qrTimerInterval) clearInterval(qrTimerInterval);
     if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'completed';
-    DemoNotifications.showToast('🎉 Exchange confirmed! Thank you!', 'success');
+    Toast.show('🎉 Exchange confirmed! Thank you!', 'success');
 
     // Emit the system "exchange completed" as a real Supabase message so
     // both parties see it, not a synthetic row pushed into MOCK_CONVERSATIONS.
@@ -1827,7 +1826,7 @@
 
   function cancelQR() {
     if (qrTimerInterval) clearInterval(qrTimerInterval);
-    DemoNotifications.showToast('QR cancelled.', 'info');
+    Toast.show('QR cancelled.', 'info');
   }
 
   // ═══ RATING ═══
@@ -1838,8 +1837,8 @@
     stars.forEach(function(s, i) { s.textContent = i < n ? '★' : '☆'; s.style.color = i < n ? '#F59E0B' : '#D1D5DB'; });
   }
   function submitRating(convId) {
-    if (currentRating === 0) { DemoNotifications.showToast('Please select a rating.', 'info'); return; }
-    DemoNotifications.showToast('Thanks! You rated ' + currentRating + ' stars ⭐', 'success');
+    if (currentRating === 0) { Toast.show('Please select a rating.', 'info'); return; }
+    Toast.show('Thanks! You rated ' + currentRating + ' stars ⭐', 'success');
     currentRating = 0;
   }
 
@@ -2019,12 +2018,12 @@
   // ═══ DEAL ACTIONS ═══
   function acceptDeal(convId) {
     CONV_ITEM_MAP[convId].status = 'accepted';
-    DemoNotifications.showToast('Deal accepted! 🤝 You can now chat.', 'success');
+    Toast.show('Deal accepted! 🤝 You can now chat.', 'success');
     openConv(convId);
     renderSidebar();
   }
   function declineDeal(convId) {
-    DemoNotifications.showToast('Deal declined.', 'info');
+    Toast.show('Deal declined.', 'info');
     delete CONV_ITEM_MAP[convId];
     activeConvId = null;
     document.getElementById('chatEmpty').style.display = '';
@@ -2038,7 +2037,7 @@
   async function sendCounter(convId) {
     var msg = dealCashAmount > 0 ? 'Counter-offer: swap + ' + dealCashAmount + ' AED cash top-up' : 'I confirmed the current swap deal.';
     await sendChatMessage(convId, msg);
-    DemoNotifications.showToast('Counter-offer sent! 📨', 'success');
+    Toast.show('Counter-offer sent! 📨', 'success');
     await loadMessages(convId);
     await renderSidebar();
   }
@@ -2103,7 +2102,7 @@
     var spot = SAFE_SPOTS.find(function(s) { return s.id === selectedSpotId; });
     if (!spot) return;
     await sendChatMessage(activeConvId, '📍 Let\'s meet at: ' + spot.icon + ' ' + spot.name + ' (' + spot.area + ', ' + spot.emirate + ')');
-    DemoNotifications.showToast('Meetup location sent! ' + spot.icon, 'success');
+    Toast.show('Meetup location sent! ' + spot.icon, 'success');
     await loadMessages(activeConvId);
     selectedSpotId = null;
     var btn = document.getElementById('spotConfirmBtn');
@@ -2120,13 +2119,11 @@
 
     var res = await sendChatMessage(activeConvId, txt);
     if (!res.success) {
-      if (typeof DemoNotifications !== 'undefined') {
-        DemoNotifications.showToast(res.error || 'Could not send message.', 'error');
-      }
+      if (window.Toast) Toast.show(res.error || 'Could not send message.', 'error');
       return;
     }
-    if (res.wasFiltered && typeof DemoNotifications !== 'undefined') {
-      DemoNotifications.showToast('Contact info was filtered out for your safety.', 'warning');
+    if (res.wasFiltered && window.Toast) {
+      Toast.show('Contact info was filtered out for your safety.', 'warning');
     }
 
     // Realtime will echo the new message back. For Demo fallback, refresh manually.
@@ -2146,7 +2143,7 @@
 
   // ═══ INIT ═══
   async function chatInit() {
-    // Resolve via SwappoAuth (Supabase session). No DemoAuth fallback.
+    // Resolve via SwappoAuth (Supabase session). No legacy-auth fallback.
     // Retry once after 600ms to survive the session-restore race on cold
     // page load.
     async function _resolve() {

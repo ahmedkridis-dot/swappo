@@ -494,8 +494,8 @@
           <li><a href="impact.html" data-i18n="footer_about">About</a></li>
           <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
           <li><a href="recycle.html" data-i18n="recycle_nav">Recycle Hub</a></li>
-            <li><a href="#" data-i18n="footer_blog" onclick="event.preventDefault();if(window.DemoNotifications)DemoNotifications.showToast('Blog coming soon! 📝','info')">Blog</a></li>
-          <li><a href="#" data-i18n="footer_careers" onclick="event.preventDefault();if(window.DemoNotifications)DemoNotifications.showToast('Careers page coming soon! 💼','info')">Careers</a></li>
+            <li><a href="#" data-i18n="footer_blog" onclick="event.preventDefault();Toast.show('Blog coming soon! 📝','info')">Blog</a></li>
+          <li><a href="#" data-i18n="footer_careers" onclick="event.preventDefault();Toast.show('Careers page coming soon! 💼','info')">Careers</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -531,9 +531,8 @@
 </div>
 
 <!-- Demo Engine Scripts -->
-<script src="../js/mock-data.js"></script>
+<script src="../js/constants.js"></script>
 <script src="../js/avatars.js"></script>
-<script src="../js/demo-engine.js"></script>
 <script src="../js/animations.js"></script>
 <script src="../js/cookie-consent.js"></script>
 <script src="../js/i18n.js"></script>
@@ -1143,12 +1142,12 @@
       try { currentUser = await _resolveCurrentUser(); } catch (e) {}
     }
     if (!currentUser) {
-      DemoNotifications.showToast('Please sign in to buy.', 'info');
+      Toast.show('Please sign in to buy.', 'info');
       setTimeout(function() { window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href); }, 700);
       return;
     }
     if (currentItem.user_id === currentUser.id) {
-      DemoNotifications.showToast("You can't buy your own item.", 'warning');
+      Toast.show("You can't buy your own item.", 'warning');
       return;
     }
     var price = currentItem.price || 0;
@@ -1164,10 +1163,10 @@
       res = { success: false, error: 'Service unavailable — please refresh.' };
     }
     if (res && res.success === false) {
-      DemoNotifications.showToast(res.error || 'Could not send offer.', 'error');
+      Toast.show(res.error || 'Could not send offer.', 'error');
       return;
     }
-    DemoNotifications.showToast('Purchase offer sent for ' + price.toLocaleString() + ' AED! The seller will review it. \u2705', 'success');
+    Toast.show('Purchase offer sent for ' + price.toLocaleString() + ' AED! The seller will review it. \u2705', 'success');
     setTimeout(function() { window.location.href = 'profile.html'; }, 1200);
   }
   window.startBuy = startBuy;
@@ -1179,12 +1178,12 @@
       try { currentUser = await _resolveCurrentUser(); } catch (e) {}
     }
     if (!currentUser) {
-      DemoNotifications.showToast('Please sign in to make an offer.', 'info');
+      Toast.show('Please sign in to make an offer.', 'info');
       setTimeout(function() { window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href); }, 700);
       return;
     }
     if (currentItem.user_id === currentUser.id) {
-      DemoNotifications.showToast("You can't make an offer on your own item.", 'warning');
+      Toast.show("You can't make an offer on your own item.", 'warning');
       return;
     }
     var price = currentItem.price || 0;
@@ -1211,7 +1210,7 @@
 
   async function submitOffer() {
     var amount = parseInt(document.getElementById('offer-amount').value) || 0;
-    if (amount < 1) { DemoNotifications.showToast('Please enter a valid amount.', 'warning'); return; }
+    if (amount < 1) { Toast.show('Please enter a valid amount.', 'warning'); return; }
     if (!currentItem) return;
     var res;
     try {
@@ -1227,16 +1226,16 @@
       }
     } catch (e) {
       console.error('submitOffer error', e);
-      DemoNotifications.showToast('Could not send offer. Please try again.', 'error');
+      Toast.show('Could not send offer. Please try again.', 'error');
       return;
     }
     if (res && res.success === false) {
-      DemoNotifications.showToast(res.error || 'Could not send offer', 'error');
+      Toast.show(res.error || 'Could not send offer', 'error');
       return;
     }
     var modal = document.querySelector('div[style*="fixed"]');
     if (modal) modal.remove();
-    DemoNotifications.showToast('Offer of ' + amount.toLocaleString() + ' AED sent! The seller will review it. ✅', 'success');
+    Toast.show('Offer of ' + amount.toLocaleString() + ' AED sent! The seller will review it. ✅', 'success');
     setTimeout(function() { window.location.href = 'profile.html'; }, 1000);
   }
   window.submitOffer = submitOffer;
@@ -1250,7 +1249,7 @@
       try { currentUser = await _resolveCurrentUser(); } catch (e) {}
     }
     if (!currentUser) {
-      DemoNotifications.showToast('Please sign in to propose a swap.', 'info');
+      Toast.show('Please sign in to propose a swap.', 'info');
       setTimeout(function() {
         window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
       }, 700);
@@ -1258,7 +1257,7 @@
     }
     // Can't swap with yourself — defensive (button should already be hidden).
     if (currentItem && currentUser && currentItem.user_id === currentUser.id) {
-      DemoNotifications.showToast("You can't swap with yourself.", 'warning');
+      Toast.show("You can't swap with yourself.", 'warning');
       return;
     }
     // Profile must be complete (pseudo + avatar) before a user can interact
@@ -1268,7 +1267,7 @@
       if (window.SwappoAuth && window.SwappoAuth.needsOnboarding) {
         var needsOnboarding = await window.SwappoAuth.needsOnboarding();
         if (needsOnboarding) {
-          DemoNotifications.showToast('Finish setting up your profile first (pseudo + avatar).', 'info');
+          Toast.show('Finish setting up your profile first (pseudo + avatar).', 'info');
           setTimeout(function() { window.location.href = 'onboarding.html'; }, 900);
           return;
         }
@@ -1315,13 +1314,11 @@
       var myItems = [];
       if (window.SwappoItems && window.db) {
         myItems = await window.SwappoItems.getByUser(currentUser.id);
-      } else if (window.DemoItems && typeof DemoItems.getByUser === 'function') {
-        myItems = DemoItems.getByUser(currentUser.id);
       } else {
         throw new Error('Items service unavailable');
       }
 
-      // Accept 'available' (Supabase) and 'active' (legacy Demo). Exclude
+      // Accept 'available' (Supabase) and 'active' (legacy). Exclude
       // 'reserved' / 'swapped' / 'sold' / 'removed' / 'pending'.
       myItems = (myItems || []).filter(function (i) {
         var s = i.status || 'available';
@@ -1355,7 +1352,7 @@
       if (emptyState) emptyState.style.display = 'block';
       var msg = (typeof t === 'function') ? t('err_load_items') : 'Failed to load your items. Please try again.';
       if (window.Toast) Toast.error(msg);
-      else if (window.DemoNotifications) DemoNotifications.showToast(msg, 'error');
+      else Toast.show(msg, 'error');
     }
   }
 
@@ -1411,7 +1408,7 @@
     if (result && result.success !== false) {
       closeSwapModal();
       // v5: NO chat before acceptance — send notification only
-      DemoNotifications.showToast('Swap proposal sent! The seller will review your offer. ✅', 'success');
+      Toast.show('Swap proposal sent! The seller will review your offer. ✅', 'success');
       if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
 
       // Redirect to dashboard offers tab (not chat)

@@ -1,7 +1,7 @@
 /* ============================================
    Swappo — Supabase Client Configuration
    Phase 1: Auth only (signUp, signIn, signOut)
-   Items + chat still live in DemoAuth/localStorage.
+   Items + chat live in Supabase. localStorage only mirrors non-PII display state.
    ============================================ */
 
 // ---- Real Supabase project credentials (swappo.ae) ----
@@ -24,7 +24,7 @@ let db = null;
         realtime: { params: { eventsPerSecond: 10 } }
       });
     } else {
-      console.warn('[Swappo] Supabase CDN not loaded — SwappoAuth will fall back to DemoAuth.');
+      console.warn('[Swappo] Supabase CDN not loaded — SwappoAuth will be offline until page refresh.');
     }
   } catch (e) {
     console.error('[Swappo] Supabase init failed:', e);
@@ -51,11 +51,11 @@ const _authReady = new Promise((resolve) => { _authReadyResolve = resolve; });
 // getSession timeout of 3s, so total worst-case latency stays < 5s.
 setTimeout(() => { if (_authReadyResolve) { _authReadyResolve(null); _authReadyResolve = null; } }, 1500);
 
-// ---- DemoAuth mirror helpers ----
+// ---- legacy-auth mirror helpers ----
 // SwappoAuth writes the authenticated user into localStorage.swappo_current_user
-// in the shape that existing DemoAuth consumers expect. This lets the rest of
+// in the shape that existing legacy-auth consumers expect. This lets the rest of
 // the app (catalogue, product, chat, profile, navbar) keep calling
-// DemoAuth.getCurrentUser() without any change while passwords live only in
+// legacy-auth.getCurrentUser() without any change while passwords live only in
 // Supabase (never in localStorage).
 
 function _mirrorFromSupabase(user, profile) {
@@ -160,7 +160,7 @@ const SwappoAuth = {
       if (!data.session) {
         return { success: true, needsVerification: true, user: data.user };
       }
-      // Auto-confirmed: mirror into localStorage for DemoAuth compat.
+      // Auto-confirmed: mirror into localStorage for legacy-auth compat.
       // Profile fetch is non-blocking — if it stalls (network hiccup) we
       // still complete the signup flow and redirect the user.
       try {
@@ -208,7 +208,7 @@ const SwappoAuth = {
     }
   },
 
-  /** Sign out: clears Supabase session + the DemoAuth mirror. */
+  /** Sign out: clears Supabase session + the mirror. */
   signOut: async function () {
     try { if (db) await db.auth.signOut(); } catch (e) {}
     _clearMirror();
@@ -391,7 +391,7 @@ const SwappoAuth = {
     }
   },
 
-  /** Sync current session into the DemoAuth mirror. Call once on page load. */
+  /** Sync current session into the mirror. Call once on page load. */
   syncMirror: async function () {
     if (!db) return null;
     try { await _authReady; } catch (e) {}

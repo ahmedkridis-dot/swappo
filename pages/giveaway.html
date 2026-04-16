@@ -979,7 +979,7 @@
               <li><a href="impact.html" data-i18n="footer_about">About</a></li>
               <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
               <li><a href="recycle.html" data-i18n="recycle_nav">Recycle Hub</a></li>
-              <li><a href="#" data-i18n="footer_blog" onclick="event.preventDefault();if(window.DemoNotifications)DemoNotifications.showToast('Blog coming soon! 📝','info')">Blog</a></li>
+              <li><a href="#" data-i18n="footer_blog" onclick="event.preventDefault();Toast.show('Blog coming soon! 📝','info')">Blog</a></li>
             </ul>
           </div>
           <div class="footer-col">
@@ -1018,8 +1018,7 @@
     </div>
 
     <!-- Demo Scripts -->
-    <script src="../js/mock-data.js"></script>
-    <script src="../js/demo-engine.js"></script>
+    <script src="../js/constants.js"></script>
     <script src="../js/animations.js"></script>
     <script src="../js/cookie-consent.js"></script>
     <script src="../js/i18n.js"></script>
@@ -1036,7 +1035,7 @@
         // Track claimed items in this session for UI updates
         const claimedItems = new Set();
 
-        // Supabase session resolver (no DemoAuth fallback — this page is 100%
+        // Supabase session resolver (no Demo*auth fallback — this page is 100%
         // backed by Supabase. If the session can't be read, the page falls
         // through to the guest overlay.)
         async function _getUser() {
@@ -1144,7 +1143,7 @@
             var title = (item.brand + ' ' + item.model).trim();
             var photo = (item.photos && item.photos[0]) || '';
             // Favorite state uses the SwappoItems in-memory cache populated at
-            // page load (getFavoriteIds). No DemoItems dependency.
+            // page load (getFavoriteIds). No Demo*items dependency.
             var fav = (window.SwappoItems && window.SwappoItems.isFavoritedSync)
               ? window.SwappoItems.isFavoritedSync(item.id)
               : false;
@@ -1199,7 +1198,7 @@
          *       (N = 1 for free, 5 for pro).
          */
         async function handleClaim(itemId, btnEl) {
-            // STEP 1 — Must be signed in (use the Supabase session, not DemoAuth)
+            // STEP 1 — Must be signed in (use the Supabase session, not Demo*auth)
             var user = await _getUser();
             if (!user) { window.location.href = 'login.html'; return; }
 
@@ -1237,11 +1236,11 @@
                 var { data: item, error: itErr } = await window.db
                     .from('items').select('id,user_id,is_giveaway,status')
                     .eq('id', itemId).maybeSingle();
-                if (itErr || !item) { DemoNotifications.showToast('This gift is no longer available.', 'error'); return; }
-                if (!item.is_giveaway) { DemoNotifications.showToast('This item is no longer a gift.', 'error'); return; }
-                if (item.user_id === user.id) { DemoNotifications.showToast("You can't claim your own gift.", 'warning'); return; }
+                if (itErr || !item) { Toast.show('This gift is no longer available.', 'error'); return; }
+                if (!item.is_giveaway) { Toast.show('This item is no longer a gift.', 'error'); return; }
+                if (item.user_id === user.id) { Toast.show("You can't claim your own gift.", 'warning'); return; }
                 if (item.status && item.status !== 'available') {
-                    DemoNotifications.showToast('This gift has already been claimed.', 'info'); return;
+                    Toast.show('This gift has already been claimed.', 'info'); return;
                 }
 
                 // 5) Insert the giveaway claim as a swap row
@@ -1272,7 +1271,7 @@
                     btnEl.innerHTML = '<i class="fas fa-check"></i> Claimed';
                 }
                 await updateClaimsCounter();
-                DemoNotifications.showToast('🎁 Gift claimed! The giver will contact you soon.', 'success');
+                Toast.show('🎁 Gift claimed! The giver will contact you soon.', 'success');
                 await updateKarmaBar(user);
                 showThankYouModal(itemId);
             } catch (err) {
@@ -1282,7 +1281,7 @@
                 if (msg.toLowerCase().indexOf('row-level security') !== -1 || msg.indexOf('42501') !== -1) {
                     msg = 'Not allowed — please sign in again and retry.';
                 }
-                DemoNotifications.showToast(msg, 'error');
+                Toast.show(msg, 'error');
             }
         }
         window.handleClaim = handleClaim;
@@ -1367,7 +1366,7 @@
 
         function sendThanks(btn) {
             var text = document.getElementById('thank-you-text').value.trim();
-            DemoNotifications.showToast(text ? 'Thanks sent to the giver! 💚' : 'Claimed! 🎉', 'success');
+            Toast.show(text ? 'Thanks sent to the giver! 💚' : 'Claimed! 🎉', 'success');
             btn.closest('div[style*="fixed"]').remove();
         }
 
@@ -1407,7 +1406,7 @@
                     nowFav = await window.SwappoItems.toggleFavorite(itemId);
                 }
             } catch (e) {
-                DemoNotifications.showToast('Could not update favorite — please sign in.', 'error');
+                Toast.show('Could not update favorite — please sign in.', 'error');
                 return;
             }
             if (nowFav) {
@@ -1497,7 +1496,7 @@
             items = await window.SwappoItems.getGiveaways();
           }
         } catch (e) { items = []; }
-        if (!items.length) { DemoNotifications.showToast('No gifts available right now!', 'info'); return; }
+        if (!items.length) { Toast.show('No gifts available right now!', 'info'); return; }
         var item = items[Math.floor(Math.random() * items.length)];
         var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Gift';
         var photo = (item.photos && item.photos[0]) || '';
