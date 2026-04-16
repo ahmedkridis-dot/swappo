@@ -948,6 +948,17 @@
                 <h1 style="font-size:28px;font-weight:700;color:var(--navy,#1A1A2E);margin:0;" data-i18n="dashboard_title">Dashboard</h1>
                 <p style="font-size:14px;color:var(--gray-text,#6B7280);margin:4px 0 0;" id="dashboard-welcome">Welcome back</p>
             </div>
+
+            <!-- Notifications bell (populated by JS) — opens a dropdown listing
+                 unread notifications from public.notifications. -->
+            <div id="notifs-wrap" style="position:relative;margin-right:8px;">
+              <button id="notifs-bell" type="button" aria-label="Notifications"
+                style="position:relative;background:#fff;border:1px solid #E5E7EB;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:#1A1A2E;">
+                <i class="fas fa-bell"></i>
+                <span id="notifs-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#FF4B55;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;padding:0 5px;border-radius:9px;align-items:center;justify-content:center;"></span>
+              </button>
+              <div id="notifs-dropdown" style="display:none;position:absolute;right:0;top:48px;min-width:320px;max-width:380px;max-height:420px;overflow-y:auto;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.12);z-index:90;"></div>
+            </div>
             <div style="display:flex;gap:10px;align-items:center;">
                 <button class="edit-profile-btn" onclick="document.querySelector('[data-tab=settings]').click();">
                     <i class="fas fa-cog"></i> Settings
@@ -1864,12 +1875,17 @@
                 var receivedPending = received.filter(function(s) { return s.status === 'pending'; }).length;
                 var totalPending = sentPending + receivedPending;
 
-                // Update badge counts
-                document.getElementById('sent-count').textContent = sentPending > 0 ? sentPending : '';
-                document.getElementById('received-count').textContent = receivedPending > 0 ? receivedPending : '';
+                // Update badge counts (guard every element — some were
+                // removed when the Offers tabs were pruned).
+                var sentCountEl = document.getElementById('sent-count');
+                if (sentCountEl) sentCountEl.textContent = sentPending > 0 ? sentPending : '';
+                var receivedCountEl = document.getElementById('received-count');
+                if (receivedCountEl) receivedCountEl.textContent = receivedPending > 0 ? receivedPending : '';
                 var badge = document.getElementById('swap-badge');
-                if (totalPending > 0) { badge.textContent = totalPending; badge.style.display = 'inline-flex'; }
-                else { badge.style.display = 'none'; }
+                if (badge) {
+                    if (totalPending > 0) { badge.textContent = totalPending; badge.style.display = 'inline-flex'; }
+                    else { badge.style.display = 'none'; }
+                }
 
                 // Render sent
                 var sentList = document.getElementById('swap-sent-list');
@@ -1897,6 +1913,119 @@
             }
 
             await renderSwapDashboard();
+
+            // ── Notifications bell (reads public.notifications) ────────
+            // Shows a count badge on the bell and a dropdown list of unread
+            // notifications so the receiver of a swap/gift_claim/message
+            // sees the event without waiting for a manual refresh.
+            (async function setupNotifications() {
+              const bellEl = document.getElementById('notifs-bell');
+              const badgeEl = document.getElementById('notifs-badge');
+              const dropEl = document.getElementById('notifs-dropdown');
+              if (!bellEl || !badgeEl || !dropEl) return;
+
+              function _fmtKind(kind) {
+                return ({
+                  swap_proposed:  { icon: '🔄', label: 'New swap request' },
+                  offer_received: { icon: '💰', label: 'New offer' },
+                  swap_accepted:  { icon: '✅', label: 'Swap accepted' },
+                  gift_claimed:   { icon: '🎁', label: 'Someone claimed your gift' },
+                  new_message:    { icon: '💬', label: 'New message' }
+                }[kind]) || { icon: '🔔', label: kind };
+              }
+              function _timeAgo(iso) {
+                const s = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+                if (s < 60) return 'just now';
+                if (s < 3600) return Math.floor(s / 60) + 'm ago';
+                if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+                return Math.floor(s / 86400) + 'd ago';
+              }
+
+              async function loadNotifs() {
+                try {
+                  const { data } = await window.db.from('notifications')
+                    .select('*').eq('user_id', user.id).eq('is_read', false)
+                    .order('created_at', { ascending: false }).limit(20);
+                  const list = data || [];
+                  if (list.length > 0) {
+                    badgeEl.textContent = list.length > 99 ? '99+' : String(list.length);
+                    badgeEl.style.display = 'flex';
+                  } else {
+                    badgeEl.style.display = 'none';
+                  }
+                  if (list.length === 0) {
+                    dropEl.innerHTML = '<div style="padding:32px;text-align:center;color:#9CA3AF;"><i class="fas fa-bell-slash" style="font-size:1.6rem;display:block;margin-bottom:8px;"></i>No new notifications</div>';
+                    return;
+                  }
+                  dropEl.innerHTML = list.map(function(n) {
+                    const k = _fmtKind(n.kind);
+                    return '<div data-nid="' + n.id + '" class="notif-row" style="padding:14px 16px;border-bottom:1px solid #F3F4F6;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'#F9FAFB\'" onmouseout="this.style.background=\'#fff\'">' +
+                      '<div style="display:flex;gap:10px;align-items:flex-start;">' +
+                        '<span style="font-size:22px;line-height:1;">' + k.icon + '</span>' +
+                        '<div style="flex:1;min-width:0;">' +
+                          '<div style="font-size:14px;font-weight:600;color:#1A1A2E;margin-bottom:2px;">' + k.label + '</div>' +
+                          '<div style="font-size:12px;color:#6B7280;">' + _timeAgo(n.created_at) + '</div>' +
+                        '</div>' +
+                      '</div></div>';
+                  }).join('') +
+                  '<div style="padding:10px;text-align:center;border-top:1px solid #E5E7EB;">' +
+                    '<button onclick="markAllNotifsRead()" style="background:none;border:none;color:#09B1BA;font-weight:600;cursor:pointer;font-size:13px;"><i class="fas fa-check-double"></i> Mark all as read</button>' +
+                  '</div>';
+
+                  // Click a row → mark it read + jump to the right page
+                  dropEl.querySelectorAll('.notif-row').forEach(function(row) {
+                    row.addEventListener('click', async function() {
+                      const nid = row.getAttribute('data-nid');
+                      const notif = list.find(function(x) { return x.id === nid; });
+                      try { await window.db.from('notifications').update({ is_read: true }).eq('id', nid); } catch (e) {}
+                      // Route by kind
+                      if (notif && (notif.kind === 'swap_proposed' || notif.kind === 'offer_received' || notif.kind === 'gift_claimed')) {
+                        // Switch to Swaps tab, Received sub-tab
+                        var swapsBtn = document.querySelector('[data-tab="swap-dashboard"]');
+                        if (swapsBtn) swapsBtn.click();
+                        var receivedBtn = document.querySelector('[data-swap-tab="received"]');
+                        if (receivedBtn) receivedBtn.click();
+                        dropEl.style.display = 'none';
+                      } else if (notif && notif.kind === 'swap_accepted') {
+                        window.location.href = 'chat.html';
+                      } else if (notif && notif.kind === 'new_message') {
+                        window.location.href = 'chat.html';
+                      }
+                    });
+                  });
+                } catch (err) { console.warn('[notifs]', err); }
+              }
+
+              window.markAllNotifsRead = async function() {
+                try {
+                  await window.db.from('notifications').update({ is_read: true })
+                    .eq('user_id', user.id).eq('is_read', false);
+                  loadNotifs();
+                } catch (e) {}
+              };
+
+              bellEl.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const open = dropEl.style.display !== 'none';
+                dropEl.style.display = open ? 'none' : 'block';
+                if (!open) loadNotifs();
+              });
+              document.addEventListener('click', function(e) {
+                if (!dropEl.contains(e.target) && !bellEl.contains(e.target)) dropEl.style.display = 'none';
+              });
+
+              // Initial load + realtime: any new notif for this user updates the badge.
+              await loadNotifs();
+              try {
+                const ch = window.db.channel('notifs:' + user.id)
+                  .on('postgres_changes', {
+                    event: '*', schema: 'public', table: 'notifications',
+                    filter: 'user_id=eq.' + user.id
+                  }, loadNotifs)
+                  .subscribe();
+                window.addEventListener('beforeunload', function() { try { ch.unsubscribe(); } catch (e) {} });
+              } catch (e) { console.warn('[notifs] realtime subscribe failed', e); }
+            })();
 
             // ── TAB: Saved Items ─────────────────────────────────────────
             const savedGrid = document.getElementById('saved-items-grid');
