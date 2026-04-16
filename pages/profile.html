@@ -297,6 +297,43 @@
         .product-status.pending { background: rgba(255,152,0,0.9); }
         .product-status.swapped { background: rgba(76,175,80,0.9); }
 
+        /* Pending-offer badge on a My Items card — tells the owner someone
+           wants their item. Clicking it should jump to Swaps → Received. */
+        .pending-offer-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #FF4B55;
+            color: #fff;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            box-shadow: 0 4px 10px rgba(255,75,85,0.35);
+            animation: pending-pulse 1.8s infinite ease-in-out;
+            cursor: pointer;
+        }
+        @keyframes pending-pulse {
+            0%,100% { transform: scale(1); }
+            50%     { transform: scale(1.06); }
+        }
+
+        /* Global loading skeleton (shimmer) — used on initial dashboard load
+           so the page doesn't flash blank cards before Supabase responds. */
+        .sk {
+            background: linear-gradient(90deg, #EEF1F4 0%, #F8FAFC 50%, #EEF1F4 100%);
+            background-size: 200% 100%;
+            animation: sk-shimmer 1.25s infinite;
+            border-radius: 8px;
+            color: transparent;
+        }
+        @keyframes sk-shimmer {
+            0%   { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        .sk-line { display: block; height: 14px; margin: 6px 0; }
+        .sk-block { display: block; height: 180px; }
+
         .product-info { padding: 14px; }
 
         .product-title {
@@ -1065,7 +1102,11 @@
                 <!-- ========== TAB: MY ITEMS ========== -->
                 <div class="tab-content active" id="my-items">
                     <div class="items-grid reveal" id="my-items-grid">
-                        <!-- Dynamically populated -->
+                        <!-- Skeleton placeholder while Supabase responds.
+                             Replaced by real cards inside renderMyItems(). -->
+                        <div class="product-card"><div class="product-image sk sk-block"></div><div class="product-info"><span class="sk sk-line" style="width:70%;"></span><span class="sk sk-line" style="width:40%;"></span></div></div>
+                        <div class="product-card"><div class="product-image sk sk-block"></div><div class="product-info"><span class="sk sk-line" style="width:60%;"></span><span class="sk sk-line" style="width:35%;"></span></div></div>
+                        <div class="product-card"><div class="product-image sk sk-block"></div><div class="product-info"><span class="sk sk-line" style="width:80%;"></span><span class="sk sk-line" style="width:45%;"></span></div></div>
                     </div>
                 </div>
 
@@ -1638,6 +1679,19 @@
             }
 
             // ── TAB: My Items ────────────────────────────────────────────
+            // Pre-fetch the count of pending swaps that target each of my
+            // items so we can show a "N pending offer(s)" badge and hint
+            // the owner that action is needed. One round-trip, small payload.
+            var pendingByItem = {};
+            try {
+                const { data: pendingRows } = await window.db.from('swaps')
+                    .select('receiver_item_id')
+                    .eq('receiver_id', user.id).eq('status', 'pending');
+                (pendingRows || []).forEach(function(r) {
+                    if (r.receiver_item_id) pendingByItem[r.receiver_item_id] = (pendingByItem[r.receiver_item_id] || 0) + 1;
+                });
+            } catch (e) { /* best-effort — badges just won't show */ }
+
             const itemsGrid = document.getElementById('my-items-grid');
             let itemsHTML = '';
             userItems.forEach(item => {
@@ -1650,11 +1704,16 @@
                                    : (itemStatus === 'pending' || itemStatus === 'reserved') ? 'pending'
                                    : 'swapped';
                 const statusLabel = itemStatus.charAt(0).toUpperCase() + itemStatus.slice(1);
+                const pendingCount = pendingByItem[item.id] || 0;
+                const pendingBadge = pendingCount > 0
+                    ? '<span class="pending-offer-badge" onclick="event.stopPropagation(); document.querySelector(\'[data-tab=swap-dashboard]\').click(); setTimeout(function(){var b=document.querySelector(\'[data-swap-tab=received]\');if(b)b.click();},50);">🔔 ' + pendingCount + ' pending offer' + (pendingCount > 1 ? 's' : '') + '</span>'
+                    : '';
 
                 itemsHTML += '<div class="product-card">' +
                     '<div class="product-image">' +
                         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '') +
                         '<span class="product-status ' + statusClass + '">' + statusLabel + '</span>' +
+                        pendingBadge +
                     '</div>' +
                     '<div class="product-info">' +
                         '<div class="product-title">' + title + '</div>' +
@@ -1674,7 +1733,7 @@
                 '<i class="fas fa-plus"></i>' +
                 '<p>Drop a new item</p>' +
             '</div>';
-            itemsGrid.innerHTML = itemsHTML;
+            itemsGrid.innerHTML = itemsHTML;  // replaces the skeleton
 
             // ── TAB: SWAP DASHBOARD ────────────────────────────────────────
             // (Legacy "Offers Received / Offers Sent" tab rendering removed
@@ -2351,20 +2410,27 @@
 
         async function deleteItem(itemId) {
             if (!confirm('Delete this item?')) return;
-            if (window.SwappoItems && window.db) {
-                try {
-                    const res = await window.SwappoItems.remove(itemId);
-                    if (res && res.success === false) {
-                        DemoNotifications.showToast(res.error || 'Could not delete.', 'error');
-                        return;
+            if (!(window.SwappoItems && window.db)) {
+                DemoNotifications.showToast('Service unavailable — please refresh.', 'error');
+                return;
+            }
+            try {
+                const res = await window.SwappoItems.remove(itemId);
+                if (res && res.success === false) {
+                    var msg = res.error || 'Could not delete.';
+                    // Migration 006 (2026-04-16) blocks deletion when the item
+                    // is referenced by a pending or accepted swap — anti-fraud
+                    // protection so donors can't make a gift disappear once
+                    // someone has claimed it.
+                    if (/pending or accepted swap/i.test(msg)) {
+                        msg = 'This item is locked — someone has a pending swap or gift claim on it. Cancel/decline the swap first to delete.';
                     }
-                } catch (e) {
-                    console.error('deleteItem error', e);
-                    DemoNotifications.showToast('Could not delete.', 'error');
+                    DemoNotifications.showToast(msg, 'error');
                     return;
                 }
-            } else {
-                DemoNotifications.showToast('Service unavailable — please refresh.', 'error');
+            } catch (e) {
+                console.error('deleteItem error', e);
+                DemoNotifications.showToast('Could not delete.', 'error');
                 return;
             }
             DemoNotifications.showToast('Item deleted.', 'success');
