@@ -41,6 +41,10 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
+        @keyframes sk-shimmer {
+            0%   { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
 
         .giveaway-hero h1 {
             font-size: 42px;
@@ -1044,7 +1048,15 @@
 
         document.addEventListener('DOMContentLoaded', async function() {
           try {
-            const user = await _getUser();
+            // Retry once to survive the Supabase session-restore race on
+            // cold page load — same pattern as profile.html / chat.html.
+            // Without this the user sees the "Sign up" guest overlay even
+            // though they're already signed in.
+            let user = await _getUser();
+            if (!user) {
+                await new Promise(function(r) { setTimeout(r, 600); });
+                user = await _getUser();
+            }
             const badgeRequired = document.getElementById('badge-required');
             const giveawayContent = document.getElementById('giveaway-content');
             const itemsArea = document.getElementById('items-area');
@@ -1093,6 +1105,10 @@
             const grid = document.getElementById('giveaway-grid');
             if (!grid) return;
 
+            // Loading skeleton while we wait for Supabase — 4 shimmer cards.
+            grid.innerHTML =
+                '<div class="giveaway-card"><div class="giveaway-card-image" style="background:linear-gradient(90deg,#EEF1F4,#F8FAFC,#EEF1F4);background-size:200% 100%;animation:sk-shimmer 1.25s infinite;"></div></div>'.repeat(4);
+
             let items = [];
             if (window.SwappoItems && window.db && window.SwappoItems.getGiveaways) {
                 try { items = await window.SwappoItems.getGiveaways(); } catch (e) { items = []; }
@@ -1106,7 +1122,13 @@
             }
 
             if (items.length === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">No giveaway items found in this category.</div>';
+                grid.innerHTML =
+                  '<div style="grid-column:1/-1;text-align:center;padding:64px 24px;color:#6B7280;background:#F9FAFB;border:1px dashed #E5E7EB;border-radius:16px;">' +
+                    '<div style="font-size:56px;margin-bottom:14px;">🎁</div>' +
+                    '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">No gifts available right now</h3>' +
+                    '<p style="font-size:14px;color:#6B7280;margin:0 0 18px;max-width:380px;margin-left:auto;margin-right:auto;">Be the first to share — donate an item and help start the Gift Corner!</p>' +
+                    '<a href="publier.html" style="display:inline-block;background:#09B1BA;color:#fff;padding:10px 22px;border-radius:999px;font-weight:700;text-decoration:none;font-size:14px;">Drop a gift →</a>' +
+                  '</div>';
                 return;
             }
 
