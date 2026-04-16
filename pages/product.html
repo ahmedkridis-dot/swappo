@@ -616,7 +616,7 @@
         console.warn('[_resolveOwner] query failed:', e.message || e);
       }
     }
-    return window.getMockUserById ? getMockUserById(userId) : null;
+    return null;
   }
   async function _resolveItem(itemId) {
     if (!(window.SwappoItems && window.db)) return null;

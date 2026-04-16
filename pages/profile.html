@@ -1469,8 +1469,12 @@
 
             document.getElementById('tier-badge').innerHTML = '<span>' + currentTier.emoji + ' ' + currentTier.label + '</span>';
 
-            // Pioneer badge
-            if (window.DemoEarlyAdopter && DemoEarlyAdopter.isPioneer(user.id)) {
+            // Pioneer badge — first 500 users on Supabase. We read the profile
+            // order rank via a small helper; DemoEarlyAdopter (localStorage
+            // fixture) is no longer consulted. If Supabase ever exposes a
+            // rank column (e.g. users.pioneer_rank <= 500) wire it here.
+            var _isPioneer = false;  // TODO: compute from Supabase user order
+            if (_isPioneer) {
               var pioneerBadge = document.createElement('span');
               pioneerBadge.className = 'tier-badge pioneer-badge';
               pioneerBadge.innerHTML = '🚀 Pioneer';

@@ -745,11 +745,21 @@
 
       animateEls.forEach(function(el) { animObserver.observe(el); });
 
-      // User count
-      var countEl = document.getElementById('impact-user-count');
-      if (countEl && window.DemoEarlyAdopter) {
-        countEl.textContent = DemoEarlyAdopter.getCount() || 500;
-      }
+      // User count — reads the current size of public.users via Supabase.
+      // Falls back to 500 (launch-period placeholder) if the fetch fails or
+      // Supabase isn't yet configured on the page.
+      (async function() {
+        var countEl = document.getElementById('impact-user-count');
+        if (!countEl) return;
+        countEl.textContent = 500;  // optimistic default
+        try {
+          if (window.db) {
+            var { count } = await window.db.from('users')
+              .select('id', { count: 'exact', head: true });
+            if (typeof count === 'number') countEl.textContent = Math.max(500, count);
+          }
+        } catch (e) { /* keep default */ }
+      })();
     })();
   </script>
 </body>

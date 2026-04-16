@@ -1645,30 +1645,11 @@
     if (method === 'meet') {
       sendChatMessage(convId, '📍 I\'d like to meet in person for this exchange!');
       DemoNotifications.showToast('Great! Choose a safe meetup spot.', 'success');
-
-      // Simulate the other party choosing delivery (conflict scenario)
-      setTimeout(function() {
-        if (activeConvId === convId) {
-          var mockConv = (MOCK_CONVERSATIONS || []).find(function(c) { return c.id === convId; });
-          if (mockConv) {
-            mockConv.messages.push({
-              id: 'msg_conflict_' + Date.now(),
-              sender_id: mockConv.other_user ? mockConv.other_user.id : 'user-2',
-              content: '🚚 I\'d actually prefer delivery, if that\'s OK?',
-              created_at: new Date().toISOString(),
-              is_system: false
-            });
-          }
-          loadMessages(convId);
-          // Show conflict card after small delay
-          setTimeout(function() {
-            var area = document.getElementById('msgArea');
-            var typing = document.getElementById('typingIndicator');
-            area.insertBefore(createConflictCard(convId, 'delivery'), typing);
-            area.scrollTop = area.scrollHeight;
-          }, 800);
-        }
-      }, 2500);
+      // NOTE: the old Demo path here injected a fake "other party prefers
+      // delivery" reply into MOCK_CONVERSATIONS to showcase the conflict
+      // card. Now that chat is 100% Supabase, the conflict card renders
+      // naturally when the other party's message arrives via the realtime
+      // channel (no client-side simulation needed).
     } else if (method === 'delivery') {
       sendChatMessage(convId, '🚚 I\'d like Swappo Delivery for this exchange!');
       DemoNotifications.showToast('Swappo Delivery selected! Estimated 25-40 AED.', 'success');
@@ -1739,23 +1720,24 @@
     }, 1000);
   }
 
-  function confirmExchange(convId) {
+  async function confirmExchange(convId) {
     if (qrTimerInterval) clearInterval(qrTimerInterval);
-    CONV_ITEM_MAP[convId].status = 'completed';
+    if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'completed';
     DemoNotifications.showToast('🎉 Exchange confirmed! Thank you!', 'success');
 
-    // Add system message
-    var mockConv = (MOCK_CONVERSATIONS || []).find(function(c) { return c.id === convId; });
-    if (mockConv) {
-      mockConv.messages.push({
-        id: 'msg_complete_' + Date.now(),
-        sender_id: 'system',
-        content: '🎉 Exchange completed successfully! Both parties confirmed.',
-        created_at: new Date().toISOString(),
-        is_system: true
-      });
-    }
-    loadMessages(convId);
+    // Emit the system "exchange completed" as a real Supabase message so
+    // both parties see it, not a synthetic row pushed into MOCK_CONVERSATIONS.
+    try {
+      if (window.db) {
+        await window.db.from('messages').insert({
+          conversation_id: convId,
+          sender_id: null,
+          content: '🎉 Exchange completed successfully! Both parties confirmed.',
+          is_system: true
+        });
+      }
+    } catch (e) { console.warn('[confirmExchange] system msg insert failed:', e); }
+    await loadMessages(convId);
 
     // Show rating card
     setTimeout(function() {
