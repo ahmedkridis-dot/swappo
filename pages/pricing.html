@@ -304,6 +304,7 @@
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
 
   <!-- Navbar -->
   <nav class="navbar">
@@ -318,7 +319,7 @@
           <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
           <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
         </div>
-        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </nav>
@@ -337,7 +338,7 @@
   </div>
 
   <!-- Hero -->
-  <section class="pricing-hero">
+  <section id="main" class="pricing-hero">
     <h1 data-i18n="pricing_hero_title">Swap for Free. Upgrade for Power.</h1>
     <p data-i18n="pricing_hero_subtitle">Unlimited swaps for everyone. Go Pro for visibility, analytics & more.</p>
     <div class="toggle-pills" style="margin-top:28px;">
@@ -543,6 +544,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="../js/supabase.js" defer></script>
   <script src="../js/toast.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/app.js" defer></script>
   <script src="../js/swappo-animations.js" defer></script>

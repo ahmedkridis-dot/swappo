@@ -1377,6 +1377,28 @@
     badge_decay_countdown: "دن آپ کا بیج محفوظ رکھنے کے لیے",
     badge_decay_downgraded: "غیر فعالیت کی وجہ سے بیج کم کر دیا گیا۔",
     badge_decay_keep: "اپنا درجہ برقرار رکھنے کے لیے فعال رہیں",
+    skip_to_content: "مواد تک جائیں",
+    action_close: "بند کریں",
+    action_open_menu: "مینو کھولیں",
+    action_back: "واپس",
+    action_send: "بھیجیں",
+    action_report: "رپورٹ",
+    action_favorite: "پسندیدہ میں شامل کریں",
+    action_delete: "حذف کریں",
+    action_share: "شیئر کریں",
+    action_copy: "کاپی",
+    action_next: "اگلا",
+    action_expand: "پھیلائیں",
+    action_collapse: "چھپائیں",
+    action_add: "شامل کریں",
+    action_remove: "ہٹائیں",
+    action_more: "مزید اختیارات",
+    action_filter: "فلٹر",
+    action_sort: "ترتیب",
+    action_add_photo: "تصویر شامل کریں",
+    action_search: "تلاش",
+    action_edit: "ترمیم"
+
   };
   if (typeof window.__SWAPPO_I18N_REGISTER__ === 'function') {
     window.__SWAPPO_I18N_REGISTER__('ur', dict);

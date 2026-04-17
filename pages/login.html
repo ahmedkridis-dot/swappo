@@ -342,6 +342,7 @@
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
   <h1 class="sr-only">Join the Swap — log in or create your Swappo account</h1>
 
   <!-- ========== NAVBAR ========== -->
@@ -360,7 +361,7 @@
           <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
         </div>
 
-        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </nav>
@@ -394,13 +395,13 @@
         <form class="auth-form" id="signup-phone-form" onsubmit="handlePhoneSignup(event)" style="margin-bottom:12px;">
           <div class="form-group">
             <label class="form-label" for="su-phone-name">Full name</label>
-            <input class="form-input" type="text" id="su-phone-name" name="name" placeholder="Ahmed Mohammed" required minlength="2" maxlength="50">
+            <input class="form-input" type="text" id="su-phone-name" name="name" placeholder="Ahmed Mohammed" required minlength="2" maxlength="50" autocomplete="tel">
           </div>
           <div class="form-group">
             <label class="form-label" for="su-phone">Phone number</label>
             <div class="phone-input-group">
               <span class="phone-prefix">🇦🇪 +971</span>
-              <input class="form-input" type="tel" id="su-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required>
+              <input class="form-input" type="tel" id="su-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required autocomplete="tel">
             </div>
             <span style="font-size:11px;color:#9CA3AF;margin-top:4px;display:block;">We'll send a 6-digit code via SMS</span>
           </div>
@@ -418,7 +419,7 @@
           </div>
 
           <div class="auth-checkbox" style="margin-top:10px;">
-            <input type="checkbox" id="su-phone-terms" required>
+            <input type="checkbox" id="su-phone-terms" required autocomplete="tel">
             <label for="su-phone-terms">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></label>
           </div>
 
@@ -437,18 +438,18 @@
         <form class="auth-form" id="signup-email-form" onsubmit="handleEmailSignup(event)" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed #E5E7EB;">
           <div class="form-group">
             <label class="form-label" for="su-email-name">Full name</label>
-            <input class="form-input" type="text" id="su-email-name" placeholder="Ahmed Mohammed" required minlength="2" maxlength="50">
+            <input class="form-input" type="text" id="su-email-name" placeholder="Ahmed Mohammed" required minlength="2" maxlength="50" autocomplete="email">
           </div>
           <div class="form-group">
             <label class="form-label" for="su-email">Email address</label>
-            <input class="form-input" type="email" id="su-email" placeholder="you@example.com" required>
+            <input class="form-input" type="email" id="su-email" placeholder="you@example.com" required autocomplete="email">
           </div>
           <div class="form-group">
             <label class="form-label" for="su-email-password">Password</label>
-            <input class="form-input" type="password" id="su-email-password" placeholder="At least 8 characters" minlength="8" required>
+            <input class="form-input" type="password" id="su-email-password" placeholder="At least 8 characters" minlength="8" required autocomplete="new-password">
           </div>
           <div class="auth-checkbox">
-            <input type="checkbox" id="su-email-terms" required>
+            <input type="checkbox" id="su-email-terms" required autocomplete="email">
             <label for="su-email-terms">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></label>
           </div>
           <button type="submit" class="auth-btn auth-btn-primary">Create account</button>
@@ -472,7 +473,7 @@
             <label class="form-label" for="li-phone">Phone number</label>
             <div class="phone-input-group">
               <span class="phone-prefix">🇦🇪 +971</span>
-              <input class="form-input" type="tel" id="li-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required>
+              <input class="form-input" type="tel" id="li-phone" placeholder="5X XXX XXXX" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required autocomplete="tel">
             </div>
           </div>
 
@@ -502,11 +503,11 @@
         <form class="auth-form" id="login-email-form" onsubmit="handleLogin(event)" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed #E5E7EB;">
           <div class="form-group">
             <label class="form-label" for="login-email">Email address</label>
-            <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" required>
+            <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" required autocomplete="email">
           </div>
           <div class="form-group">
             <label class="form-label" for="login-password">Password</label>
-            <input class="form-input" type="password" id="login-password" name="password" placeholder="Your password" required>
+            <input class="form-input" type="password" id="login-password" name="password" placeholder="Your password" required autocomplete="current-password">
           </div>
           <div class="auth-forgot">
             <a href="#">Forgot password?</a>
@@ -527,7 +528,7 @@
 
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
-    <div class="container">
+    <div id="main" class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="site-logo footer-brand-text">Swappo</div>
@@ -598,6 +599,7 @@
   <script src="../js/cookie-consent.js" defer></script>
   <script src="../js/i18n/en.js" defer></script>
   <script src="../js/i18n.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/register-sw.js" defer></script>
   <!-- Supabase Auth (Phase 1) — must load before supabase.js -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>

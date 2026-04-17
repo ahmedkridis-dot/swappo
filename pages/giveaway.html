@@ -755,6 +755,7 @@
     </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
     <h1 class="sr-only">Gift Corner — free items from the Swappo community</h1>
     <!-- Navbar -->
     <nav class="navbar">
@@ -771,7 +772,7 @@
             <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
             <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
           </div>
-          <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+          <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
         </div>
       </div>
     </nav>
@@ -829,7 +830,7 @@
     </section>
 
     <!-- Main Content -->
-    <main class="main-container">
+    <main id="main" class="main-container">
         <!-- Give to Unlock gate (shown for newcomers with 0 swaps AND 0 donations) -->
         <div id="badge-required" class="badge-required-message" style="display:none;">
             <div style="max-width:640px;margin:60px auto;text-align:center;padding:0 20px;">
@@ -1036,6 +1037,7 @@
     <script src="../js/supabase.js" defer></script>
     <script src="../js/swappo-items.js" defer></script>
     <script src="../js/toast.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
     <script src="../js/notifications-bell.js" defer></script>
     <script src="../js/app.js" defer></script>
     <script src="../js/swappo-animations.js" defer></script>
@@ -1515,7 +1517,7 @@
           '<div class="surprise-modal surprise-modal-card">' +
             '<button class="surprise-close" onclick="this.closest(\'.surprise-overlay\').remove()">&times;</button>' +
             '<div style="font-size:48px;margin-bottom:12px;">🎁</div>' +
-            (photo ? '<img src="' + photo + '" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px;">' : '') +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px;" alt="">' : '') +
             '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
             '<p style="font-size:13px;color:#9CA3AF;margin:0 0 4px;">FREE · ' + (item.category || '') + '</p>' +
             '<p style="font-size:12px;color:#6B7280;font-style:italic;margin:0 0 20px;">A gift that might make your day!</p>' +

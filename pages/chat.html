@@ -781,6 +781,9 @@
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(9,177,186,0.3);
   }
+  /* A11y: keyboard focus ring on the slider thumb (outline:none only on the track) */
+  .dp-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(9,177,186,0.4); }
+  .dp-slider:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgba(9,177,186,0.4); }
   .dp-amount { text-align: center; margin: 8px 0; }
   .dp-amount-val { font-size: 36px; font-weight: 800; color: #09B1BA; letter-spacing: -0.03em; }
   .dp-amount-cur { font-size: 14px; font-weight: 600; color: #6B7280; margin-left: 4px; }
@@ -1110,6 +1113,7 @@
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
   <h1 class="sr-only">SwapChat — in-app messaging on Swappo</h1>
   <!-- Navbar -->
   <nav class="navbar">
@@ -1121,7 +1125,7 @@
           <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
           <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
         </div>
-        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </nav>
@@ -1136,7 +1140,7 @@
           <h2>Messages</h2>
           <span class="sb-badge" id="totalUnread">0</span>
         </div>
-        <input class="sb-search" placeholder="Search conversations..." id="sbSearch" oninput="filterConversations()">
+        <input class="sb-search" placeholder="Search conversations..." id="sbSearch" oninput="filterConversations()" autocomplete="off">
       </div>
       <div class="sb-filters">
         <button class="sb-filter active" onclick="setSbFilter('all')">All</button>
@@ -1148,9 +1152,9 @@
     </aside>
 
     <!-- CENTER: Chat area -->
-    <main class="chat-center">
+    <main id="main" class="chat-center">
       <div class="ch-header" id="chatHeader" style="display:none;">
-        <button class="qa-btn" onclick="document.getElementById('chatSidebar').classList.add('open')" style="display:none;" id="mobileBackBtn"><i class="fas fa-arrow-left"></i></button>
+        <button class="qa-btn" onclick="document.getElementById('chatSidebar').classList.add('open')" style="display:none;" id="mobileBackBtn" aria-label="Back" data-i18n-aria-label="action_back"><i class="fas fa-arrow-left"></i></button>
         <div class="ch-header-avatar" id="chAvatar"></div>
         <div class="ch-header-info">
           <div class="ch-header-name" id="chName"></div>
@@ -1158,7 +1162,7 @@
         </div>
         <div class="ch-header-actions">
           <button class="ch-deal-btn" id="dealToggleBtn" onclick="toggleDealPanel()"><i class="fas fa-handshake"></i> Deal</button>
-          <button onclick="Toast.show('Report submitted.','info')"><i class="fas fa-flag"></i></button>
+          <button onclick="Toast.show('Report submitted.','info')" aria-label="Report" data-i18n-aria-label="action_report"><i class="fas fa-flag"></i></button>
         </div>
       </div>
 
@@ -1180,7 +1184,7 @@
       <div class="ch-input" id="inputBar" style="display:none;">
         <div class="ch-input-row">
           <input type="text" class="ch-text" id="chatInput" placeholder="Type a message...">
-          <button class="ch-send" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+          <button class="ch-send" id="sendBtn" disabled aria-label="Send" data-i18n-aria-label="action_send"><i class="fas fa-paper-plane"></i></button>
         </div>
         <div class="ch-hint"><i class="fas fa-shield-alt"></i> Contact info is filtered for safety</div>
       </div>
@@ -1215,6 +1219,7 @@
   <script src="../js/swappo-swaps.js" defer></script>
   <script src="../js/swappo-chat.js" defer></script>
   <script src="../js/toast.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/identity-card.js" defer></script>
   <script src="../js/offer-threading.js" defer></script>
@@ -1355,7 +1360,7 @@
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   }
-  // Allow only http(s) or data:image URLs for <img src=> — blocks javascript:/vbscript:/file:
+  // Allow only http(s) or data:image URLs for <img src= alt=""> — blocks javascript:/vbscript:/file:
   function safeImgUrl(u) {
     if (!u) return '';
     var s = String(u).trim();
@@ -2027,7 +2032,7 @@
         var meetHTML = '<div class="dp-meetup-wrap">' +
           '<div class="dp-section-title"><i class="fas fa-shield-alt" style="color:#09B1BA;"></i> Safe Meetup Spots</div>' +
           '<div class="dp-safety-tip"><i class="fas fa-lightbulb"></i> Always meet in a public, well-lit place.</div>' +
-          '<input type="text" class="dp-meetup-search" id="spotSearch" placeholder="Search malls, metro, cafés..." oninput="filterSpots()">' +
+          '<input type="text" class="dp-meetup-search" id="spotSearch" placeholder="Search malls, metro, cafés..." oninput="filterSpots()" autocomplete="off">' +
           '<div class="dp-meetup-cats" id="spotCats"></div>' +
           '<div class="dp-spots-list" id="spotsList"></div>' +
           '<button class="dp-spot-confirm" id="spotConfirmBtn" disabled onclick="confirmSpot()"><i class="fas fa-paper-plane"></i> Send Meetup Location</button>' +

@@ -126,6 +126,10 @@ function applyTranslations() {
     const key = el.getAttribute('data-i18n-title');
     if (key) el.title = t(key);
   });
+  document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+    const key = el.getAttribute('data-i18n-aria-label');
+    if (key) el.setAttribute('aria-label', t(key));
+  });
   document.querySelectorAll('[data-i18n-alt]').forEach(el => {
     const key = el.getAttribute('data-i18n-alt');
     if (key) el.alt = t(key);

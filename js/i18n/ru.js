@@ -1375,6 +1375,28 @@
     badge_decay_countdown: "дней, чтобы сохранить значок",
     badge_decay_downgraded: "Значок понижен из-за неактивности.",
     badge_decay_keep: "Оставайтесь активны, чтобы сохранить уровень",
+    skip_to_content: "Перейти к содержанию",
+    action_close: "Закрыть",
+    action_open_menu: "Открыть меню",
+    action_back: "Назад",
+    action_send: "Отправить",
+    action_report: "Пожаловаться",
+    action_favorite: "В избранное",
+    action_delete: "Удалить",
+    action_share: "Поделиться",
+    action_copy: "Копировать",
+    action_next: "Далее",
+    action_expand: "Развернуть",
+    action_collapse: "Свернуть",
+    action_add: "Добавить",
+    action_remove: "Удалить",
+    action_more: "Ещё",
+    action_filter: "Фильтр",
+    action_sort: "Сортировка",
+    action_add_photo: "Добавить фото",
+    action_search: "Поиск",
+    action_edit: "Редактировать"
+
   };
   if (typeof window.__SWAPPO_I18N_REGISTER__ === 'function') {
     window.__SWAPPO_I18N_REGISTER__('ru', dict);

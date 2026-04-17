@@ -592,6 +592,7 @@
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
   <h1 class="sr-only">Drop an Item — list your item on Swappo for swap, sale, or gift</h1>
 
   <!-- ========== NAVBAR ========== -->
@@ -610,7 +611,7 @@
           <a href="publier.html" class="btn btn-primary btn-sm" style="background: var(--primary-dark);" data-i18n="drop_item">Drop an Item</a>
         </div>
 
-        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </nav>
@@ -643,7 +644,7 @@
 
   <!-- ========== MAIN CONTENT ========== -->
   <div class="publish-page">
-    <div class="container">
+    <div id="main" class="container">
       <div class="publish-container">
         <!-- STEP INDICATOR -->
         <div class="step-indicator">
@@ -959,6 +960,7 @@
   <script src="../js/swappo-storage.js" defer></script>
   <script src="../js/swappo-items.js" defer></script>
   <script src="../js/toast.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/app.js" defer></script>
   <script src="../js/swappo-animations.js" defer></script>

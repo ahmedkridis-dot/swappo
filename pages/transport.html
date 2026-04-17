@@ -165,6 +165,7 @@
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
   <!-- Navbar (stays clear + interactive) -->
   <nav class="navbar">
     <div class="container">
@@ -178,7 +179,7 @@
           <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
           <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
         </div>
-        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </nav>
@@ -212,7 +213,7 @@
   <div id="mega-menu-mount"></div>
 
   <!-- ========== HERO ========== -->
-  <section class="transport-hero">
+  <section id="main" class="transport-hero">
     <div class="container">
       <div style="display:inline-block;background:#FEF3C7;color:#92400E;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:16px;letter-spacing:0.05em;text-transform:uppercase;">🚧 Coming Soon — Preview Only</div>
       <div style="font-size:48px;margin-bottom:16px;">🚛</div>
@@ -265,7 +266,7 @@
       </div>
       <p style="font-size:13px;opacity:0.75;margin-bottom:20px;">We're selecting our first transport partners. Leave your email to be notified.</p>
       <div class="notify-form">
-        <input type="email" id="notify-email" placeholder="your@email.com">
+        <input type="email" id="notify-email" placeholder="your@email.com" autocomplete="email">
         <button onclick="submitNotify()">Notify Me</button>
       </div>
     </div>
@@ -331,6 +332,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="../js/supabase.js" defer></script>
   <script src="../js/toast.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/mega-menu.js" defer></script>
   <script src="../js/swappo-animations.js" defer></script>

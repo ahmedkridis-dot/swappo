@@ -1398,6 +1398,28 @@
     badge_decay_countdown: "days to keep your badge",
     badge_decay_downgraded: "Badge downgraded due to inactivity.",
     badge_decay_keep: "Stay active to keep your tier",
+    skip_to_content: "Skip to content",
+    action_close: "Close",
+    action_open_menu: "Open menu",
+    action_back: "Back",
+    action_send: "Send",
+    action_report: "Report",
+    action_favorite: "Add to favorites",
+    action_delete: "Delete",
+    action_share: "Share",
+    action_copy: "Copy",
+    action_next: "Next",
+    action_expand: "Expand",
+    action_collapse: "Collapse",
+    action_add: "Add",
+    action_remove: "Remove",
+    action_more: "More options",
+    action_filter: "Filter",
+    action_sort: "Sort",
+    action_add_photo: "Add photo",
+    action_search: "Search",
+    action_edit: "Edit"
+
   };
   if (typeof window.__SWAPPO_I18N_REGISTER__ === 'function') {
     window.__SWAPPO_I18N_REGISTER__('en', dict);

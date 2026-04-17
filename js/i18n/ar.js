@@ -1378,6 +1378,28 @@
     badge_decay_countdown: "أيام للحفاظ على شارتك",
     badge_decay_downgraded: "تم تخفيض الشارة بسبب عدم النشاط.",
     badge_decay_keep: "ابقَ نشطاً للحفاظ على مستواك",
+    skip_to_content: "الانتقال إلى المحتوى",
+    action_close: "إغلاق",
+    action_open_menu: "فتح القائمة",
+    action_back: "رجوع",
+    action_send: "إرسال",
+    action_report: "إبلاغ",
+    action_favorite: "إضافة إلى المفضلة",
+    action_delete: "حذف",
+    action_share: "مشاركة",
+    action_copy: "نسخ",
+    action_next: "التالي",
+    action_expand: "توسيع",
+    action_collapse: "طي",
+    action_add: "إضافة",
+    action_remove: "إزالة",
+    action_more: "المزيد",
+    action_filter: "تصفية",
+    action_sort: "فرز",
+    action_add_photo: "إضافة صورة",
+    action_search: "بحث",
+    action_edit: "تعديل"
+
   };
   if (typeof window.__SWAPPO_I18N_REGISTER__ === 'function') {
     window.__SWAPPO_I18N_REGISTER__('ar', dict);

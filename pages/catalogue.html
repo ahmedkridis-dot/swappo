@@ -244,6 +244,7 @@
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
   <h1 class="sr-only">Swap Market — browse items available for swap, buy, or gift across the UAE</h1>
 
   <!-- ========== NAVBAR ========== -->
@@ -262,7 +263,7 @@
           <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
         </div>
 
-        <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+        <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
       </div>
     </div>
   </nav>
@@ -294,7 +295,7 @@
   </script>
 
   <!-- ========== LOCATION BAND (compact) ========== -->
-  <section class="hero-location-band compact" aria-label="Your location and search radius">
+  <section id="main" class="hero-location-band compact" aria-label="Your location and search radius">
     <div class="container">
       <div class="hero-location-inner">
         <div class="hero-location-left">
@@ -334,7 +335,7 @@
     <div class="filter-bar">
       <div class="search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" id="catalogue-search" placeholder="Search items..." data-i18n-placeholder="catalogue_search_placeholder">
+        <input type="text" id="catalogue-search" placeholder="Search items..." data-i18n-placeholder="catalogue_search_placeholder" autocomplete="off">
       </div>
 
       <select id="filter-category">
@@ -530,6 +531,7 @@
   <script src="../js/supabase.js" defer></script>
   <script src="../js/swappo-items.js" defer></script>
   <script src="../js/toast.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/stories.js" defer></script>
   <script src="../js/feed-tabs.js" defer></script>
@@ -1085,7 +1087,7 @@
           var score = Math.floor(75 + Math.random() * 20);
           return '<a href="product.html?id=' + item.id + '" style="flex-shrink:0;width:140px;text-decoration:none;">' +
             '<div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:12px;overflow:hidden;transition:all 0.3s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'">' +
-            (photo ? '<img src="' + photo + '" style="width:100%;height:100px;object-fit:cover;">' : '<div style="height:100px;background:#f5f5f5;"></div>') +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:100px;object-fit:cover;" alt="">' : '<div style="height:100px;background:#f5f5f5;"></div>') +
             '<div style="padding:8px;">' +
             '<div style="font-size:12px;font-weight:600;color:#1A1A2E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + title + '</div>' +
             '<div style="font-size:11px;color:#09B1BA;font-weight:600;">' + score + '% match</div>' +
@@ -1116,7 +1118,7 @@
         overlay.innerHTML =
           '<div class="surprise-modal surprise-modal-card">' +
             '<button class="surprise-close" onclick="this.closest(\'.surprise-overlay\').remove()">&times;</button>' +
-            (photo ? '<img src="' + photo + '" style="width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:16px;">' : '') +
+            (photo ? '<img src="' + photo + '" style="width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:16px;" alt="">' : '') +
             '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
             '<p style="font-size:13px;color:#9CA3AF;margin:0 0 20px;">' + (item.category || '') + ' · ' + (item.condition || '') + '</p>' +
             '<div style="display:flex;gap:10px;justify-content:center;">' +

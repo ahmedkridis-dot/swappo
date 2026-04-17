@@ -950,6 +950,7 @@
     </style>
 </head>
 <body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
     <!-- Navbar (standard structure for i18n compatibility) -->
     <nav class="navbar">
       <div class="container">
@@ -963,7 +964,7 @@
             <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
             <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
           </div>
-          <button class="navbar-toggle"><i class="fas fa-bars"></i></button>
+          <button class="navbar-toggle" aria-label="Open menu" data-i18n-aria-label="action_open_menu"><i class="fas fa-bars"></i></button>
         </div>
       </div>
     </nav>
@@ -982,7 +983,7 @@
   </div>
 
     <!-- ========== MAIN CONTAINER ========== -->
-    <div class="container" style="padding-top:24px;padding-bottom:40px;">
+    <div id="main" class="container" style="padding-top:24px;padding-bottom:40px;">
 
         <!-- ========== DASHBOARD HEADER (Figma style) ========== -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
@@ -1175,25 +1176,25 @@
                                     <!-- Pseudo -->
                                     <div>
                                         <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Username <span style="color:var(--text-muted);font-weight:400;">(public)</span></label>
-                                        <input type="text" id="settings-pseudo" maxlength="20" placeholder="e.g. ahmed_k" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                        <input type="text" id="settings-pseudo" maxlength="20" placeholder="e.g. ahmed_k" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="username">
                                         <span id="settings-pseudo-hint" style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">3–20 letters, numbers and underscores.</span>
                                     </div>
                                     <!-- Name -->
                                     <div>
                                         <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Full name <span style="color:var(--text-muted);font-weight:400;">(shown only after swap accepted)</span></label>
-                                        <input type="text" id="settings-name" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                        <input type="text" id="settings-name" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="name">
                                     </div>
                                     <!-- Email -->
                                     <div>
                                         <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Email <span style="color:var(--text-muted);font-weight:400;">(read-only)</span></label>
-                                        <input type="email" id="settings-email" disabled style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg-light);color:var(--text-muted);">
+                                        <input type="email" id="settings-email" disabled style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg-light);color:var(--text-muted);" autocomplete="email">
                                     </div>
                                     <!-- Phone -->
                                     <div>
                                         <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Phone <span style="color:var(--text-muted);font-weight:400;">(UAE 5XXXXXXXX)</span></label>
                                         <div style="display:flex;align-items:center;gap:8px;">
                                             <span style="padding:10px 12px;background:var(--bg-light);border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;color:var(--text);">🇦🇪 +971</span>
-                                            <input type="tel" id="settings-phone" maxlength="9" pattern="^5[0-9]{8}$" placeholder="5X XXX XXXX" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                            <input type="tel" id="settings-phone" maxlength="9" pattern="^5[0-9]{8}$" placeholder="5X XXX XXXX" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="tel">
                                         </div>
                                     </div>
                                     <!-- City -->
@@ -1302,9 +1303,9 @@
                                 <h3><i class="fas fa-life-ring"></i> <span data-i18n="settings_recovery_title">Recovery contact</span></h3>
                                 <div id="recovery-form" style="display:grid;gap:10px;max-width:420px;">
                                     <label style="font-size:12px;color:var(--text-muted);" data-i18n="settings_recovery_email">Recovery email</label>
-                                    <input type="email" id="recovery-email" placeholder="name@example.com" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                                    <input type="email" id="recovery-email" placeholder="name@example.com" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;" autocomplete="email">
                                     <label style="font-size:12px;color:var(--text-muted);" data-i18n="settings_recovery_phone">Recovery phone</label>
-                                    <input type="tel" id="recovery-phone" placeholder="+971 5X XXX XXXX" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;">
+                                    <input type="tel" id="recovery-phone" placeholder="+971 5X XXX XXXX" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;" autocomplete="tel">
                                     <button id="save-recovery-btn" type="button" class="account-btn" style="margin-top:6px;">
                                         <i class="fas fa-save"></i> <span data-i18n="settings_save">Save</span>
                                     </button>
@@ -1404,6 +1405,7 @@
     <script src="../js/swappo-swaps.js" defer></script>
     <script src="../js/swappo-chat.js" defer></script>
     <script src="../js/toast.js" defer></script>
+  <script src="../js/a11y-helpers.js" defer></script>
     <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/identity-card.js" defer></script>
   <script src="../js/offer-threading.js" defer></script>
