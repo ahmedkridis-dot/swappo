@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09B1BA">
   <meta name="robots" content="noindex, nofollow">
   <meta name="description" content="SwapChat — Swappo's in-app messaging for swappers. Negotiate, agree on meetup spots, and confirm exchanges safely in the UAE's first barter, gift & recycle platform.">
   <link rel="canonical" href="https://swappo.ae/pages/chat.html">
@@ -569,7 +570,7 @@
 
   /* Input Bar */
   .ch-input {
-    padding: 12px 16px 14px;
+    padding: 12px 16px max(14px, env(safe-area-inset-bottom));
     background: #fff;
     border-top: 1px solid #EDF0F3;
     flex-shrink: 0;
@@ -1088,6 +1089,8 @@
       transition: transform 0.3s ease;
       z-index: 700;
       display: flex;
+      /* A11y P1: iOS home indicator / Android gesture bar — respect bottom safe area */
+      padding-bottom: env(safe-area-inset-bottom);
     }
     .deal-panel.open {
       transform: translateY(0);
