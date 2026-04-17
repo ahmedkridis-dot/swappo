@@ -149,7 +149,7 @@
     .auth-btn {
       width: 100%; height: 48px; font-size: 0.95rem; font-weight: 600;
       border: none; border-radius: var(--radius-pill, 999px); cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     }
     .auth-btn-primary { background: var(--teal, #09B1BA); color: #fff; }
     .auth-btn-primary:hover { background: var(--teal-dark, #067A80); transform: translateY(-1px); box-shadow: var(--shadow-teal); }
@@ -170,7 +170,7 @@
       display: flex; align-items: center; justify-content: center; gap: 10px;
       height: 50px; border: 1px solid var(--gray-border, #E5E7EB); border-radius: var(--radius-md, 12px);
       background: #fff; font-size: 0.95rem; font-weight: 600; color: #1A1A2E;
-      cursor: pointer; transition: all 0.3s ease;
+      cursor: pointer; transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     }
     .auth-social-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
     .auth-social-btn i { font-size: 1.1rem; }
@@ -187,7 +187,7 @@
       display: flex; align-items: center; justify-content: center; gap: 10px;
       height: 50px; border: 2px solid var(--teal, #09B1BA); border-radius: var(--radius-md, 12px);
       background: transparent; font-size: 0.95rem; font-weight: 600; color: var(--teal, #09B1BA);
-      cursor: pointer; transition: all 0.3s ease; width: 100%;
+      cursor: pointer; transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; width: 100%;
     }
     .auth-email-btn:hover { background: rgba(9,177,186,0.05); transform: translateY(-1px); }
 
@@ -246,7 +246,7 @@
     .avatar-picker-btn {
       display: flex; align-items: center; gap: 12px;
       padding: 10px 16px; border: 2px dashed #EBEBEB; border-radius: 12px;
-      background: #FAFAFA; cursor: pointer; transition: all 0.2s;
+      background: #FAFAFA; cursor: pointer; transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
       width: 100%;
     }
     .avatar-picker-btn:hover { border-color: #09B1BA; background: #F0FBFC; }
@@ -292,7 +292,7 @@
     .avatar-option {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
       padding: 8px 6px; border-radius: 12px; border: 2px solid transparent;
-      cursor: pointer; transition: all 0.2s; background: none; width: 90px;
+      cursor: pointer; transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; background: none; width: 90px;
     }
     .avatar-option:hover { border-color: #09B1BA; background: #F0FBFC; }
     .avatar-option.selected {
@@ -310,7 +310,7 @@
     }
     .avatar-modal-footer button {
       padding: 10px 24px; border-radius: 8px; font-size: 0.9rem;
-      font-weight: 600; cursor: pointer; transition: all 0.2s; border: none;
+      font-weight: 600; cursor: pointer; transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; border: none;
     }
     .avatar-modal-cancel { background: #F5F5F5; color: #555; }
     .avatar-modal-cancel:hover { background: #EBEBEB; }
@@ -354,7 +354,7 @@
 
         <div class="navbar-search">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search items...">
+          <input type="text" placeholder="Search items…" autocomplete="off">
         </div>
 
         <div class="navbar-actions">

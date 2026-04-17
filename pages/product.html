@@ -355,7 +355,7 @@
       <a href="../index.html" class="site-logo">Swappo</a>
       <div class="navbar-search">
         <i class="fas fa-search"></i>
-        <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+        <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
       </div>
       <div class="navbar-actions">
 
@@ -387,9 +387,9 @@
     <span>&rsaquo;</span>
     <a href="catalogue.html">Swap Market</a>
     <span>&rsaquo;</span>
-    <span id="breadcrumb-category">...</span>
+    <span id="breadcrumb-category">…</span>
     <span>&rsaquo;</span>
-    <span id="breadcrumb-item">...</span>
+    <span id="breadcrumb-item">…</span>
   </div>
 </div>
 
@@ -411,7 +411,7 @@
     <div class="product-info">
       <!-- Product Header -->
       <div class="product-header">
-        <h1 class="product-title" id="product-title">...</h1>
+        <h1 class="product-title" id="product-title">…</h1>
         <div class="product-meta" id="product-meta"></div>
         <div class="swap-info" id="swap-info"></div>
       </div>
@@ -812,7 +812,7 @@
       actionsHTML += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="cash-chips">';
       [0, 25, 100, 200, 500].forEach(function(amt) {
         var label = amt === 0 ? 'No cash' : '+' + amt + ' AED';
-        actionsHTML += '<button class="' + (amt === 0 ? 'cash-chip-active' : '') + '" onclick="selectCashAmount(' + amt + ',this)" style="padding:6px 14px;border-radius:999px;border:2px solid ' + (amt === 0 ? 'var(--primary)' : '#E5E7EB') + ';background:' + (amt === 0 ? 'var(--primary)' : 'white') + ';color:' + (amt === 0 ? 'white' : '#333') + ';font-weight:600;font-size:12px;cursor:pointer;transition:all 0.2s;">' + label + '</button>';
+        actionsHTML += '<button class="' + (amt === 0 ? 'cash-chip-active' : '') + '" onclick="selectCashAmount(' + amt + ',this)" style="padding:6px 14px;border-radius:999px;border:2px solid ' + (amt === 0 ? 'var(--primary)' : '#E5E7EB') + ';background:' + (amt === 0 ? 'var(--primary)' : 'white') + ';color:' + (amt === 0 ? 'white' : '#333') + ';font-weight:600;font-size:12px;cursor:pointer;transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;">' + label + '</button>';
       });
       actionsHTML += '</div>';
       actionsHTML += '<input type="range" min="0" max="1000" step="5" value="0" id="cash-slider" style="width:100%;accent-color:var(--primary);margin:4px 0;" oninput="updateCashFromSlider(this.value)">';
@@ -1221,7 +1221,7 @@
         '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">Make an offer</h3>' +
         '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">for "' + title + '" (listed at ' + price.toLocaleString() + ' AED)</p>' +
         '<label style="font-size:13px;font-weight:600;color:#1A1A2E;display:block;margin-bottom:6px;">Your cash offer (AED)</label>' +
-        '<input type="number" id="offer-amount" min="1" value="' + price + '" style="width:100%;padding:12px 16px;border:1px solid #E5E7EB;border-radius:12px;font-size:18px;font-weight:700;font-family:inherit;outline:none;margin-bottom:16px;" onfocus="this.style.borderColor=\'#09B1BA\'" onblur="this.style.borderColor=\'#E5E7EB\'">' +
+        '<input type="number" id="offer-amount" min="1" value="' + price + '" style="width:100%;padding:12px 16px;border:1px solid #E5E7EB;border-radius:12px;font-size:18px;font-weight:700;font-family:inherit;outline:none;margin-bottom:16px;" onfocus="this.style.borderColor=\'#09B1BA\'" onblur="this.style.borderColor=\'#E5E7EB\'" autocomplete="off">' +
         '<p style="font-size:12px;color:#9CA3AF;margin:0 0 20px;">You can also propose a swap from your items via "Propose a Swap".</p>' +
         '<div style="display:flex;gap:10px;">' +
           '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="flex:1;padding:12px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;font-weight:600;cursor:pointer;color:#6B7280;">Cancel</button>' +

@@ -162,7 +162,7 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .edit-profile-btn:hover { background: var(--teal-dark, #067A80); transform: translateY(-1px); }
@@ -181,7 +181,7 @@
             border-radius: var(--radius-lg, 16px);
             padding: 24px 20px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
         .stat-card:hover {
             transform: translateY(-3px);
@@ -239,7 +239,7 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             white-space: nowrap;
         }
 
@@ -436,7 +436,7 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: all 0.2s;
+            transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
         }
         .swap-tab:hover { color: #333; }
         .swap-tab.active {
@@ -483,7 +483,7 @@
             border-radius: var(--radius-lg, 16px);
             padding: 20px;
             margin-bottom: 12px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
         .swap-request-card:hover { box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,0.08)); border-color: rgba(9,177,186,0.2); }
         .swap-request-header {
@@ -606,7 +606,7 @@
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
         }
         .swap-actions .btn-reject:hover { background: #FFF5F5; }
         .swap-actions .btn-cancel {
@@ -617,7 +617,7 @@
             border-radius: 8px;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
         }
         .swap-actions .btn-cancel:hover { background: #F5F5F5; color: #666; }
         .swap-rating-input {
@@ -959,7 +959,7 @@
           <a href="../index.html" class="site-logo">Swappo</a>
           <div class="navbar-search">
             <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+            <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
           </div>
           <div class="navbar-actions">
             <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
@@ -1019,11 +1019,11 @@
         <!-- Hidden profile fields (kept for JS to populate) -->
         <div style="display:none;">
             <div id="profile-avatar">?</div>
-            <h2 id="profile-name">Loading...</h2>
+            <h2 id="profile-name">Loading…</h2>
             <p id="profile-location"><i class="fas fa-map-marker-alt"></i> <span>—</span></p>
             <p id="profile-member-since">Member since —</p>
             <p id="profile-email"></p>
-            <div id="tier-badge"><span>Loading...</span></div>
+            <div id="tier-badge"><span>Loading…</span></div>
             <div id="tier-progress"></div>
             <div class="progress-fill" id="progress-fill"></div>
             <div id="tier-badges-row"></div>
@@ -1328,7 +1328,7 @@
                         <!-- Sidebar: Subscription Management -->
                         <div class="settings-sidebar">
                             <div class="subscription-card" id="settings-subscription-card">
-                                <div class="subscription-title" id="settings-sub-title">Loading...</div>
+                                <div class="subscription-title" id="settings-sub-title">Loading…</div>
                                 <div class="subscription-price" id="settings-sub-price"></div>
 
                                 <div style="text-align:left;margin-bottom:16px;" id="settings-sub-quotas">
@@ -2265,7 +2265,7 @@
                 grid.innerHTML = keys.map(k => {
                   const a = window.SWAPPO_AVATARS[k];
                   const sel = (k === _selectedAvatar) ? ' selected' : '';
-                  return '<button type="button" class="avatar-slot' + sel + '" data-key="' + k + '" style="aspect-ratio:1;border-radius:10px;border:2px solid ' + (sel ? '#09B1BA' : '#E5E7EB') + ';background:#fff;padding:4px;cursor:pointer;overflow:hidden;transition:all 0.2s;">' + a.svg + '</button>';
+                  return '<button type="button" class="avatar-slot' + sel + '" data-key="' + k + '" style="aspect-ratio:1;border-radius:10px;border:2px solid ' + (sel ? '#09B1BA' : '#E5E7EB') + ';background:#fff;padding:4px;cursor:pointer;overflow:hidden;transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;">' + a.svg + '</button>';
                 }).join('');
                 // If current avatar is a URL (uploaded), show it as first selected slot
                 if (_selectedAvatar && /^https?:\/\//.test(_selectedAvatar)) {
@@ -2643,8 +2643,8 @@
                 '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">Boost your item</h3>' +
                 '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">Get more visibility in search results</p>' +
                 '<div style="display:flex;flex-direction:column;gap:10px;">' +
-                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'24h\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition:all .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>24h Boost</strong></span><span style="font-weight:700;color:#09B1BA;">5 AED</span></button>' +
-                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'3d\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition:all .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>3-day Boost</strong></span><span style="font-weight:700;color:#09B1BA;">10 AED</span></button>' +
+                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'24h\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition: transform .2s, opacity .2s, background-color .2s, border-color .2s, color .2s, box-shadow .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>24h Boost</strong></span><span style="font-weight:700;color:#09B1BA;">5 AED</span></button>' +
+                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'3d\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition: transform .2s, opacity .2s, background-color .2s, border-color .2s, color .2s, box-shadow .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>3-day Boost</strong></span><span style="font-weight:700;color:#09B1BA;">10 AED</span></button>' +
                   '<button onclick="this.closest(\'div[style*=fixed]\').remove();DemoPayment.buyBoost(\'' + itemId + '\',\'7d\')" style="padding:14px;border:2px solid #09B1BA;border-radius:12px;background:#F0FBFC;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;"><span><strong>7-day Featured</strong> <span style="font-size:11px;color:#6B7280;">⭐ Best value</span></span><span style="font-weight:700;color:#09B1BA;">25 AED</span></button>' +
                 '</div>' +
                 '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="margin-top:12px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;">Cancel</button>' +

@@ -4,9 +4,9 @@
  * Cache-first for assets, Network-first for HTML and API calls
  */
 
-const CACHE_NAME = 'swappo-v75';
-const ASSET_CACHE = 'swappo-assets-v74';
-const API_CACHE = 'swappo-api-v74';
+const CACHE_NAME = 'swappo-v76';
+const ASSET_CACHE = 'swappo-assets-v76';
+const API_CACHE = 'swappo-api-v76';
 
 // Files to pre-cache during install
 // NOTE: During Coming Soon phase, we only precache the landing page and its assets.

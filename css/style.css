@@ -72,11 +72,12 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  /* Transitions */
-  --transition-fast: all var(--dur-fast) ease;
-  --transition: all var(--dur-normal) ease;
-  --transition-slow: all var(--dur-slow) ease;
-  --transition-spring: all var(--dur-normal) ease;
+  /* Transitions — GPU-safe props only (avoid layout thrashing) */
+  --t-props: transform, opacity, background-color, border-color, color, box-shadow;
+  --transition-fast: transform var(--dur-fast) ease, opacity var(--dur-fast) ease, background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  --transition: transform var(--dur-normal) ease, opacity var(--dur-normal) ease, background-color var(--dur-normal) ease, border-color var(--dur-normal) ease, color var(--dur-normal) ease, box-shadow var(--dur-normal) ease;
+  --transition-slow: transform var(--dur-slow) ease, opacity var(--dur-slow) ease, background-color var(--dur-slow) ease, border-color var(--dur-slow) ease, color var(--dur-slow) ease, box-shadow var(--dur-slow) ease;
+  --transition-spring: transform var(--dur-normal) var(--ease-out), opacity var(--dur-normal) var(--ease-out), background-color var(--dur-normal) var(--ease-out), border-color var(--dur-normal) var(--ease-out), color var(--dur-normal) var(--ease-out), box-shadow var(--dur-normal) var(--ease-out);
 }
 
 /* --- RESET & BASE --- */
@@ -798,7 +799,7 @@ a.site-logo:hover { color: #078A91 !important; }
   padding: 7px 14px; background: #fff;
   border: 1px solid #E5E7EB; border-radius: 999px;
   font-size: 0.8rem; font-weight: 600; color: #374151;
-  cursor: pointer; transition: all 0.18s ease;
+  cursor: pointer; transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 .hero-location-right .radius-btn:hover {
   border-color: #09B1BA; color: #09B1BA;
@@ -1060,7 +1061,7 @@ a.site-logo:hover { color: #078A91 !important; }
   background: rgba(255, 255, 255, 0.15) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   color: white !important;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-glass:hover {

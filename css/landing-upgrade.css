@@ -215,7 +215,7 @@
   text-align: center;
   position: relative;
   cursor: default;
-  transition: all 0.35s ease;
+  transition: transform 0.35s ease, opacity 0.35s ease, background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
 }
 .step-card:hover {
   border-color: var(--primary, #09B1BA);
@@ -311,7 +311,7 @@
   padding: 28px 16px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.35s ease;
+  transition: transform 0.35s ease, opacity 0.35s ease, background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
   text-decoration: none;
   display: block;
 }
@@ -458,7 +458,7 @@
   border: 1px solid rgba(9, 177, 186, 0.12);
   border-radius: 20px;
   padding: 32px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 .why-card:hover {
   background: rgba(9, 177, 186, 0.08);
@@ -574,7 +574,7 @@
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: transform 0.3s, opacity 0.3s, background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
   background: transparent;
   color: #6B7280;
 }
@@ -669,7 +669,7 @@
   font-size: 14px;
   text-decoration: none;
   text-align: center;
-  transition: all 0.3s;
+  transition: transform 0.3s, opacity 0.3s, background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
   border: 2px solid var(--primary);
   color: var(--primary);
   background: white;
@@ -1044,7 +1044,7 @@
   font-weight: 700;
   border-radius: 999px;
   box-shadow: 0 6px 24px rgba(9,177,186,0.35);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 .hero-video-section .hero-cta .btn-pill-teal:hover {
   background: #078A91 !important;
@@ -1060,7 +1060,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 999px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 .hero-video-section .hero-outline-btn:hover {
   background: rgba(255,255,255,0.18) !important;
@@ -1150,7 +1150,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 .hero-video-float .hero-sound-toggle:hover {
   background: rgba(9,177,186,0.6);

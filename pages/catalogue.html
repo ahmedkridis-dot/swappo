@@ -35,7 +35,7 @@
   <style>
     /* Map view toggle */
     .view-toggle { display: flex; gap: 4px; background: #F3F4F6; border-radius: 10px; padding: 3px; }
-    .view-toggle button { padding: 8px 14px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; background: transparent; color: #6B7280; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+    .view-toggle button { padding: 8px 14px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; background: transparent; color: #6B7280; transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; display: flex; align-items: center; gap: 5px; }
     .view-toggle button.active { background: #fff; color: #1A1A2E; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .catalogue-split { display: flex; gap: 0; }
     .catalogue-split .catalogue-list { flex: 1; min-width: 0; }
@@ -123,7 +123,7 @@
       font-weight: 600;
       color: var(--gray-muted, #9CA3AF);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
       white-space: nowrap;
     }
     .filter-bar .clear-filters:hover {
@@ -167,7 +167,7 @@
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
       color: #333;
     }
     .gender-filter .gender-btn:hover { border-color: var(--teal); color: var(--teal); }
@@ -189,7 +189,7 @@
       background: white;
       cursor: pointer;
       font-size: 12px;
-      transition: all 0.2s;
+      transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
       color: #555;
     }
     .subcategory-chips .sub-chip:hover { border-color: #09B1BA; color: #09B1BA; }
@@ -211,7 +211,7 @@
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      transition: all 0.2s;
+      transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
     }
     .zone-filter .zone-btn:hover { border-color: #09B1BA; }
     .zone-filter .zone-btn.active {
@@ -233,7 +233,7 @@
       background: white;
       cursor: pointer;
       font-size: 11px;
-      transition: all 0.2s;
+      transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
     }
     .age-filter .age-chip:hover { border-color: #09B1BA; }
     .age-filter .age-chip.active {
@@ -256,7 +256,7 @@
 
         <div class="navbar-search">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+          <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
         </div>
 
         <div class="navbar-actions">
@@ -307,7 +307,7 @@
             <span class="hero-location-label" data-i18n="items_near_you">items near you</span>
             <span class="hero-location-name" id="locationName">
               <i class="fas fa-spinner fa-spin" style="font-size:0.75rem;"></i>
-              <span data-i18n="detecting_location">Detecting location...</span>
+              <span data-i18n="detecting_location">Detecting location…</span>
             </span>
           </div>
         </div>
@@ -336,7 +336,7 @@
     <div class="filter-bar">
       <div class="search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" id="catalogue-search" placeholder="Search items..." data-i18n-placeholder="catalogue_search_placeholder" autocomplete="off">
+        <input type="text" id="catalogue-search" placeholder="Search items…" data-i18n-placeholder="catalogue_search_placeholder" autocomplete="off">
       </div>
 
       <select id="filter-category">
@@ -380,9 +380,9 @@
       </select>
 
       <div style="display:flex;align-items:center;gap:6px;">
-        <input type="number" id="filter-price-min" min="0" placeholder="Min AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;">
+        <input type="number" id="filter-price-min" min="0" placeholder="Min AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;" autocomplete="off">
         <span style="color:#9CA3AF;">–</span>
-        <input type="number" id="filter-price-max" min="0" placeholder="Max AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;">
+        <input type="number" id="filter-price-max" min="0" placeholder="Max AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;" autocomplete="off">
       </div>
 
       <select id="filter-sort">
@@ -428,7 +428,7 @@
   <!-- ========== MAIN CONTENT ========== -->
   <div class="container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <span class="result-count" id="item-count">Loading...</span>
+      <span class="result-count" id="item-count">Loading…</span>
       <div class="view-toggle" id="viewToggle">
         <button class="active" onclick="setView('grid')"><i class="fas fa-th-large"></i> Grid</button>
         <button onclick="setView('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
@@ -1087,7 +1087,7 @@
           var photo = (item.photos && item.photos[0]) || '';
           var score = Math.floor(75 + Math.random() * 20);
           return '<a href="product.html?id=' + item.id + '" style="flex-shrink:0;width:140px;text-decoration:none;">' +
-            '<div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:12px;overflow:hidden;transition:all 0.3s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'">' +
+            '<div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:12px;overflow:hidden;transition: transform 0.3s, opacity 0.3s, background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'">' +
             (photo ? '<img src="' + photo + '" style="width:100%;height:100px;object-fit:cover;" alt="">' : '<div style="height:100px;background:#f5f5f5;"></div>') +
             '<div style="padding:8px;">' +
             '<div style="font-size:12px;font-weight:600;color:#1A1A2E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + title + '</div>' +

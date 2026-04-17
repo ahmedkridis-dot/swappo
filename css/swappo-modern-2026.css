@@ -177,7 +177,7 @@ h1, h2, h3, h4, .display {
   border-radius: 20px !important;
   background: white;
   border: 1px solid rgba(229,231,235,0.6) !important;
-  transition: all 0.5s var(--ease-out-quart) !important;
+  transition: transform 0.5s var(--ease-out-quart) !important, opacity 0.5s var(--ease-out-quart) !important, background-color 0.5s var(--ease-out-quart) !important, border-color 0.5s var(--ease-out-quart) !important, color 0.5s var(--ease-out-quart) !important, box-shadow 0.5s var(--ease-out-quart) !important;
   position: relative;
   isolation: isolate;
 }
@@ -252,7 +252,7 @@ h1, h2, h3, h4, .display {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  transition: all 0.5s var(--ease-out-quart) !important;
+  transition: transform 0.5s var(--ease-out-quart) !important, opacity 0.5s var(--ease-out-quart) !important, background-color 0.5s var(--ease-out-quart) !important, border-color 0.5s var(--ease-out-quart) !important, color 0.5s var(--ease-out-quart) !important, box-shadow 0.5s var(--ease-out-quart) !important;
 }
 .category-icon-card:hover .cat-icon i {
   background: linear-gradient(135deg, #09B1BA 0%, #5EEAD4 100%);
@@ -390,7 +390,7 @@ h1, h2, h3, h4, .display {
 .hero-floating-item:hover {
   transform: scale(1.1) !important;
   box-shadow: var(--shadow-elevation-4), var(--shadow-glow-teal) !important;
-  transition: all 0.4s var(--ease-spring);
+  transition: transform 0.4s var(--ease-spring), opacity 0.4s var(--ease-spring), background-color 0.4s var(--ease-spring), border-color 0.4s var(--ease-spring), color 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-spring);
 }
 
 /* ===== ECO TICKER UPGRADE ===== */
@@ -402,7 +402,7 @@ h1, h2, h3, h4, .display {
 
 /* ===== INPUT FIELDS UPGRADE ===== */
 .form-input, .input-styled, input[type="text"], input[type="email"], input[type="password"], input[type="tel"], textarea {
-  transition: all 0.4s var(--ease-out-quart) !important;
+  transition: transform 0.4s var(--ease-out-quart) !important, opacity 0.4s var(--ease-out-quart) !important, background-color 0.4s var(--ease-out-quart) !important, border-color 0.4s var(--ease-out-quart) !important, color 0.4s var(--ease-out-quart) !important, box-shadow 0.4s var(--ease-out-quart) !important;
 }
 .form-input:focus, .input-styled:focus,
 input[type="text"]:focus, input[type="email"]:focus,

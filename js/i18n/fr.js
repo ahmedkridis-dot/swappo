@@ -43,7 +43,7 @@
     adopt_subtitle: "Nous nous associons aux refuges des Émirats pour aider ces belles âmes à trouver un nouveau foyer. Lancement imminent.",
     adopt_cta: "Restez connectés →",
     // Navbar
-    search_placeholder: "Rechercher des articles...",
+    search_placeholder: "Rechercher des articles…",
     join_swap: "Rejoindre l'Échange",
     drop_item: "Déposer un article",
     list_new_item: "Ajouter un article",
@@ -1108,7 +1108,7 @@
     all_conditions: "Tous les états",
     newest_first: "Plus récent",
     clear: "Effacer",
-    catalogue_search_placeholder: "Rechercher des articles...",
+    catalogue_search_placeholder: "Rechercher des articles…",
 
     // Product page
     item_details: "Détails de l'article",

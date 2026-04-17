@@ -43,7 +43,7 @@
     adopt_subtitle: "ہم یو اے ای کے جانوروں کے پناہ گاہوں کے ساتھ شراکت کر رہے ہیں تاکہ ان خوبصورت روحوں کو نیا گھر مل سکے۔ جلد لانچ ہو رہا ہے۔",
     adopt_cta: "منتظر رہیں →",
     // Navbar
-    search_placeholder: "چیزیں تلاش کریں...",
+    search_placeholder: "چیزیں تلاش کریں…",
     join_swap: "سواپ میں شامل ہوں",
     drop_item: "آئٹم شامل کریں",
     list_new_item: "نیا آئٹم شامل کریں",
@@ -947,7 +947,7 @@
 
     // Chat page
     swapchat: "سواپ چیٹ",
-    type_message: "ایک پیغام لکھیں...",
+    type_message: "ایک پیغام لکھیں…",
     swap_accepted: "سواپ منظور ہو گیا — شناخت ظاہر ہو گئی",
     confirm_exchange: "تبادلے کی تصدیق کریں",
     auto_filter_warning: "فون نمبر، ای میل اور لنکس خود بخود فلٹر ہو جاتے ہیں",
@@ -973,8 +973,8 @@
     // Common
     km: "کلومیٹر",
     all_uae: "تمام یو اے ای",
-    detecting_location: "مقام کی شناخت جاری ہے...",
-    loading: "لوڈ ہو رہا ہے...",
+    detecting_location: "مقام کی شناخت جاری ہے…",
+    loading: "لوڈ ہو رہا ہے…",
     error: "خرابی",
     success: "کامیابی",
     cancel: "منسوخ کریں",
@@ -1107,7 +1107,7 @@
     all_conditions: "تمام حالات",
     newest_first: "نئے پہلے",
     clear: "صاف",
-    catalogue_search_placeholder: "چیزیں تلاش کریں...",
+    catalogue_search_placeholder: "چیزیں تلاش کریں…",
 
     // Product page
     item_details: "آئٹم کی تفصیلات",
@@ -1230,7 +1230,7 @@
     photo_face_blurred: 'آپ کی رازداری کے لیے چہرہ خود بخود دھندلا کر دیا گیا',
     photo_faces_blurred: 'آپ کی رازداری کے لیے چہرے خود بخود دھندلا کر دیے گئے',
     photo_use_original: 'اصل استعمال کریں',
-    photo_processing: 'پروسیسنگ...',
+    photo_processing: 'پروسیسنگ…',
     photo_privacy_shield: 'پرائیویسی شیلڈ فعال',
     phone_auto_share: 'میچ پر میرا نمبر خودکار طور پر شئیر کریں',
     phone_privacy_note: 'آپ کا نمبر صرف میچ ہوئے سویپرز کو ملتا ہے، عوامی نہیں ہوتا',

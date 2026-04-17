@@ -34,7 +34,7 @@
     footer_delivery_fee: "Service fee 5% on deliveries only. In-person trades are always free.",
     hero_watch_teaser: "Watch teaser",
     // Navbar
-    search_placeholder: "Search items...",
+    search_placeholder: "Search items…",
     join_swap: "Join the Swap",
     drop_item: "Drop an Item",
     list_new_item: "List new item",
@@ -1080,7 +1080,7 @@
 
     // Chat page
     swapchat: "SwapChat",
-    type_message: "Type a message...",
+    type_message: "Type a message…",
     swap_accepted: "Swap accepted — Identities revealed",
     confirm_exchange: "Confirm exchange",
     auto_filter_warning: "Phone numbers, emails & links are automatically filtered",
@@ -1240,7 +1240,7 @@
     all_conditions: "All Conditions",
     newest_first: "Newest first",
     clear: "Clear",
-    catalogue_search_placeholder: "Search items...",
+    catalogue_search_placeholder: "Search items…",
 
     // Product page
     item_details: "Item Details",

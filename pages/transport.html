@@ -37,7 +37,7 @@
     .transport-filters select { padding: 10px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; background: rgba(255,255,255,0.12); color: #fff; font-size: 14px; font-family: inherit; cursor: pointer; backdrop-filter: blur(8px); min-width: 140px; }
     .transport-filters select option { color: #1A1A2E; background: #fff; }
     .transport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; padding: 48px 0; }
-    .transporter-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 20px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; }
+    .transporter-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 20px; overflow: hidden; transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; cursor: pointer; }
     .transporter-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(9,177,186,0.15); border-color: #09B1BA; }
     .transporter-card-img { height: 180px; background: linear-gradient(135deg, #E6F7F8, #F3F4F6); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
     .transporter-card-img img { width: 100%; height: 100%; object-fit: cover; }
@@ -57,7 +57,7 @@
     .transporter-price { font-size: 15px; font-weight: 700; color: #1A1A2E; margin-bottom: 14px; }
     .transporter-price small { font-size: 12px; font-weight: 500; color: #6B7280; }
     .transporter-actions { display: flex; gap: 8px; }
-    .transporter-actions button { flex: 1; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .transporter-actions button { flex: 1; padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; font-family: inherit; }
     .btn-view { background: #F3F4F6; border: 1px solid #E5E7EB; color: #1A1A2E; }
     .btn-view:hover { border-color: #09B1BA; color: #09B1BA; }
     .btn-quote { background: #09B1BA; border: none; color: #fff; }
@@ -174,7 +174,7 @@
         <a href="../index.html" class="site-logo">Swappo</a>
         <div class="navbar-search">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+          <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
         </div>
         <div class="navbar-actions">
           <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
@@ -574,7 +574,7 @@
             '<label>Loading Help Needed?</label>' +
             '<select id="q-help"><option value="no">No — I can load/unload myself</option><option value="yes">Yes — need help loading & unloading</option></select>' +
             '<label>Notes (optional)</label>' +
-            '<textarea id="q-notes" placeholder="Any special instructions..."></textarea>' +
+            '<textarea id="q-notes" placeholder="Any special instructions…"></textarea>' +
             '<button class="btn-quote" style="width:100%;padding:14px;font-size:15px;border-radius:14px;margin-top:8px;" onclick="submitQuote(\'' + t.id + '\')"><i class="fas fa-paper-plane"></i> Send Request</button>' +
           '</div>' +
         '</div>' +

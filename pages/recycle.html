@@ -294,7 +294,7 @@
       padding: 24px 16px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
       font-family: inherit;
     }
     .recycle-cat-btn:hover {
@@ -359,7 +359,7 @@
       border: 1px solid rgba(9, 177, 186, 0.15);
       border-radius: 14px;
       padding: 18px;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     }
     .recycle-center-card:hover {
       border-color: var(--primary);
@@ -415,7 +415,7 @@
       border: 1px solid var(--border, #E5E7EB);
       border-radius: var(--radius-lg, 16px);
       padding: 22px;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
       opacity: 0;
       transform: translateY(20px);
     }
@@ -677,7 +677,7 @@
         <a href="../index.html" class="site-logo">Swappo</a>
         <div class="navbar-search">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+          <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
         </div>
         <div class="navbar-actions">
           <a href="chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>

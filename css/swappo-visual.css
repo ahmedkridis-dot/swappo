@@ -142,7 +142,7 @@
   border: 2px solid transparent;
   cursor: pointer;
   text-decoration: none;
-  transition: all var(--dur) ease;
+  transition: transform var(--dur) ease, opacity var(--dur) ease, background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease, box-shadow var(--dur) ease;
   line-height: 1.4;
 }
 .btn-pill:hover { transform: translateY(-2px); }
@@ -192,7 +192,7 @@
   border: 1px solid rgba(9,177,186,0.12);
   border-radius: var(--radius-xl);
   padding: 32px;
-  transition: all var(--dur) ease;
+  transition: transform var(--dur) ease, opacity var(--dur) ease, background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease, box-shadow var(--dur) ease;
 }
 .glass-card:hover {
   background: rgba(9,177,186,0.08);
@@ -206,7 +206,7 @@
   border: 1px solid var(--gray-border);
   border-radius: var(--radius-lg);
   padding: 24px;
-  transition: all var(--dur) ease;
+  transition: transform var(--dur) ease, opacity var(--dur) ease, background-color var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease, box-shadow var(--dur) ease;
 }
 .swappo-card:hover {
   border-color: var(--teal);
@@ -274,7 +274,7 @@
 /* Footer social icons: gray to teal hover */
 .footer-social a {
   color: rgba(255,255,255,0.5);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 .footer-social a:hover {
   color: var(--teal-light, #5EEAD4);
@@ -394,7 +394,7 @@
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(9,177,186,0.4);
   z-index: 1000;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
   animation: surprisePulse 10s ease-in-out infinite;
   display: flex;
   align-items: center;
@@ -425,7 +425,7 @@
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(16,185,129,0.4);
   z-index: 1000;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
   animation: surprisePulse 10s ease-in-out infinite;
   display: flex;
   align-items: center;
@@ -535,7 +535,7 @@
   border-radius: var(--radius-md, 12px);
   padding: 20px;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 .adopt-card:hover {
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,0.08));
@@ -614,7 +614,7 @@
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all var(--dur);
+  transition: transform var(--dur), opacity var(--dur), background-color var(--dur), border-color var(--dur), color var(--dur), box-shadow var(--dur);
   background: transparent;
   color: var(--gray-text);
 }

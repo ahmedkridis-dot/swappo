@@ -70,7 +70,7 @@
     /* Avatar grid */
     .avatar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
     @media (max-width: 560px) { .avatar-grid { grid-template-columns: repeat(4, 1fr); } }
-    .avatar-option { position: relative; aspect-ratio: 1; border-radius: 14px; border: 2px solid #E5E7EB; background: #fff; cursor: pointer; padding: 6px; transition: all 0.2s; overflow: hidden; }
+    .avatar-option { position: relative; aspect-ratio: 1; border-radius: 14px; border: 2px solid #E5E7EB; background: #fff; cursor: pointer; padding: 6px; transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; overflow: hidden; }
     .avatar-option:hover { border-color: #09B1BA; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(9,177,186,0.15); }
     .avatar-option.selected { border-color: #09B1BA; background: linear-gradient(135deg, #E6F7F8 0%, #FFFFFF 80%); box-shadow: 0 6px 16px rgba(9,177,186,0.25); }
     .avatar-option.selected::after { content: '✓'; position: absolute; top: 4px; right: 6px; width: 18px; height: 18px; background: #09B1BA; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
@@ -85,7 +85,7 @@
     .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #E5E7EB; }
     .divider span { background: #fff; padding: 0 12px; position: relative; font-size: 11px; color: #9CA3AF; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
 
-    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; border: none; border-radius: 14px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s; font-family: inherit; }
     .btn-primary { background: linear-gradient(135deg, #09B1BA 0%, #078A91 100%); color: #fff; box-shadow: 0 8px 20px rgba(9,177,186,0.3); }
     .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(9,177,186,0.4); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }

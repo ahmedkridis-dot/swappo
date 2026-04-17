@@ -14,7 +14,7 @@
     contact_whatsapp_label: "WhatsApp",
     contact_phone_line: "<i class=\"fas fa-phone\" style=\"width:16px;opacity:0.7;\"></i> +971 54 312 5559",
     // Navbar
-    search_placeholder: "Поиск товаров...",
+    search_placeholder: "Поиск товаров…",
     join_swap: "Присоединиться",
     drop_item: "Добавить товар",
     list_new_item: "Добавить товар",
@@ -919,7 +919,7 @@
 
     // Chat page
     swapchat: "СвопЧат",
-    type_message: "Введите сообщение...",
+    type_message: "Введите сообщение…",
     swap_accepted: "Обмен принят — Личности раскрыты",
     confirm_exchange: "Подтвердить обмен",
     auto_filter_warning: "Телефоны, email и ссылки фильтруются автоматически",
@@ -945,8 +945,8 @@
     // Common
     km: "км",
     all_uae: "Все ОАЭ",
-    detecting_location: "Определение местоположения...",
-    loading: "Загрузка...",
+    detecting_location: "Определение местоположения…",
+    loading: "Загрузка…",
     error: "Ошибка",
     success: "Успешно",
     cancel: "Отмена",
@@ -1079,7 +1079,7 @@
     all_conditions: "Все состояния",
     newest_first: "Сначала новые",
     clear: "Сбросить",
-    catalogue_search_placeholder: "Поиск товаров...",
+    catalogue_search_placeholder: "Поиск товаров…",
 
     // Product page
     item_details: "Детали товара",
@@ -1202,7 +1202,7 @@
     photo_face_blurred: 'лицо автоматически размыто для вашей конфиденциальности',
     photo_faces_blurred: 'лица автоматически размыты для вашей конфиденциальности',
     photo_use_original: 'Использовать оригинал',
-    photo_processing: 'Обработка...',
+    photo_processing: 'Обработка…',
     photo_privacy_shield: 'Защита приватности активна',
     phone_auto_share: 'Автоматически передать номер при совпадении',
     phone_privacy_note: 'Номер передаётся только сматченным свопперам, никогда не виден публично',

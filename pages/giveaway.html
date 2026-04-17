@@ -85,7 +85,7 @@
             font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             text-decoration: none;
             display: inline-block;
         }
@@ -105,7 +105,7 @@
             font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             text-decoration: none;
             display: inline-block;
         }
@@ -218,7 +218,7 @@
             font-weight: 500;
             border-radius: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid transparent;
         }
 
@@ -269,7 +269,7 @@
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid #E0E0E0;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             position: relative;
         }
 
@@ -325,7 +325,7 @@
             cursor: pointer;
             border: none;
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             z-index: 2;
         }
 
@@ -417,7 +417,7 @@
             font-weight: 600;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -765,7 +765,7 @@
           <a href="../index.html" class="site-logo">Swappo</a>
           <div class="navbar-search">
             <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search items..." data-i18n-placeholder="search_placeholder">
+            <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
           </div>
           <div class="navbar-actions">
             <a href="chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>
@@ -816,7 +816,7 @@
               <span class="hero-location-label" data-i18n="items_near_you">items near you</span>
               <span class="hero-location-name" id="locationName">
                 <i class="fas fa-spinner fa-spin" style="font-size:0.75rem;"></i>
-                <span data-i18n="detecting_location">Detecting location...</span>
+                <span data-i18n="detecting_location">Detecting location…</span>
               </span>
             </div>
           </div>
@@ -841,13 +841,13 @@
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
                     <!-- Option 1: Complete a swap -->
-                    <div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:32px 24px;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--teal)';this.style.boxShadow='0 8px 28px rgba(9,177,186,0.12)'" onmouseout="this.style.borderColor='';this.style.boxShadow=''">
+                    <div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:32px 24px;text-align:center;transition: transform 0.3s, opacity 0.3s, background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;" onmouseover="this.style.borderColor='var(--teal)';this.style.boxShadow='0 8px 28px rgba(9,177,186,0.12)'" onmouseout="this.style.borderColor='';this.style.boxShadow=''">
                         <div style="font-size:40px;margin-bottom:12px;">🔄</div>
                         <h3 style="font-size:16px;font-weight:600;color:var(--navy,#1A1A2E);margin:0 0 8px;" data-i18n="gift_unlock_swap">Complete your first swap</h3>
                         <a href="catalogue.html" class="btn-pill btn-pill-outline" style="font-size:13px;padding:8px 20px;margin-top:8px;" data-i18n="gift_unlock_swap_btn">Go to Swap Market →</a>
                     </div>
                     <!-- Option 2: Give an item -->
-                    <div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:32px 24px;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--teal)';this.style.boxShadow='0 8px 28px rgba(9,177,186,0.12)'" onmouseout="this.style.borderColor='';this.style.boxShadow=''">
+                    <div style="background:white;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-lg,16px);padding:32px 24px;text-align:center;transition: transform 0.3s, opacity 0.3s, background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;" onmouseover="this.style.borderColor='var(--teal)';this.style.boxShadow='0 8px 28px rgba(9,177,186,0.12)'" onmouseout="this.style.borderColor='';this.style.boxShadow=''">
                         <div style="font-size:40px;margin-bottom:12px;">🎁</div>
                         <h3 style="font-size:16px;font-weight:600;color:var(--navy,#1A1A2E);margin:0 0 8px;" data-i18n="gift_unlock_give">Give an item away</h3>
                         <a href="publier.html?type=gift" class="btn-pill btn-pill-teal" style="font-size:13px;padding:8px 20px;margin-top:8px;" data-i18n="gift_unlock_give_btn">Post a gift now →</a>
@@ -1366,7 +1366,7 @@
                     '<div style="font-size:48px;margin-bottom:12px;">🎁</div>' +
                     '<h3 style="font-size:20px;font-weight:700;color:var(--navy,#1A1A2E);margin:0 0 8px;" data-i18n="gift_claimed_title">Item claimed!</h3>' +
                     '<p style="font-size:14px;color:var(--gray-text,#6B7280);margin:0 0 20px;" data-i18n="gift_thank_prompt">Want to say thanks to the giver?</p>' +
-                    '<textarea id="thank-you-text" maxlength="140" placeholder="Write a short thank you..." style="width:100%;height:70px;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-md,12px);padding:12px;font-family:inherit;font-size:14px;resize:none;margin-bottom:16px;"></textarea>' +
+                    '<textarea id="thank-you-text" maxlength="140" placeholder="Write a short thank you…" style="width:100%;height:70px;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-md,12px);padding:12px;font-family:inherit;font-size:14px;resize:none;margin-bottom:16px;"></textarea>' +
                     '<div style="display:flex;gap:10px;justify-content:center;">' +
                         '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--gray-bg,#F8F9FA);border:none;padding:10px 24px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);" data-i18n="gift_thank_skip">Skip</button>' +
                         '<button onclick="sendThanks(this)" style="background:var(--teal,#09B1BA);color:white;border:none;padding:10px 24px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;" data-i18n="gift_thank_send">Send thanks 💚</button>' +

@@ -43,7 +43,7 @@
     adopt_subtitle: "نتعاون مع ملاجئ الإمارات لمساعدة هذه الأرواح الجميلة على إيجاد منزل جديد. الإطلاق قريبًا.",
     adopt_cta: "ترقبوا المزيد →",
     // Navbar
-    search_placeholder: "ابحث عن الأشياء...",
+    search_placeholder: "ابحث عن الأشياء…",
     join_swap: "انضم للتبادل",
     drop_item: "أضف منتج",
     list_new_item: "إضافة منتج جديد",
@@ -948,7 +948,7 @@
 
     // Chat page
     swapchat: "دردشة التبديل",
-    type_message: "اكتب رسالة...",
+    type_message: "اكتب رسالة…",
     swap_accepted: "تم قبول التبديل — تم الكشف عن الهويات",
     confirm_exchange: "تأكيد الصفقة",
     auto_filter_warning: "يتم تصفية أرقام الهاتف والبريد الإلكتروني والروابط تلقائياً",
@@ -974,8 +974,8 @@
     // Common
     km: "كم",
     all_uae: "كل الإمارات",
-    detecting_location: "جاري الكشف عن الموقع...",
-    loading: "جاري التحميل...",
+    detecting_location: "جاري الكشف عن الموقع…",
+    loading: "جاري التحميل…",
     error: "خطأ",
     success: "نجاح",
     cancel: "إلغاء",
@@ -1108,7 +1108,7 @@
     all_conditions: "جميع الحالات",
     newest_first: "الأحدث أولاً",
     clear: "مسح",
-    catalogue_search_placeholder: "ابحث عن الأشياء...",
+    catalogue_search_placeholder: "ابحث عن الأشياء…",
 
     // Product page
     item_details: "تفاصيل المنتج",
@@ -1231,7 +1231,7 @@
     photo_face_blurred: 'الوجه مشوّش تلقائياً لحماية خصوصيتك',
     photo_faces_blurred: 'الوجوه مشوّشة تلقائياً لحماية خصوصيتك',
     photo_use_original: 'استخدم النسخة الأصلية',
-    photo_processing: 'قيد المعالجة...',
+    photo_processing: 'قيد المعالجة…',
     photo_privacy_shield: 'حماية الخصوصية مفعّلة',
     phone_auto_share: 'مشاركة رقمي تلقائياً عند المطابقة',
     phone_privacy_note: 'رقمك يُشارك فقط مع من يطابقك، ولا يُرى علنياً أبداً',
