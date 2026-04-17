@@ -1,33 +1,78 @@
-# Swappo — Project Instructions for Claude Code
+# Swappo — Instructions pour Claude Code
+**Dernière mise à jour : 17 avril 2026**
 
-## What is Swappo?
-Swappo (swappo.ae) is the **UAE's first marketplace for swapping, buying, selling, and gifting**. Users list items with a price, then others can propose a swap, buy with cash, or make a combined offer. Identity is revealed only when both parties accept. Swappo monetizes via Swappo Pro subscriptions (29 AED/mo) and a 5% service fee on delivery purchases (Pro = 0% fee).
-
-## Règle d'or — SWAP FIRST (2026-04-11)
-- On the site, **swap is ALWAYS mentioned first**: "swapping, buying, selling, gifting"
-- CTA: "Start Swapping" (not "It's Free")
-- Primary button on product page: "Propose a Swap"
-- Badge order on cards: Swap > Buy > Gift
-- Buy/sell is a support, not the identity
-- Footer tagline: keep "barter, gift & recycle" — do NOT add buy/sell
-- B2B/pitch materials can lead with buy/sell, but user-facing site = swap first
+## Qu'est-ce que Swappo ?
+Swappo (swappo.ae) est la **première marketplace UAE dédiée au swap, achat, vente, don et recyclage**. 4 modes : Swap (troc), Buy/Sell (cash), Gift (gratuit), Recycle (éco). Chaque item a un prix visible. Les utilisateurs sont **anonymes jusqu'à l'acceptance mutuelle** d'une offre.
 
 ## Communication
-- **Ahmed** is the project owner. He speaks **French** — always respond in French.
-- Interface languages: **English** (primary), **French**, **Arabic**, **Urdu** (all 4 via i18n.js)
+- **Ahmed** est le fondateur. Il parle **français** — toujours répondre en français.
+- Interface : **5 langues** — EN (primaire), FR, AR (RTL), UR (RTL), RU
+- Tout nouveau texte UI → ajouter dans `js/i18n.js` en 5 langues, utiliser `data-i18n="key"` ou `t('key')`
+
+## Statut du projet
+- **Supabase** : CONNECTÉ et opérationnel (auth, DB, storage, realtime)
+- **Vercel** : Déployé, auto-deploy depuis GitHub main
+- **Stealth mode** : `swappo.ae` = Coming Soon. Dev URL = `swappo.ae/dev-a7f3k9mz2q.html` (NE PAS référencer home.html)
+- **GitHub** : `https://github.com/ahmedkridis-dot/swappo.git` branche `main`
+- **Site VIDE** : zéro items en production. Prêt à lancer. Les vrais users ajouteront les vrais items.
+
+## Skills obligatoires
+**AVANT de coder, lis ces fichiers :**
+1. `../.claude/skills/swappo-dev/SKILL.md` — Toutes les règles business, flows, demo accounts, UI specs
+2. `../.claude/skills/swappo-visual/SKILL.md` — Design system, animations, composants visuels
+
+## Règles absolues (JAMAIS violer)
+
+### 1. SWAP FIRST
+- Ordre des mots partout : **"swapping, buying, selling, gifting"** — jamais "buying" en premier
+- CTA principal : **"Start Swapping"** (pas "It's Free", pas "Start Now")
+- Bouton primaire product page : **"Propose a Swap"** (teal)
+- Ordre badges sur cartes : Swap > Buy > Gift
+- Footer tagline : **"The UAE's first dedicated barter, gift & recycle platform."**
+
+### 2. ANONYMITÉ jusqu'à acceptance
+- Avant acceptance : pseudo hashé `Swapper#XXXX` + badge + rating. PAS de nom, PAS de photo.
+- L'offre = notification système, PAS un chat.
+- Après acceptance mutuelle : identités révélées, chat s'ouvre.
+- Le chat n'existe JAMAIS avant acceptance.
+
+### 3. PAS DE PAIEMENT sur Swappo
+Swappo ne touche JAMAIS l'argent des deals entre users.
+- Revenue = delivery fees + Pro subs + boosts + transport commission + vehicle inspection + ads
+- Pour l'extra-cash entre users : on affiche 3 options (Cash au meetup / Aani / COD), on ne traite rien
+- Stripe = UNIQUEMENT pour Pro (29 AED/mois) + boosts + delivery fees Swappo
+
+### 4. FIND A TRUCK = canal business permanent
+- Visible dans : footer, Deal Tracker du chat, catalogue sidebar, product page (grosses catégories)
+- **PAS** dans le header/navbar principal
+- Seul le formulaire d'inscription chauffeur peut afficher "Coming Soon"
+
+### 5. PAS DE MODE DÉMO
+- Le site est en PRODUCTION. Zéro `DemoAuth`, `DemoItems`, `DemoGiveaway`, `DemoChat`, `DemoNotifications`
+- Tout lit et écrit dans **Supabase**. Jamais localStorage pour des données métier.
+- `demo-engine.js` et `mock-data.js` sont dans `_archive/` — ne pas les réintroduire
+- Utiliser `js/toast.js` pour les toasts (pas DemoNotifications.showToast)
+- Utiliser `js/constants.js` pour les taxonomies (pas mock-data.js)
+
+### 6. DESIGN — ne pas changer
+- Couleurs : teal `#09B1BA`, fond blanc `#FFFFFF`, texte `#171717`
+- Font : Inter (+ Poppins pour headings)
+- CSS existants : `style.css`, `swappo-visual.css`, `swappo-modern-2026.css`, `landing-upgrade.css`
+- **Ne pas modifier les CSS existants** sauf bug explicite
+- Nouveaux composants → copier le style des composants existants
 
 ## Tech Stack
-- **Frontend**: HTML / CSS / vanilla JS (static prototype — currently built)
-- **Backend**: Supabase (auth, PostgreSQL database, storage, real-time chat) — TO BE CONNECTED
-- **Mobile**: PWA first (manifest.json + sw.js already exist), then Capacitor for app stores
-- **Location**: Browser GPS + OpenStreetMap Nominatim reverse geocoding (free, no API key)
-- **Hosting target**: Vercel or Netlify
-- **Design**: Vinted-inspired — white backgrounds, teal (#09B1BA) primary, clean cards, Inter font
-- **Logo**: `<i class="fas fa-handshake"></i> Swappo` (handshake icon + text, everywhere)
+- **Frontend** : HTML / CSS / vanilla JS (PAS de React, PAS de Next.js, PAS de TypeScript)
+- **Backend** : Supabase (auth, PostgreSQL, storage, realtime, RLS)
+- **Mobile** : PWA first → Capacitor wrapper plus tard
+- **Hosting** : Vercel (auto-deploy depuis GitHub main)
+- **i18n** : `js/i18n.js` avec objet `translations` + data-i18n + RTL auto pour AR/UR
+- **Location** : Browser GPS + OpenStreetMap Nominatim
+- **Design** : Vinted-inspired, voir skill `swappo-visual`
 
 ## CSS Variables (Design Tokens)
 ```css
---primary: #09B1BA;
+--primary: #09B1BA;      /* Teal principal */
 --primary-dark: #078A91;
 --primary-light: #E6F7F8;
 --secondary: #FF4B55;
@@ -42,168 +87,116 @@ Swappo (swappo.ae) is the **UAE's first marketplace for swapping, buying, sellin
 --font: 'Inter', sans-serif;
 ```
 
-## File Structure
+## Structure fichiers
 ```
 ehvoila/
-├── index.html              ← Homepage
-├── manifest.json           ← PWA manifest
-├── sw.js                   ← Service Worker
-├── CLAUDE.md               ← This file (project instructions)
+├── index.html                  ← Coming Soon (public)
+├── dev-a7f3k9mz2q.html        ← Homepage réelle (dev URL)
+├── CLAUDE.md                   ← CE FICHIER
+├── manifest.json / sw.js       ← PWA
 ├── css/
-│   └── style.css           ← Global design system
+│   ├── style.css               ← Design system global
+│   ├── swappo-visual.css       ← Composants visuels
+│   ├── swappo-modern-2026.css  ← Modernisation
+│   └── landing-upgrade.css     ← Landing page
 ├── js/
-│   ├── app.js              ← GPS, favorites, filters
-│   └── i18n.js             ← Multilingual (EN/FR/AR/UR + RTL support)
-├── img/
-│   ├── icon-192.svg        ← PWA icon (handshake + SWAPPO)
-│   └── icon-512.svg        ← PWA icon large
-└── pages/
-    ├── login.html          ← "Join the Swap" (signup/login)
-    ├── catalogue.html      ← "Swap Market" (browse items)
-    ├── publier.html        ← "Drop an Item" (list item — 4-step wizard)
-    ├── giveaway.html       ← "Gift Corner" (free items)
-    ├── product.html        ← Product detail page
-    ├── profile.html        ← "My Swaps" (user profile/dashboard)
-    └── chat.html           ← "SwapChat" (messaging)
+│   ├── supabase.js             ← Client Supabase + helpers auth
+│   ├── i18n.js                 ← Traductions 5 langues
+│   ├── app.js                  ← GPS, favorites, filtres
+│   ├── swappo-items.js         ← CRUD items Supabase
+│   ├── swappo-swaps.js         ← CRUD swaps/offers Supabase
+│   ├── swappo-chat.js          ← Chat realtime Supabase
+│   ├── swappo-storage.js       ← Upload photos Supabase Storage
+│   ├── toast.js                ← Notifications toast (remplace DemoNotifications)
+│   ├── constants.js            ← Taxonomies catégories/conditions/badges
+│   ├── identity-card.js        ← Composant Identity Card anonyme/révélé
+│   ├── notifications-bell.js   ← Cloche notifs globale
+│   ├── truck-link.js           ← Injection Find a Truck
+│   ├── stories.js              ← Stories Pro (Depop-style)
+│   ├── offer-threading.js      ← Threading contre-offres
+│   ├── feed-tabs.js            ← Tabs catalogue (Trending/Around You/Latest/For You)
+│   ├── auto-decline.js         ← Auto-decline Pro
+│   ├── badge-decay.js          ← Badge decay Airbnb-style
+│   ├── mega-menu.js            ← Mega menu catégories
+│   ├── publier.js              ← Formulaire publication item
+│   ├── chat.js / items.js / swaps.js ← Legacy helpers
+│   └── _archive/               ← demo-engine.js, mock-data.js (MORT, ne pas utiliser)
+├── pages/
+│   ├── login.html              ← Join the Swap (signup/login Supabase Auth)
+│   ├── onboarding.html         ← Pseudo + avatar après signup
+│   ├── catalogue.html          ← Swap Market (browse + filtres + tabs)
+│   ├── publier.html            ← Drop an Item (4 étapes + GPS)
+│   ├── product.html            ← Page produit (Propose Swap / Buy / Make Offer)
+│   ├── profile.html            ← My Swaps (dashboard complet)
+│   ├── profile-public.html     ← Profil public read-only
+│   ├── chat.html               ← SwapChat (realtime + Deal Tracker)
+│   ├── giveaway.html           ← Gift Corner
+│   ├── pricing.html            ← Free vs Pro
+│   ├── transport.html          ← Find a Truck
+│   ├── recycle.html            ← Recycle Hub
+│   ├── impact.html             ← Swappo Impact
+│   ├── reset-password.html     ← Reset mot de passe
+│   ├── terms.html / privacy.html / cookies.html / legal.html
+│   └── contact.html            ← Contact (+971 54 312 5559)
+└── sql/
+    └── schema.sql + migrations via Supabase MCP
 ```
 
-## Swappo Vocabulary (Custom Branding)
-| Standard        | Swappo Name       |
-|----------------|-------------------|
-| Home           | Home              |
-| Catalogue      | **Swap Market**   |
-| Post Item      | **Drop an Item**  |
-| My Profile     | **My Swaps**      |
-| Giveaways      | **Gift Corner**   |
-| Messages       | **SwapChat**      |
-| Login/Signup   | **Join the Swap** |
-| Notifications  | **SwapAlerts**    |
+## Business Model v5 (avril 2026)
+| Plan | Prix | Détails |
+|------|------|---------|
+| **Free** | 0 | Unlimited listings/swaps/purchases, 1 gift claim/mois, 5% fee delivery, ads |
+| **Pro** | 29 AED/mois (249/an) | 0% fee, 3 boosts/mois, 5 gift claims/mois, no ads, 💎 badge, analytics, Stories |
 
-## Core Business Rules (CRITICAL — never violate these)
+### Revenue streams (6)
+1. **Delivery fees** (~30%) — marge sur livreur tiers
+2. **Pro subscriptions** (~15%) — 29 AED/mois
+3. **Boosts** (~15%) — 5/10/25 AED par promotion
+4. **Find a Truck** (~10%) — commission 10-15% sur transporteurs
+5. **Vehicle inspection** (~5%) — partenariat garages
+6. **Ads** (~5%) — sur version Free
 
-### 1. Subscription-Based Swap Access
-Users get a monthly quota of swaps based on their plan. Identity is revealed automatically when BOTH parties accept a swap (counts as 1 swap from each user's quota). Never show real names, photos, or contact info before mutual acceptance.
+## Supabase — Tables principales
+- `auth.users` — Comptes (email/phone, Supabase Auth)
+- `profiles` / `users_public` (view) — Pseudo, avatar, rating, badges, is_pro
+- `items` — Listings (title, category, brand, model, condition, price, modes, photos, GPS)
+- `swaps` — Offres/échanges (proposer_id, receiver_id, items, status, payment_method)
+- `conversations` + `messages` — Chat realtime
+- `notifications` — Bell dropdown
+- `reviews` — Ratings post-échange
+- `stories` — Stories Pro 24h
+- Toutes les tables ont RLS activé
 
-### 2. Subscription Tiers
-| | Free | Bronze (19 AED/mo) | Silver (39 AED/mo) | Premium (69 AED/mo) |
-|---|---|---|---|---|
-| Swaps/month | 2 | 4 | 6 | Unlimited |
-| Giveaway claims/month | 1 | 2 | 3 | 5 |
-| Boosts/month | 0 | 1 | 2 | 4 |
-| Badge | Newcomer | Bronze | Silver | Premium |
-| Ads | Yes | Reduced | Reduced | No ads |
-| Identity reveal | Included in swap | Included | Included | Included |
+## Vocabulaire Swappo
+| Standard | Swappo |
+|----------|--------|
+| Home | Home |
+| Catalogue | **Swap Market** |
+| Post Item | **Drop an Item** |
+| My Profile | **My Swaps** |
+| Giveaways | **Gift Corner** |
+| Messages | **SwapChat** |
+| Login/Signup | **Join the Swap** |
+| Notifications | **SwapAlerts** |
 
-### 3. No Free-Text Descriptions
-Product listings use ONLY structured form fields (dropdowns, selects). NO open text area for descriptions. This is an anti-circumvention measure — prevents users from sneaking contact info into descriptions.
+## Navbar standard (header)
+Logo | Search | Chat icon | Profile icon | "Join the Swap" | "Drop an Item"
+**PAS** de Find a Truck dans le header.
 
-### 4. Giveaway Rules
-- Must have badge ⭐ (1+ completed swap) to access Gift Corner
-- Claims limited by subscription tier (Free: 1/mo, Bronze: 2/mo, Silver: 3/mo, Premium: 5/mo)
-- Claiming locks that category for 30 days (anti-reseller)
+## UAE / Legal
+- **Société** : Hannibal General Trading L.L.C - S.P.C
+- **Abu Dhabi** — ADRA Registry No. 6158841
+- **TDRA e-activity** : NOL-26-100000206 (valide jusqu'au 09/04/2027)
+- **Contact** : +971 54 312 5559 / contact@swappo.ae
 
-### 5. Chat Security
-- In-app chat only (SwapChat)
-- Auto-filter phone numbers, emails, and links
-- Chat opens only after swap is mutually accepted
-
-### 6. Content Moderation
-Banned: weapons, drugs, adult toys, nudity, counterfeit, medications
-3-level filtering: category blacklist → AI photo detection → user reports (3 reports = auto-suspend)
-
-### 7. Guest Teaser Model
-- Guests CAN browse and see products (last 2 photos hidden)
-- Guests CANNOT: propose, like, publish, access giveaways, chat
-- Pages must be SEO-indexable
-
-## Badge System (6 Tiers + 5 Special)
-### Tier badges (swap count):
-- 🌱 Newcomer: 0 | ⭐ Swapper: 1 | 🔥 Active: 5 | 💎 Pro: 15 | 🏆 Elite: 30 | 👑 Legend: 75
-
-### Special badges (stackable):
-- 🎁 Generous Heart (5+ donations) | 🌍 Community Builder (5 referrals) | ⚡ Speed Swapper (exchange <48h) | 🛡️ Trusted Trader (10 consecutive, 0 disputes) | 🔍 Category Expert (5 in same category)
-
-**Badges NEVER give free points — they are status only.**
-
-## Revenue Streams (6)
-1. Subscription tiers (core ~65%) — Bronze 19, Silver 39, Premium 69 AED/mo
-2. Boost listings (~15%) — Bronze 1/mo, Silver 2/mo, Premium 4/mo, extra boosts purchasable
-3. Advertising (~10%) — shown to Free and reduced for Bronze/Silver
-4. Delivery partnerships Fetchr/Aramex (~5%)
-5. High-value transaction fees (~3%) — Vehicles category
-6. Data insights (long-term)
-
-## Product Categories (8)
-1. Clothing & Accessories
-2. Books & Media
-3. Kids & Baby
-4. Sports & Leisure
-5. Furniture & Home
-6. Electronics & Phones
-7. Vehicles
-8. Other
-
-## Multi-Swap
-Users can offer 2-3 items against 1 (from MVP). Counts as 1 swap from each user's quota.
-
-## Rating System
-After exchange: both rate 1-5 stars. Public on profile. 3 reports → auto-suspend.
-
-## Notifications (from Day 1)
-- Push via PWA Web Push API
-- Email via Supabase / Resend
-- Triggers: swap proposal, swap accepted, new message, boost expiring, giveaway near you, badge unlocked, swap quota almost reached, subscription renewal
-
-## Premium Subscription (69 AED/month) — Top Tier
-- Unlimited swaps per month
-- Premium badge
-- No ads
-- 4 boosts/month
-- 5 giveaway claims/month
-
-## UAE / Legal Context
-- **Operating Company**: Hannibal General Trading - L.L.C - S.P.C
-- **Registry No.**: 6158841 (Abu Dhabi - ADRA)
-- **Economic Licence No.**: CN-5592284
-- **Legal Form**: LLC - Sole Proprietorship Company
-- **Licensed Activities**: E-Commerce Through Websites (4791018), E-Commerce Through Social Media (4791019), General Trading (4690018)
-- **Owner**: Ahmed Ben Kridis Agrebi (100%)
-- **Address**: Abu Dhabi, UAE
-- **Licence Expiry**: 11/11/2026
-- **Payments**: Apple Pay, Google Pay, Cards, Tabby, Stripe/Tap for subscriptions
-- **Trademark**: "Swappo" to be registered via Ministry of Economy (~800-1,500 AED)
-- **Applicable Law**: UAE Federal Laws, Federal Decree Law No. 14/2023 (E-Commerce), Federal Law No. 15/2020 (Consumer Protection)
-- **Jurisdiction**: Courts of Abu Dhabi, UAE
-- **No SVF license needed** — subscription model is standard SaaS
-- **Legal pages**: Terms & Conditions, Privacy Policy, Cookie Policy (already created, need update to subscription model)
-
-## Payment Policy (decided 2026-04-07)
-
-Swappo processes payments via Stripe for ONLY these services:
-- Pro subscriptions (29 AED/month or 249 AED/year)
-- Boosts (5/10/25 AED per item promotion)
-- Delivery service fees (Phase 2, ~20 AED per delivery)
-
-Swappo NEVER processes:
-- Cash top-ups between users (negotiation tool only, exchanged in person)
-- Direct user-to-user payments (would require PSP license)
-
-For swaps with cash top-up + delivery (Phase 2), the courier collects
-cash via COD (Cash on Delivery) service. Swappo only charges the
-delivery + COD service fees, never touches the user-to-user cash.
-
-The cash top-up component on `pages/product.html` is purely a negotiation
-tool — no fees, no Stripe calls, no commission. Users settle the cash
-hand-to-hand at the swap meetup.
-
-## What To Do Next
-Priority tasks for backend connection:
-1. Set up Supabase project (auth, database schema, storage buckets)
-2. Connect login.html to Supabase Auth (email + Google/Apple/Facebook OAuth)
-3. Create database tables: users, subscriptions, items, swaps, messages, ratings, badges
-4. Connect publier.html to item creation (Supabase insert + Storage for photos)
-5. Connect catalogue.html to real data (Supabase queries with filters)
-6. Implement real-time chat via Supabase Realtime
-7. Add subscription logic (tier check, swap quota tracking, monthly reset)
-8. Integrate payment for subscriptions (Stripe or Tap Payments for UAE)
-9. Deploy to Vercel/Netlify
+## Erreurs à ne JAMAIS reproduire
+1. **DemoNotifications.showToast** → utiliser `Toast.show()` depuis `js/toast.js`
+2. **DemoItems.browse / DemoItems.renderCard** → utiliser `SwappoItems` depuis `js/swappo-items.js`
+3. **Chat avant acceptance** → le chat n'existe JAMAIS avant acceptance mutuelle
+4. **"Buy" avant "Swap"** → Swap toujours en premier
+5. **Items démo dans le catalogue** → le site est VIDE en production
+6. **localStorage pour données métier** → Supabase uniquement
+7. **Modifier les CSS sans demander** → copier le style existant
+8. **Find a Truck dans le header** → seulement footer, Deal Tracker, catalogue sidebar
+9. **Clés i18n manquantes** → chaque string en 5 langues, zéro `snake_case` affiché
+10. **Reveal d'identité avant acceptance** → pseudo + badge seulement
