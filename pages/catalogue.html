@@ -712,7 +712,6 @@
       if (catSelect) {
         catSelect.addEventListener('change', () => {
           currentFilters.category = catSelect.value;
-          if (window.DemoSuggestions) DemoSuggestions.trackBrowsedCategory(currentFilters.category);
           visibleCount = PAGE_SIZE;
           renderCatalogue();
           updateSubcategoryBar();
@@ -839,7 +838,6 @@
             'gaming & consoles': 'gaming'
           };
           currentFilters.category = catMap[text] || '';
-          if (window.DemoSuggestions) DemoSuggestions.trackBrowsedCategory(currentFilters.category);
           if (catSelect) catSelect.value = currentFilters.category;
           visibleCount = PAGE_SIZE;
           renderCatalogue();

@@ -641,8 +641,7 @@
   // ============ MAIN INIT ============
   document.addEventListener('DOMContentLoaded', async function() {
     try {
-    initDemoMode();
-
+    // Supabase-only — no Demo mode init needed anymore
     var params = new URLSearchParams(window.location.search);
     var itemId = params.get('id');
 
