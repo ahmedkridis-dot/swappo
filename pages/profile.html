@@ -1696,6 +1696,7 @@
     <script src="../js/register-sw.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="../js/supabase.js" defer></script>
+    <script src="../js/swappo-storage.js" defer></script>
     <script src="../js/swappo-items.js" defer></script>
     <script src="../js/swappo-swaps.js" defer></script>
     <script src="../js/swappo-chat.js" defer></script>
@@ -2710,10 +2711,14 @@
 
               // ---- Avatar upload ----
               const upInput = document.getElementById('settings-avatar-upload');
-              if (upInput && window.SwappoStorage) {
+              if (upInput) {
                 upInput.addEventListener('change', async (ev) => {
                   const file = ev.target.files && ev.target.files[0];
                   if (!file) return;
+                  if (!window.SwappoStorage) {
+                    Toast.show('Photo upload is unavailable — please refresh the page.', 'error');
+                    return;
+                  }
                   try {
                     const processed = await window.SwappoStorage.processFile(file);
                     _uploadBlob = processed;
