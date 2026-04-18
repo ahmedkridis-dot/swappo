@@ -862,6 +862,24 @@
               <label for="giveawayCheckbox"><i class="fas fa-gift"></i> <span data-i18n="publish_giveaway_option">Offer as Giveaway (FREE)</span></label>
             </div>
 
+            <!-- Gift Box Option (only visible when "Offer as Giveaway" is on) -->
+            <div id="giftBoxWrap" style="display:none;background:linear-gradient(135deg,#ECFDF5,#F0FDF4);border:1px solid rgba(16,185,129,0.3);border-radius:14px;padding:16px;margin-top:12px;">
+              <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="giftBoxCheckbox" onchange="toggleGiftBoxPicker()" style="margin-top:3px;width:18px;height:18px;accent-color:#10B981;">
+                <div>
+                  <div style="font-weight:700;color:#065F46;">📦 Bundle into a Gift Box</div>
+                  <div style="font-size:12px;color:#047857;margin-top:4px;">Pick ≥1 of your other available items — they'll be listed as a single <strong>Gift Box</strong>. The claimer takes the whole bundle.</div>
+                </div>
+              </label>
+              <div id="giftBoxPicker" style="display:none;margin-top:14px;">
+                <div id="giftBoxItemsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;max-height:260px;overflow-y:auto;padding:4px;"></div>
+                <div id="giftBoxPickerEmpty" style="display:none;padding:14px;text-align:center;color:#6B7280;font-size:13px;">
+                  You have no other available items yet. Publish this one first, then bundle later from your Dashboard.
+                </div>
+                <div id="giftBoxSummary" style="font-size:12px;color:#065F46;margin-top:10px;font-weight:600;"></div>
+              </div>
+            </div>
+
             <!-- The Swappo Promise -->
             <div class="swappo-promise" style="background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:8px;padding:16px 20px;margin:24px 0;">
               <h4 style="color:#92400E;margin:0 0 8px;font-size:0.95rem;" data-i18n="promise_title">The Swappo Promise</h4>

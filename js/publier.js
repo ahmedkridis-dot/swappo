@@ -557,6 +557,88 @@ window.toggleGiveaway = function() {
   cb.checked = !cb.checked;
   formState.isGiveaway = cb.checked;
   document.getElementById('giveawayOption').classList.toggle('checked', cb.checked);
+  // Show/hide the Gift Box wrapper alongside the giveaway toggle.
+  var giftBoxWrap = document.getElementById('giftBoxWrap');
+  if (giftBoxWrap) giftBoxWrap.style.display = cb.checked ? 'block' : 'none';
+  // Reset gift-box state if the user turns giveaway off.
+  if (!cb.checked) {
+    var gbCb = document.getElementById('giftBoxCheckbox');
+    if (gbCb && gbCb.checked) { gbCb.checked = false; window.toggleGiftBoxPicker(); }
+  }
+};
+
+// ── Gift Box item picker ─────────────────────────────────
+// Loads the user's OTHER available items (status='available', not already
+// in a box) and lets them multi-select which ones bundle together with
+// the item being published as a single Gift Box.
+window._giftBoxSelected = new Set();
+window.toggleGiftBoxPicker = async function () {
+  var cb = document.getElementById('giftBoxCheckbox');
+  var panel = document.getElementById('giftBoxPicker');
+  if (!cb || !panel) return;
+  if (!cb.checked) {
+    panel.style.display = 'none';
+    window._giftBoxSelected.clear();
+    _refreshGiftBoxSummary();
+    return;
+  }
+  panel.style.display = 'block';
+  // Lazy-load user's items
+  try {
+    var user = null;
+    if (window.SwappoAuth && window.SwappoAuth.isReady()) {
+      user = await window.SwappoAuth.getCurrentUser();
+    }
+    if (!user) return;
+    var items = await window.SwappoItems.getByUser(user.id);
+    items = (items || []).filter(function (i) {
+      return i.status === 'available' && !i.box_id;
+    });
+    var grid = document.getElementById('giftBoxItemsGrid');
+    var empty = document.getElementById('giftBoxPickerEmpty');
+    if (!items.length) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    grid.innerHTML = items.map(function (it) {
+      var photo = (it.photos && it.photos[0]) || '';
+      var title = ((it.brand || '') + ' ' + (it.model || '')).trim() || it.type;
+      return '<div class="gb-tile" data-id="' + it.id + '" onclick="toggleGiftBoxItem(this)" style="position:relative;border:2px solid #E5E7EB;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:1;background:#fff;">' +
+        (photo ? '<img src="' + photo + '" style="width:100%;height:100%;object-fit:cover;">' : '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:28px;background:#F3F4F6;">📦</div>') +
+        '<div style="position:absolute;top:4px;right:4px;width:20px;height:20px;background:#fff;border:2px solid #10B981;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#10B981;">☐</div>' +
+        '<div style="position:absolute;bottom:0;left:0;right:0;padding:4px 6px;background:linear-gradient(transparent, rgba(0,0,0,0.7));color:#fff;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + title + '</div>' +
+      '</div>';
+    }).join('');
+  } catch (e) { console.warn('[gift-box] picker load failed', e && e.message); }
+};
+
+window.toggleGiftBoxItem = function (el) {
+  var id = el.getAttribute('data-id');
+  if (window._giftBoxSelected.has(id)) {
+    window._giftBoxSelected.delete(id);
+    el.style.borderColor = '#E5E7EB';
+    var cb = el.querySelector('div[style*="border-radius:4px"]');
+    if (cb) { cb.textContent = '☐'; cb.style.background = '#fff'; cb.style.color = '#10B981'; }
+  } else {
+    window._giftBoxSelected.add(id);
+    el.style.borderColor = '#10B981';
+    var cb2 = el.querySelector('div[style*="border-radius:4px"]');
+    if (cb2) { cb2.textContent = '✓'; cb2.style.background = '#10B981'; cb2.style.color = '#fff'; }
+  }
+  _refreshGiftBoxSummary();
+};
+
+function _refreshGiftBoxSummary() {
+  var el = document.getElementById('giftBoxSummary');
+  if (!el) return;
+  var n = window._giftBoxSelected.size;
+  if (n === 0) {
+    el.innerHTML = '<span style="color:#6B7280;font-style:italic;">Pick at least 1 other item to bundle.</span>';
+  } else {
+    el.innerHTML = '📦 <strong>' + (n + 1) + ' items</strong> will ship together as a single Gift Box (this one + ' + n + ' selected).';
+  }
 }
 
 // ========================
@@ -712,7 +794,33 @@ window.publishItem = async function(e) {
       return;
     }
 
-    Toast.show('Item published! \uD83C\uDF89', 'success');
+    // ── Gift Box bundling ──────────────────────────────
+    // If the user ticked "Bundle into a Gift Box" AND picked at least
+    // one other item, wrap everything (this new item + the selected
+    // existing ones) into a single Gift Box via the create_gift_box RPC.
+    var giftBoxCb = document.getElementById('giftBoxCheckbox');
+    var shouldBundle = !!(giftBoxCb && giftBoxCb.checked && formState.isGiveaway && window._giftBoxSelected && window._giftBoxSelected.size > 0);
+    if (shouldBundle) {
+      try {
+        var newItemId = result && result.item && result.item.id;
+        if (newItemId) {
+          var allIds = [newItemId].concat(Array.from(window._giftBoxSelected));
+          var boxResp = await window.db.rpc('create_gift_box', {
+            p_item_ids: allIds,
+            p_title: null,
+            p_description: null
+          });
+          if (boxResp.error) {
+            console.warn('[publish] gift-box bundle failed', boxResp.error);
+            Toast.show('Item published, but Gift Box bundling failed: ' + boxResp.error.message, 'warning');
+          } else {
+            Toast.show('Gift Box of ' + allIds.length + ' items published! 🎁', 'success');
+          }
+        }
+      } catch (e) { console.warn('[publish] gift-box error', e); }
+    } else {
+      Toast.show('Item published! \uD83C\uDF89', 'success');
+    }
     setTimeout(function() {
       window.location.href = 'catalogue.html';
     }, 1200);

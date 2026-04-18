@@ -311,9 +311,13 @@
     const distBadge = (item._distance_km != null)
       ? '<div class="swp-distance-badge">📍 ' + item._distance_km.toFixed(1) + ' km</div>'
       : '';
+    // Gift Box badge — item bundled with ≥1 others as a single-claim box.
+    const boxBadge = item.box_id
+      ? '<div style="position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;box-shadow:0 4px 10px rgba(16,185,129,0.35);display:inline-flex;align-items:center;gap:4px;">📦 BOX</div>'
+      : '';
     return '<div class="product-card"' + dataAttrs + ' data-href="' + href + '" onclick="if(!event.target.closest(\'.product-fav\'))window.location.href=this.dataset.href" style="cursor:pointer">' +
       '<div class="product-img" style="position:relative;">' +
-        distBadge +
+        distBadge + boxBadge +
         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '<div style="width:100%;height:100%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:28px;">\u{1F4E6}</div>') +
         '<button class="product-fav" type="button" style="top:8px; bottom:auto;" data-fav-id="' + itemIdAttr + '" onclick="event.stopPropagation(); SwappoItems.toggleFavorite(this.dataset.favId).then(r => { this.querySelector(\'i\').className = r.favorited ? \'fas fa-heart\' : \'far fa-heart\'; });">' +
           '<i class="' + (fav ? 'fas fa-heart' : 'far fa-heart') + '"></i>' +

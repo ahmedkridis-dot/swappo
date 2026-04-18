@@ -68,28 +68,58 @@
     if (!uid) return { success: false, error: 'You must be signed in.' };
 
     const {
-      myItemId = null, theirItemId, cashAmount = 0, cashDirection = 'none',
+      myItemId = null, myItemIds = null, theirItemId, theirBoxId = null,
+      cashAmount = 0, cashDirection = 'none',
       isPurchase = false, isGiveawayClaim = false
     } = args || {};
 
-    if (!theirItemId) return { success: false, error: 'Target item required.' };
+    if (!theirItemId && !theirBoxId) return { success: false, error: 'Target item required.' };
 
-    const itemsMap = await _fetchItems([theirItemId, myItemId].filter(Boolean));
-    const theirItem = itemsMap[theirItemId];
-    if (!theirItem) return { success: false, error: 'Item not found.' };
-    if (theirItem.user_id === uid) return { success: false, error: "You can't swap with yourself." };
+    // Resolve the receiver. Either a single item or a gift-box listing.
+    var receiverUserId = null;
+    var targetItemId   = theirItemId || null;
+    if (theirBoxId) {
+      const { data: box } = await global.db.from('boxes').select('id, owner_id, kind, status').eq('id', theirBoxId).maybeSingle();
+      if (!box) return { success: false, error: 'Gift Box not found.' };
+      if (box.status !== 'listed') return { success: false, error: 'Gift Box is no longer available.' };
+      if (box.owner_id === uid) return { success: false, error: "You can't claim your own Gift Box." };
+      receiverUserId = box.owner_id;
+    } else {
+      const itemsMap = await _fetchItems([theirItemId].filter(Boolean));
+      const theirItem = itemsMap[theirItemId];
+      if (!theirItem) return { success: false, error: 'Item not found.' };
+      if (theirItem.user_id === uid) return { success: false, error: "You can't swap with yourself." };
+      receiverUserId = theirItem.user_id;
+    }
 
-    if (myItemId) {
-      const myItem = itemsMap[myItemId];
+    // Proposer side: either a single item, OR an array of 2+ items that
+    // we first bundle into a Swap Box via RPC, OR nothing (pure cash /
+    // gift claim).
+    var proposerBoxId = null;
+    var normalizedItemId = myItemId;
+    if (Array.isArray(myItemIds) && myItemIds.length >= 2) {
+      const { data: newBoxId, error: boxErr } = await global.db.rpc('create_swap_box', { p_item_ids: myItemIds });
+      if (boxErr) return { success: false, error: boxErr.message || 'Could not build a Swap Box.' };
+      proposerBoxId = newBoxId;
+      normalizedItemId = null;
+    } else if (Array.isArray(myItemIds) && myItemIds.length === 1) {
+      normalizedItemId = myItemIds[0];
+    }
+
+    if (normalizedItemId) {
+      const itemsMap = await _fetchItems([normalizedItemId]);
+      const myItem = itemsMap[normalizedItemId];
       if (!myItem) return { success: false, error: "Your item wasn't found." };
       if (myItem.user_id !== uid) return { success: false, error: "That item isn't yours." };
     }
 
     const row = {
       proposer_id: uid,
-      receiver_id: theirItem.user_id,
-      proposer_item_id: myItemId,
-      receiver_item_id: theirItemId,
+      receiver_id: receiverUserId,
+      proposer_item_id: normalizedItemId,
+      proposer_box_id: proposerBoxId,
+      receiver_item_id: targetItemId,
+      receiver_box_id: theirBoxId,
       cash_amount: Number(cashAmount) || 0,
       cash_direction: cashDirection,
       is_purchase: !!isPurchase,
@@ -102,12 +132,20 @@
 
     // Notify the RECEIVER in Supabase (so they see it across devices).
     try {
-      var titleTxt = isPurchase ? 'New purchase offer' : 'New swap offer';
-      var msgTxt   = isPurchase
-        ? ('Someone wants to buy your item' + (Number(cashAmount) > 0 ? ' for ' + Number(cashAmount) + ' AED' : '') + '.')
-        : 'Someone proposed a swap on your item.';
+      var boxCount = 0;
+      if (proposerBoxId && Array.isArray(myItemIds)) boxCount = myItemIds.length;
+      var titleTxt = isPurchase ? 'New purchase offer'
+                   : (proposerBoxId ? 'New Swap Box offer' : 'New swap offer');
+      var msgTxt;
+      if (isPurchase) {
+        msgTxt = 'Someone wants to buy your item' + (Number(cashAmount) > 0 ? ' for ' + Number(cashAmount) + ' AED' : '') + '.';
+      } else if (proposerBoxId) {
+        msgTxt = 'Someone proposed a Swap Box of ' + boxCount + ' items for your item.';
+      } else {
+        msgTxt = 'Someone proposed a swap on your item.';
+      }
       await global.db.from('notifications').insert({
-        user_id: theirItem.user_id,
+        user_id: receiverUserId,
         kind: isPurchase ? 'offer_received' : 'swap_proposed',
         type: isPurchase ? 'offer' : 'swap',
         title: titleTxt,
@@ -115,8 +153,11 @@
         url: '/pages/profile.html?tab=swap-dashboard&swap=' + data.id,
         payload: {
           swap_id: data.id,
-          item_id: theirItemId,
+          item_id: targetItemId,
           proposer_id: uid,
+          proposer_box_id: proposerBoxId,
+          proposer_box_count: boxCount,
+          receiver_box_id: theirBoxId,
           cash_amount: Number(cashAmount) || 0,
           cash_direction: cashDirection
         }
@@ -180,11 +221,32 @@
       .update({ status: 'cancelled' }).eq('id', swapId);
     if (error) return { success: false, error: error.message };
 
-    // Release items if they were reserved
+    // Release single items if they were reserved
     const ids = [swap.receiver_item_id, swap.proposer_item_id].filter(Boolean);
     if (ids.length) {
       await global.db.from(ITEMS_TABLE).update({ status: 'available' }).in('id', ids);
     }
+
+    // Swap Box side: the proposer's box was created just for this swap —
+    // cancel it + free its items. We fire-and-forget via the cancel_box
+    // RPC so we don't block on permission edge cases.
+    if (swap.proposer_box_id) {
+      try { await global.db.rpc('cancel_box', { p_box_id: swap.proposer_box_id }); } catch (_) {}
+    }
+    // Gift Box side: the receiver's box stays listed; just make sure the
+    // items are available again and the box status reverts to listed.
+    if (swap.receiver_box_id) {
+      try {
+        const { data: boxItems } = await global.db.from('box_items')
+          .select('item_id').eq('box_id', swap.receiver_box_id);
+        const boxItemIds = (boxItems || []).map(r => r.item_id);
+        if (boxItemIds.length) {
+          await global.db.from(ITEMS_TABLE).update({ status: 'available' }).in('id', boxItemIds);
+        }
+        await global.db.from('boxes').update({ status: 'listed' }).eq('id', swap.receiver_box_id);
+      } catch (_) {}
+    }
+
     return { success: true };
   }
 

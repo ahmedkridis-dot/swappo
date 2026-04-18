@@ -53,6 +53,7 @@ type Ctx = {
   preview: string | null;   // short quote of the chat message (new_message kind)
   url: string;              // deep link into swappo.ae
   kind: string;
+  box_count: number | null; // size of the Swap Box if the proposer offered a box
 };
 
 // ── email templates ───────────────────────────────────────
@@ -64,9 +65,11 @@ function template(ctx: Ctx): { subject: string; html: string } {
       ? { label: 'Browse items', url: `${SITE_URL}/pages/catalogue.html` }
       : { label: 'View offer', url: ctx.url };
 
+  const boxSuffix = ctx.box_count && ctx.box_count >= 2
+    ? ` (Swap Box of ${ctx.box_count} items)` : '';
   const headline =
     ctx.kind === 'swap_proposed' || ctx.kind === 'offer_received'
-      ? `${ctx.actor_name} wants to swap for your ${esc(ctx.item_title)}`
+      ? `${ctx.actor_name} wants to swap for your ${esc(ctx.item_title)}${boxSuffix ? ' ' + esc(boxSuffix) : ''}`
       : ctx.kind === 'swap_accepted'
       ? `${ctx.actor_name} accepted your offer!`
       : ctx.kind === 'swap_declined'
@@ -259,6 +262,7 @@ serve(async (req: Request) => {
     preview: typeof payload.preview === 'string' ? (payload.preview as string) : null,
     url,
     kind: notif.kind,
+    box_count: typeof payload.proposer_box_count === 'number' ? (payload.proposer_box_count as number) : null,
   });
 
   // Send via Resend

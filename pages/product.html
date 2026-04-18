@@ -620,6 +620,16 @@
     }
     .modal-actions .btn-primary { flex: 1; }
 
+    /* Wizard dots (in modal header) */
+    .wizard-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #E5E7EB;
+      transition: background 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .wizard-dot.active { background: var(--primary); transform: scale(1.3); }
+    .wizard-dot.done { background: var(--primary); opacity: 0.5; }
+
     /* ============ RESPONSIVE ============ */
     @media (max-width: 768px) {
       .product-grid { grid-template-columns: 1fr; gap: 24px; }
@@ -792,42 +802,95 @@
   </div>
 </aside>
 
-<!-- ============ SWAP PROPOSAL MODAL ============ -->
+<!-- ============ SWAP PROPOSAL MODAL (2-step wizard) ============
+     Step 1 — Pick 1+ items from your inventory. Selecting 2+ auto-
+              bundles them into a Swap Box on the backend.
+     Step 2 — Optional extra cash to balance + recap + send.
+=============================================================== -->
 <div id="swapModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2 class="modal-title">Choose an item to offer</h2>
-      <button class="modal-close" onclick="closeSwapModal()" aria-label="Close" data-i18n-aria-label="action_close">
-        <i class="fas fa-times"></i>
-      </button>
+      <h2 class="modal-title" id="swapModalTitle">Choose items to offer</h2>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span class="wizard-dot" id="wiz-dot-1" aria-hidden="true"></span>
+        <span class="wizard-dot" id="wiz-dot-2" aria-hidden="true"></span>
+        <button class="modal-close" onclick="closeSwapModal()" aria-label="Close" data-i18n-aria-label="action_close" style="margin-left:8px;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     </div>
 
-    <div class="modal-info" id="modal-info">
-      <i class="fas fa-info-circle"></i>
-      Select one of your items to propose for this swap. Both parties use 1 swap from their monthly quota.
+    <!-- ── STEP 1 — items picker ────────────────────── -->
+    <div id="wizStep1">
+      <div class="modal-info" id="modal-info">
+        <i class="fas fa-info-circle"></i>
+        Pick one item — or select <strong>2 or more</strong> to offer a <strong>Swap Box</strong>. Both parties use 1 swap from their monthly quota.
+      </div>
+
+      <div class="user-items-grid" id="my-items-grid"></div>
+
+      <div id="emptyState" class="modal-empty" style="display: none;">
+        <div class="modal-empty-icon">📦</div>
+        <p>You don't have any items listed yet.</p>
+        <a href="publier.html" class="modal-empty-link">
+          <i class="fas fa-plus"></i> List your first item
+        </a>
+      </div>
+
+      <div id="swapBoxBanner" style="display:none;background:linear-gradient(135deg,#E6F7F8,#D0F0F2);border:1px solid #09B1BA;border-radius:12px;padding:12px 14px;margin-top:14px;display:flex;gap:10px;align-items:center;">
+        <div style="font-size:24px;">📦</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#065F6A;">Swap Box — <span id="swapBoxCount">0</span> items bundled</div>
+          <div style="font-size:11px;color:#078A91;">The other party gets a single "Swap Box" offer. Accept as one unit.</div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="padding-top:16px;">
+        <button class="btn-primary" onclick="wizardNext()" id="wiz-next-btn" style="width:100%;padding:18px 32px;font-size:17px;font-weight:700;border-radius:14px;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:10px;opacity:0.5;cursor:not-allowed;" disabled>
+          <span id="wiz-next-label">Continue</span><i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
     </div>
 
-    <div class="user-items-grid" id="my-items-grid"></div>
+    <!-- ── STEP 2 — cash + recap + send ────────────── -->
+    <div id="wizStep2" style="display:none;">
+      <div class="modal-info" style="background:linear-gradient(135deg,#FFF8E1,#FEF3C7);border-color:#FDE68A;">
+        <i class="fas fa-coins" style="color:#D97706;"></i>
+        Want to balance the deal? Add some cash — it's paid <strong>hand-to-hand at the meetup</strong>, never through Swappo.
+      </div>
 
-    <div id="emptyState" class="modal-empty" style="display: none;">
-      <div class="modal-empty-icon">📦</div>
-      <p>You don't have any items listed yet.</p>
-      <a href="publier.html" class="modal-empty-link">
-        <i class="fas fa-plus"></i> List your first item
-      </a>
+      <!-- Recap strip -->
+      <div id="wizRecap" style="background:#F8FAFA;border:1px solid var(--border);border-radius:14px;padding:14px;margin:14px 0;"></div>
+
+      <!-- Cash slider block (identical logic to the previous inline block) -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="cash-chips">
+          <button type="button" class="cash-chip-active" onclick="selectCashAmount(0,this)"   style="padding:6px 14px;border-radius:999px;border:2px solid var(--primary);background:var(--primary);color:white;font-weight:600;font-size:12px;cursor:pointer;">No cash</button>
+          <button type="button" onclick="selectCashAmount(25,this)"  style="padding:6px 14px;border-radius:999px;border:2px solid #E5E7EB;background:white;color:#333;font-weight:600;font-size:12px;cursor:pointer;">+25 AED</button>
+          <button type="button" onclick="selectCashAmount(100,this)" style="padding:6px 14px;border-radius:999px;border:2px solid #E5E7EB;background:white;color:#333;font-weight:600;font-size:12px;cursor:pointer;">+100 AED</button>
+          <button type="button" onclick="selectCashAmount(200,this)" style="padding:6px 14px;border-radius:999px;border:2px solid #E5E7EB;background:white;color:#333;font-weight:600;font-size:12px;cursor:pointer;">+200 AED</button>
+          <button type="button" onclick="selectCashAmount(500,this)" style="padding:6px 14px;border-radius:999px;border:2px solid #E5E7EB;background:white;color:#333;font-weight:600;font-size:12px;cursor:pointer;">+500 AED</button>
+        </div>
+        <input type="range" id="cash-slider" min="0" max="1000" step="25" value="0" style="width:100%;accent-color:var(--primary);" oninput="updateCashFromSlider(this.value)">
+        <div style="text-align:center;margin-top:12px;">
+          <div style="font-size:30px;font-weight:800;color:var(--primary);line-height:1.1;" id="cash-display">0 AED</div>
+          <div style="font-size:11px;color:#6B7280;font-style:italic;margin-top:4px;">💵 Paid in person — not processed by Swappo</div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="display:flex;gap:10px;padding-top:16px;">
+        <button type="button" onclick="wizardBack()" style="flex:0 0 auto;padding:14px 18px;background:transparent;border:1.5px solid var(--border);border-radius:12px;font-weight:600;color:#4A4A5A;cursor:pointer;display:flex;align-items:center;gap:6px;">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <button class="btn-primary" onclick="confirmSwap()" id="confirm-swap-btn" style="flex:1;padding:16px 20px;font-size:16px;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:10px;">
+          <i class="fas fa-paper-plane"></i> Send Swap Request
+        </button>
+      </div>
     </div>
 
-    <!-- Swap recap (shown when cash is added) -->
-    <div id="swap-recap" style="display:none;background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;padding:14px;margin-top:14px;">
-      <div style="font-size:13px;font-weight:700;color:#1A1A2E;margin-bottom:4px;" id="swap-recap-line">You give: Item + 0 AED in cash</div>
-      <div style="font-size:11px;color:#6B7280;font-style:italic;">💵 Cash payment in person — not processed by Swappo</div>
-    </div>
-
-    <div class="modal-actions" style="padding-top:16px;">
-      <button class="btn-primary" onclick="confirmSwap()" id="confirm-swap-btn" style="width:100%;padding:18px 32px;font-size:17px;font-weight:700;border-radius:14px;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:10px;opacity:0.5;cursor:not-allowed;" disabled>
-        <i class="fas fa-exchange-alt"></i> Confirm Swap
-      </button>
-    </div>
+    <!-- Legacy hidden #swap-recap container kept for any external JS that
+         reads it. Real recap now lives in #wizRecap. -->
+    <div id="swap-recap" style="display:none;"><div id="swap-recap-line"></div></div>
   </div>
 </div>
 
@@ -1155,29 +1218,10 @@
       : false;
     var actionsHTML = '';
 
-    // Item + Cash section — NEGOTIATION TOOL ONLY
-    // Cash top-up is a pure negotiation feature. Swappo NEVER processes this payment,
-    // takes NO commission, and the money is exchanged hand-to-hand at meetup.
-    // Stripe is reserved for Pro subscriptions, Boosts, and Delivery service fees.
-    if (!item.is_giveaway && !isGuest) {
-      var tooltipText = "This helps balance unequal swaps. The cash is exchanged hand-to-hand at meetup. For card payment via the platform, choose Swappo Delivery (coming soon).";
-      actionsHTML += '<div id="cash-section" style="background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border-radius:12px;padding:16px;border:1px solid #FFE082;margin-bottom:12px;">';
-      actionsHTML += '<div style="font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">💰 Add cash to sweeten the deal <span title="' + tooltipText + '" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#FBBF24;color:white;font-size:11px;cursor:help;font-weight:800;font-style:italic;">i</span></div>';
-      actionsHTML += '<div style="background:rgba(9,177,186,0.08);border-left:3px solid #09B1BA;padding:8px 12px;border-radius:6px;margin-bottom:12px;">';
-      actionsHTML += '<div style="font-size:12px;color:#1A1A2E;font-weight:600;">🤝 Cash to be exchanged in person at swap meetup</div>';
-      actionsHTML += '<div style="font-size:10px;color:#6B7280;margin-top:2px;">Swappo never handles this payment — it\'s directly between you and the other swapper.</div>';
-      actionsHTML += '</div>';
-      actionsHTML += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="cash-chips">';
-      [0, 25, 100, 200, 500].forEach(function(amt) {
-        var label = amt === 0 ? 'No cash' : '+' + amt + ' AED';
-        actionsHTML += '<button class="' + (amt === 0 ? 'cash-chip-active' : '') + '" onclick="selectCashAmount(' + amt + ',this)" style="padding:6px 14px;border-radius:999px;border:2px solid ' + (amt === 0 ? 'var(--primary)' : '#E5E7EB') + ';background:' + (amt === 0 ? 'var(--primary)' : 'white') + ';color:' + (amt === 0 ? 'white' : '#333') + ';font-weight:600;font-size:12px;cursor:pointer;transition: transform 0.2s, opacity 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;">' + label + '</button>';
-      });
-      actionsHTML += '</div>';
-      actionsHTML += '<input type="range" min="0" max="1000" step="5" value="0" id="cash-slider" style="width:100%;accent-color:var(--primary);margin:4px 0;" oninput="updateCashFromSlider(this.value)">';
-      actionsHTML += '<div style="text-align:center;margin-top:4px;"><span id="cash-display" style="font-size:24px;font-weight:800;color:var(--primary);">0 AED</span>';
-      actionsHTML += '<div id="cash-fee" style="font-size:11px;color:#6B7280;margin-top:4px;font-style:italic;">💵 Paid in person — not processed by Swappo</div></div>';
-      actionsHTML += '</div>';
-    }
+    // The legacy "Add cash to sweeten the deal" panel used to live here,
+    // always visible in the sidebar. It confused users (asking for cash
+    // before picking an item). As of 2026-04-18 the cash slider lives in
+    // STEP 2 of the swap wizard (see #wizStep2 in the modal).
 
     if (isOwner) {
       // Owner view: show management actions, NOT swap/buy/offer (you can't
@@ -1508,17 +1552,16 @@
     if (el) el.textContent = amount + ' AED';
     var feeEl = document.getElementById('cash-fee');
     if (feeEl) feeEl.textContent = amount > 0 ? '💵 Paid in person at meetup — not processed by Swappo' : '💵 Paid in person — not processed by Swappo';
-    // Update modal recap if visible
+    // Keep the legacy hidden recap pill in sync (downstream code reads it).
     var recap = document.getElementById('swap-recap');
     var recapLine = document.getElementById('swap-recap-line');
     if (recap && recapLine) {
       if (amount > 0) {
-        recap.style.display = 'block';
         recapLine.textContent = 'You give: Your item + ' + amount + ' AED in cash';
-      } else {
-        recap.style.display = 'none';
       }
     }
+    // Refresh the wizard step-2 live recap card.
+    if (typeof _renderWizardRecap === 'function') _renderWizardRecap();
   }
   window.selectCashAmount = selectCashAmount;
   window.updateCashFromSlider = updateCashFromSlider;
@@ -1669,6 +1712,9 @@
       } catch (e) { console.warn('[openSwapModal] publish gate check failed:', e); }
     }
     selectedSwapItemId = null;
+    selectedSwapItemIds = [];
+    selectedCashAmount = 0;
+    wizardGoTo(1);
     document.getElementById('swapModal').classList.add('open');
     // Refresh items
     loadMyItemsInModal();
@@ -1680,16 +1726,107 @@
   function closeSwapModal() {
     document.getElementById('swapModal').classList.remove('open');
     selectedSwapItemId = null;
+    selectedSwapItemIds = [];
     document.querySelectorAll('.user-item').forEach(function(el) {
       el.classList.remove('selected');
       var cb = el.querySelector('.user-item-checkbox');
       if (cb) cb.textContent = '\u2610';
     });
-    var btn = document.getElementById('confirm-swap-btn');
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-    btn.style.cursor = 'not-allowed';
+    _refreshWizardState();
   }
+
+  // ── 2-step wizard helpers ─────────────────────────
+  var wizStep = 1;
+  var selectedSwapItemIds = [];
+
+  function wizardGoTo(n) {
+    wizStep = n;
+    var s1 = document.getElementById('wizStep1');
+    var s2 = document.getElementById('wizStep2');
+    var d1 = document.getElementById('wiz-dot-1');
+    var d2 = document.getElementById('wiz-dot-2');
+    var title = document.getElementById('swapModalTitle');
+    if (n === 1) {
+      if (s1) s1.style.display = '';
+      if (s2) s2.style.display = 'none';
+      if (d1) d1.className = 'wizard-dot active';
+      if (d2) d2.className = 'wizard-dot';
+      if (title) title.textContent = 'Choose items to offer';
+    } else {
+      if (s1) s1.style.display = 'none';
+      if (s2) s2.style.display = '';
+      if (d1) d1.className = 'wizard-dot done';
+      if (d2) d2.className = 'wizard-dot active';
+      if (title) title.textContent = 'Add cash + confirm';
+      _renderWizardRecap();
+    }
+  }
+  window.wizardGoTo = wizardGoTo;
+
+  function wizardNext() {
+    if (!selectedSwapItemIds.length) return;
+    wizardGoTo(2);
+  }
+  window.wizardNext = wizardNext;
+  function wizardBack() { wizardGoTo(1); }
+  window.wizardBack = wizardBack;
+
+  function _refreshWizardState() {
+    var count = selectedSwapItemIds.length;
+    var banner = document.getElementById('swapBoxBanner');
+    var countEl = document.getElementById('swapBoxCount');
+    var nextBtn = document.getElementById('wiz-next-btn');
+    var nextLabel = document.getElementById('wiz-next-label');
+    if (banner) banner.style.display = (count >= 2 ? 'flex' : 'none');
+    if (countEl) countEl.textContent = String(count);
+    if (nextBtn) {
+      nextBtn.disabled = count === 0;
+      nextBtn.style.opacity = count ? '1' : '0.5';
+      nextBtn.style.cursor = count ? 'pointer' : 'not-allowed';
+    }
+    if (nextLabel) {
+      nextLabel.textContent = count >= 2 ? 'Continue with Swap Box (' + count + ')' : 'Continue';
+    }
+  }
+
+  function _renderWizardRecap() {
+    var recap = document.getElementById('wizRecap');
+    if (!recap || !currentItem) return;
+    var count = selectedSwapItemIds.length;
+    var theirTitle = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || currentItem.type || 'their item';
+    var theirPhoto = (currentItem.photos && currentItem.photos[0]) || '';
+    var minePreview = '';
+    if (count >= 2) {
+      minePreview = '<div style="display:flex;align-items:center;gap:6px;"><div style="font-size:20px;">📦</div><div><div style="font-size:14px;font-weight:700;color:#1A1A2E;">Swap Box</div><div style="font-size:11px;color:#6B7280;">' + count + ' items bundled</div></div></div>';
+    } else if (count === 1 && window._modalItemIndex) {
+      var onlyId = selectedSwapItemIds[0];
+      var mine = window._modalItemIndex[onlyId] || {};
+      var mt = ((mine.brand || '') + ' ' + (mine.model || '')).trim() || mine.type || 'your item';
+      var mp = (mine.photos && mine.photos[0]) || '';
+      minePreview = '<div style="display:flex;align-items:center;gap:6px;">' +
+        (mp ? '<img src="' + mp + '" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">' : '') +
+        '<div style="font-size:14px;font-weight:700;color:#1A1A2E;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + mt + '</div></div>';
+    }
+    var cashLine = (selectedCashAmount && selectedCashAmount > 0)
+      ? '<div style="font-size:12px;color:#D97706;font-weight:600;margin-top:8px;">+ ' + selectedCashAmount + ' AED cash</div>'
+      : '';
+    recap.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">You offer</div>' +
+          minePreview + cashLine +
+        '</div>' +
+        '<div style="font-size:20px;color:#09B1BA;">↔</div>' +
+        '<div style="flex:1;min-width:0;text-align:right;">' +
+          '<div style="font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">You receive</div>' +
+          '<div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">' +
+            '<div style="font-size:14px;font-weight:700;color:#1A1A2E;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + theirTitle + '</div>' +
+            (theirPhoto ? '<img src="' + theirPhoto + '" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+  window._renderWizardRecap = _renderWizardRecap;
 
   // B-021: async Supabase-first load with loud error surfacing.
   async function loadMyItemsInModal() {
@@ -1722,6 +1859,11 @@
       grid.style.display = '';
       emptyState.style.display = 'none';
 
+      // Cache the items so the wizard recap can look up photos/titles
+      // without an extra query.
+      window._modalItemIndex = {};
+      myItems.forEach(function (mi) { window._modalItemIndex[mi.id] = mi; });
+
       grid.innerHTML = myItems.map(function(mi) {
         var photo = (mi.photos && mi.photos[0]) || '';
         var miTitle = ((mi.brand || '') + ' ' + (mi.model || '')).trim() || mi.type;
@@ -1746,37 +1888,35 @@
 
   function toggleItemSelection(element) {
     var itemId = element.getAttribute('data-item');
+    var cb = element.querySelector('.user-item-checkbox');
+    var idx = selectedSwapItemIds.indexOf(itemId);
 
-    // Single selection mode
-    if (element.classList.contains('selected')) {
+    if (idx >= 0) {
+      // Deselect
+      selectedSwapItemIds.splice(idx, 1);
       element.classList.remove('selected');
-      element.querySelector('.user-item-checkbox').textContent = '\u2610';
-      selectedSwapItemId = null;
+      if (cb) cb.textContent = '\u2610';
     } else {
-      // Deselect others
-      document.querySelectorAll('.user-item.selected').forEach(function(el) {
-        el.classList.remove('selected');
-        el.querySelector('.user-item-checkbox').textContent = '\u2610';
-      });
+      // Select (multi-select enabled — ≥2 auto-bundles into a Swap Box)
+      selectedSwapItemIds.push(itemId);
       element.classList.add('selected');
-      element.querySelector('.user-item-checkbox').textContent = '\u2713';
-      selectedSwapItemId = itemId;
+      if (cb) cb.textContent = '\u2713';
     }
 
-    var btn = document.getElementById('confirm-swap-btn');
-    btn.disabled = !selectedSwapItemId;
-    btn.style.opacity = selectedSwapItemId ? '1' : '0.5';
-    btn.style.cursor = selectedSwapItemId ? 'pointer' : 'not-allowed';
+    // Legacy single-item var kept in sync for any external reader.
+    selectedSwapItemId = selectedSwapItemIds[0] || null;
+
+    _refreshWizardState();
   }
 
   async function confirmSwap() {
-    if (!selectedSwapItemId || !currentItem) return;
+    if (!selectedSwapItemIds.length || !currentItem) return;
 
     var result;
     try {
       if (window.SwappoSwaps && window.db) {
         var payload = {
-          myItemId: selectedSwapItemId,
+          myItemIds: selectedSwapItemIds.slice(),   // array — auto-bundled into a Swap Box if ≥2
           theirItemId: currentItem.id
         };
         if (selectedCashAmount && selectedCashAmount > 0) {
@@ -1795,8 +1935,12 @@
 
     if (result && result.success !== false) {
       closeSwapModal();
-      // v5: NO chat before acceptance — send notification only
-      Toast.show('Swap proposal sent! The seller will review your offer. ✅', 'success');
+      var wasBox = selectedSwapItemIds.length >= 2;
+      Toast.show(
+        (wasBox ? 'Swap Box proposal sent! ' : 'Swap proposal sent! ') +
+        'The seller will review your offer. ✅',
+        'success'
+      );
       if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
 
       // Redirect to dashboard offers tab (not chat)

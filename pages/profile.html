@@ -1965,30 +1965,74 @@
                 return _usersCache.get(userId) || { pseudo: 'Unknown', avatar: null };
             }
 
+            var _boxesCache = new Map(); // box_id -> { box, item_ids: [] }
+
             async function _hydrateSwaps(swapsArr) {
                 if (!window.db || !swapsArr.length) return;
                 const itemIds = new Set();
                 const userIds = new Set();
+                const boxIds = new Set();
                 swapsArr.forEach(s => {
                     if (s.proposer_item_id) itemIds.add(s.proposer_item_id);
                     if (s.receiver_item_id) itemIds.add(s.receiver_item_id);
+                    if (s.proposer_box_id) boxIds.add(s.proposer_box_id);
+                    if (s.receiver_box_id) boxIds.add(s.receiver_box_id);
                     if (s.proposer_id) userIds.add(s.proposer_id);
                     if (s.receiver_id) userIds.add(s.receiver_id);
                 });
                 try {
-                    // NOTE: select only columns that actually exist in public.users —
-                    // `avatar_color` does NOT exist (legacy Demo-only field); asking
-                    // for it makes the entire query error out silently, leaving the
-                    // cache empty and every user render falling back to "Unknown".
-                    const [itemsResp, usersResp] = await Promise.all([
-                        itemIds.size ? window.db.from('items').select('id,brand,model,category,type,photos,price,condition,is_giveaway,status').in('id', Array.from(itemIds)) : Promise.resolve({data:[]}),
-                        userIds.size ? window.db.from('users').select('id,pseudo,name,avatar,plan,badge,swap_count').in('id', Array.from(userIds)) : Promise.resolve({data:[]})
+                    const [itemsResp, usersResp, boxesResp, boxItemsResp] = await Promise.all([
+                        itemIds.size ? window.db.from('items').select('id,brand,model,category,type,photos,price,condition,is_giveaway,status,box_id').in('id', Array.from(itemIds)) : Promise.resolve({data:[]}),
+                        userIds.size ? window.db.from('users').select('id,pseudo,name,avatar,plan,badge,swap_count').in('id', Array.from(userIds)) : Promise.resolve({data:[]}),
+                        boxIds.size ? window.db.from('boxes').select('id,owner_id,kind,title,status').in('id', Array.from(boxIds)) : Promise.resolve({data:[]}),
+                        boxIds.size ? window.db.from('box_items').select('box_id,item_id').in('box_id', Array.from(boxIds)) : Promise.resolve({data:[]})
                     ]);
                     if (itemsResp.error) console.warn('[_hydrateSwaps] items error:', itemsResp.error.message);
                     if (usersResp.error) console.warn('[_hydrateSwaps] users error:', usersResp.error.message);
+                    if (boxesResp.error) console.warn('[_hydrateSwaps] boxes error:', boxesResp.error.message);
                     (itemsResp.data || []).forEach(it => _itemsCache.set(it.id, it));
                     (usersResp.data || []).forEach(u => _usersCache.set(u.id, u));
+                    (boxesResp.data || []).forEach(b => _boxesCache.set(b.id, { box: b, item_ids: [] }));
+                    (boxItemsResp.data || []).forEach(bi => {
+                        var entry = _boxesCache.get(bi.box_id);
+                        if (entry) entry.item_ids.push(bi.item_id);
+                    });
+
+                    // Second fetch: items that are inside boxes but weren't
+                    // already in the first batch.
+                    const boxItemIds = new Set();
+                    _boxesCache.forEach(v => v.item_ids.forEach(id => { if (!_itemsCache.has(id)) boxItemIds.add(id); }));
+                    if (boxItemIds.size) {
+                        const boxItemsData = await window.db.from('items')
+                            .select('id,brand,model,category,type,photos,price,condition,is_giveaway,status,box_id')
+                            .in('id', Array.from(boxItemIds));
+                        (boxItemsData.data || []).forEach(it => _itemsCache.set(it.id, it));
+                    }
                 } catch (e) { console.error('_hydrateSwaps error', e); }
+            }
+
+            function findBox(boxId) {
+                if (!boxId) return null;
+                return _boxesCache.get(boxId) || null;
+            }
+
+            /** Build a render-friendly "side" object for proposer or receiver.
+             *  Returns: { kind: 'item' | 'box', item, box, items, count, photos } */
+            function resolveSwapSide(swap, which) {
+                var boxId = which === 'proposer' ? swap.proposer_box_id : swap.receiver_box_id;
+                var itemId = which === 'proposer' ? swap.proposer_item_id : swap.receiver_item_id;
+                if (boxId) {
+                    var entry = findBox(boxId);
+                    var items = entry ? entry.item_ids.map(id => _itemsCache.get(id)).filter(Boolean) : [];
+                    return {
+                        kind: 'box',
+                        box: entry ? entry.box : null,
+                        items: items,
+                        count: items.length,
+                        photos: items.map(i => (i.photos && i.photos[0]) || null).filter(Boolean).slice(0, 3)
+                    };
+                }
+                return { kind: 'item', item: findItem(itemId) };
             }
 
             function getItemPhoto(item) {
@@ -2034,6 +2078,32 @@
                 return diff + ' days ago';
             }
 
+            function _sideHTML(side, label) {
+                if (!side) return '<div class="swap-request-item"><img src="' + getItemPhoto(null) + '" alt=""><div class="item-info"><div class="item-title">—</div><div class="item-category">' + label + '</div></div></div>';
+                if (side.kind === 'box') {
+                    var cover = (side.photos && side.photos[0]) ||
+                        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+                    var boxLabel = side.box && side.box.kind === 'gift' ? '🎁 Gift Box' : '📦 Swap Box';
+                    return '<div class="swap-request-item">' +
+                        '<div style="position:relative;width:56px;height:56px;flex-shrink:0;">' +
+                            '<img src="' + cover + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">' +
+                            '<div style="position:absolute;bottom:-4px;right:-4px;background:#09B1BA;color:#fff;border:2px solid #fff;border-radius:999px;min-width:20px;height:20px;padding:0 5px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;">' + side.count + '</div>' +
+                        '</div>' +
+                        '<div class="item-info">' +
+                            '<div class="item-title">' + boxLabel + '</div>' +
+                            '<div class="item-category">' + side.count + ' items · ' + label + '</div>' +
+                        '</div>' +
+                    '</div>';
+                }
+                return '<div class="swap-request-item">' +
+                    '<img src="' + getItemPhoto(side.item) + '" alt="">' +
+                    '<div class="item-info">' +
+                        '<div class="item-title">' + getItemTitle(side.item) + '</div>' +
+                        '<div class="item-category">' + label + '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+
             function renderSwapCard(swap, perspective) {
                 var isProposer = swap.proposer_id === user.id;
                 var otherUserId = isProposer ? swap.receiver_id : swap.proposer_id;
@@ -2042,6 +2112,13 @@
                 var theirItemId = isProposer ? swap.receiver_item_id : swap.proposer_item_id;
                 var myItem = findItem(myItemId);
                 var theirItem = findItem(theirItemId);
+
+                // Resolve both sides via the box-aware helper. This is the
+                // new source of truth — boxes render as a single unit.
+                var proposerSide = resolveSwapSide(swap, 'proposer');
+                var receiverSide = resolveSwapSide(swap, 'receiver');
+                var mySide    = isProposer ? proposerSide : receiverSide;
+                var theirSide = isProposer ? receiverSide : proposerSide;
 
                 // For pure cash offers (no proposer item) or giveaway claims,
                 // synthesize a "virtual item" on the proposer's side so the
@@ -2086,15 +2163,9 @@
                         '<span class="swap-request-date">' + daysAgo(swap.created_at) + '</span>' +
                     '</div>' +
                     '<div class="swap-request-items">' +
-                        '<div class="swap-request-item">' +
-                            '<img src="' + getItemPhoto(isProposer ? myItem : theirItem) + '" alt="">' +
-                            '<div class="item-info"><div class="item-title">' + getItemTitle(isProposer ? myItem : theirItem) + '</div><div class="item-category">' + (isProposer ? 'Your item' : 'Their offer') + '</div></div>' +
-                        '</div>' +
+                        _sideHTML(isProposer ? mySide : theirSide, isProposer ? 'Your offer' : 'Their offer') +
                         '<i class="fas fa-exchange-alt swap-arrow-icon"></i>' +
-                        '<div class="swap-request-item">' +
-                            '<img src="' + getItemPhoto(isProposer ? theirItem : myItem) + '" alt="">' +
-                            '<div class="item-info"><div class="item-title">' + getItemTitle(isProposer ? theirItem : myItem) + '</div><div class="item-category">' + (isProposer ? 'Requested' : 'Your item') + '</div></div>' +
-                        '</div>' +
+                        _sideHTML(isProposer ? theirSide : mySide, isProposer ? 'Requested' : 'Your item') +
                     '</div>' +
                     '<div class="swap-request-footer">' +
                         statusBadgeHTML(swap.status) +

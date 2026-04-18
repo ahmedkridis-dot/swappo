@@ -2326,24 +2326,78 @@
   }
 
   // ═══ DEAL PANEL ═══
-  function renderDealPanel(convId) {
+  // Cache of swap rows keyed by conv_id so box rendering doesn't refetch
+  // on every renderDealPanel call.
+  var _swapRowCache = {};
+  var _boxSnapshotCache = {}; // box_id -> {box, items}
+
+  async function _loadBoxSnapshot(boxId) {
+    if (!boxId || !window.db) return null;
+    if (_boxSnapshotCache[boxId]) return _boxSnapshotCache[boxId];
+    try {
+      var boxResp = await window.db.from('boxes').select('id,owner_id,kind,title,status').eq('id', boxId).maybeSingle();
+      var linkResp = await window.db.from('box_items').select('item_id').eq('box_id', boxId);
+      var ids = (linkResp.data || []).map(function (r) { return r.item_id; });
+      var items = [];
+      if (ids.length) {
+        var it = await window.db.from('items').select('id,brand,model,type,photos,price,category,condition,is_giveaway,status').in('id', ids);
+        items = it.data || [];
+      }
+      _boxSnapshotCache[boxId] = { box: boxResp.data || null, items: items };
+      return _boxSnapshotCache[boxId];
+    } catch (_) { return null; }
+  }
+
+  async function renderDealPanel(convId) {
     var map = CONV_ITEM_MAP[convId] || {};
     var conv = _convCache.find(function(c) { return c.id === convId; }) || {};
-    // Items come from the conversation's embedded Supabase rows.
-    // (A proposer_item ref would come from the linked swap — we don't
-    // display it separately here, Deal Panel shows the receiver item.)
     var theirItem = conv.item || null;
     var myItem = null;
     var status = map.status || (conv.identity_revealed ? 'accepted' : 'pending');
     var cash = map.cash || 0;
     dealCashAmount = cash;
 
+    // If we have a swap_id on the conv, look up the swap once so we can
+    // render boxes on either side. Fetch is cached.
+    var swap = _swapRowCache[convId] || null;
+    if (!swap && conv.swap_id && window.db) {
+      try {
+        var r = await window.db.from('swaps').select('id,proposer_id,receiver_id,proposer_item_id,proposer_box_id,receiver_item_id,receiver_box_id,cash_amount').eq('id', conv.swap_id).maybeSingle();
+        if (r && r.data) { swap = r.data; _swapRowCache[convId] = swap; }
+      } catch (_) {}
+    }
+    var myBoxSnapshot = null;
+    var theirBoxSnapshot = null;
+    if (swap && currentUser) {
+      var isProposer = swap.proposer_id === currentUser.id;
+      var myBoxId    = isProposer ? swap.proposer_box_id : swap.receiver_box_id;
+      var theirBoxId = isProposer ? swap.receiver_box_id : swap.proposer_box_id;
+      if (myBoxId)    myBoxSnapshot    = await _loadBoxSnapshot(myBoxId);
+      if (theirBoxId) theirBoxSnapshot = await _loadBoxSnapshot(theirBoxId);
+    }
+
     document.getElementById('dpEmpty').style.display = 'none';
     document.getElementById('dpContent').style.display = '';
 
+    function _dpRenderBox(snapshot, label, labelCls) {
+      if (!snapshot || !snapshot.box) return '';
+      var cover = (snapshot.items[0] && snapshot.items[0].photos && snapshot.items[0].photos[0]) || '';
+      var coverSafe = safeImgUrl(cover);
+      var kindLabel = snapshot.box.kind === 'gift' ? '🎁 Gift Box' : '📦 Swap Box';
+      return '<div class="dp-item">' +
+        (coverSafe ? '<img class="dp-item-photo" src="' + coverSafe + '" alt="">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>') +
+        '<div class="dp-item-body">' +
+          '<div class="dp-item-label ' + labelCls + '">' + label + '</div>' +
+          '<div class="dp-item-name">' + kindLabel + '</div>' +
+          '<div class="dp-item-meta">' + snapshot.items.length + ' items bundled</div>' +
+        '</div></div>';
+    }
+
     // Items — all user-controlled strings escaped (C-1 stored-XSS hardening)
     var itemsHTML = '<div class="dp-items">';
-    if (theirItem) {
+    if (theirBoxSnapshot) {
+      itemsHTML += _dpRenderBox(theirBoxSnapshot, 'THEIR OFFER', 'theirs');
+    } else if (theirItem) {
       var theirPhoto = theirItem.photos ? theirItem.photos[0] : '';
       var theirPhotoSafe = safeImgUrl(theirPhoto);
       var theirIdSafe = escapeHTML(theirItem.id);
@@ -2363,7 +2417,9 @@
         '<div class="dp-item-body"><div class="dp-item-label theirs">CASH PURCHASE</div><div class="dp-item-name">Full cash offer</div><div class="dp-item-price">' + cashSafe + ' AED</div></div></div>';
     }
     itemsHTML += '<div class="dp-arrow"><span><i class="fas fa-exchange-alt"></i></span></div>';
-    if (myItem) {
+    if (myBoxSnapshot) {
+      itemsHTML += _dpRenderBox(myBoxSnapshot, 'YOUR OFFER', 'yours');
+    } else if (myItem) {
       var myPhoto = myItem.photos ? myItem.photos[0] : '';
       var myPhotoSafe = safeImgUrl(myPhoto);
       var myIdSafe = escapeHTML(myItem.id);
