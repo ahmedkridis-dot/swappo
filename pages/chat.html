@@ -1283,6 +1283,15 @@
       <div class="qr-modal-card" id="qrModalCard"></div>
     </div>
 
+    <!-- Rating Modal — opens automatically after a successful swap
+         confirmation (same modal for both the QR shower and the
+         scanner, driven by _onSwapCompleted or a ?rate=<swap_id>
+         URL parameter on landing). -->
+    <div class="qr-modal" id="rateModal" role="dialog" aria-modal="true" aria-labelledby="rateModalTitle" aria-hidden="true">
+      <div class="qr-modal-backdrop" onclick="closeRatingModal()"></div>
+      <div class="qr-modal-card" id="rateModalCard"></div>
+    </div>
+
     <!-- RIGHT: Deal Tracker Panel -->
     <aside class="deal-panel" id="dealPanel" role="complementary" aria-label="Deal Tracker">
       <div class="dp-head">
@@ -1826,28 +1835,67 @@
     return div;
   }
 
-  // Rating Card — Swappo branded "Swapped!" celebration
-  function createRatingCard(convId) {
+  // Rating Card — Swappo branded "Swapped!" celebration.
+  // Rendered inside the rating modal AND (legacy) directly in the chat.
+  function createRatingCard(convId, swapId) {
     var div = document.createElement('div');
     div.className = 'smart-card success';
     div.style.background = 'linear-gradient(135deg, #E6F7F8 0%, #FFFFFF 70%)';
     div.style.border = '1.5px solid #09B1BA';
+    div.dataset.swapId = swapId || '';
     div.innerHTML =
       '<div style="text-align:center;padding:8px 4px;">' +
         '<div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#09B1BA,#078A91);margin-bottom:12px;box-shadow:0 8px 24px rgba(9,177,186,0.35);animation:swapPulse 1.8s ease-in-out infinite;">' +
           '<span style="font-size:38px;">🤝</span>' +
         '</div>' +
-        '<div style="font-size:26px;font-weight:900;color:#09B1BA;margin-bottom:2px;letter-spacing:-0.03em;">Swapped!</div>' +
+        '<div id="rateModalTitle" style="font-size:26px;font-weight:900;color:#09B1BA;margin-bottom:2px;letter-spacing:-0.03em;">Swapped!</div>' +
         '<div style="font-size:13px;color:#078A91;font-weight:600;margin-bottom:4px;">Another deal sealed the Swappo way</div>' +
         '<div style="font-size:12px;color:#6B7280;margin-bottom:18px;">Rate your experience — help the community trust</div>' +
-        '<div id="ratingStars" style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;">' +
+        '<div id="ratingStars" role="radiogroup" aria-label="Rating" style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;">' +
           [1,2,3,4,5].map(function(i) {
-            return '<span onclick="setRating(' + i + ')" style="font-size:34px;cursor:pointer;transition:transform 0.2s;color:#FFB800;" onmouseenter="this.style.transform=\'scale(1.25) rotate(-8deg)\'" onmouseleave="this.style.transform=\'scale(1)\'">☆</span>';
+            return '<span role="radio" tabindex="0" aria-checked="false" onclick="setRating(' + i + ')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();setRating(' + i + ')}" style="font-size:34px;cursor:pointer;transition:transform 0.2s;color:#FFB800;user-select:none;" onmouseenter="this.style.transform=\'scale(1.25) rotate(-8deg)\'" onmouseleave="this.style.transform=\'scale(1)\'">☆</span>';
           }).join('') +
         '</div>' +
-        '<button class="sc-btn primary" style="background:linear-gradient(135deg,#09B1BA,#078A91);box-shadow:0 6px 18px rgba(9,177,186,0.35);" onclick="submitRating(\'' + convId + '\')"><i class="fas fa-handshake"></i> Seal the Swap</button>' +
+        '<button class="sc-btn primary" style="background:linear-gradient(135deg,#09B1BA,#078A91);box-shadow:0 6px 18px rgba(9,177,186,0.35);width:100%;" onclick="submitRating(\'' + convId + '\')"><i class="fas fa-handshake"></i> Seal the Swap</button>' +
+        '<button class="sc-btn ghost" style="margin-top:8px;width:100%;" onclick="closeRatingModal()">Skip for now</button>' +
       '</div>';
     return div;
+  }
+
+  // Open / close the rating overlay. Both parties see this modal after
+  // a successful confirm (shower via realtime, scanner via URL param).
+  function openRatingModal(convId, swapId) {
+    var modal = document.getElementById('rateModal');
+    var slot = document.getElementById('rateModalCard');
+    if (!modal || !slot) return;
+    currentRating = 0;
+    currentRatingSwapId = swapId || null;
+    currentRatingConvId = convId || null;
+    slot.innerHTML = '';
+    slot.appendChild(createRatingCard(convId, swapId));
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeRatingModal() {
+    var modal = document.getElementById('rateModal');
+    var slot = document.getElementById('rateModalCard');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+    if (slot) slot.innerHTML = '';
+    currentRating = 0;
+    currentRatingSwapId = null;
+    currentRatingConvId = null;
+    // Scrub the rate query param so refresh doesn't re-open it
+    try {
+      var u = new URL(window.location.href);
+      if (u.searchParams.has('rate')) {
+        u.searchParams.delete('rate');
+        window.history.replaceState(null, '', u.toString());
+      }
+    } catch (_) {}
   }
 
   function renderSmartCardFromMsg(msg) {
@@ -2065,30 +2113,29 @@
     if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'completed';
     Toast.show('🎉 Exchange confirmed!', 'success');
 
-    // Drop a system message so both sides see a trace in the chat
+    // Open the rating modal RIGHT AWAY — no await before it, so even
+    // if the system-message insert or loadMessages() fail we never
+    // leave the user without a way to rate. (Ahmed reported a swap
+    // where the rating never appeared after QR success.)
+    setTimeout(function () { openRatingModal(convId, swapId); }, 400);
+
+    // Best-effort: drop a system message so both sides see a trace
+    // in the chat. Failures here must not block the rating UX.
     try {
       if (window.db) {
-        await window.db.from('messages').insert({
+        window.db.from('messages').insert({
           conversation_id: convId,
           sender_id: null,
           content: '🎉 Exchange completed successfully! Both parties confirmed via QR.',
           is_system: true
-        });
+        }).then(function () {
+          loadMessages(convId).catch(function () {});
+        }, function () {});
       }
     } catch (e) { console.warn('[qr] system msg insert failed:', e); }
-    await loadMessages(convId);
 
-    // Rating prompt
-    setTimeout(function() {
-      var area = document.getElementById('msgArea');
-      var typing = document.getElementById('typingIndicator');
-      if (!area) return;
-      area.insertBefore(createRatingCard(convId), typing);
-      area.scrollTop = area.scrollHeight;
-    }, 600);
-
-    renderDealPanel(convId);
-    renderSidebar();
+    try { renderDealPanel(convId); } catch (_) {}
+    try { renderSidebar(); } catch (_) {}
   }
 
   // Kept for the rating flow ("Simulate Scan" removed — confirmation now
@@ -2108,15 +2155,45 @@
 
   // ═══ RATING ═══
   var currentRating = 0;
+  var currentRatingSwapId = null;   // set by openRatingModal
+  var currentRatingConvId = null;   // set by openRatingModal
+
   function setRating(n) {
     currentRating = n;
     var stars = document.querySelectorAll('#ratingStars span');
-    stars.forEach(function(s, i) { s.textContent = i < n ? '★' : '☆'; s.style.color = i < n ? '#F59E0B' : '#D1D5DB'; });
+    stars.forEach(function(s, i) {
+      var on = i < n;
+      s.textContent = on ? '★' : '☆';
+      s.style.color = on ? '#F59E0B' : '#D1D5DB';
+      s.setAttribute('aria-checked', String(on));
+    });
   }
-  function submitRating(convId) {
+
+  async function submitRating(convId) {
     if (currentRating === 0) { Toast.show('Please select a rating.', 'info'); return; }
+
+    // Persist to DB via rate_swap RPC. The swapId comes from openRatingModal
+    // (authoritative); fall back to resolving by conversation if missing.
+    var swapId = currentRatingSwapId;
+    if (!swapId) {
+      try { swapId = await _resolveSwapId(convId); } catch (_) {}
+    }
+    if (swapId && window.db) {
+      try {
+        var res = await window.db.rpc('rate_swap', {
+          p_swap_id: swapId,
+          p_rating: currentRating
+        });
+        if (res.error) throw res.error;
+      } catch (e) {
+        console.warn('[rate_swap] save failed', e && e.message);
+        Toast.show('Could not save rating — try again.', 'error');
+        return;
+      }
+    }
+
     Toast.show('Thanks! You rated ' + currentRating + ' stars ⭐', 'success');
-    currentRating = 0;
+    closeRatingModal();
   }
 
   // ═══ DEAL PANEL ═══
@@ -2537,6 +2614,8 @@
   }
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
+    var rateModal = document.getElementById('rateModal');
+    if (rateModal && rateModal.classList.contains('open')) { closeRatingModal(); return; }
     var qrModal = document.getElementById('qrModal');
     if (qrModal && qrModal.classList.contains('open')) { cancelQR(); return; }
     var panel = document.getElementById('dealPanel');
@@ -2590,6 +2669,14 @@
     document.getElementById('chatInput').addEventListener('input', function() { document.getElementById('sendBtn').disabled = !this.value.trim(); });
 
     if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
+
+    // ?rate=<swap_id> — the scanner lands here after confirm.html; we
+    // auto-open the rating modal so they're not left stranded.
+    var rateParam = params.get('rate');
+    if (rateParam) {
+      var convForRate = targetConv || (_convCache[0] && _convCache[0].id) || null;
+      setTimeout(function () { openRatingModal(convForRate, rateParam); }, 500);
+    }
   }
 
   // Cleanup Realtime on navigate

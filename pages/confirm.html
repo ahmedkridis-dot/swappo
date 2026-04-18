@@ -229,19 +229,32 @@
       var data = res.data || {};
       var convId = data.conversation_id || null;
       var swapId = data.swap_id || null;
-      var chatHref = '/pages/chat.html' + (convId ? ('?conv=' + convId) : '');
-      setState('success', 'Exchange confirmed!', 'Nice one \u2014 both sides are now locked in. Leave a rating to finish.', [
-        { label: 'Open chat', href: chatHref, primary: true },
-        { label: 'View my dashboard', href: '/pages/profile.html' }
-      ]);
 
-      // A tiny reassurance for the user: show the swap id
-      if (swapId) {
-        var d = document.createElement('div');
-        d.className = 'detail';
-        d.innerHTML = '<strong>Swap ID:</strong> ' + swapId;
-        document.getElementById('actions').parentNode.insertBefore(d, document.getElementById('actions'));
-      }
+      // Build the deep link back into the chat. The `rate=<swap_id>`
+      // query param tells chat.html to auto-open the rating modal as
+      // soon as the page finishes loading — otherwise the scanner was
+      // left with no obvious way to leave a star rating (Ahmed
+      // reported this on 2026-04-18).
+      var qs = [];
+      if (convId) qs.push('conv=' + encodeURIComponent(convId));
+      if (swapId) qs.push('rate=' + encodeURIComponent(swapId));
+      var chatHref = '/pages/chat.html' + (qs.length ? '?' + qs.join('&') : '');
+
+      setState(
+        'success',
+        'Exchange confirmed!',
+        'Nice one \u2014 redirecting you to the chat to leave a rating\u2026',
+        [
+          { label: 'Open chat now', href: chatHref, primary: true },
+          { label: 'View my dashboard', href: '/pages/profile.html' }
+        ]
+      );
+
+      // Auto-redirect after a short beat so the user sees the success
+      // state first. If they tap "Open chat now" first, that's fine.
+      setTimeout(function () {
+        if (document.visibilityState !== 'hidden') window.location.replace(chatHref);
+      }, 2200);
     }
 
     document.addEventListener('DOMContentLoaded', run);

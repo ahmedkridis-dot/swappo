@@ -161,14 +161,20 @@ begin
   perform public.bump_swap_count(v_swap.proposer_id);
   perform public.bump_swap_count(v_swap.receiver_id);
 
-  return jsonb_build_object(
-    'success',        true,
-    'completed',      true,
-    'swap_id',        v_swap.id,
-    'proposer_id',    v_swap.proposer_id,
-    'receiver_id',    v_swap.receiver_id,
-    'is_purchase',    v_swap.is_purchase
-  );
+  -- conversation_id is resolved from conversations.swap_id so the
+  -- scanner's confirm.html can deep-link straight into the rating modal.
+  declare v_conv_id uuid; begin
+    select id into v_conv_id from public.conversations where swap_id = v_swap.id limit 1;
+    return jsonb_build_object(
+      'success',         true,
+      'completed',       true,
+      'swap_id',         v_swap.id,
+      'conversation_id', v_conv_id,
+      'proposer_id',     v_swap.proposer_id,
+      'receiver_id',     v_swap.receiver_id,
+      'is_purchase',     v_swap.is_purchase
+    );
+  end;
 end;
 $$;
 
