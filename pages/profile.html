@@ -942,6 +942,71 @@
                by-character inside the compact card. */
             .my-auto-decline-host { display: none; }
 
+            /* ── Profile 2-col layout stacks on mobile ────────────────── */
+            .profile-body-layout { flex-direction: column !important; gap: 16px !important; }
+            .profile-body-aside { width: 100% !important; order: 2; }
+
+            /* ── Compact subscription banner (replaces the tall sidebar) ─
+               On phones the big 300px upgrade card unbalances the page.
+               We keep it attractive (teal accent + upgrade CTA) but
+               compress it into a single-row banner: plan chip · quotas ·
+               Upgrade pill. Give & Earn stays below. */
+            .profile-body-aside .subscription-sidebar-card {
+                padding: 14px 16px !important;
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                grid-template-areas: "plan quotas cta" "renew renew renew";
+                align-items: center;
+                gap: 10px 14px;
+            }
+            .profile-body-aside .sub-sidebar-header {
+                grid-area: plan;
+                text-align: left !important;
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+                border-bottom: none !important;
+                display: flex;
+                flex-direction: column;
+                min-width: 72px;
+            }
+            .profile-body-aside .sub-sidebar-plan { font-size: 16px !important; margin-bottom: 0 !important; }
+            .profile-body-aside .sub-sidebar-badge { font-size: 11px !important; }
+            .profile-body-aside #sidebar-quotas {
+                grid-area: quotas;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px 10px;
+                min-width: 0;
+            }
+            .profile-body-aside .sub-quota-item {
+                margin-bottom: 0 !important;
+                flex: 0 1 auto;
+                min-width: 0;
+            }
+            .profile-body-aside .sub-quota-label {
+                font-size: 11px !important;
+                gap: 4px;
+                margin-bottom: 2px !important;
+            }
+            .profile-body-aside .sub-quota-bar { height: 3px !important; width: 56px; }
+            .profile-body-aside .sub-upgrade-btn {
+                grid-area: cta;
+                width: auto !important;
+                margin-top: 0 !important;
+                padding: 8px 14px !important;
+                font-size: 12px !important;
+                border-radius: 999px !important;
+                white-space: nowrap;
+            }
+            .profile-body-aside .sub-renewal {
+                grid-area: renew;
+                margin-top: 4px !important;
+                padding-top: 8px !important;
+                font-size: 11px !important;
+            }
+            /* Give & Earn stays as its own card below the banner */
+            .profile-body-aside #give-earn-widget { margin-top: 12px !important; }
+
             .swap-request-items { flex-direction: column; }
             .swap-arrow-icon { transform: rotate(90deg); }
             .swap-request-footer { flex-direction: column; align-items: stretch; }
@@ -1105,8 +1170,8 @@
         </div>
 
         <!-- ========== 2-COLUMN LAYOUT (Figma: left=content, right=sidebar) ========== -->
-        <div style="display: flex; gap: 24px; align-items: flex-start;">
-            <div style="flex: 1; min-width: 0;">
+        <div class="profile-body-layout" style="display: flex; gap: 24px; align-items: flex-start;">
+            <div class="profile-body-main" style="flex: 1; min-width: 0;">
                 <!-- ========== TAB NAVIGATION ========== -->
                 <!-- NOTE: legacy "Offers Received / Offers Sent" tabs removed
                      2026-04-16 (DEMO-PURGE). Their content was rendered from
@@ -1369,7 +1434,7 @@
             </div>
 
             <!-- ========== SUBSCRIPTION SIDEBAR ========== -->
-            <aside style="width: 300px;">
+            <aside class="profile-body-aside" style="width: 300px;">
                 <div class="subscription-sidebar-card" id="subscription-sidebar">
                     <div class="sub-sidebar-header">
                         <div class="sub-sidebar-plan" id="sidebar-plan-name">Free</div>
