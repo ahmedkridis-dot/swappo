@@ -83,8 +83,9 @@
         </div>
 
         <div class="navbar-actions">
-          <a href="pages/chat.html" class="navbar-icon" title="SwapChat"><i class="fas fa-comment-dots"></i></a>
-          <a href="pages/profile.html" class="navbar-icon" title="My Swaps"><i class="fas fa-user-circle"></i></a>
+          <!-- Bell + Messages icons + Dashboard chip are injected by
+               notifications-bell.js, messages-icon.js, dashboard-link.js
+               (visible once authenticated). -->
           <a href="pages/login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
           <a href="pages/publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
         </div>
@@ -485,6 +486,8 @@
   <script src="js/toast.js" defer></script>
   <script src="js/a11y-helpers.js" defer></script>
   <script src="js/dashboard-link.js" defer></script>
+  <script src="js/notifications-bell.js" defer></script>
+  <script src="js/messages-icon.js" defer></script>
   <script src="js/animations.js" defer></script>
   <script src="js/cookie-consent.js" defer></script>
   <script src="js/app.js" defer></script>
