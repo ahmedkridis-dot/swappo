@@ -1589,7 +1589,19 @@
     if (!useSwappo()) return;
     _rtUnsub = window.SwappoChat.subscribe(convId, function(msg) {
       if (!msg || msg.conversation_id !== convId) return;
-      _msgCache[convId] = (_msgCache[convId] || []).concat(msg);
+      // Dedupe: sendChatMessage() already pushes the outgoing row into
+      // _msgCache for optimistic render. Realtime echoes the same row
+      // back to the sender, so skip it if id (or fallback signature)
+      // matches something already cached.
+      var cache = _msgCache[convId] || [];
+      var exists = cache.some(function (m) {
+        if (msg.id && m.id) return m.id === msg.id;
+        return m.sender_id === msg.sender_id &&
+               m.content === msg.content &&
+               m.created_at === msg.created_at;
+      });
+      if (exists) return;
+      _msgCache[convId] = cache.concat(msg);
       if (convId === activeConvId) {
         renderMessagesFrom(_msgCache[convId]);
       }
@@ -1725,16 +1737,22 @@
       if (cash > 0) dealTypeHTML += '<span class="sb-deal-amount">' + cash.toLocaleString() + ' AED</span>';
 
       // SAFE: escape all user-controlled strings before HTML concatenation (C-1 stored-XSS fix)
+      var displayName = o.pseudo || o.display_name || o.name || 'User';
       var safeConvId = escapeHTML(c.id);
-      var safeName = escapeHTML(o.name || 'User');
+      var safeName = escapeHTML(displayName);
       var safePreview = escapeHTML(preview);
       var safeAvatarColor = safeColor(o.avatar_color || '#09B1BA');
+      var safeAvatarUrl = safeImgUrl(o.avatar);
       var safePhoto = safeImgUrl(photo);
       var safeTime = escapeHTML(time);
       var safeUnread = escapeHTML(String(c.unread_count || 0));
 
+      var avatarInner = safeAvatarUrl
+        ? '<img src="' + safeAvatarUrl + '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+        : escapeHTML(initial(displayName));
+
       return '<div class="sb-card' + (c.id === activeConvId ? ' active' : '') + '" onclick="openConv(\'' + safeConvId + '\')">' +
-        '<div class="sb-avatar" style="background:' + safeAvatarColor + '">' + escapeHTML(initial(o.name)) +
+        '<div class="sb-avatar" style="background:' + safeAvatarColor + '">' + avatarInner +
         (status === 'accepted' ? '<span class="sb-online"></span>' : '') + '</div>' +
         '<div class="sb-meta">' +
           '<div class="sb-row"><span class="sb-name">' + safeName + '</span><span class="sb-time">' + safeTime + '</span></div>' +
@@ -1767,10 +1785,16 @@
     if (activeCard) activeCard.classList.add('active');
 
     // Header
-    var displayName = o.name || o.pseudo || 'Swapper';
+    var displayName = o.pseudo || o.display_name || o.name || 'Swapper';
     document.getElementById('chatHeader').style.display = '';
-    document.getElementById('chAvatar').style.background = o.avatar_color || '#09B1BA';
-    document.getElementById('chAvatar').textContent = initial(displayName);
+    var chAvatar = document.getElementById('chAvatar');
+    var chAvatarUrl = safeImgUrl(o.avatar);
+    chAvatar.style.background = chAvatarUrl ? 'transparent' : (o.avatar_color || '#09B1BA');
+    if (chAvatarUrl) {
+      chAvatar.innerHTML = '<img src="' + chAvatarUrl + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      chAvatar.textContent = initial(displayName);
+    }
     document.getElementById('chName').textContent = displayName;
     // Track partner's id on the header button so clicking opens their public profile
     var headBtn = document.getElementById('chHeaderOpenProfile');
@@ -1843,8 +1867,22 @@
       // Build with DOM + textContent (fixes stored-XSS C-1).
       var av = document.createElement('div');
       av.className = 'msg-av';
-      av.style.background = isMine ? myColor : (o.avatar_color || '#6B7280');
-      av.textContent = initial(isMine ? currentUser.name : o.name);
+      var avUrl = isMine ? safeImgUrl(currentUser && currentUser.avatar)
+                         : safeImgUrl(o.avatar);
+      var avName = isMine
+        ? (currentUser && (currentUser.pseudo || currentUser.display_name || currentUser.name))
+        : (o.pseudo || o.display_name || o.name);
+      if (avUrl) {
+        av.style.background = 'transparent';
+        var imgEl = document.createElement('img');
+        imgEl.src = avUrl;
+        imgEl.alt = '';
+        imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+        av.appendChild(imgEl);
+      } else {
+        av.style.background = isMine ? myColor : (o.avatar_color || '#6B7280');
+        av.textContent = initial(avName);
+      }
       var bubble = document.createElement('div');
       bubble.className = 'msg-bubble';
       bubble.textContent = m.content; // SAFE
