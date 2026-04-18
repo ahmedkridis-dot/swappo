@@ -584,6 +584,121 @@
   @keyframes qrFade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes qrPop { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
 
+  /* ── Item & Box Detail modals (Ahmed 2026-04-18) ── */
+  .idm-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .idm-modal.open { display: flex; }
+  .idm-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: idmFade 0.22s ease-out;
+  }
+  .idm-card {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100vh - 40px);
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 32px 80px rgba(9,17,28,0.3), 0 4px 16px rgba(9,17,28,0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: idmPop 0.28s cubic-bezier(0.16,1,0.3,1);
+  }
+  .idm-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.9); border: 0; color: #1A1A2E;
+    font-size: 14px; cursor: pointer; z-index: 2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .idm-close:hover { transform: scale(1.08); background: #fff; }
+  .idm-hero {
+    position: relative; width: 100%; aspect-ratio: 4 / 3;
+    background: linear-gradient(135deg, #F0FBFC, #E6F7F8); overflow: hidden;
+  }
+  .idm-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .idm-hero-empty { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 72px; }
+  .idm-price-chip {
+    position: absolute; bottom: 16px; left: 16px;
+    background: rgba(9,177,186,0.95); color: #fff;
+    font-weight: 800; font-size: 15px; padding: 8px 16px;
+    border-radius: 999px; box-shadow: 0 8px 24px rgba(9,177,186,0.4);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .idm-price-chip.free {
+    background: linear-gradient(135deg, #10B981, #059669);
+    box-shadow: 0 8px 24px rgba(16,185,129,0.4);
+  }
+  .idm-body { padding: 22px 24px 28px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .idm-title { font-size: 22px; font-weight: 800; color: #1A1A2E; letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 10px; }
+  .idm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .idm-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; background: #F3F4F6; color: #4A4A5A; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .idm-chip.accent { background: #E6F7F8; color: #078A91; }
+  .idm-thumbs { display: flex; gap: 8px; margin: 0 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .idm-thumbs::-webkit-scrollbar { height: 3px; }
+  .idm-thumbs::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
+  .idm-thumb { flex: 0 0 64px; aspect-ratio: 1; border-radius: 10px; overflow: hidden; border: 2px solid transparent; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+  .idm-thumb.active { border-color: #09B1BA; box-shadow: 0 0 0 3px rgba(9,177,186,0.18); }
+  .idm-thumb:hover { transform: translateY(-1px); }
+  .idm-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .idm-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 18px; padding: 16px 18px; background: #F8FAFA; border: 1px solid #E5E7EB; border-radius: 14px; }
+  .idm-spec-label { font-size: 11px; color: #6B7280; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 2px; }
+  .idm-spec-value { font-size: 14px; font-weight: 700; color: #1A1A2E; }
+  .idm-footer-link { margin: 18px 0 0; text-align: center; }
+  .idm-footer-link a { font-size: 13px; color: #09B1BA; font-weight: 600; text-decoration: none; border-bottom: 1px dashed rgba(9,177,186,0.4); padding-bottom: 2px; }
+  .idm-footer-link a:hover { color: #078A91; border-bottom-style: solid; }
+  /* Box viewer — grid of item thumbnails */
+  .idm-box-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    padding: 20px 24px 24px;
+  }
+  .idm-box-tile {
+    background: #F8FAFA;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .idm-box-tile:hover { transform: translateY(-2px); border-color: #09B1BA; box-shadow: 0 8px 20px rgba(9,177,186,0.15); }
+  .idm-box-tile-img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #F3F4F6; }
+  .idm-box-tile-empty { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 28px; background: #F3F4F6; }
+  .idm-box-tile-body { padding: 8px 10px; }
+  .idm-box-tile-title { font-size: 12px; font-weight: 700; color: #1A1A2E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .idm-box-tile-price { font-size: 11px; color: #6B7280; margin-top: 2px; }
+  .idm-box-header {
+    padding: 24px 24px 4px;
+    text-align: center;
+  }
+  .idm-box-kicker {
+    font-size: 11px; font-weight: 700; color: #09B1BA;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  @keyframes idmFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes idmPop { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: none; } }
+  @media (max-width: 480px) {
+    .idm-specs { grid-template-columns: 1fr; gap: 12px; }
+    .idm-title { font-size: 18px; }
+    .idm-card { max-height: calc(100vh - 20px); }
+  }
+
   /* Badge celebration — big emoji, glow, "Swapped a tier!" */
   .badge-burst {
     display: inline-flex;
@@ -1331,6 +1446,20 @@
       <div class="qr-modal-card" id="badgeModalCard"></div>
     </div>
 
+    <!-- Box contents viewer — shows every item inside a Swap/Gift Box.
+         Opens via openBoxDetail(boxId); each tile opens openItemDetail(itemId). -->
+    <div class="idm-modal" id="boxDetailModal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="idm-backdrop" onclick="closeBoxDetail()"></div>
+      <div class="idm-card" id="boxDetailCard"></div>
+    </div>
+
+    <!-- Single-item detail modal (glassmorphism, same as profile.html).
+         Opens from box tiles inside a Deal Tracker or from the box viewer. -->
+    <div class="idm-modal" id="idmModal" role="dialog" aria-modal="true" aria-labelledby="idmTitle" aria-hidden="true">
+      <div class="idm-backdrop" onclick="closeItemDetail()"></div>
+      <div class="idm-card" id="idmCard"></div>
+    </div>
+
     <!-- RIGHT: Deal Tracker Panel -->
     <aside class="deal-panel" id="dealPanel" role="complementary" aria-label="Deal Tracker">
       <div class="dp-head">
@@ -1777,16 +1906,16 @@
           '<span class="sc-option-price free">FREE</span>' +
         '</div>' +
         // DELIVERY: Coming Soon (Phase 2 — logistics partnerships not live yet)
-        '<div class="sc-option" onclick="Toast.show(\'Delivery launches soon — for now, arrange the hand-off in person via chat.\', \'info\')" style="opacity:0.7;cursor:default;">' +
+        '<div class="sc-option" title="Launches with our partner network" style="opacity:0.75;cursor:default;border:1.5px dashed #09B1BA;background:#F0FBFC;">' +
           '<span class="sc-option-icon">🚚</span>' +
-          '<div class="sc-option-text"><div class="sc-option-label">Swappo Delivery <span style="font-size:10px;background:#F59E0B;color:white;padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;">SOON</span></div><div class="sc-option-desc">We pick up & deliver · Coming soon</div></div>' +
-          '<span class="sc-option-price" style="color:#9CA3AF;">~25 AED</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Swappo Delivery</div><div class="sc-option-desc">We pick up &amp; deliver</div></div>' +
+          '<span class="sc-option-price" style="background:#F0FBFC;color:#078A91;border:1px solid #09B1BA;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;">COMING SOON</span>' +
         '</div>' +
         (isLargeItem ?
-        '<div class="sc-option" onclick="window.location.href=\'transport.html\'" style="cursor:pointer;">' +
+        '<div class="sc-option" title="Truck partners joining soon" style="opacity:0.75;cursor:default;border:1.5px dashed #F9A8D4;background:#FDF2F8;">' +
           '<span class="sc-option-icon">🚛</span>' +
-          '<div class="sc-option-text"><div class="sc-option-label">Find a Truck</div><div class="sc-option-desc">For furniture &amp; large items — 5 UAE partners online</div></div>' +
-          '<span class="sc-option-price">from 80 AED</span>' +
+          '<div class="sc-option-text"><div class="sc-option-label">Find a Truck</div><div class="sc-option-desc">For furniture &amp; large items</div></div>' +
+          '<span class="sc-option-price" style="background:#FDF2F8;color:#9D174D;border:1px solid #F9A8D4;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;">COMING SOON</span>' +
         '</div>' : '') +
       '</div>';
     return div;
@@ -1955,6 +2084,177 @@
     if (modal) { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
     if (slot) slot.innerHTML = '';
   }
+
+  // ═══ BOX & ITEM DETAIL MODALS (Ahmed 2026-04-18) ══════════════
+  // Tap a Swap Box tile in the Deal Tracker → open a grid of its
+  // items. Tap an item → open the polished single-item detail view
+  // with photos, specs, price, and a link to the product page.
+
+  function _idmEsc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function _idmCap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+  function _idmCond(c) { return ({ new: 'New', like_new: 'Like New', good: 'Good', fair: 'Fair' })[c] || _idmCap(c || ''); }
+
+  window.openBoxDetail = async function (boxId) {
+    if (!boxId) return;
+    var modal = document.getElementById('boxDetailModal');
+    var card = document.getElementById('boxDetailCard');
+    if (!modal || !card) return;
+
+    // Try the in-memory snapshot first (populated by renderDealPanel).
+    var snapshot = (window._boxSnapshotByIdCache && window._boxSnapshotByIdCache[boxId])
+      || (window._boxSnapshotCache && window._boxSnapshotCache[boxId])
+      || null;
+
+    // Fall back to a fresh fetch.
+    if (!snapshot && window.db) {
+      try {
+        var boxResp = await window.db.from('boxes').select('id,owner_id,kind,title,status').eq('id', boxId).maybeSingle();
+        var linkResp = await window.db.from('box_items').select('item_id').eq('box_id', boxId);
+        var ids = (linkResp.data || []).map(function (r) { return r.item_id; });
+        var itemsResp = ids.length
+          ? await window.db.from('items').select('id,brand,model,type,photos,price,category,condition,is_giveaway,status,year,size,color,emirate,city').in('id', ids)
+          : { data: [] };
+        snapshot = { box: boxResp.data || null, items: itemsResp.data || [] };
+      } catch (_) {}
+    }
+    if (!snapshot || !snapshot.box) return;
+
+    var kindLabel = snapshot.box.kind === 'gift' ? '🎁 Gift Box' : '📦 Swap Box';
+    var tilesHTML = (snapshot.items || []).map(function (it) {
+      var photo = (it.photos && it.photos[0]) || '';
+      var title = ((it.brand || '') + ' ' + (it.model || '')).trim() || it.type || 'Item';
+      var priceTxt = it.is_giveaway ? 'FREE' : (it.price ? Number(it.price).toLocaleString() + ' AED' : '—');
+      return '<div class="idm-box-tile" tabindex="0" role="button" onclick="openItemDetail(\'' + it.id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openItemDetail(\'' + it.id + '\')}">'
+        + (photo ? '<img class="idm-box-tile-img" src="' + _idmEsc(photo) + '" alt="">' : '<div class="idm-box-tile-empty">📦</div>')
+        + '<div class="idm-box-tile-body">'
+          + '<div class="idm-box-tile-title">' + _idmEsc(title) + '</div>'
+          + '<div class="idm-box-tile-price">' + _idmEsc(priceTxt) + '</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+
+    card.innerHTML =
+      '<button class="idm-close" onclick="closeBoxDetail()" aria-label="Close"><i class="fas fa-times"></i></button>' +
+      '<div class="idm-box-header">' +
+        '<div class="idm-box-kicker">' + (snapshot.items.length) + ' items bundled</div>' +
+        '<h2 class="idm-title" style="margin-top:6px;">' + kindLabel + '</h2>' +
+        '<p style="font-size:13px;color:#6B7280;margin:4px 0 0;">Tap any item to see the full details before you decide.</p>' +
+      '</div>' +
+      '<div class="idm-box-grid">' + (tilesHTML || '<div style="grid-column:1/-1;text-align:center;color:#9CA3AF;padding:24px;">No items in this box.</div>') + '</div>';
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  };
+
+  window.closeBoxDetail = function () {
+    var m = document.getElementById('boxDetailModal');
+    var s = document.getElementById('boxDetailCard');
+    if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); }
+    if (s) s.innerHTML = '';
+  };
+
+  window._idmPhotos = [];
+  window.idmSwapHero = function (idx) {
+    if (!window._idmPhotos[idx]) return;
+    var hero = document.querySelector('#idmCard .idm-hero img');
+    if (hero) hero.src = window._idmPhotos[idx];
+    document.querySelectorAll('#idmCard .idm-thumb').forEach(function (t, i) {
+      t.classList.toggle('active', i === idx);
+    });
+  };
+
+  window.openItemDetail = async function (itemId) {
+    if (!itemId) return;
+    var card = document.getElementById('idmCard');
+    var modal = document.getElementById('idmModal');
+    if (!card || !modal) return;
+
+    card.innerHTML = '<div style="padding:60px 40px;text-align:center;color:#9CA3AF;"><i class="fas fa-circle-notch fa-spin" style="font-size:28px;"></i></div>';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Pull from the box snapshot cache first (fastest), then a DB query.
+    var item = null;
+    try {
+      var caches = Object.values(window._boxSnapshotByIdCache || {});
+      for (var i = 0; i < caches.length && !item; i++) {
+        item = (caches[i].items || []).find(function (x) { return x.id === itemId; }) || null;
+      }
+    } catch (_) {}
+    if (!item && window.db) {
+      try {
+        var r = await window.db.from('items')
+          .select('id,brand,model,category,subcategory,type,photos,price,condition,is_giveaway,status,box_id,year,size,color,emirate,city')
+          .eq('id', itemId).maybeSingle();
+        item = r && r.data ? r.data : null;
+      } catch (_) {}
+    }
+
+    if (!item) {
+      card.innerHTML = '<button class="idm-close" onclick="closeItemDetail()" aria-label="Close"><i class="fas fa-times"></i></button>'
+        + '<div style="padding:48px 32px;text-align:center;">'
+        + '<div style="font-size:48px;margin-bottom:12px;">🤷</div>'
+        + '<div style="font-size:16px;font-weight:700;color:#1A1A2E;">Item unavailable</div>'
+        + '</div>';
+      return;
+    }
+
+    var photos = Array.isArray(item.photos) ? item.photos.filter(Boolean) : [];
+    window._idmPhotos = photos;
+    var heroSrc = photos[0] || '';
+    var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type || 'Item';
+    var priceChip = item.is_giveaway
+      ? '<div class="idm-price-chip free">🎁 FREE · Gift</div>'
+      : (item.price > 0
+          ? '<div class="idm-price-chip">' + Number(item.price).toLocaleString() + ' AED</div>'
+          : '');
+    var locationVal = item.emirate || item.city || '—';
+    var specs = [
+      { label: 'Condition', value: _idmCond(item.condition) || '—' },
+      { label: 'Year',      value: item.year || '—' },
+      { label: 'Brand',     value: item.brand || '—' },
+      { label: 'Size',      value: item.size || '—' },
+      { label: 'Color',     value: item.color || '—' },
+      { label: 'Location',  value: locationVal }
+    ];
+    var thumbs = photos.length > 1
+      ? '<div class="idm-thumbs">' + photos.map(function (p, i) {
+          return '<div class="idm-thumb' + (i === 0 ? ' active' : '') + '" onclick="idmSwapHero(' + i + ')"><img src="' + _idmEsc(p) + '" alt=""></div>';
+        }).join('') + '</div>'
+      : '';
+
+    card.innerHTML =
+      '<button class="idm-close" onclick="closeItemDetail()" aria-label="Close"><i class="fas fa-times"></i></button>' +
+      '<div class="idm-hero">' +
+        (heroSrc ? '<img src="' + _idmEsc(heroSrc) + '" alt="' + _idmEsc(title) + '">' : '<div class="idm-hero-empty">📦</div>') +
+        priceChip +
+      '</div>' +
+      '<div class="idm-body">' +
+        thumbs +
+        '<h2 id="idmTitle" class="idm-title">' + _idmEsc(title) + '</h2>' +
+        '<div class="idm-chips">' +
+          (item.category ? '<span class="idm-chip accent"><i class="fas fa-tag"></i> ' + _idmEsc(_idmCap(item.category)) + '</span>' : '') +
+          (item.box_id ? '<span class="idm-chip" style="background:#ECFDF5;color:#065F46;"><i class="fas fa-box"></i> Part of a Box</span>' : '') +
+          (item.is_giveaway ? '<span class="idm-chip" style="background:#FEF3C7;color:#92400E;"><i class="fas fa-gift"></i> Gift</span>' : '') +
+        '</div>' +
+        '<div class="idm-specs">' +
+          specs.map(function (s) {
+            return '<div><div class="idm-spec-label">' + _idmEsc(s.label) + '</div>'
+                 + '<div class="idm-spec-value">' + _idmEsc(s.value) + '</div></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="idm-footer-link"><a href="product.html?id=' + _idmEsc(item.id) + '" target="_blank" rel="noopener">Open full product page <i class="fas fa-arrow-up-right-from-square" style="font-size:11px;"></i></a></div>' +
+      '</div>';
+  };
+
+  window.closeItemDetail = function () {
+    var m = document.getElementById('idmModal');
+    if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); }
+  };
 
   // Look for the most recent unread badge_earned notification for this
   // user and, if there is one, fire the celebration + mark it read so
@@ -2384,12 +2684,16 @@
       var cover = (snapshot.items[0] && snapshot.items[0].photos && snapshot.items[0].photos[0]) || '';
       var coverSafe = safeImgUrl(cover);
       var kindLabel = snapshot.box.kind === 'gift' ? '🎁 Gift Box' : '📦 Swap Box';
-      return '<div class="dp-item">' +
+      // Stash the snapshot so openBoxDetail(boxId) can read it without a refetch.
+      var bid = snapshot.box.id;
+      window._boxSnapshotByIdCache = window._boxSnapshotByIdCache || {};
+      window._boxSnapshotByIdCache[bid] = snapshot;
+      return '<div class="dp-item" onclick="openBoxDetail(\'' + bid + '\')" style="cursor:pointer;" title="View bundled items">' +
         (coverSafe ? '<img class="dp-item-photo" src="' + coverSafe + '" alt="">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:28px;">📦</div>') +
         '<div class="dp-item-body">' +
           '<div class="dp-item-label ' + labelCls + '">' + label + '</div>' +
           '<div class="dp-item-name">' + kindLabel + '</div>' +
-          '<div class="dp-item-meta">' + snapshot.items.length + ' items bundled</div>' +
+          '<div class="dp-item-meta">' + snapshot.items.length + ' items bundled · <span style="color:#09B1BA;font-weight:700;">Tap to view</span></div>' +
         '</div></div>';
     }
 
@@ -2483,37 +2787,38 @@
         '<div class="dp-section-title"><i class="fas fa-concierge-bell" style="color:#09B1BA;"></i> Services</div>';
 
       if (!deliveryChoice[convId] || !deliveryChoice[convId].resolved) {
-        // P4A — Vinted Delivery-First: the delivery card is the dominant option.
-        // It takes the full width with a teal gradient background + "Fastest +
-        // Safest" badge and a pre-filled fee estimate. Meet-in-person + truck
-        // sit below as smaller outline options.
-        var feeEstimate = '25-40 AED';
+        // Launch mode (Ahmed 2026-04-18): only "Meet in person" is live.
+        // Swappo Delivery + Find a Truck are flagged as Coming Soon until
+        // the partner network is onboarded. We render them so users know
+        // what's in the pipeline, but disable clicks.
+
+        // Meet in person — PRIMARY (promoted to a teal gradient card)
         servicesHTML +=
-          '<div class="dp-service-card dp-primary" onclick="chooseExchangeMethod(\'' + convId + '\', \'delivery\')" ' +
-            'style="background:linear-gradient(135deg,#09B1BA,#0891B2);color:#fff;border:0;padding:18px;margin-bottom:8px;position:relative;">' +
-            '<div class="dp-service-icon" style="background:rgba(255,255,255,0.18);color:#fff;">🚚</div>' +
+          '<div class="dp-service-card dp-primary" onclick="chooseExchangeMethod(\'' + convId + '\', \'meet\')" ' +
+            'style="background:linear-gradient(135deg,#09B1BA,#0891B2);color:#fff;border:0;padding:18px;margin-bottom:8px;position:relative;cursor:pointer;">' +
+            '<div class="dp-service-icon" style="background:rgba(255,255,255,0.18);color:#fff;">📍</div>' +
             '<div class="dp-service-text">' +
-              '<div class="dp-service-label" style="color:#fff;font-size:15px;">' + _trP('mode_delivery_recommended','Swappo Delivery') + '</div>' +
-              '<div class="dp-service-desc" style="color:rgba(255,255,255,0.85);">' + _trP('mode_delivery_fastest','⚡ Fastest + Safest') + ' · ' + _trP('mode_delivery_fee_hint','Estimated fee') + ' ' + feeEstimate + '</div>' +
+              '<div class="dp-service-label" style="color:#fff;font-size:15px;">' + _trP('mode_meeting_alt','Meet in person') + '</div>' +
+              '<div class="dp-service-desc" style="color:rgba(255,255,255,0.85);">Free · pick a public, well-lit spot</div>' +
             '</div>' +
-            '<span class="dp-service-price" style="color:#fff;font-weight:800;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:999px;">' + feeEstimate + '</span>' +
+            '<span class="dp-service-price" style="color:#fff;font-weight:800;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:999px;">FREE</span>' +
           '</div>';
+
+        // Swappo Delivery — COMING SOON (teal dashed, disabled)
         servicesHTML +=
-          '<div class="dp-service-card" onclick="chooseExchangeMethod(\'' + convId + '\', \'meet\')" ' +
-            'style="border:1.5px solid #E5E7EB;background:#fff;">' +
-            '<div class="dp-service-icon" style="background:#F3F4F6;">📍</div>' +
-            '<div class="dp-service-text"><div class="dp-service-label">' + _trP('mode_meeting_alt','Meet in person') + '</div><div class="dp-service-desc">Free · pick a safe spot</div></div>' +
-            '<span class="dp-service-price">FREE</span>' +
+          '<div class="dp-service-card dp-delivery-soon" title="Swappo Delivery joining soon" style="border:1.5px dashed #09B1BA;background:#F0FBFC;opacity:0.92;cursor:default;">' +
+            '<div class="dp-service-icon" style="background:#fff;">🚚</div>' +
+            '<div class="dp-service-text"><div class="dp-service-label">' + _trP('mode_delivery_recommended','Swappo Delivery') + '</div><div class="dp-service-desc">⚡ Fastest + Safest · Pickup & drop-off</div></div>' +
+            '<span class="dp-service-price" style="background:#F0FBFC;color:#078A91;border:1px solid #09B1BA;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;">COMING SOON</span>' +
           '</div>';
-        // Find a Truck — Coming Soon (Ahmed 2026-04-18). The partner
-        // network isn't live yet, so we display it but block clicks
-        // and show a soft "Coming Soon" pill instead of the price.
+
+        // Find a Truck — COMING SOON (pink dashed, disabled)
         servicesHTML +=
-            '<div class="dp-service-card dp-truck-soon" title="Truck partners joining soon" style="border:1.5px dashed #F9A8D4;background:#FDF2F8;opacity:0.92;cursor:default;">' +
-              '<div class="dp-service-icon" style="background:#fff;">🚛</div>' +
-              '<div class="dp-service-text"><div class="dp-service-label">' + _trP('truck_nav_link','Find a Truck').replace(/^🚛\s*/, '') + '</div><div class="dp-service-desc">Large items · furniture · heavy</div></div>' +
-              '<span class="dp-service-price" style="background:#FDF2F8;color:#9D174D;border:1px solid #F9A8D4;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;">COMING SOON</span>' +
-            '</div>';
+          '<div class="dp-service-card dp-truck-soon" title="Truck partners joining soon" style="border:1.5px dashed #F9A8D4;background:#FDF2F8;opacity:0.92;cursor:default;">' +
+            '<div class="dp-service-icon" style="background:#fff;">🚛</div>' +
+            '<div class="dp-service-text"><div class="dp-service-label">' + _trP('truck_nav_link','Find a Truck').replace(/^🚛\s*/, '') + '</div><div class="dp-service-desc">Large items · furniture · heavy</div></div>' +
+            '<span class="dp-service-price" style="background:#FDF2F8;color:#9D174D;border:1px solid #F9A8D4;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;">COMING SOON</span>' +
+          '</div>';
       }
       servicesHTML += '</div>';
 
@@ -2794,6 +3099,11 @@
   }
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
+    // Priority: detail modals (topmost) first, then rating/QR, then drawer.
+    var idm = document.getElementById('idmModal');
+    if (idm && idm.classList.contains('open')) { closeItemDetail(); return; }
+    var box = document.getElementById('boxDetailModal');
+    if (box && box.classList.contains('open')) { closeBoxDetail(); return; }
     var rateModal = document.getElementById('rateModal');
     if (rateModal && rateModal.classList.contains('open')) { closeRatingModal(); return; }
     var qrModal = document.getElementById('qrModal');
