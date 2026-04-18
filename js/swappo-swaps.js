@@ -326,16 +326,25 @@
       .order('created_at', { ascending: false });
     return data || [];
   }
+  // Active (non-terminal) statuses that belong in the Sent / Received
+  // lists. Everything else — completed, declined, cancelled, expired —
+  // lives in History.
+  const ACTIVE_STATUSES = ['pending', 'accepted'];
+
   async function getSent(userId) {
     if (!global.db || !userId) return [];
     const { data } = await global.db.from(TABLE).select('*')
-      .eq('proposer_id', userId).order('created_at', { ascending: false });
+      .eq('proposer_id', userId)
+      .in('status', ACTIVE_STATUSES)
+      .order('created_at', { ascending: false });
     return data || [];
   }
   async function getReceived(userId) {
     if (!global.db || !userId) return [];
     const { data } = await global.db.from(TABLE).select('*')
-      .eq('receiver_id', userId).order('created_at', { ascending: false });
+      .eq('receiver_id', userId)
+      .in('status', ACTIVE_STATUSES)
+      .order('created_at', { ascending: false });
     return data || [];
   }
   async function getHistory(userId) {
