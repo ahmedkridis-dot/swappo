@@ -22,7 +22,9 @@
 
   const CONV_TABLE = 'conversations';
   const MSG_TABLE = 'messages';
-  const USERS_TABLE = 'users';
+  // Public-safe view: pseudo + avatar + badge exposed without PII.
+  // Reading from public.users directly is blocked by RLS for non-self.
+  const USERS_TABLE = 'users_public';
 
   async function _currentUserId() {
     if (!global.SwappoAuth || !global.SwappoAuth.isReady()) return null;
@@ -95,7 +97,8 @@
     const itemIds = convs.map(c => c.item_id).filter(Boolean);
 
     const [usersResp, itemsResp] = await Promise.all([
-      global.db.from(USERS_TABLE).select('id,pseudo,name,avatar,plan,badge,swap_count').in('id', otherIds),
+      // users_public exposes pseudo/display_name/avatar/badge/rating — no `name` column.
+      global.db.from(USERS_TABLE).select('id,pseudo,display_name,avatar,plan,badge,swap_count').in('id', otherIds),
       itemIds.length
         ? global.db.from('items').select('id,brand,model,category,photos,price,is_giveaway').in('id', itemIds)
         : Promise.resolve({ data: [] })
@@ -114,7 +117,20 @@
         identity_revealed: c.identity_revealed,
         last_message: c.last_message_preview || '',
         last_message_at: c.last_message_at,
-        other_user: usersMap[otherId] || { id: otherId, pseudo: '', name: 'User', avatar: '', plan: 'free' },
+        // Normalize the user so downstream code can always read `.pseudo`
+        // even when users_public only provided `display_name`.
+        other_user: (function (u) {
+          if (!u) return { id: otherId, pseudo: 'Swapper', avatar: '', plan: 'free' };
+          return {
+            id: u.id,
+            pseudo: u.pseudo || u.display_name || ('User_' + String(u.id || '').slice(0, 4)),
+            display_name: u.display_name,
+            avatar: u.avatar,
+            plan: u.plan,
+            badge: u.badge,
+            swap_count: u.swap_count
+          };
+        })(usersMap[otherId]),
         item: itemsMap[c.item_id] || null,
         item_title: itemsMap[c.item_id]
           ? ((itemsMap[c.item_id].brand || '') + ' ' + (itemsMap[c.item_id].model || '')).trim()
