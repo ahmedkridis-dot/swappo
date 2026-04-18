@@ -31,211 +31,512 @@
   <link rel="stylesheet" href="../css/swappo-visual.css">
   <link rel="stylesheet" href="../css/swappo-modern-2026.css">
   <style>
-    /* ============ BREADCRUMB ============ */
+    /* ============================================
+       PRODUCT PAGE — Dubizzle-style layout v2
+       (Ahmed brief 2026-04-18)
+       ============================================ */
+
+    /* ── Breadcrumb ───────────────────────────── */
     .breadcrumb {
       background: var(--bg);
-      padding: 16px 24px;
+      padding: 14px 24px;
       border-bottom: 1px solid var(--border);
-      font-size: 14px;
+      font-size: 13px;
     }
     .breadcrumb-list {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
+      display: flex; gap: 8px; align-items: center;
+      max-width: 1200px; margin: 0 auto;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-    .breadcrumb-list a { color: var(--primary); font-weight: 500; }
+    .breadcrumb-list::-webkit-scrollbar { display: none; }
+    .breadcrumb-list a { color: var(--primary); font-weight: 500; white-space: nowrap; }
     .breadcrumb-list a:hover { color: var(--primary-dark); }
-    .breadcrumb-list span { color: var(--text-muted); }
+    .breadcrumb-list span { color: var(--text-muted); white-space: nowrap; }
+    .breadcrumb-back {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: var(--primary); font-weight: 600;
+      padding: 6px 10px; margin-right: 4px;
+      border-radius: 8px; text-decoration: none;
+    }
+    .breadcrumb-back:hover { background: var(--primary-light); }
 
-    /* ============ PRODUCT LAYOUT ============ */
+    /* ── Main container ───────────────────────── */
     .product-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 32px 24px;
+      padding: 24px;
       background: var(--bg-light);
     }
-    .product-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      margin-bottom: 48px;
-    }
 
-    /* ============ PHOTO GALLERY ============ */
-    .photo-gallery { display: flex; flex-direction: column; gap: 12px; }
-    .main-photo-container {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background: var(--bg);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
+    /* ── Photo gallery (hero + side thumbs, Dubizzle-style) ── */
+    .pg {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
     }
+    .pg-hero, .main-photo-container {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .pg-hero { min-height: 300px; }
     .main-photo {
       width: 100%; height: 100%;
       object-fit: cover;
       cursor: pointer;
-      transition: transform 0.3s ease;
+      transition: transform 0.4s ease;
+      display: block;
     }
-    .main-photo:hover { transform: scale(1.05); }
+    .main-photo:hover { transform: scale(1.03); }
     .photo-count-badge {
       position: absolute; bottom: 12px; right: 12px;
-      background: rgba(0,0,0,0.6); color: white;
-      padding: 6px 12px; border-radius: var(--radius);
+      background: rgba(15,23,42,0.75); color: white;
+      padding: 6px 12px; border-radius: 999px;
       font-size: 12px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px;
+      backdrop-filter: blur(6px);
     }
-    .thumbnail-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    /* Side thumbnails column (desktop only) — populated by JS via cloning
+       the first 2 photos. On narrow viewports we hide this and show the
+       horizontal .thumbnail-strip below instead. */
+    .pg-side {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+    }
+    .pg-side-thumb {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .pg-side-thumb:hover { transform: scale(1.02); }
+    .pg-side-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pg-side-more {
+      position: absolute; inset: 0;
+      background: rgba(15,23,42,0.55);
+      color: #fff; font-size: 18px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px;
+    }
+    .pg-side-more i { font-size: 20px; }
+
+    /* Horizontal thumbnail strip (all photos, visible under hero on all
+       viewports for quick swap). Tap = swap hero. */
+    .thumbnail-strip {
+      display: flex; gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 24px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .thumbnail-strip::-webkit-scrollbar { height: 4px; }
+    .thumbnail-strip::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
     .thumbnail {
-      position: relative; aspect-ratio: 1;
-      background: var(--bg); border: 2px solid transparent;
-      border-radius: var(--radius); cursor: pointer;
-      overflow: hidden; transition: border-color 0.2s;
+      position: relative;
+      flex: 0 0 84px;
+      aspect-ratio: 1;
+      background: #fff;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
     }
-    .thumbnail:hover { border-color: var(--primary); }
-    .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
-    .thumbnail.active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+    .thumbnail:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumbnail.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(9,177,186,0.15);
+    }
     .thumbnail.blurred img { filter: blur(8px); }
     .thumbnail-lock {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.5); color: white; font-size: 18px;
+      background: rgba(15,23,42,0.5); color: white; font-size: 16px;
     }
     .thumbnail-lock-text {
       position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
       font-size: 9px; font-weight: 600; text-align: center; white-space: nowrap; width: 95%;
+      color: #fff;
     }
 
-    /* ============ PRODUCT INFO (right column) ============ */
-    .product-info { display: flex; flex-direction: column; gap: 24px; }
-    .product-header {
-      background: var(--bg); padding: 24px;
-      border-radius: var(--radius-lg); border: 1px solid var(--border);
+    /* ── 2-col layout: main content + sticky sidebar ── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 28px;
+      align-items: start;
+      margin-bottom: 48px;
     }
-    .product-title { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
-    .product-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .product-main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+    .product-aside {
+      position: sticky; top: 88px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    /* ── Price row (top of main column) ─────── */
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .price-amount {
+      font-size: 32px; font-weight: 800;
+      color: #1A1A2E; letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .price-amount .price-ccy { font-size: 15px; font-weight: 600; color: #6B7280; margin-right: 8px; letter-spacing: 0.04em; }
+    .price-tags {
+      display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+    }
+    .price-actions {
+      display: flex; gap: 8px;
+    }
+    .icon-pill {
+      width: 40px; height: 40px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #4A4A5A;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .icon-pill:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── Product header (title + meta) ──────── */
+    .product-header {
+      background: #fff; padding: 20px 24px;
+      border-radius: 16px; border: 1px solid var(--border);
+    }
+    .product-title {
+      font-size: 24px; font-weight: 700;
+      color: #1A1A2E; letter-spacing: -0.02em;
+      margin: 0 0 10px;
+      line-height: 1.25;
+    }
+    .product-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .meta-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: #F3F4F6;
+      color: #4A4A5A;
+      border-radius: 999px;
+      font-size: 13px; font-weight: 500;
+    }
+    .meta-chip i { font-size: 11px; color: #9CA3AF; }
     .category-chip {
       display: inline-flex; align-items: center; gap: 6px;
       background: var(--primary-light); color: var(--primary-dark);
-      padding: 6px 12px; border-radius: var(--radius);
+      padding: 5px 12px; border-radius: 999px;
       font-size: 13px; font-weight: 600;
     }
-    .badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--accent); color: white;
-      padding: 6px 12px; border-radius: var(--radius);
-      font-size: 13px; font-weight: 600;
-    }
-    .swap-info {
-      display: flex; align-items: center; gap: 12px;
-      padding: 16px; background: var(--primary-light);
-      border-radius: var(--radius); margin-top: 20px;
-    }
-    .swap-info-icon { font-size: 24px; color: var(--primary); }
-    .swap-info-text { font-size: 14px; color: var(--text); }
-    .swap-info-text strong { font-weight: 700; }
+    /* swap-info is hidden now — price lives in .price-row */
+    .swap-info { display: none !important; }
+    /* Legacy #price-display card is auto-inserted by renderItem() to show
+       a big price card. In the Dubizzle-style layout the price already
+       sits in .price-row at the top of the main column, so this card
+       would duplicate the info — hide it. */
+    #price-display { display: none !important; }
 
-    /* ============ DETAILS CARD ============ */
+    /* ── Overview / details card ──────────── */
     .details-card {
-      background: var(--bg); padding: 24px;
-      border-radius: var(--radius-lg); border: 1px solid var(--border);
+      background: #fff; padding: 20px 24px;
+      border-radius: 16px; border: 1px solid var(--border);
     }
-    .details-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    .details-title {
+      font-size: 18px; font-weight: 700;
+      color: #1A1A2E; letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 24px;
+      row-gap: 14px;
+    }
     .detail-row {
-      display: flex; justify-content: space-between;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 2px;
+      padding: 0; border: none;
     }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-label { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
-    .detail-value { font-size: 14px; font-weight: 600; }
-    .location-row {
+    .detail-label { font-size: 12px; color: #6B7280; font-weight: 500; }
+    .detail-value { font-size: 14px; font-weight: 600; color: #1A1A2E; }
+    .location-row, .posted-row, .interested-row {
       display: flex; align-items: center; gap: 8px;
-      padding: 16px 0; font-size: 14px; color: var(--text-secondary);
+      padding: 10px 0; font-size: 13px; color: var(--text-secondary);
+      border-top: 1px solid var(--border);
     }
-    .location-row strong { font-weight: 600; }
-    .posted-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 0; font-size: 13px; color: var(--text-muted);
-    }
-    .interested-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 0; font-size: 13px; color: var(--text-secondary);
-    }
+    .location-row:first-of-type { margin-top: 4px; }
     .interested-row i { color: var(--secondary); font-size: 14px; }
 
-    /* ============ ACTION BUTTONS ============ */
+    /* ── Action buttons (inside sidebar) ──── */
     .action-buttons {
-      background: var(--bg); padding: 24px;
-      border-radius: var(--radius-lg); border: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 12px;
+      background: #fff; padding: 20px;
+      border-radius: 16px; border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 10px;
     }
     .action-buttons .btn-primary {
-      padding: 16px 24px; font-size: 15px;
+      padding: 14px 22px; font-size: 15px;
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      border-radius: var(--radius);
+      border-radius: 12px; font-weight: 700;
     }
     .action-buttons .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(9, 177, 186, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(9,177,186,0.25);
     }
-    .action-buttons .btn-primary:active { transform: translateY(0); }
-    .secondary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .secondary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .btn-secondary {
-      background: var(--bg-light); color: var(--primary);
-      padding: 12px 16px; border: 2px solid var(--primary);
-      border-radius: var(--radius); font-size: 14px; font-weight: 600;
-      cursor: pointer; transition: background 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: #F8FAFA; color: var(--primary);
+      padding: 11px 14px; border: 1.5px solid var(--primary);
+      border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
     }
     .btn-secondary:hover { background: var(--primary-light); }
     .btn-secondary.active { background: var(--primary); color: white; }
     .text-link {
       color: var(--primary); font-size: 13px; font-weight: 500;
-      cursor: pointer; text-align: center; padding: 8px 0;
+      cursor: pointer; text-align: center; padding: 6px 0;
     }
     .text-link:hover { color: var(--primary-dark); text-decoration: underline; }
 
-    /* ============ SELLER CARD ============ */
+    /* ── Seller card (sidebar) ──────────── */
     .seller-card {
-      background: var(--bg); padding: 24px;
-      border-radius: var(--radius-lg); border: 1px solid var(--border);
+      background: #fff; padding: 24px 20px;
+      border-radius: 16px; border: 1px solid var(--border);
       text-align: center;
     }
     .seller-avatar {
-      width: 80px; height: 80px; background: var(--bg-light);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 36px; margin: 0 auto 16px; color: var(--text-muted);
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #E6F7F8, #D0F0F2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 12px;
+      color: var(--primary);
+      overflow: hidden;
     }
-    .seller-name { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .seller-avatar svg, .seller-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .seller-name {
+      font-size: 16px; font-weight: 700;
+      color: #1A1A2E; margin-bottom: 6px;
+    }
     .seller-badge {
-      display: inline-block; background: var(--primary-light); color: var(--primary-dark);
-      padding: 6px 12px; border-radius: var(--radius);
-      font-size: 12px; font-weight: 600; margin-bottom: 16px;
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 4px 12px; border-radius: 999px;
+      font-size: 12px; font-weight: 600;
+      margin-bottom: 14px;
     }
     .seller-info {
       display: flex; flex-direction: column; gap: 8px;
-      padding: 16px 0; border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      font-size: 13px; color: var(--text-secondary);
+      padding: 12px 0; margin-top: 4px;
+      border-top: 1px solid var(--border);
+      font-size: 13px; color: #6B7280;
     }
-    .seller-info-item { display: flex; justify-content: space-between; }
+    .seller-info-item { display: flex; justify-content: space-between; gap: 8px; }
+    .seller-info-item strong { color: #1A1A2E; font-weight: 600; }
     .seller-disclaimer {
-      font-size: 12px; color: var(--text-muted);
-      margin-top: 16px; font-style: italic;
+      font-size: 11px; color: #9CA3AF;
+      margin-top: 10px; line-height: 1.5;
+      text-align: left;
     }
 
-    /* ============ SIMILAR ITEMS ============ */
+    /* ── Similar items ─────────────────── */
     .similar-section {
-      margin-top: 64px; padding-top: 48px;
-      border-top: 2px solid var(--border);
+      margin-top: 48px; padding-top: 32px;
+      border-top: 1px solid var(--border);
     }
-    .section-title { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+    .section-title {
+      font-size: 22px; font-weight: 800;
+      color: #1A1A2E; letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
     .product-grid-similar {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 16px;
+    }
+
+    /* ── Floating chat widget (desktop bubble, mobile bottom sheet) ── */
+    .fchat {
+      position: fixed;
+      right: 20px; bottom: 20px;
+      z-index: 800;
+      width: min(340px, calc(100vw - 40px));
+      font-family: inherit;
+    }
+    .fchat-toggle {
+      width: 100%;
+      background: linear-gradient(135deg, #09B1BA, #078A91);
+      color: #fff;
+      border: 0;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 12px 32px rgba(9,177,186,0.45);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      touch-action: manipulation;
+    }
+    .fchat-toggle:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(9,177,186,0.5); }
+    .fchat-toggle i { font-size: 16px; }
+    .fchat-panel {
+      display: none;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(15,23,42,0.22), 0 4px 16px rgba(15,23,42,0.08);
+      overflow: hidden;
+      animation: fchatPop 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .fchat.open .fchat-panel { display: block; }
+    .fchat.open .fchat-toggle { display: none; }
+    @keyframes fchatPop { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+    .fchat-header {
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #09B1BA, #078A91);
+      color: #fff;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .fchat-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .fchat-who { flex: 1; min-width: 0; }
+    .fchat-name { font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .fchat-sub { font-size: 11px; opacity: 0.88; }
+    .fchat-close {
+      width: 30px; height: 30px;
+      background: rgba(255,255,255,0.18);
+      border: 0;
+      border-radius: 50%;
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .fchat-product {
+      display: flex; gap: 10px; align-items: center;
+      padding: 12px 16px;
+      background: #F8FAFA;
+      border-bottom: 1px solid var(--border);
+    }
+    .fchat-product-img {
+      width: 56px; height: 56px; border-radius: 10px;
+      background: #E5E7EB; object-fit: cover;
+      flex-shrink: 0;
+    }
+    .fchat-product-meta { min-width: 0; flex: 1; }
+    .fchat-product-title {
+      font-size: 13px; font-weight: 600; color: #1A1A2E;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fchat-product-price {
+      font-size: 14px; font-weight: 800; color: #09B1BA;
+    }
+    .fchat-body { padding: 14px 16px 6px; }
+    .fchat-hint {
+      font-size: 12px; color: #6B7280;
+      line-height: 1.5; margin: 0 0 12px;
+    }
+    .fchat-actions {
+      display: flex; flex-direction: column; gap: 8px;
+      padding: 0 16px 14px;
+    }
+    .fchat-btn {
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      border: 1.5px solid transparent;
+      transition: all 0.2s;
+    }
+    .fchat-btn.primary { background: linear-gradient(135deg,#09B1BA,#078A91); color: #fff; }
+    .fchat-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(9,177,186,0.3); }
+    .fchat-btn.amber { background: #F59E0B; color: #fff; }
+    .fchat-btn.amber:hover { background: #D97706; }
+    .fchat-btn.outline { background: #fff; color: var(--primary); border-color: var(--primary); }
+    .fchat-btn.outline:hover { background: var(--primary-light); }
+
+    /* ── Responsive ────────────────────────── */
+    @media (max-width: 1023px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .product-aside { position: static; }
+      /* Reorder: on tablet/mobile, action-buttons should come right after
+         the product header for primary-first UX. We use order. */
+      .product-main { order: 1; }
+      .product-aside { order: 2; }
+    }
+    @media (max-width: 900px) {
+      /* Drop the side thumbnails column — hero goes full width, the
+         horizontal thumbnail-strip below shows everything. */
+      .pg { grid-template-columns: 1fr; }
+      .pg-side { display: none; }
+    }
+    @media (max-width: 768px) {
+      .product-container { padding: 16px; }
+      .pg { gap: 8px; }
+      .pg-hero, .main-photo-container { border-radius: 14px; }
+      .price-row { padding: 14px 16px; }
+      .price-amount { font-size: 26px; }
+      .product-title { font-size: 20px; }
+      .product-header, .details-card, .action-buttons, .seller-card {
+        padding: 16px; border-radius: 14px;
+      }
+      .details-grid { grid-template-columns: 1fr; row-gap: 12px; }
+      .secondary-actions { grid-template-columns: 1fr; }
+      .section-title { font-size: 18px; }
+      .product-grid-similar {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .seller-avatar { width: 64px; height: 64px; }
+
+      /* Floating widget: switch to bottom-anchored on mobile. Collapsed
+         shows a full-width sticky bar; expanded rises as a bottom sheet. */
+      .fchat {
+        right: 0; left: 0; bottom: 0;
+        width: 100%;
+        padding: 10px 12px max(10px, env(safe-area-inset-bottom));
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -8px 24px rgba(0,0,0,0.08);
+      }
+      .fchat-toggle { padding: 14px 20px; border-radius: 14px; box-shadow: 0 6px 18px rgba(9,177,186,0.35); }
+      .fchat-panel { border-radius: 20px 20px 0 0; }
+      /* Add bottom spacing on the container so the sticky widget doesn't
+         cover content when the user scrolls to the bottom. */
+      .product-container { padding-bottom: 120px; }
+    }
+    @media (max-width: 480px) {
+      .thumbnail { flex: 0 0 72px; }
+      .price-amount { font-size: 24px; }
     }
     .product-card-image {
       width: 100%; aspect-ratio: 1;
@@ -393,38 +694,61 @@
   </div>
 </div>
 
-<!-- ============ MAIN CONTENT ============ -->
+<!-- ============ MAIN CONTENT (Dubizzle-style v2) ============ -->
 <div class="product-container" id="product-container">
+
+  <!-- ── Photo gallery: hero + 2 side thumbs (desktop) ── -->
+  <section class="pg" aria-label="Item photos">
+    <div class="pg-hero main-photo-container">
+      <img id="mainPhoto" src="" alt="" class="main-photo">
+      <div class="photo-count-badge" id="photo-count-badge">
+        <i class="fas fa-images"></i><span>0</span>
+      </div>
+    </div>
+    <div class="pg-side" id="pg-side" aria-hidden="true">
+      <!-- Populated by JS (hydrateSideThumbs) after renderItem finishes -->
+    </div>
+  </section>
+
+  <!-- Horizontal thumbnail strip — populated by the existing JS into #thumbnail-strip -->
+  <div class="thumbnail-strip" id="thumbnail-strip"></div>
+
+  <!-- ── 2-col grid: main content + sticky sidebar ── -->
   <div class="product-grid">
-    <!-- LEFT: PHOTO GALLERY -->
-    <div class="photo-gallery">
-      <div class="main-photo-container">
-        <img id="mainPhoto" src="" alt="" class="main-photo">
-        <div class="photo-count-badge" id="photo-count-badge">
-          <i class="fas fa-images" style="margin-right: 6px;"></i><span>0</span> photos
+
+    <!-- MAIN COLUMN -->
+    <div class="product-main">
+
+      <!-- Price + favorite/share row (top of main) -->
+      <div class="price-row">
+        <div>
+          <div class="price-amount" id="price-amount">—</div>
+          <div class="price-tags" id="price-tags"></div>
+        </div>
+        <div class="price-actions">
+          <button class="icon-pill" id="price-fav" aria-label="Save" onclick="toggleFavorite()"><i class="far fa-heart"></i></button>
+          <button class="icon-pill" aria-label="Share" onclick="shareItem()"><i class="fas fa-share-alt"></i></button>
         </div>
       </div>
-      <div class="thumbnail-strip" id="thumbnail-strip"></div>
-    </div>
 
-    <!-- RIGHT: ITEM INFO -->
-    <div class="product-info">
-      <!-- Product Header -->
+      <!-- Product title + meta chips -->
       <div class="product-header">
         <h1 class="product-title" id="product-title">…</h1>
         <div class="product-meta" id="product-meta"></div>
         <div class="swap-info" id="swap-info"></div>
       </div>
 
-      <!-- Item Details -->
+      <!-- Overview / details -->
       <div class="details-card" id="details-card"></div>
 
-      <!-- Action Buttons -->
-      <div class="action-buttons" id="action-buttons"></div>
-
-      <!-- Seller Info -->
-      <div class="seller-card reveal" id="seller-card"></div>
     </div>
+
+    <!-- STICKY SIDEBAR (seller + actions) -->
+    <aside class="product-aside" aria-label="Seller and actions">
+      <div class="seller-card reveal" id="seller-card"></div>
+      <div class="action-buttons" id="action-buttons"></div>
+    </aside>
+
   </div>
 
   <!-- ============ SIMILAR ITEMS ============ -->
@@ -433,6 +757,40 @@
     <div class="product-grid-similar" id="similar-grid"></div>
   </div>
 </div>
+
+<!-- ============ FLOATING CHAT WIDGET ============
+     Desktop: bottom-right bubble. Mobile: sticky bottom bar that
+     expands upward into a bottom sheet. The content respects the
+     Swappo anonymity rule — no free-text input, only quick-action
+     shortcuts to the same modals the main action-buttons already use. -->
+<aside class="fchat" id="fchat" role="complementary" aria-label="Quick actions">
+  <button class="fchat-toggle" type="button" onclick="toggleFchat()">
+    <i class="fas fa-comments"></i><span>Make an offer</span>
+  </button>
+  <div class="fchat-panel" role="dialog" aria-label="Quick actions panel">
+    <div class="fchat-header">
+      <div class="fchat-avatar" id="fchat-avatar"><i class="fas fa-user"></i></div>
+      <div class="fchat-who">
+        <div class="fchat-name" id="fchat-name">Anonymous Swapper</div>
+        <div class="fchat-sub" id="fchat-sub">Identity revealed after acceptance</div>
+      </div>
+      <button class="fchat-close" type="button" onclick="toggleFchat()" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="fchat-product">
+      <img class="fchat-product-img" id="fchat-product-img" src="" alt="">
+      <div class="fchat-product-meta">
+        <div class="fchat-product-title" id="fchat-product-title">…</div>
+        <div class="fchat-product-price" id="fchat-product-price">—</div>
+      </div>
+    </div>
+    <div class="fchat-body">
+      <p class="fchat-hint">Pick how you'd like to start. The seller sees an anonymous offer — names are revealed only once both sides accept.</p>
+    </div>
+    <div class="fchat-actions" id="fchat-actions">
+      <!-- Rendered by hydrateFchatActions() after renderItem() resolves -->
+    </div>
+  </div>
+</aside>
 
 <!-- ============ SWAP PROPOSAL MODAL ============ -->
 <div id="swapModal" class="modal">
@@ -956,6 +1314,10 @@
     document.getElementById('swapModal').addEventListener('click', function(event) {
       if (event.target === this) closeSwapModal();
     });
+
+    // ── Hydrate the Dubizzle-style v2 UI (Ahmed 2026-04-18) ──
+    try { hydrateProductUiV2(item, owner, isGuest, isOwner, title); }
+    catch (e) { console.warn('[product-v2] hydrate failed', e && e.message); }
     } catch (err) {
       console.error('[product] init failed:', err);
       try {
@@ -1458,6 +1820,153 @@
       showToast('Report submitted. Our team will review this item.');
     }
   }
+
+  // ============================================================
+  //  Dubizzle-style v2 UI hydration  (Ahmed brief 2026-04-18)
+  //  Populates: price-amount, price-tags, pg-side (side thumbs),
+  //  fchat header/product/actions + keeps the floating widget in
+  //  sync with the item + user. Runs AFTER renderItem() finishes
+  //  so we can read the same owner/currentItem the main render used.
+  // ============================================================
+
+  function hydrateProductUiV2(item, owner, isGuest, isOwner, title) {
+    // ── Price row ─────────────────────────
+    var priceEl = document.getElementById('price-amount');
+    var tagsEl  = document.getElementById('price-tags');
+    if (priceEl) {
+      if (item.is_giveaway) {
+        priceEl.innerHTML = '<span style="color:#10B981;">FREE</span>';
+      } else {
+        var p = (item.price || 0).toLocaleString();
+        priceEl.innerHTML = '<span class="price-ccy">AED</span>' + p;
+      }
+    }
+    if (tagsEl) {
+      var chips = [];
+      if (item.is_giveaway) {
+        chips.push('<span class="meta-chip" style="background:#D1FAE5;color:#065F46;">🎁 Gift</span>');
+      } else {
+        chips.push('<span class="meta-chip" style="background:#E6F7F8;color:#078A91;">🔄 Swap</span>');
+        chips.push('<span class="meta-chip" style="background:#FEF3C7;color:#92400E;">🛒 Buy</span>');
+      }
+      tagsEl.innerHTML = chips.join('');
+    }
+
+    // ── Favorite icon-pill (mirrors the existing saveBtn state) ──
+    try {
+      var favPill = document.getElementById('price-fav');
+      var isFav = window.SwappoItems && window.SwappoItems.isFavoritedSync
+        ? window.SwappoItems.isFavoritedSync(item.id)
+        : false;
+      if (favPill) {
+        favPill.innerHTML = isFav ? '<i class="fas fa-heart" style="color:#EF4444;"></i>' : '<i class="far fa-heart"></i>';
+      }
+    } catch (_) {}
+
+    // ── Side thumbnails (desktop gallery) ──
+    var side = document.getElementById('pg-side');
+    if (side) {
+      var photos = (item.photos || []).slice(0, 8);
+      var t1 = photos[1] || photos[0] || '';
+      var t2 = photos[2] || photos[1] || photos[0] || '';
+      var more = Math.max(0, photos.length - 2);
+      var html = '';
+      if (t1) {
+        html += '<div class="pg-side-thumb" onclick="swapHeroTo(1)"><img src="' + t1 + '" alt=""></div>';
+      }
+      if (t2) {
+        html += '<div class="pg-side-thumb" onclick="swapHeroTo(' + (photos[2] ? 2 : 1) + ')">' +
+          '<img src="' + t2 + '" alt="">' +
+          (more > 1 ? '<div class="pg-side-more"><i class="fas fa-images"></i>' + photos.length + '</div>' : '') +
+        '</div>';
+      }
+      side.innerHTML = html;
+    }
+
+    // ── Floating chat widget hydration ──
+    var fTitle = document.getElementById('fchat-product-title');
+    var fPrice = document.getElementById('fchat-product-price');
+    var fImg   = document.getElementById('fchat-product-img');
+    var fName  = document.getElementById('fchat-name');
+    var fSub   = document.getElementById('fchat-sub');
+    var fAv    = document.getElementById('fchat-avatar');
+    var fActs  = document.getElementById('fchat-actions');
+
+    if (fTitle) fTitle.textContent = title;
+    if (fPrice) {
+      fPrice.textContent = item.is_giveaway ? 'FREE' : (item.price || 0).toLocaleString() + ' AED';
+    }
+    if (fImg) {
+      var firstPhoto = (item.photos && item.photos[0]) || '';
+      if (firstPhoto) fImg.src = firstPhoto; else fImg.style.display = 'none';
+    }
+    if (fName) {
+      fName.textContent = (owner && owner.pseudo) ? owner.pseudo : 'Anonymous Swapper';
+    }
+    if (fSub) {
+      var badgeEmoji = owner ? (owner.badge_emoji || '⭐') : '⭐';
+      var badgeLabel = owner ? (owner.badge_tier ? capitalizeFirst(owner.badge_tier) : 'Swapper') : 'Swapper';
+      fSub.innerHTML = badgeEmoji + ' ' + badgeLabel + ' · Identity revealed after acceptance';
+    }
+    if (fAv) {
+      if (owner && owner.avatar && window.getAvatarSVG) {
+        fAv.innerHTML = getAvatarSVG(owner.avatar);
+      } else {
+        fAv.innerHTML = '<i class="fas fa-user"></i>';
+      }
+    }
+
+    // Build the quick-action buttons — mirrors the ones in action-buttons
+    // but condensed, and wires to the same handlers so modals still open.
+    if (fActs) {
+      var htmlA = '';
+      if (isGuest) {
+        htmlA += '<a class="fchat-btn primary" href="login.html?redirect=' + encodeURIComponent(window.location.href) + '"><i class="fas fa-sign-in-alt"></i> Sign in to offer</a>';
+      } else if (isOwner) {
+        htmlA += '<a class="fchat-btn outline" href="profile.html#my-items"><i class="fas fa-cog"></i> Manage in My Swaps</a>';
+      } else if (item.is_giveaway) {
+        htmlA += '<button type="button" class="fchat-btn primary" onclick="claimGiveaway && claimGiveaway(); toggleFchat();"><i class="fas fa-gift"></i> Claim this gift</button>';
+      } else {
+        htmlA += '<button type="button" class="fchat-btn primary" onclick="toggleFchat(); openSwapModal();"><i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
+        htmlA += '<button type="button" class="fchat-btn amber" onclick="toggleFchat(); startBuy();"><i class="fas fa-shopping-cart"></i> Buy for ' + (item.price || 0).toLocaleString() + ' AED</button>';
+        htmlA += '<button type="button" class="fchat-btn outline" onclick="toggleFchat(); openOfferModal();"><i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
+      }
+      fActs.innerHTML = htmlA;
+    }
+  }
+
+  // Swap the hero image from the Dubizzle-style side thumbs
+  window.swapHeroTo = function (index) {
+    if (!currentItem || !currentItem.photos || !currentItem.photos[index]) return;
+    var hero = document.getElementById('mainPhoto');
+    if (hero) hero.src = currentItem.photos[index];
+    // Sync the existing thumbnail-strip active state
+    var thumbs = document.querySelectorAll('.thumbnail-strip .thumbnail');
+    thumbs.forEach(function (t, i) { t.classList.toggle('active', i === index); });
+  };
+
+  // Floating chat widget toggle
+  window.toggleFchat = function () {
+    var w = document.getElementById('fchat');
+    if (!w) return;
+    w.classList.toggle('open');
+  };
+
+  // Native Web Share or clipboard fallback
+  window.shareItem = async function () {
+    var url = window.location.href;
+    var title = document.getElementById('product-title')?.textContent || 'Swappo item';
+    if (navigator.share) {
+      try { await navigator.share({ title: title, url: url }); return; } catch (_) {}
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      if (window.Toast && Toast.show) Toast.show('Link copied to clipboard.', 'success');
+      else showToast && showToast('Link copied to clipboard.');
+    } catch (_) {
+      if (window.Toast) Toast.show('Copy failed — long-press the address bar to share.', 'info');
+    }
+  };
 </script>
 
 </body>
