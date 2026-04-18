@@ -74,7 +74,9 @@ begin
 
   -- 32-char hex token (16 random bytes = 128 bits of entropy)
   v_token   := encode(extensions.gen_random_bytes(16), 'hex');
-  v_expires := now() + interval '10 seconds';
+  -- 30-second window — camera scanning takes longer on real phones
+  -- than a ping (focus + decode + redirect). Tuned with Ahmed 2026-04-18.
+  v_expires := now() + interval '30 seconds';
 
   update public.swaps
     set qr_token      = v_token,

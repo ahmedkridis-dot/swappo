@@ -1787,7 +1787,7 @@
     return div;
   }
 
-  // QR Confirmation Card — real QR handshake (10-second token)
+  // QR Confirmation Card — real QR handshake (30-second token)
   // The other party scans this code with their phone's camera →
   // opens confirm.html → RPC confirms the swap for both sides.
   function createQRCard(convId) {
@@ -1918,7 +1918,7 @@
     renderDealPanel(convId);
   }
 
-  // ═══ QR CONFIRMATION (real handshake, 10-sec token) ═══
+  // ═══ QR CONFIRMATION (real handshake, 30-sec token) ═══
   var _qrRtUnsub = null;   // realtime subscription on this swap row
 
   async function _resolveSwapId(convId) {
@@ -1993,7 +1993,9 @@
     }
     var row = Array.isArray(gen.data) ? gen.data[0] : gen.data;
     var token = row && row.qr_token;
-    var expiresAt = row && row.expires_at ? new Date(row.expires_at).getTime() : Date.now() + 10000;
+    // Fallback to 30 s if the server didn't return an expiry — matches
+    // the server-side window in generate_swap_qr().
+    var expiresAt = row && row.expires_at ? new Date(row.expires_at).getTime() : Date.now() + 30000;
     if (!token) { Toast.show('QR generation failed.', 'error'); return; }
 
     // 2. Render the real QR pointing at confirm.html

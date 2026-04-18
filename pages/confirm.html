@@ -205,7 +205,7 @@
         var peek = await window.db.rpc('peek_swap_qr', { p_token: token });
         if (peek && peek.data && peek.data.valid === false) {
           var reason = peek.data.reason;
-          if (reason === 'expired')      return setState('error','QR expired','The 10-second window passed. Ask the other party to generate a new code.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+          if (reason === 'expired')      return setState('error','QR expired','The 30-second window passed. Ask the other party to generate a new code.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
           if (reason === 'own_qr')       return setState('error','That\u2019s your own QR','You cannot scan a code you issued. Hand your phone to the other party.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
           if (reason === 'not_yours')    return setState('error','Not your swap','This QR belongs to a swap you are not part of.', [{ label:'Open Swappo', href:'/', primary:true }]);
           if (reason === 'not_found')    return setState('error','QR already used or unknown','Either this code was already scanned or it no longer exists. Generate a new one.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
@@ -217,7 +217,7 @@
       var res = await window.db.rpc('confirm_swap_qr', { p_token: token });
       if (res.error) {
         var m = String(res.error.message || '');
-        if (/qr_expired/.test(m))            return setState('error','QR expired','The 10-second window passed. Ask the other party to regenerate.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+        if (/qr_expired/.test(m))            return setState('error','QR expired','The 30-second window passed. Ask the other party to regenerate.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
         if (/qr_not_found/.test(m))          return setState('error','QR already used','This code was already consumed. Only one scan is allowed.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
         if (/cannot_scan_own_qr/.test(m))    return setState('error','That\u2019s your own QR','Hand your phone to the other party so they can scan.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
         if (/not_your_swap/.test(m))         return setState('error','Not your swap','This QR belongs to a swap you are not part of.', [{ label:'Open Swappo', href:'/', primary:true }]);
