@@ -1961,8 +1961,14 @@
             }
 
             function findUser(userId) {
-                if (!userId) return { pseudo: 'Unknown', avatar: null };
-                return _usersCache.get(userId) || { pseudo: 'Unknown', avatar: null };
+                if (!userId) return { pseudo: 'Swapper', avatar: null };
+                var u = _usersCache.get(userId);
+                if (!u) return { pseudo: 'Swapper', avatar: null };
+                // users_public exposes either pseudo OR display_name — pick
+                // whichever is present so the card never shows "Unknown".
+                if (!u.pseudo && u.display_name) u.pseudo = u.display_name;
+                if (!u.pseudo) u.pseudo = 'User_' + String(userId).slice(0, 4);
+                return u;
             }
 
             var _boxesCache = new Map(); // box_id -> { box, item_ids: [] }
@@ -1983,7 +1989,9 @@
                 try {
                     const [itemsResp, usersResp, boxesResp, boxItemsResp] = await Promise.all([
                         itemIds.size ? window.db.from('items').select('id,brand,model,category,type,photos,price,condition,is_giveaway,status,box_id').in('id', Array.from(itemIds)) : Promise.resolve({data:[]}),
-                        userIds.size ? window.db.from('users').select('id,pseudo,name,avatar,plan,badge,swap_count').in('id', Array.from(userIds)) : Promise.resolve({data:[]}),
+                        // public-safe view: pseudo + avatar + badge (no PII).
+                        // The raw `users` table is RLS-blocked for non-self reads.
+                        userIds.size ? window.db.from('users_public').select('id,pseudo,display_name,avatar,plan,badge,swap_count,rating_avg,rating_count').in('id', Array.from(userIds)) : Promise.resolve({data:[]}),
                         boxIds.size ? window.db.from('boxes').select('id,owner_id,kind,title,status').in('id', Array.from(boxIds)) : Promise.resolve({data:[]}),
                         boxIds.size ? window.db.from('box_items').select('box_id,item_id').in('box_id', Array.from(boxIds)) : Promise.resolve({data:[]})
                     ]);
@@ -2084,6 +2092,25 @@
                     var cover = (side.photos && side.photos[0]) ||
                         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
                     var boxLabel = side.box && side.box.kind === 'gift' ? '🎁 Gift Box' : '📦 Swap Box';
+                    // Unique id for the expandable panel so two boxes on the
+                    // same card don't collide.
+                    var panelId = 'box-panel-' + Math.random().toString(36).slice(2, 9);
+                    var toggleBtn = side.count > 0
+                        ? '<button type="button" onclick="(function(ev){ev.stopPropagation();var p=document.getElementById(\'' + panelId + '\');if(!p)return;var open=p.style.display!==\'none\';p.style.display=open?\'none\':\'block\';ev.currentTarget.setAttribute(\'aria-expanded\',String(!open));})(event)" aria-expanded="false" style="background:transparent;border:1px solid #E5E7EB;color:#09B1BA;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;margin-top:6px;">'
+                            + '<i class="fas fa-box-open" style="margin-right:4px;"></i> See ' + side.count + ' items'
+                        + '</button>'
+                        : '';
+                    var itemsList = '<div id="' + panelId + '" style="display:none;margin-top:10px;grid-column:1/-1;">'
+                        + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;">'
+                        + side.items.map(function (it) {
+                            var pphoto = (it.photos && it.photos[0]) || '';
+                            var tt = ((it.brand || '') + ' ' + (it.model || '')).trim() || it.type || 'Item';
+                            return '<div style="background:#F8FAFA;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;">'
+                                + (pphoto ? '<img src="' + pphoto + '" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">' : '<div style="aspect-ratio:1;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:22px;">📦</div>')
+                                + '<div style="padding:4px 6px;font-size:10px;font-weight:600;color:#1A1A2E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tt + '</div>'
+                            + '</div>';
+                          }).join('')
+                        + '</div></div>';
                     return '<div class="swap-request-item">' +
                         '<div style="position:relative;width:56px;height:56px;flex-shrink:0;">' +
                             '<img src="' + cover + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">' +
@@ -2092,7 +2119,9 @@
                         '<div class="item-info">' +
                             '<div class="item-title">' + boxLabel + '</div>' +
                             '<div class="item-category">' + side.count + ' items · ' + label + '</div>' +
+                            toggleBtn +
                         '</div>' +
+                        itemsList +
                     '</div>';
                 }
                 return '<div class="swap-request-item">' +
