@@ -80,8 +80,12 @@
       function finish() {
         if (completed) return;
         completed = true;
-        setValue(target);
-        el.dataset.counterValue = target;
+        // Re-read data-target in case it was updated after init
+        // (e.g. by live-stats.js fetching real values from Supabase).
+        var latest = parseFloat(el.getAttribute('data-target'));
+        var endValue = isNaN(latest) ? target : latest;
+        setValue(endValue);
+        el.dataset.counterValue = endValue;
       }
 
       function step(ts) {
@@ -175,26 +179,8 @@
         } catch(e) {}
       }
 
-      // Live updates every 30s — preserves the data-target baseline
-      // and only ADDS to it (never resets to 0).
-      setInterval(function() {
-        var nums = ticker.querySelectorAll('.eco-ticker-number');
-        nums.forEach(function(el) {
-          // Use the running counter value if available (counterValue), else
-          // start from data-target so we never restart from 0.
-          var base = parseFloat(el.dataset.counterValue);
-          if (isNaN(base) || base === 0) base = parseFloat(el.getAttribute('data-target')) || 0;
-          var increment = Math.floor(Math.random() * 3) + 1;
-          var newVal = base + increment;
-          el.dataset.counterValue = newVal;
-          var suffix = el.getAttribute('data-suffix') || '';
-          el.textContent = Math.floor(newVal).toLocaleString() + suffix;
-        });
-        var liveEl = document.getElementById('ecoTickerLive');
-        if (liveEl) {
-          liveEl.textContent = '+' + (Math.floor(Math.random() * 20) + 5) + ' in the last hour';
-        }
-      }, 30000);
+      // Live stats updates are handled by js/live-stats.js
+      // (real data fetched from Supabase RPC get_live_stats).
     }
 
     // ── Floating Recycle Hub button — DISABLED for now (kept in code for reactivation) ──
