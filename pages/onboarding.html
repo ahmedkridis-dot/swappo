@@ -177,13 +177,26 @@
 
     function ensureAuthed() {
       // Page must only be reachable after a valid session. If not, send to login.
-      return (async function() {
+      return (async function () {
+        // iOS cold-start tolerance: wait up to 3s for the Supabase SDK
+        // to rehydrate the JWT, then give the session one retry 600ms
+        // later before bouncing to login (Ahmed 2026-04-18 bug report).
+        var tries = 0;
+        while (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) && tries < 30) {
+          await new Promise(function (r) { setTimeout(r, 100); });
+          tries++;
+        }
         if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
           toast('Auth service unavailable. Please refresh.', 'error');
-          setTimeout(function() { window.location.href = 'login.html'; }, 1500);
+          setTimeout(function () { window.location.href = 'login.html'; }, 1500);
           return null;
         }
-        var u = await window.SwappoAuth.getCurrentUser();
+        var u = null;
+        try { u = await window.SwappoAuth.getCurrentUser(); } catch (_) {}
+        if (!u) {
+          await new Promise(function (r) { setTimeout(r, 600); });
+          try { u = await window.SwappoAuth.getCurrentUser(); } catch (_) {}
+        }
         if (!u) {
           window.location.href = 'login.html';
           return null;

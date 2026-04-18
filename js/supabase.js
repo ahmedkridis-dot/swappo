@@ -46,10 +46,13 @@ try { window.db = db; } catch (e) {}
 // that need a reliable session read should `await _authReady` first.
 let _authReadyResolve = null;
 const _authReady = new Promise((resolve) => { _authReadyResolve = resolve; });
-// Safety: resolve after 1.5s even if no event arrives (some browsers skip
-// INITIAL_SESSION when storage is empty). 1.5s is far below the per-query
-// getSession timeout of 3s, so total worst-case latency stays < 5s.
-setTimeout(() => { if (_authReadyResolve) { _authReadyResolve(null); _authReadyResolve = null; } }, 1500);
+// Safety: resolve after 2.5s even if no event arrives (some browsers skip
+// INITIAL_SESSION when storage is empty). Bumped from 1.5s → 2.5s on
+// 2026-04-18 after Ahmed reported iOS Safari cold-starts bouncing
+// freshly-logged-in users back to login — a 1.5s timeout fired before
+// the SDK finished rehydrating the JWT on slow connections. 2.5s is
+// still well under the 3s per-query timeout downstream.
+setTimeout(() => { if (_authReadyResolve) { _authReadyResolve(null); _authReadyResolve = null; } }, 2500);
 
 // ---- legacy-auth mirror helpers ----
 // SwappoAuth writes the authenticated user into localStorage.swappo_current_user

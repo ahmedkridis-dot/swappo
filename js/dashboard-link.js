@@ -68,10 +68,16 @@
   function init() {
     mount();
     // Hide the link when user is anonymous — no dashboard to link to.
+    // Use getSession() (local JWT read) not getUser() (network roundtrip)
+    // so the Dashboard button doesn't disappear on slow iOS connections.
     setTimeout(async function () {
       if (!window.db) return;
       try {
-        const { data: { user } } = await window.db.auth.getUser();
+        const res = await Promise.race([
+          window.db.auth.getSession(),
+          new Promise(function (resolve) { setTimeout(function () { resolve({ data: { session: null } }); }, 1500); })
+        ]);
+        const user = res && res.data && res.data.session ? res.data.session.user : null;
         const link = document.getElementById(ID);
         if (!link) return;
         if (!user) link.style.display = 'none';

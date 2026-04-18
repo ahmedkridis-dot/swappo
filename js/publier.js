@@ -24,13 +24,39 @@ function _pubSafeUrl(u) {
 // ========================
 // AUTH CHECK
 // ========================
-document.addEventListener('DOMContentLoaded', function() {
-  var user = (JSON.parse(localStorage.getItem('swappo_current_user')||'null'));
-  if (!user) {
-    window.location.href = 'login.html?redirect=/pages/publier.html';
-    return;
-  }
-  updateNavbarForDemo();
+// iOS PWA / Safari cold start quirk: localStorage may be empty while the
+// Supabase SDK is still rehydrating the JWT in the background. A one-shot
+// synchronous check here was bouncing freshly-logged-in users to login /
+// signup right after they arrived. We now:
+//   1. Wait for SwappoAuth.isReady() (polled up to 3s)
+//   2. Then ask for the actual session
+//   3. Retry once after 600ms if still null — matches chat.html's pattern
+// No redirect happens until both checks fail.
+document.addEventListener('DOMContentLoaded', function () {
+  (async function checkAuth() {
+    async function _sessionUser() {
+      // Wait for SwappoAuth to come online (capped at ~3s)
+      var tries = 0;
+      while (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady()) && tries < 30) {
+        await new Promise(function (r) { setTimeout(r, 100); });
+        tries++;
+      }
+      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return null;
+      try { return await window.SwappoAuth.getCurrentUser(); } catch (_) { return null; }
+    }
+
+    var u = await _sessionUser();
+    if (!u) {
+      // One more chance after the auth-restore window
+      await new Promise(function (r) { setTimeout(r, 600); });
+      u = await _sessionUser();
+    }
+    if (!u) {
+      window.location.href = 'login.html?redirect=/pages/publier.html';
+      return;
+    }
+    if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
+  })();
 });
 
 // ========================
