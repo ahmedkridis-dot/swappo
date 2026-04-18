@@ -730,7 +730,9 @@
           items = window.SwappoFeedTabs.applyFilter(items);
         }
 
-        const grid = document.getElementById('catalogue-grid');
+        // `grid` was already declared at the top of renderCatalogue (see above).
+        // Re-declaring here was a SyntaxError that silently aborted the entire
+        // inline script, leaving the catalogue stuck on "Loading…".
         const count = document.getElementById('item-count');
 
         if (count) count.textContent = items.length + ' items found';
