@@ -920,10 +920,18 @@
             .edit-profile-btn { width: 100%; }
             .profile-badges-section { width: 100%; }
             .special-badges { justify-content: center; }
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            /* Force 2-col on mobile even when the inline style says 4 */
+            .stats-row { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
 
             .items-grid,
             .saved-grid { grid-template-columns: repeat(2, 1fr); }
+
+            /* Reduce paddings so cards don't crush on 375px */
+            .profile-card { padding: 16px !important; }
+            .profile-name { font-size: 1.3rem !important; }
+            .tabs-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+            .tabs-nav::-webkit-scrollbar { display: none; }
+            .tab-btn { white-space: nowrap; }
 
             .swap-request-items { flex-direction: column; }
             .swap-arrow-icon { transform: rotate(90deg); }
@@ -940,13 +948,16 @@
             .container { padding: 16px 12px; }
 
             .profile-header { padding: 20px 16px; }
-            .stat-card { padding: 16px; }
-            .stat-number { font-size: 24px; }
+            .stat-card { padding: 14px !important; min-width: 0; }
+            .stat-number { font-size: 22px !important; }
+            .stat-label { font-size: 11px !important; }
+            .stat-icon { width: 32px !important; height: 32px !important; }
 
             .items-grid,
             .saved-grid { grid-template-columns: 1fr; }
 
-            .stats-row { grid-template-columns: 1fr; }
+            /* 2 cols on very small phones so text doesn't wrap too aggressively */
+            .stats-row { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
         }
     </style>
 </head>
@@ -1046,7 +1057,7 @@
             <a href="chat.html" class="stat-card" style="text-align:left;position:relative;text-decoration:none;color:inherit;cursor:pointer;">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                     <div class="stat-icon plan" style="margin:0 0 12px 0;"><i class="fas fa-comment-dots" style="font-size:18px;"></i></div>
-                    <span style="background:var(--teal,#09B1BA);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;" id="chat-badge-count">3</span>
+                    <span style="background:var(--teal,#09B1BA);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;" id="chat-badge-count">0</span>
                 </div>
                 <div class="stat-number" id="stat-donated" style="text-align:left;">0</div>
                 <div class="stat-label" style="text-align:left;" data-i18n="dash_active_chats">Active chats</div>
@@ -1054,7 +1065,7 @@
             <!-- Your Rating -->
             <a href="#swaps" class="stat-card" style="text-align:left;text-decoration:none;color:inherit;cursor:pointer;" onclick="document.querySelector('[data-tab=swaps]')?.click()">
                 <div class="stat-icon" style="margin:0 0 12px 0;background:#FEF3C7;color:#D97706;"><i class="fas fa-star" style="font-size:18px;"></i></div>
-                <div class="stat-number" id="stat-saved" style="text-align:left;">4.9</div>
+                <div class="stat-number" id="stat-saved" style="text-align:left;">—</div>
                 <div class="stat-label" style="text-align:left;" data-i18n="dash_your_rating">Your rating</div>
             </a>
             <!-- Exchanges this month (plan card — colored bg) -->
@@ -1407,6 +1418,7 @@
     <script src="../js/swappo-chat.js" defer></script>
     <script src="../js/toast.js" defer></script>
   <script src="../js/a11y-helpers.js" defer></script>
+  <script src="../js/dashboard-link.js" defer></script>
     <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/identity-card.js" defer></script>
   <script src="../js/offer-threading.js" defer></script>
@@ -1665,8 +1677,14 @@
             }).length;
             document.getElementById('stat-donated').textContent = _unread;
             var chatBadge = document.getElementById('chat-badge-count');
-            if (chatBadge) chatBadge.textContent = _unread;
-            document.getElementById('stat-saved').textContent = (user.rating || 4.9).toFixed(1);
+            if (chatBadge) {
+              chatBadge.textContent = _unread;
+              chatBadge.style.display = _unread > 0 ? '' : 'none';
+            }
+            // Rating: show "—" for new users (no ratings yet), never fake 4.9
+            var ratingAvg = Number(user.rating_avg || user.rating || 0);
+            var ratingCount = Number(user.rating_count || 0);
+            document.getElementById('stat-saved').textContent = (ratingCount > 0 && ratingAvg > 0) ? ratingAvg.toFixed(1) : '—';
             // Plan card: show swaps completed (v5: unlimited, no quota)
             var swapsCompleted = planInfo.swaps_used || swapCount || 0;
             document.getElementById('stat-plan').textContent = swapsCompleted;
@@ -1962,9 +1980,13 @@
                     actionsHTML = '<div class="swap-rating" style="color:#FFB800;">' + '\u2605'.repeat(swap.rating) + '<span style="color:#DDD;">' + '\u2605'.repeat(5 - swap.rating) + '</span></div>';
                 }
 
+                // Per Ahmed 2026-04-18: the counter-party card must be clickable
+                // → opens profile-public.html for that user.
+                var partnerUrl = otherUserId ? ('profile-public.html?id=' + encodeURIComponent(otherUserId)) : null;
+                var partnerOpen = partnerUrl ? (' onclick="window.location.href=\'' + partnerUrl + '\'" role="button" tabindex="0" style="cursor:pointer;"') : '';
                 return '<div class="swap-request-card">' +
                     '<div class="swap-request-header">' +
-                        '<div class="swap-request-user">' +
+                        '<div class="swap-request-user"' + partnerOpen + '>' +
                             '<div class="user-avatar">' + getUserAvatarHTML(otherUser) + '</div>' +
                             '<span class="user-name">' + (otherUser.pseudo || 'Anonymous') + '</span>' +
                         '</div>' +
@@ -2003,8 +2025,16 @@
                     Toast.show('Service unavailable.', 'error'); return;
                 }
                 var result = await window.SwappoSwaps.respond(swapId, true);
-                if (result && result.success) { Toast.show('Swap accepted! Identities revealed.', 'success'); renderSwapDashboard(); }
-                else Toast.show((result && result.error) || 'Error', 'error');
+                if (result && result.success) {
+                    // Auto-open the chat on the new conversation (per-user request 2026-04-18)
+                    var convId = result.conversationId || (result.swap && result.swap.conversation_id);
+                    Toast.show('Swap accepted — opening chat…', 'success');
+                    setTimeout(function () {
+                        window.location.href = 'chat.html' + (convId ? ('?conv=' + convId) : '');
+                    }, 700);
+                } else {
+                    Toast.show((result && result.error) || 'Error', 'error');
+                }
             }
 
             async function rejectSwap(swapId) {

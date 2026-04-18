@@ -102,9 +102,17 @@
 
     // Notify the RECEIVER in Supabase (so they see it across devices).
     try {
+      var titleTxt = isPurchase ? 'New purchase offer' : 'New swap offer';
+      var msgTxt   = isPurchase
+        ? ('Someone wants to buy your item' + (Number(cashAmount) > 0 ? ' for ' + Number(cashAmount) + ' AED' : '') + '.')
+        : 'Someone proposed a swap on your item.';
       await global.db.from('notifications').insert({
         user_id: theirItem.user_id,
         kind: isPurchase ? 'offer_received' : 'swap_proposed',
+        type: isPurchase ? 'offer' : 'swap',
+        title: titleTxt,
+        message: msgTxt,
+        url: '/pages/profile.html?tab=swap-dashboard&swap=' + data.id,
         payload: {
           swap_id: data.id,
           item_id: theirItemId,
@@ -128,72 +136,29 @@
     const uid = await _currentUserId();
     if (!uid) return { success: false, error: 'You must be signed in.' };
 
-    const { data: swap, error: fetchErr } = await global.db.from(TABLE)
-      .select('*').eq('id', swapId).maybeSingle();
-    if (fetchErr || !swap) return { success: false, error: 'Swap not found.' };
-    if (swap.receiver_id !== uid) return { success: false, error: "You can't respond to this swap." };
-    if (swap.status !== 'pending') return { success: false, error: 'Swap is no longer pending.' };
-
     if (!accept) {
+      // Decline stays a simple direct update.
+      const { data: swap, error: fetchErr } = await global.db.from(TABLE)
+        .select('*').eq('id', swapId).maybeSingle();
+      if (fetchErr || !swap) return { success: false, error: 'Swap not found.' };
+      if (swap.receiver_id !== uid) return { success: false, error: "You can't respond to this swap." };
+      if (swap.status !== 'pending') return { success: false, error: 'Swap is no longer pending.' };
       const { data: updated, error } = await global.db.from(TABLE)
         .update({ status: 'declined' }).eq('id', swapId).select('*').single();
       if (error) return { success: false, error: error.message };
       return { success: true, swap: updated };
     }
 
-    // Accept: mark accepted + reserve items + open conversation
-    const now = new Date().toISOString();
-    const { data: updated, error } = await global.db.from(TABLE)
-      .update({ status: 'accepted', accepted_at: now })
-      .eq('id', swapId).select('*').single();
-    if (error) return { success: false, error: error.message };
-
-    // Reserve both items
-    const reserveIds = [updated.receiver_item_id, updated.proposer_item_id].filter(Boolean);
-    await global.db.from(ITEMS_TABLE).update({ status: 'reserved' }).in('id', reserveIds);
-
-    // Create or fetch the conversation (identity revealed)
-    const [u1, u2] = _canonicalPair(updated.proposer_id, updated.receiver_id);
-    const convRow = {
-      user1_id: u1,
-      user2_id: u2,
-      item_id: updated.receiver_item_id,
-      swap_id: updated.id,
-      identity_revealed: true
-    };
-    let conversationId = null;
-    const { data: conv, error: convErr } = await global.db.from(CONV_TABLE)
-      .upsert(convRow, { onConflict: 'user1_id,user2_id,item_id' })
-      .select('*').single();
-    if (!convErr && conv) {
-      conversationId = conv.id;
-      // System message
-      await global.db.from(MSG_TABLE).insert({
-        conversation_id: conv.id,
-        sender_id: null,
-        content: 'Swap accepted — identities revealed. You can now chat to arrange the meetup.',
-        is_system: true
-      });
-    }
-
-    // Notify the PROPOSER in Supabase (they initiated, now need to know the
-    // receiver accepted so they can open the chat).
-    try {
-      await global.db.from('notifications').insert({
-        user_id: updated.proposer_id,
-        kind: 'swap_accepted',
-        payload: {
-          swap_id: updated.id,
-          conversation_id: conversationId,
-          item_id: updated.receiver_item_id
-        }
-      });
-    } catch (e) { console.warn('[respond] notify proposer failed:', e.message || e); }
+    // Accept: call the secure RPC (reserves both items, creates convo + system msg,
+    // notifies the proposer, bypassing client-side RLS limits).
+    const { data: rpcRes, error: rpcErr } = await global.db.rpc('accept_swap', { p_swap_id: swapId });
+    if (rpcErr) return { success: false, error: rpcErr.message };
+    if (!rpcRes || !rpcRes.success) return { success: false, error: rpcRes?.error || 'Accept failed.' };
 
     if (global.Toast) {
-      global.Toast.show('Swap accepted — open the chat to arrange your meetup.', 'success');
+      global.Toast.show('Swap accepted — opening chat…', 'success', 2500);
     }
-    return { success: true, swap: updated, conversationId };
+    return { success: true, swap: { id: rpcRes.swap_id, status: 'accepted' }, conversationId: rpcRes.conversation_id };
   }
 
   // ---------- CANCEL ----------

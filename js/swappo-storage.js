@@ -20,32 +20,73 @@
 (function (global) {
   'use strict';
 
-  const MAX_FILES   = 5;
-  const MAX_SIZE_MB = 2;
-  const MAX_SIDE_PX = 1600;
+  const MAX_FILES   = 8;           // iPhone carrousel = up to 8 photos per listing
+  const MAX_SIZE_MB = 2;           // AFTER resize/compression (the upload itself)
+  const MAX_SIDE_PX = 1920;        // enough for retina, respects iPhone 12MP source
   const WEBP_QUALITY = 0.85;
   const BUCKET = 'item-photos';
 
-  /** Load an image file into an <img> element (returns a Promise<HTMLImageElement>). */
-  function _loadImage(file) {
+  /** Load an image file into an <img> / ImageBitmap. Handles HEIC, big iPhone
+   *  files, drag-dropped images with empty MIME type. */
+  async function _loadImage(file) {
+    // Fast path 1: native <img> — works for JPEG, PNG, WebP, GIF, and HEIC on
+    // Safari/iOS (iPhone Safari supports HEIC natively).
+    try {
+      const img = await _loadImg(file);
+      return img;
+    } catch (e) {
+      // Fast path 2: createImageBitmap — Chrome can decode extra formats here.
+      if (typeof createImageBitmap === 'function') {
+        try {
+          const bmp = await createImageBitmap(file);
+          return { naturalWidth: bmp.width, naturalHeight: bmp.height, _bitmap: bmp };
+        } catch (_) { /* fall through */ }
+      }
+      // HEIC fallback (desktop Chrome / Firefox) — lazy-load heic2any from CDN
+      // and convert to JPEG on the fly. This is a one-off 300KB that only
+      // loads if the user actually drops a HEIC file.
+      if (/\.(heic|heif)$/i.test(file.name) || /heic|heif/i.test(file.type || '')) {
+        try {
+          const heic2any = await _loadHeic2Any();
+          const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+          return _loadImg(converted);
+        } catch (err) {
+          throw new Error('This HEIC photo could not be decoded. Try saving it as JPEG first.');
+        }
+      }
+      throw new Error('Could not read image file. Please try a different photo.');
+    }
+  }
+
+  function _loadImg(file) {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const img = new Image();
-      img.onload = () => {
-        resolve(img);
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error('Could not read image file.'));
-      };
+      img.onload = () => resolve(img);
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode failed')); };
       img.src = url;
     });
   }
 
-  /** Resize to fit within MAX_SIDE_PX x MAX_SIDE_PX, return canvas. */
-  function _resizeToCanvas(img) {
-    let w = img.naturalWidth || img.width;
-    let h = img.naturalHeight || img.height;
+  let _heic2anyPromise = null;
+  function _loadHeic2Any() {
+    if (_heic2anyPromise) return _heic2anyPromise;
+    _heic2anyPromise = new Promise((resolve, reject) => {
+      if (global.heic2any) return resolve(global.heic2any);
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+      s.onload = () => resolve(global.heic2any);
+      s.onerror = () => reject(new Error('heic2any load failed'));
+      document.head.appendChild(s);
+    });
+    return _heic2anyPromise;
+  }
+
+  /** Resize to fit within MAX_SIDE_PX x MAX_SIDE_PX, return canvas. Accepts
+   *  either an HTMLImageElement or an ImageBitmap wrapper. */
+  function _resizeToCanvas(src) {
+    let w = src.naturalWidth || src.width || 0;
+    let h = src.naturalHeight || src.height || 0;
 
     if (w > MAX_SIDE_PX || h > MAX_SIDE_PX) {
       if (w >= h) {
@@ -60,10 +101,9 @@
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext('2d');
-    // High-quality resampling
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0, w, h);
+    ctx.drawImage(src._bitmap || src, 0, 0, w, h);
     return canvas;
   }
 
@@ -118,8 +158,14 @@
    * Returns { blob, mime, ext, width, height, sizeKB, preview }.
    */
   async function processFile(file) {
-    if (!file || !/^image\//.test(file.type)) {
-      throw new Error('File is not an image.');
+    if (!file) throw new Error('No file.');
+    // Accept if MIME starts with image/ OR extension is known image
+    // (iOS drag-drop sometimes sends empty type; HEIC may not be flagged).
+    const looksLikeImage =
+      /^image\//.test(file.type || '') ||
+      /\.(jpe?g|png|gif|webp|heic|heif|bmp|tiff?|avif)$/i.test(file.name || '');
+    if (!looksLikeImage) {
+      throw new Error('This file does not look like a photo.');
     }
     const img = await _loadImage(file);
     const canvas = _resizeToCanvas(img);

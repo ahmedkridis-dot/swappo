@@ -779,9 +779,9 @@
           <!-- ========== STEP 3: PHOTOS ========== -->
           <div class="step-section" data-section="photos">
             <h2 class="step-title" data-i18n="publish_add_photos">Add photos of your item</h2>
-            <p class="step-subtitle" data-i18n="publish_step3_subtitle">Step 3 of 4 — Up to 5 photos, 2 MB each. Auto-resized & optimized.</p>
+            <p class="step-subtitle" data-i18n="publish_step3_subtitle">Step 3 of 4 — Up to 8 photos. iPhone HEIC, JPEG, PNG all accepted.</p>
 
-            <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoFiles(event)">
+            <input type="file" id="photoFileInput" accept="image/*,.heic,.heif,.jpg,.jpeg,.png,.webp" multiple style="display:none" onchange="handlePhotoFiles(event)">
 
             <div class="photo-grid" id="photoGrid">
               <div class="photo-slot" data-index="0" onclick="openPhotoPicker(0)">
@@ -962,6 +962,7 @@
   <script src="../js/swappo-items.js" defer></script>
   <script src="../js/toast.js" defer></script>
   <script src="../js/a11y-helpers.js" defer></script>
+  <script src="../js/dashboard-link.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/app.js" defer></script>
   <script src="../js/swappo-animations.js" defer></script>

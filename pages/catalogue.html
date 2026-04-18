@@ -533,6 +533,7 @@
   <script src="../js/swappo-items.js" defer></script>
   <script src="../js/toast.js" defer></script>
   <script src="../js/a11y-helpers.js" defer></script>
+  <script src="../js/dashboard-link.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/stories.js" defer></script>
   <script src="../js/feed-tabs.js" defer></script>
@@ -554,6 +555,28 @@
         window.SwappoFeedTabs.onChange(function () {
           if (typeof renderCatalogue === 'function') renderCatalogue();
         });
+      }
+
+      // Realtime: any INSERT / UPDATE on items → re-render the catalogue
+      // (debounced so a burst of changes doesn't re-render per row).
+      if (window.db) {
+        var _rtRefreshDebounce = null;
+        window.db.channel('catalogue-items')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'items' },
+              function () {
+                clearTimeout(_rtRefreshDebounce);
+                _rtRefreshDebounce = setTimeout(function () {
+                  if (typeof renderCatalogue === 'function') renderCatalogue();
+                }, 400);
+              })
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'items' },
+              function () {
+                clearTimeout(_rtRefreshDebounce);
+                _rtRefreshDebounce = setTimeout(function () {
+                  if (typeof renderCatalogue === 'function') renderCatalogue();
+                }, 400);
+              })
+          .subscribe();
       }
 
       const params = new URLSearchParams(window.location.search);
@@ -602,8 +625,30 @@
         });
       }
 
-      // Phase 2: source of truth = Supabase (SwappoItems). Fall back to Demo if unavailable.
+      // Skeleton cards shown while items load — kills the perceived blank state
+      function showCatalogueSkeleton() {
+        const grid = document.getElementById('catalogue-grid');
+        if (!grid) return;
+        const n = 8;
+        let html = '';
+        for (let i = 0; i < n; i++) {
+          html += '<div class="product-card skeleton-card" aria-hidden="true">' +
+                    '<div class="skeleton skeleton-img" style="aspect-ratio:2/3;width:100%;"></div>' +
+                    '<div style="padding:10px 8px 8px;">' +
+                      '<div class="skeleton skeleton-line" style="width:80%;height:12px;margin-bottom:6px;"></div>' +
+                      '<div class="skeleton skeleton-line-short" style="width:50%;height:10px;"></div>' +
+                    '</div>' +
+                  '</div>';
+        }
+        grid.innerHTML = html;
+      }
+
+      // Phase 2: source of truth = Supabase (SwappoItems). Show skeletons first.
       async function renderCatalogue() {
+        const grid = document.getElementById('catalogue-grid');
+        const alreadyHasItems = grid && grid.children.length > 0 && !grid.querySelector('.skeleton-card');
+        if (!alreadyHasItems) showCatalogueSkeleton();
+
         const useSwappo = !!(window.SwappoItems && window.db);
         if (useSwappo && window.SwappoItems.getFavoriteIds) {
           try { await window.SwappoItems.getFavoriteIds(); } catch (e) {}

@@ -228,8 +228,15 @@ window.selectCategory = function(btn, category) {
   formState.category = category;
   formState.details = {};
   formState.photos = [];
-  document.getElementById('btnNextStep1').disabled = false;
+  var nextBtn = document.getElementById('btnNextStep1');
+  if (nextBtn) nextBtn.disabled = false;
   renderDetailsFields();
+  // UX (per Ahmed 2026-04-18): single click selects AND auto-advances to
+  // step 2. Visual feedback kept short so the user sees the selection flash.
+  if (window.__suppressAutoAdvance) return;
+  setTimeout(function () {
+    if (typeof window.nextStep === 'function') window.nextStep();
+  }, 220);
 }
 
 // ========================

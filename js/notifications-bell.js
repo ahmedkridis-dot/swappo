@@ -188,12 +188,81 @@
     try {
       state.sub = window.db.channel('notif-bell-' + state.userId)
         .on('postgres_changes',
-          { event: '*', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + state.userId },
+          { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + state.userId },
+          function (payload) {
+            var row = _normalizeNotif(payload.new || {});
+            // Prepend + refresh dropdown
+            state.notifs.unshift(row);
+            state.notifs = state.notifs.slice(0, 10);
+            state.unread = state.notifs.filter(function (n) { return !n.read_at; }).length;
+            render();
+            // Bell pulse animation
+            var btn = document.querySelector('#' + BELL_ID + ' .swp-bell-btn');
+            if (btn) { btn.classList.add('swp-bell-pulse'); setTimeout(function () { btn.classList.remove('swp-bell-pulse'); }, 1400); }
+            // Pop-up toast (clickable → deep link)
+            _showPopup(row);
+          }
+        )
+        .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + state.userId },
           function () { loadNotifs(); }
         )
         .subscribe();
     } catch (err) {
       console.warn('[bell.subscribe] realtime unavailable', err);
+    }
+  }
+
+  function _showPopup(n) {
+    if (!n || !n.title) return;
+    // Lazy-build a dedicated pop-up container (independent of Toast)
+    var host = document.getElementById('swp-popup-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'swp-popup-host';
+      host.style.cssText = 'position:fixed;top:76px;right:16px;z-index:9500;display:flex;flex-direction:column;gap:8px;max-width:360px;pointer-events:none;';
+      document.body.appendChild(host);
+    }
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'swp-popup-card';
+    card.style.cssText = [
+      'pointer-events:auto;background:#fff;border:1px solid #EBEBEB;border-left:4px solid #09B1BA;',
+      'border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;text-align:left;',
+      'box-shadow:0 12px 32px rgba(0,0,0,0.15);cursor:pointer;width:100%;max-width:360px;',
+      'font-family:Inter,sans-serif;animation:swp-popup-in 0.25s ease-out;'
+    ].join(' ');
+    card.innerHTML =
+      '<div style="width:32px;height:32px;flex-shrink:0;border-radius:10px;background:#09B1BA;color:#fff;display:flex;align-items:center;justify-content:center;"><i class="fas ' + iconFor(n.type) + '"></i></div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="swp-popup-title" style="font-weight:700;font-size:0.9rem;color:#171717;"></div>' +
+        '<div class="swp-popup-msg" style="font-size:0.82rem;color:#555;margin-top:2px;"></div>' +
+      '</div>' +
+      '<span style="font-size:18px;color:#9CA3AF;">×</span>';
+    card.querySelector('.swp-popup-title').textContent = n.title;
+    card.querySelector('.swp-popup-msg').textContent = n.message || '';
+    card.addEventListener('click', function () {
+      // Mark read then navigate
+      if (n.id && window.db) {
+        window.db.from('notifications').update({ read_at: new Date().toISOString(), is_read: true }).eq('id', n.id).then(function () {});
+      }
+      if (n.url) window.location.href = n.url;
+    });
+    host.appendChild(card);
+    setTimeout(function () {
+      card.style.transition = 'transform 0.25s, opacity 0.25s';
+      card.style.transform = 'translateX(110%)';
+      card.style.opacity = '0';
+      setTimeout(function () { card.remove(); }, 280);
+    }, 6000);
+    // Inject keyframes once
+    if (!document.getElementById('swp-popup-keyframes')) {
+      var st = document.createElement('style');
+      st.id = 'swp-popup-keyframes';
+      st.textContent = '@keyframes swp-popup-in{from{opacity:0;transform:translateX(110%)}to{opacity:1;transform:translateX(0)}}' +
+                       '.swp-bell-pulse{animation:swp-bell-pulse 1.4s ease-in-out;}' +
+                       '@keyframes swp-bell-pulse{0%,100%{transform:rotate(0)}10%{transform:rotate(-18deg)}20%,40%{transform:rotate(14deg)}30%{transform:rotate(-12deg)}50%,80%{transform:rotate(0)}}';
+      document.head.appendChild(st);
     }
   }
 

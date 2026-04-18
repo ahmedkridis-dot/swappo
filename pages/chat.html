@@ -1158,11 +1158,13 @@
     <main id="main" class="chat-center">
       <div class="ch-header" id="chatHeader" style="display:none;">
         <button class="qa-btn" onclick="document.getElementById('chatSidebar').classList.add('open')" style="display:none;" id="mobileBackBtn" aria-label="Back" data-i18n-aria-label="action_back"><i class="fas fa-arrow-left"></i></button>
-        <div class="ch-header-avatar" id="chAvatar"></div>
-        <div class="ch-header-info">
-          <div class="ch-header-name" id="chName"></div>
-          <div class="ch-header-badge" id="chBadge"></div>
-        </div>
+        <button type="button" id="chHeaderOpenProfile" class="ch-header-user" onclick="openPartnerProfile()" aria-label="View profile" style="display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;flex:1;min-width:0;text-align:left;font-family:inherit;">
+          <div class="ch-header-avatar" id="chAvatar"></div>
+          <div class="ch-header-info">
+            <div class="ch-header-name" id="chName"></div>
+            <div class="ch-header-badge" id="chBadge"></div>
+          </div>
+        </button>
         <div class="ch-header-actions">
           <button class="ch-deal-btn" id="dealToggleBtn" onclick="toggleDealPanel()"><i class="fas fa-handshake"></i> Deal</button>
           <button onclick="Toast.show('Report submitted.','info')" aria-label="Report" data-i18n-aria-label="action_report"><i class="fas fa-flag"></i></button>
@@ -1223,6 +1225,7 @@
   <script src="../js/swappo-chat.js" defer></script>
   <script src="../js/toast.js" defer></script>
   <script src="../js/a11y-helpers.js" defer></script>
+  <script src="../js/dashboard-link.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
   <script src="../js/identity-card.js" defer></script>
   <script src="../js/offer-threading.js" defer></script>
@@ -1498,6 +1501,9 @@
     document.getElementById('chAvatar').style.background = o.avatar_color || '#09B1BA';
     document.getElementById('chAvatar').textContent = initial(displayName);
     document.getElementById('chName').textContent = displayName;
+    // Track partner's id on the header button so clicking opens their public profile
+    var headBtn = document.getElementById('chHeaderOpenProfile');
+    if (headBtn && o.id) headBtn.setAttribute('data-partner-id', o.id);
     var badgeText = '';
     if (o.badge_emoji || o.badge_tier) {
       badgeText = (o.badge_emoji || '') + ' ' + ((o.badge_tier || '').charAt(0).toUpperCase() + (o.badge_tier || '').slice(1));
@@ -2308,6 +2314,14 @@
   function toggleDealPanel() {
     document.getElementById('dealPanel').classList.toggle('open');
   }
+
+  // ═══ PROFILE OPEN (per Ahmed 2026-04-18 — header avatar clickable) ═══
+  window.openPartnerProfile = function () {
+    var btn = document.getElementById('chHeaderOpenProfile');
+    var id = btn && btn.getAttribute('data-partner-id');
+    if (!id) return;
+    window.location.href = 'profile-public.html?id=' + encodeURIComponent(id);
+  };
 
   // ═══ INIT ═══
   async function chatInit() {
