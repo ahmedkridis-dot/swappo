@@ -486,6 +486,25 @@
             transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
         .swap-request-card:hover { box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,0.08)); border-color: rgba(9,177,186,0.2); }
+
+        /* Intent badge — differentiates Purchase / Swap / Gift in the offers list */
+        .swap-intent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .swap-intent-purchase { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+        .swap-intent-swap     { background: #E6F7F8; color: #0E7490; border: 1px solid #A5F3FC; }
+        .swap-intent-gift     { background: #FCE7F3; color: #9D174D; border: 1px solid #FBCFE8; }
+        .swap-intent-card-purchase { border-left: 3px solid #F59E0B; }
+        .swap-intent-card-swap     { border-left: 3px solid #09B1BA; }
+        .swap-intent-card-gift     { border-left: 3px solid #EC4899; }
         .swap-request-header {
             display: flex;
             align-items: center;
@@ -2206,7 +2225,21 @@
                         photos: items.map(i => (i.photos && i.photos[0]) || null).filter(Boolean).slice(0, 3)
                     };
                 }
-                return { kind: 'item', item: findItem(itemId) };
+                var item = findItem(itemId);
+                if (item) return { kind: 'item', item: item };
+
+                // No item on this side — only the proposer's side can be
+                // cash-only or a gift claim. For the receiver's side we still
+                // surface "Unknown item" so the real bug is visible.
+                if (which === 'proposer') {
+                    if (swap.is_giveaway_claim) {
+                        return { kind: 'gift' };
+                    }
+                    if (swap.is_purchase || Number(swap.cash_amount) > 0) {
+                        return { kind: 'cash', amount: Number(swap.cash_amount) || 0 };
+                    }
+                }
+                return { kind: 'item', item: null };
             }
 
             function getItemPhoto(item) {
@@ -2254,6 +2287,25 @@
 
             function _sideHTML(side, label) {
                 if (!side) return '<div class="swap-request-item"><img src="' + getItemPhoto(null) + '" alt=""><div class="item-info"><div class="item-title">—</div><div class="item-category">' + label + '</div></div></div>';
+                if (side.kind === 'cash') {
+                    var amt = side.amount > 0 ? side.amount.toLocaleString() + ' AED' : 'Cash';
+                    return '<div class="swap-request-item cash-side">' +
+                        '<div style="width:56px;height:56px;flex-shrink:0;border-radius:8px;background:linear-gradient(135deg,#FEF3C7,#FDE68A);display:flex;align-items:center;justify-content:center;font-size:26px;">💰</div>' +
+                        '<div class="item-info">' +
+                            '<div class="item-title">' + amt + '</div>' +
+                            '<div class="item-category">Cash offer · ' + label + '</div>' +
+                        '</div>' +
+                    '</div>';
+                }
+                if (side.kind === 'gift') {
+                    return '<div class="swap-request-item gift-side">' +
+                        '<div style="width:56px;height:56px;flex-shrink:0;border-radius:8px;background:linear-gradient(135deg,#FCE7F3,#FBCFE8);display:flex;align-items:center;justify-content:center;font-size:26px;">🎁</div>' +
+                        '<div class="item-info">' +
+                            '<div class="item-title">Gift claim</div>' +
+                            '<div class="item-category">Free · ' + label + '</div>' +
+                        '</div>' +
+                    '</div>';
+                }
                 if (side.kind === 'box') {
                     var cover = (side.photos && side.photos[0]) ||
                         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -2333,11 +2385,34 @@
                 if (!myItem && isProposer) myItem = _virtualProposerItem();
                 if (!theirItem && !isProposer) theirItem = _virtualProposerItem();
 
+                // Intent badge — makes "Purchase vs Swap vs Gift" unambiguous
+                var intent;
+                if (swap.is_giveaway_claim) {
+                    intent = { cls: 'gift', label: '🎁 Gift claim', accept: 'Accept gift' };
+                } else if (swap.is_purchase) {
+                    var pAmt = Number(swap.cash_amount) || 0;
+                    intent = {
+                        cls: 'purchase',
+                        label: pAmt > 0 ? '🛒 Purchase · ' + pAmt.toLocaleString() + ' AED'
+                                        : '🛒 Purchase',
+                        accept: pAmt > 0 ? 'Sell for ' + pAmt.toLocaleString() + ' AED' : 'Accept sale'
+                    };
+                } else if (Number(swap.cash_amount) > 0) {
+                    intent = {
+                        cls: 'swap',
+                        label: '⇄ Swap + ' + Number(swap.cash_amount).toLocaleString() + ' AED',
+                        accept: 'Accept swap'
+                    };
+                } else {
+                    intent = { cls: 'swap', label: '⇄ Swap', accept: 'Accept swap' };
+                }
+                var intentBadgeHTML = '<span class="swap-intent-badge swap-intent-' + intent.cls + '">' + intent.label + '</span>';
+
                 var actionsHTML = '';
                 if (perspective === 'sent' && swap.status === 'pending') {
                     actionsHTML = '<div class="swap-actions"><button class="btn-cancel" onclick="cancelSwap(\'' + swap.id + '\')"><i class="fas fa-times"></i> Cancel</button></div>';
                 } else if (perspective === 'received' && swap.status === 'pending') {
-                    actionsHTML = '<div class="swap-actions"><button class="btn-accept" onclick="acceptSwap(\'' + swap.id + '\')"><i class="fas fa-check"></i> Accept</button><button class="btn-reject" onclick="rejectSwap(\'' + swap.id + '\')"><i class="fas fa-times"></i> Decline</button></div>';
+                    actionsHTML = '<div class="swap-actions"><button class="btn-accept" onclick="acceptSwap(\'' + swap.id + '\', \'' + intent.cls + '\')"><i class="fas fa-check"></i> ' + intent.accept + '</button><button class="btn-reject" onclick="rejectSwap(\'' + swap.id + '\')"><i class="fas fa-times"></i> Decline</button></div>';
                 } else if (perspective === 'history' && (swap.status === 'completed' || swap.status === 'accepted') && !swap.rating) {
                     actionsHTML = '<div class="swap-rating-input" data-swap="' + swap.id + '">' +
                         [1,2,3,4,5].map(function(n) {
@@ -2351,13 +2426,16 @@
                 // → opens profile-public.html for that user.
                 var partnerUrl = otherUserId ? ('profile-public.html?id=' + encodeURIComponent(otherUserId)) : null;
                 var partnerOpen = partnerUrl ? (' onclick="window.location.href=\'' + partnerUrl + '\'" role="button" tabindex="0" style="cursor:pointer;"') : '';
-                return '<div class="swap-request-card">' +
+                return '<div class="swap-request-card swap-intent-card-' + intent.cls + '">' +
                     '<div class="swap-request-header">' +
                         '<div class="swap-request-user"' + partnerOpen + '>' +
                             '<div class="user-avatar">' + getUserAvatarHTML(otherUser) + '</div>' +
                             '<span class="user-name">' + (otherUser.pseudo || 'Anonymous') + '</span>' +
                         '</div>' +
-                        '<span class="swap-request-date">' + daysAgo(swap.created_at) + '</span>' +
+                        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+                            intentBadgeHTML +
+                            '<span class="swap-request-date">' + daysAgo(swap.created_at) + '</span>' +
+                        '</div>' +
                     '</div>' +
                     '<div class="swap-request-items">' +
                         _sideHTML(isProposer ? mySide : theirSide, isProposer ? 'Your offer' : 'Their offer') +
@@ -2381,15 +2459,17 @@
                 else Toast.show((result && result.error) || 'Error', 'error');
             }
 
-            async function acceptSwap(swapId) {
+            async function acceptSwap(swapId, intentCls) {
                 if (!(window.SwappoSwaps && window.SwappoSwaps.respond)) {
                     Toast.show('Service unavailable.', 'error'); return;
                 }
                 var result = await window.SwappoSwaps.respond(swapId, true);
                 if (result && result.success) {
-                    // Auto-open the chat on the new conversation (per-user request 2026-04-18)
                     var convId = result.conversationId || (result.swap && result.swap.conversation_id);
-                    Toast.show('Swap accepted — opening chat…', 'success');
+                    var toastText = intentCls === 'gift'     ? 'Gift accepted — opening chat…'
+                                  : intentCls === 'purchase' ? 'Sale accepted — opening chat…'
+                                  :                            'Swap accepted — opening chat…';
+                    Toast.show(toastText, 'success');
                     setTimeout(function () {
                         window.location.href = 'chat.html' + (convId ? ('?conv=' + convId) : '');
                     }, 700);
