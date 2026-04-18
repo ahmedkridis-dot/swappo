@@ -545,6 +545,45 @@
   .qr-timer.expiring { color: #EF4444; animation: pulse-red 1s infinite; }
   @keyframes pulse-red { 50% { opacity: 0.6; } }
 
+  /* ──────────────────────────────────────────────────────────
+     QR Confirmation Modal
+     Full-screen overlay. Lives outside chat + deal panel so a
+     mobile drawer can never hide it.
+  ────────────────────────────────────────────────────────── */
+  .qr-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    /* iOS safe-area for the card */
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+  .qr-modal.open { display: flex; }
+  .qr-modal-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: qrFade 0.2s ease-out;
+  }
+  .qr-modal-card {
+    position: relative;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 360px;
+    padding: 8px;
+    animation: qrPop 0.25s cubic-bezier(0.16,1,0.3,1);
+  }
+  .qr-modal-card .smart-card { margin: 0; border-radius: 16px; }
+  @keyframes qrFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes qrPop { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
+
   @keyframes smartCardIn {
     from { opacity: 0; transform: translateY(12px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
@@ -1234,6 +1273,16 @@
          it closes the panel — mirrors the header close button. -->
     <div class="dp-backdrop" id="dealBackdrop" onclick="toggleDealPanel()" aria-hidden="true"></div>
 
+    <!-- QR Confirmation Modal — independent overlay so it's visible on top
+         of chat AND Deal Tracker on any viewport. Ahmed 2026-04-18:
+         previously the QR was inserted into the chat area which was
+         hidden behind the Deal Tracker drawer on mobile, so the user
+         missed the 10-second window. -->
+    <div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle" aria-hidden="true">
+      <div class="qr-modal-backdrop" onclick="cancelQR()"></div>
+      <div class="qr-modal-card" id="qrModalCard"></div>
+    </div>
+
     <!-- RIGHT: Deal Tracker Panel -->
     <aside class="deal-panel" id="dealPanel" role="complementary" aria-label="Deal Tracker">
       <div class="dp-head">
@@ -1886,16 +1935,41 @@
     return null;
   }
 
+  function _openQrModal(cardEl) {
+    var modal = document.getElementById('qrModal');
+    var slot = document.getElementById('qrModalCard');
+    if (!modal || !slot) return;
+    slot.innerHTML = '';
+    slot.appendChild(cardEl);
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function _closeQrModal() {
+    var modal = document.getElementById('qrModal');
+    var slot = document.getElementById('qrModalCard');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+    if (slot) slot.innerHTML = '';
+  }
+
   async function showQRConfirmation(convId) {
-    var area = document.getElementById('msgArea');
-    var typing = document.getElementById('typingIndicator');
+    // Close the Deal Tracker drawer on mobile/tablet so nothing overlaps
+    // the modal. On desktop it's a no-op (drawer isn't open there).
+    var dealPanel = document.getElementById('dealPanel');
+    if (dealPanel && dealPanel.classList.contains('open') && window.innerWidth <= 1100) {
+      toggleDealPanel();
+    }
 
     // Remove any previous QR card for this conv
     var existing = document.getElementById('qrCard-' + convId);
     if (existing) existing.remove();
 
-    area.insertBefore(createQRCard(convId), typing);
-    area.scrollTop = area.scrollHeight;
+    // Render the QR inside a full-screen modal, not in the chat area.
+    var card = createQRCard(convId);
+    _openQrModal(card);
 
     var swapId = await _resolveSwapId(convId);
     if (!swapId) {
@@ -1985,6 +2059,7 @@
   async function _onSwapCompleted(convId, swapId) {
     if (qrTimerInterval) clearInterval(qrTimerInterval);
     _teardownQrRealtime();
+    _closeQrModal();
     if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'completed';
     Toast.show('🎉 Exchange confirmed!', 'success');
 
@@ -2025,8 +2100,7 @@
   function cancelQR() {
     if (qrTimerInterval) clearInterval(qrTimerInterval);
     _teardownQrRealtime();
-    var card = document.querySelector('[id^="qrCard-"]');
-    if (card) card.remove();
+    _closeQrModal();
     Toast.show('QR cancelled.', 'info');
   }
 
@@ -2461,6 +2535,8 @@
   }
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
+    var qrModal = document.getElementById('qrModal');
+    if (qrModal && qrModal.classList.contains('open')) { cancelQR(); return; }
     var panel = document.getElementById('dealPanel');
     if (panel && panel.classList.contains('open')) toggleDealPanel();
   });
