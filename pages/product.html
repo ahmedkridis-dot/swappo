@@ -794,7 +794,7 @@
       </div>
     </div>
     <div class="fchat-body">
-      <p class="fchat-hint">Pick how you'd like to start. The seller sees an anonymous offer — names are revealed only once both sides accept.</p>
+      <p class="fchat-hint">Pick how you'd like to start. Offers and chat open up once both sides accept.</p>
     </div>
     <div class="fchat-actions" id="fchat-actions">
       <!-- Rendered by hydrateFchatActions() after renderItem() resolves -->
@@ -1036,18 +1036,31 @@
     if (!userId) return null;
     if (window.db) {
       try {
-        var res = await window.db.from('users')
-          .select('id,pseudo,name,avatar,plan,swap_count,badge,created_at').eq('id', userId).maybeSingle();
+        // Query the public-safe view (RLS blocks reads on public.users for
+        // anyone other than self — users_public exposes only the fields a
+        // visitor is allowed to see: pseudo, avatar, badge, rating, etc.).
+        var res = await window.db.from('users_public')
+          .select('id,pseudo,display_name,avatar,plan,is_pro,swap_count,badge,rating_avg,rating_count,created_at')
+          .eq('id', userId)
+          .maybeSingle();
         if (res && res.data) {
-          return Object.assign({}, res.data, {
+          var d = res.data;
+          return {
+            id: d.id,
+            pseudo: d.pseudo || d.display_name || ('User_' + String(userId).slice(0, 4)),
+            avatar: d.avatar,
+            plan: d.plan,
+            is_pro: d.is_pro,
+            swap_count: d.swap_count,
+            badge: d.badge,
+            rating_avg: d.rating_avg,
+            rating_count: d.rating_count,
             avatar_color: '#09B1BA',
-            badge_emoji: { newcomer: '\u{1F331}', swapper: '\u{2B50}', active: '\u{1F525}', pro: '\u{1F48E}', elite: '\u{1F3C6}', legend: '\u{1F451}' }[res.data.badge] || '\u{1F331}',
-            badge_tier: res.data.badge || 'newcomer',
-            // created_at from public.users is set on INSERT (trigger); fall back
-            // to today's ISO string so downstream slice(0,7) never crashes.
-            created_at: res.data.created_at || new Date().toISOString(),
-            city: res.data.city || 'UAE'
-          });
+            badge_emoji: { newcomer: '\u{1F331}', swapper: '\u{2B50}', active: '\u{1F525}', pro: '\u{1F48E}', elite: '\u{1F3C6}', legend: '\u{1F451}' }[d.badge] || '\u{1F331}',
+            badge_tier: d.badge || 'newcomer',
+            created_at: d.created_at || new Date().toISOString(),
+            city: 'UAE'
+          };
         }
       } catch (e) {
         console.warn('[_resolveOwner] query failed:', e.message || e);
@@ -1302,28 +1315,37 @@
 
     document.getElementById('action-buttons').innerHTML = actionsHTML;
 
-    // ── Seller card (anonymous) ──
-    var sellerAvatarHTML = '';
+    // ── Seller card ──────────────────────────────────
+    // Ahmed 2026-04-18: anonymity dropped from this card. Always show
+    // the seller's pseudo + avatar + badge + rating. Real names stay
+    // hidden (users_public view doesn't expose the `name` column).
+    var sellerAvatarHTML;
     if (owner && owner.avatar && window.getAvatarSVG) {
       sellerAvatarHTML = '<div class="seller-avatar">' + getAvatarSVG(owner.avatar) + '</div>';
+    } else if (owner && owner.pseudo) {
+      var initial = (owner.pseudo || '?').trim().charAt(0).toUpperCase();
+      sellerAvatarHTML = '<div class="seller-avatar" style="background:linear-gradient(135deg,#09B1BA,#078A91);color:#fff;font-weight:800;font-size:28px;">' + initial + '</div>';
     } else {
-      sellerAvatarHTML = '<div class="seller-avatar">?</div>';
+      sellerAvatarHTML = '<div class="seller-avatar"><i class="fas fa-user" style="color:#09B1BA;"></i></div>';
     }
-    var sellerName = (owner && owner.pseudo) ? owner.pseudo : 'Anonymous Swapper';
+    var sellerName = owner && owner.pseudo ? owner.pseudo : 'Swapper';
     var sellerHTML = sellerAvatarHTML;
     sellerHTML += '<div class="seller-name">' + sellerName + '</div>';
     if (owner) {
       sellerHTML += '<div class="seller-badge">' + owner.badge_emoji + ' ' + capitalizeFirst(owner.badge_tier) + '</div>';
-      // NOTE: "special badges" (Generous Heart etc.) require aggregate queries
-      // across giveaways/swaps — will be wired in the dashboard pass. For now
-      // the seller card just shows the tier badge.
+      // Rating row (shown only when the seller has at least one rating)
+      if (owner.rating_count && owner.rating_avg) {
+        var stars = '\u2605'.repeat(Math.round(owner.rating_avg)) + '\u2606'.repeat(5 - Math.round(owner.rating_avg));
+        sellerHTML += '<div style="font-size:13px;color:#F59E0B;font-weight:600;margin-bottom:10px;">' + stars + ' <span style="color:#6B7280;font-weight:500;">(' + owner.rating_count + ')</span></div>';
+      }
       sellerHTML += '<div class="seller-info">';
-      sellerHTML += '<div class="seller-info-item"><span>' + t('seller_location') + ':</span><strong>' + (owner.city || 'UAE') + '</strong></div>';
       var memberSince = (owner.created_at ? String(owner.created_at).slice(0, 7).replace('-', '/') : '—');
       sellerHTML += '<div class="seller-info-item"><span>' + t('seller_member_since') + ':</span><strong>' + memberSince + '</strong></div>';
+      if (typeof owner.swap_count === 'number') {
+        sellerHTML += '<div class="seller-info-item"><span>Swaps completed:</span><strong>' + owner.swap_count + '</strong></div>';
+      }
       sellerHTML += '</div>';
     }
-    sellerHTML += '<p class="seller-disclaimer">' + t('seller_disclaimer') + '</p>';
     document.getElementById('seller-card').innerHTML = sellerHTML;
 
     // ── Similar items ──
@@ -2045,16 +2067,22 @@
       if (firstPhoto) fImg.src = firstPhoto; else fImg.style.display = 'none';
     }
     if (fName) {
-      fName.textContent = (owner && owner.pseudo) ? owner.pseudo : 'Anonymous Swapper';
+      fName.textContent = owner && owner.pseudo ? owner.pseudo : 'Swapper';
     }
     if (fSub) {
       var badgeEmoji = owner ? (owner.badge_emoji || '⭐') : '⭐';
       var badgeLabel = owner ? (owner.badge_tier ? capitalizeFirst(owner.badge_tier) : 'Swapper') : 'Swapper';
-      fSub.innerHTML = badgeEmoji + ' ' + badgeLabel + ' · Identity revealed after acceptance';
+      var ratingBit = (owner && owner.rating_count && owner.rating_avg)
+        ? ' · ⭐ ' + owner.rating_avg.toFixed(1) + ' (' + owner.rating_count + ')'
+        : '';
+      fSub.textContent = badgeEmoji + ' ' + badgeLabel + ratingBit;
     }
     if (fAv) {
       if (owner && owner.avatar && window.getAvatarSVG) {
         fAv.innerHTML = getAvatarSVG(owner.avatar);
+      } else if (owner && owner.pseudo) {
+        var fInit = (owner.pseudo || '?').trim().charAt(0).toUpperCase();
+        fAv.innerHTML = '<span style="font-weight:800;">' + fInit + '</span>';
       } else {
         fAv.innerHTML = '<i class="fas fa-user"></i>';
       }
