@@ -140,7 +140,7 @@
         <h1 data-i18n-html="hero_title_v2">Someone needs what you have. <span class="gradient-text" data-i18n="hero_title_accent">Swap it.</span></h1>
         <p class="hero-subtitle-text" data-i18n="hero_subtitle">The UAE's first marketplace for swapping, buying, selling, and gifting. Trade items with your community.</p>
         <div class="hero-cta">
-          <a href="pages/login.html" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start Swapping</a>
+          <a href="pages/login.html" id="hero-start-btn" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start Swapping</a>
           <a href="#how-it-works" class="btn-pill btn-pill-outline hero-outline-btn" data-i18n="how_it_works">How it works</a>
         </div>
         <div class="hero-trust">
@@ -351,10 +351,10 @@
     <div class="container">
       <h2 data-i18n="the_swappo_effect">The Swappo Effect</h2>
       <div class="impact-counters">
-        <div class="impact-stat"><div class="impact-number" data-target="12450" data-suffix="+">0</div><div class="impact-label" data-i18n="impact_items_swapped">Items Swapped</div></div>
-        <div class="impact-stat"><div class="impact-number" data-target="8200" data-suffix="+">0</div><div class="impact-label" data-i18n="impact_happy_swappers">Happy Swappers</div></div>
-        <div class="impact-stat"><div class="impact-number" data-target="15" data-suffix=" tons">0</div><div class="impact-label" data-i18n="impact_co2_saved">CO&#x2082; Saved</div></div>
-        <div class="impact-stat"><div class="impact-number" data-target="2500000" data-prefix="AED " data-suffix="+">0</div><div class="impact-label" data-i18n="impact_value_exchanged">Value Exchanged</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="0" data-live-key="items_swapped">0</div><div class="impact-label" data-i18n="impact_items_swapped">Items Swapped</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="0" data-live-key="happy_swappers">0</div><div class="impact-label" data-i18n="impact_happy_swappers">Happy Swappers</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="0" data-live-key="co2_kg_saved" data-suffix=" kg">0</div><div class="impact-label" data-i18n="impact_co2_saved">CO&#x2082; Saved</div></div>
+        <div class="impact-stat"><div class="impact-number" data-target="0" data-live-key="value_exchanged_aed" data-prefix="AED ">0</div><div class="impact-label" data-i18n="impact_value_exchanged">Value Exchanged</div></div>
       </div>
     </div>
   </section>
@@ -493,6 +493,7 @@
   <script src="js/app.js" defer></script>
   <script src="js/swappo-animations.js" defer></script>
   <script src="js/live-stats.js" defer></script>
+  <script src="js/hero-cta.js" defer></script>
   <script src="js/swappo-modern-2026.js" defer></script>
   <script src="js/i18n/en.js" defer></script>
   <script src="js/i18n.js" defer></script>

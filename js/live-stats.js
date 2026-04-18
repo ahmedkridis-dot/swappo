@@ -21,25 +21,40 @@
     return '+' + n + ' in the last hour';
   }
 
+  function writeCounter(el, rawValue) {
+    var divisor = parseFloat(el.getAttribute('data-live-divisor') || '1');
+    var value = Number(rawValue);
+    if (!isFinite(value)) value = 0;
+    var scaled = divisor && divisor !== 1 ? value / divisor : value;
+    var suffix = el.getAttribute('data-suffix') || '';
+    var prefix = el.getAttribute('data-prefix') || '';
+    el.setAttribute('data-target', String(scaled));
+    el.dataset.counterValue = String(scaled);
+    el.textContent = prefix + Math.floor(scaled).toLocaleString() + suffix;
+  }
+
   function applyStats(stats) {
+    if (!stats) return;
+
     var ticker = document.getElementById('ecoTicker');
-    if (!ticker || !stats) return;
+    if (ticker) {
+      ticker.querySelectorAll('.eco-ticker-number').forEach(function (el, i) {
+        var key = el.getAttribute('data-live-key') || KEY_BY_INDEX[i];
+        if (!key) return;
+        writeCounter(el, stats[key]);
+      });
+      var liveEl = document.getElementById('ecoTickerLive');
+      if (liveEl) liveEl.textContent = formatLiveLabel(stats.items_last_hour);
+    }
 
-    var nums = ticker.querySelectorAll('.eco-ticker-number');
-    nums.forEach(function (el, i) {
-      var key = el.getAttribute('data-live-key') || KEY_BY_INDEX[i];
+    // Any other counter on the page (e.g. Swappo Effect) that opts in via
+    // data-live-key. Skip elements already handled inside the eco-ticker.
+    document.querySelectorAll('[data-live-key]').forEach(function (el) {
+      if (el.closest && el.closest('#ecoTicker')) return;
+      var key = el.getAttribute('data-live-key');
       if (!key) return;
-      var value = Number(stats[key]);
-      if (!isFinite(value)) value = 0;
-
-      el.setAttribute('data-target', String(value));
-      el.dataset.counterValue = String(value);
-      var suffix = el.getAttribute('data-suffix') || '';
-      el.textContent = Math.floor(value).toLocaleString() + suffix;
+      writeCounter(el, stats[key]);
     });
-
-    var liveEl = document.getElementById('ecoTickerLive');
-    if (liveEl) liveEl.textContent = formatLiveLabel(stats.items_last_hour);
   }
 
   async function fetchStats() {
