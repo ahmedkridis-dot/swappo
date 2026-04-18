@@ -301,7 +301,51 @@
 
         .product-status.active { background: rgba(9,177,186,0.9); }
         .product-status.pending { background: rgba(255,152,0,0.9); }
+        .product-status.reserved { background: rgba(255,152,0,0.9); }
         .product-status.swapped { background: rgba(76,175,80,0.9); }
+        .product-status.sold { background: rgba(139,92,246,0.9); }
+        .product-status.removed { background: rgba(107,114,128,0.9); }
+
+        /* My Items filter pills — split active / reserved / swapped / sold */
+        .my-items-filters { margin-bottom: 16px; }
+        .mi-filter {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px;
+            background: transparent;
+            border: 1px solid var(--gray-border, #E5E7EB);
+            border-radius: 999px;
+            font-size: 13px; font-weight: 600;
+            color: var(--text-secondary, #555);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            font-family: inherit;
+        }
+        .mi-filter:hover { border-color: var(--primary, #09B1BA); color: var(--primary, #09B1BA); }
+        .mi-filter.active {
+            background: var(--primary, #09B1BA);
+            border-color: var(--primary, #09B1BA);
+            color: #fff;
+        }
+        .mi-filter-count {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 20px; height: 18px;
+            padding: 0 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 999px;
+            font-size: 11px; font-weight: 700;
+        }
+        .mi-filter.active .mi-filter-count { background: rgba(255,255,255,0.25); }
+        /* Terminal state cards are visually softer + lose the "action" buttons */
+        .product-card.is-terminal { opacity: 0.78; }
+        .product-card.is-terminal .product-actions .product-action-btn { display: none; }
+        .product-card.is-terminal .product-actions::after {
+            content: 'Swap completed · archived';
+            font-size: 12px; color: var(--text-muted, #6B7280);
+            padding: 8px 0;
+        }
+        .product-card.is-terminal[data-status="sold"] .product-actions::after {
+            content: 'Sold · archived';
+        }
 
         /* Pending-offer badge on a My Items card — tells the owner someone
            wants their item. Clicking it should jump to Swaps → Received. */
@@ -1402,6 +1446,12 @@
 
                 <!-- ========== TAB: MY ITEMS ========== -->
                 <div class="tab-content active" id="my-items">
+                    <div class="my-items-filters" id="my-items-filters" role="tablist" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+                        <button type="button" class="mi-filter active" data-mi-filter="active" role="tab" aria-selected="true">Active <span class="mi-filter-count" data-mi-count="active">0</span></button>
+                        <button type="button" class="mi-filter" data-mi-filter="reserved" role="tab" aria-selected="false">Reserved <span class="mi-filter-count" data-mi-count="reserved">0</span></button>
+                        <button type="button" class="mi-filter" data-mi-filter="swapped" role="tab" aria-selected="false">Swapped <span class="mi-filter-count" data-mi-count="swapped">0</span></button>
+                        <button type="button" class="mi-filter" data-mi-filter="sold" role="tab" aria-selected="false">Sold <span class="mi-filter-count" data-mi-count="sold">0</span></button>
+                    </div>
                     <div class="items-grid reveal" id="my-items-grid">
                         <!-- Skeleton placeholder while Supabase responds.
                              Replaced by real cards inside renderMyItems(). -->
@@ -2049,23 +2099,33 @@
             } catch (e) { /* best-effort — badges just won't show */ }
 
             const itemsGrid = document.getElementById('my-items-grid');
-            let itemsHTML = '';
-            userItems.forEach(item => {
+            // Classify into buckets so the filter pills have counts + can
+            // slice the view. Active = live listings, Reserved = locked
+            // in a pending swap, Swapped / Sold = terminal archives.
+            function _bucketFor(status) {
+                if (status === 'available' || status === 'active') return 'active';
+                if (status === 'reserved' || status === 'pending')  return 'reserved';
+                if (status === 'swapped')                           return 'swapped';
+                if (status === 'sold')                              return 'sold';
+                if (status === 'removed')                           return 'removed';
+                return 'active';
+            }
+            const buckets = { active: [], reserved: [], swapped: [], sold: [], removed: [] };
+            userItems.forEach(item => { buckets[_bucketFor(item.status)].push(item); });
+
+            function _cardHTML(item) {
                 const title = (item.brand + ' ' + item.model).trim() || item.type;
                 const photo = (item.photos && item.photos[0]) || '';
-                // Supabase statuses: available/reserved/swapped/sold/removed
-                // Demo*items legacy: active/pending/swapped
                 const itemStatus = item.status || 'available';
-                const statusClass = (itemStatus === 'active' || itemStatus === 'available') ? 'active'
-                                   : (itemStatus === 'pending' || itemStatus === 'reserved') ? 'pending'
-                                   : 'swapped';
+                const bucket = _bucketFor(itemStatus);
+                const statusClass = bucket;
                 const statusLabel = itemStatus.charAt(0).toUpperCase() + itemStatus.slice(1);
+                const terminalCls = (bucket === 'swapped' || bucket === 'sold' || bucket === 'removed') ? ' is-terminal' : '';
                 const pendingCount = pendingByItem[item.id] || 0;
                 const pendingBadge = pendingCount > 0
                     ? '<span class="pending-offer-badge" onclick="event.stopPropagation(); document.querySelector(\'[data-tab=swap-dashboard]\').click(); setTimeout(function(){var b=document.querySelector(\'[data-swap-tab=received]\');if(b)b.click();},50);">🔔 ' + pendingCount + ' pending offer' + (pendingCount > 1 ? 's' : '') + '</span>'
                     : '';
-
-                itemsHTML += '<div class="product-card" data-my-item-id="' + item.id + '">' +
+                return '<div class="product-card' + terminalCls + '" data-my-item-id="' + item.id + '" data-mi-bucket="' + bucket + '" data-status="' + itemStatus + '">' +
                     '<div class="product-image">' +
                         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '') +
                         '<span class="product-status ' + statusClass + '">' + statusLabel + '</span>' +
@@ -2083,14 +2143,47 @@
                         '<div class="my-auto-decline-host" data-item-id="' + item.id + '"></div>' +
                     '</div>' +
                 '</div>';
-            });
+            }
 
-            // Add "Drop a new item" card
-            itemsHTML += '<div class="new-item-card" onclick="window.location.href=\'publier.html\'">' +
-                '<i class="fas fa-plus"></i>' +
-                '<p>Drop a new item</p>' +
-            '</div>';
-            itemsGrid.innerHTML = itemsHTML;  // replaces the skeleton
+            function _renderBucket(bucketName) {
+                const list = buckets[bucketName] || [];
+                let html = list.map(_cardHTML).join('');
+                if (bucketName === 'active') {
+                    html += '<div class="new-item-card" onclick="window.location.href=\'publier.html\'">' +
+                        '<i class="fas fa-plus"></i><p>Drop a new item</p>' +
+                    '</div>';
+                } else if (!list.length) {
+                    const empty = {
+                        reserved: 'No items are currently reserved.',
+                        swapped:  "You haven't swapped anything yet.",
+                        sold:     "You haven't sold anything yet.",
+                        removed:  'No removed items.'
+                    }[bucketName] || '';
+                    html = '<div class="swap-empty" style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted,#6B7280);">' + empty + '</div>';
+                }
+                itemsGrid.innerHTML = html;
+            }
+
+            // Default bucket: Active. Clicking a pill switches the grid.
+            const filtersEl = document.getElementById('my-items-filters');
+            if (filtersEl) {
+                ['active', 'reserved', 'swapped', 'sold'].forEach(function (k) {
+                    const countEl = filtersEl.querySelector('[data-mi-count="' + k + '"]');
+                    if (countEl) countEl.textContent = String(buckets[k].length);
+                });
+                filtersEl.querySelectorAll('.mi-filter').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        filtersEl.querySelectorAll('.mi-filter').forEach(function (b) {
+                            b.classList.remove('active');
+                            b.setAttribute('aria-selected', 'false');
+                        });
+                        btn.classList.add('active');
+                        btn.setAttribute('aria-selected', 'true');
+                        _renderBucket(btn.getAttribute('data-mi-filter'));
+                    });
+                });
+            }
+            _renderBucket('active');
 
             // P4B — Auto-decline control per item. Pro users get a live toggle;
             // Free users see a greyed-out "Pro feature" pill.
