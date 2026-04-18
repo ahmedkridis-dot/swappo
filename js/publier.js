@@ -454,6 +454,7 @@ window.handlePhotoFiles = async function(e) {
   // Start at the pending slot (or first empty), and fill forward
   var start = _pendingSlotIndex != null ? _pendingSlotIndex : 0;
   var maxSlots = SwappoStorage.MAX_FILES || 5;
+  var totalFacesBlurred = 0;
 
   for (var i = 0; i < files.length; i++) {
     var slotIdx = -1;
@@ -471,7 +472,23 @@ window.handlePhotoFiles = async function(e) {
     var slotEl = document.querySelector('.photo-slot[data-index="' + slotIdx + '"]');
     if (slotEl) slotEl.classList.add('uploading');
     try {
-      var processed = await SwappoStorage.processFile(files[i]);
+      // Privacy Shield — blur faces + reject phone/email/URL in the photo
+      var safeInput = files[i];
+      if (window.PhotoSafety) {
+        try {
+          var safety = await PhotoSafety.processImage(files[i], { blurFaces: true, redactText: true });
+          if (safety.rejected) {
+            Toast.show('🚫 ' + safety.rejectReason, 'error');
+            if (slotEl) slotEl.classList.remove('uploading');
+            continue;
+          }
+          if (safety.facesDetected > 0) totalFacesBlurred += safety.facesDetected;
+          if (safety.blob) safeInput = safety.blob;
+        } catch (safetyErr) {
+          console.warn('[publier] PhotoSafety failed, uploading unmodified', safetyErr);
+        }
+      }
+      var processed = await SwappoStorage.processFile(safeInput);
       formState.photoBlobs[slotIdx] = {
         preview: processed.preview,
         processed: processed,
@@ -483,6 +500,9 @@ window.handlePhotoFiles = async function(e) {
       if (slotEl) slotEl.classList.remove('uploading');
     }
     refreshPhotoGrid();
+  }
+  if (totalFacesBlurred > 0) {
+    Toast.show('🛡️ ' + totalFacesBlurred + ' face' + (totalFacesBlurred > 1 ? 's' : '') + ' auto-blurred for your privacy.', 'info');
   }
   _pendingSlotIndex = null;
 };

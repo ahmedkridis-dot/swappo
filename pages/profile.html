@@ -1679,6 +1679,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="../js/supabase.js" defer></script>
     <script src="../js/swappo-storage.js" defer></script>
+    <script src="../js/photo-safety.js" defer></script>
     <script src="../js/swappo-items.js" defer></script>
     <script src="../js/swappo-swaps.js" defer></script>
     <script src="../js/swappo-chat.js" defer></script>
@@ -2689,7 +2690,22 @@
                     return;
                   }
                   try {
-                    const processed = await window.SwappoStorage.processFile(file);
+                    // Privacy Shield — keep the user's face (it's their avatar),
+                    // but reject any phone / email / URL visible in the image.
+                    let safeFile = file;
+                    if (window.PhotoSafety) {
+                      try {
+                        const safety = await window.PhotoSafety.processImage(file, { blurFaces: false, redactText: true });
+                        if (safety.rejected) {
+                          Toast.show('🚫 ' + safety.rejectReason, 'error');
+                          return;
+                        }
+                        if (safety.blob) safeFile = safety.blob;
+                      } catch (safetyErr) {
+                        console.warn('[profile] PhotoSafety failed, uploading unmodified', safetyErr);
+                      }
+                    }
+                    const processed = await window.SwappoStorage.processFile(safeFile);
                     _uploadBlob = processed;
                     _selectedAvatar = null;
                     // Preview in first slot
