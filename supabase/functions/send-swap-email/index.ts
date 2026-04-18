@@ -119,7 +119,7 @@ function template(ctx: Ctx): { subject: string; html: string } {
         <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(9,177,186,0.08);">
           <tr>
             <td style="padding:28px 28px 8px;text-align:center;">
-              <div style="font-size:22px;font-weight:800;letter-spacing:-0.02em;color:#09B1BA;">Swappo</div>
+              <img src="${SITE_URL}/assets/brand/lockup/swappo-lockup-teal-on-white.png" alt="Swappo" width="150" height="42" style="display:inline-block;border:0;outline:0;max-width:150px;height:auto;text-decoration:none;" />
             </td>
           </tr>
           <tr>
