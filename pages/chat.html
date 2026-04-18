@@ -626,6 +626,43 @@
     color: #9CA3AF;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  /* Close button — hidden on wide desktop where the panel is always
+     visible, shown on <=1100px where the panel opens as a drawer/sheet. */
+  .dp-close {
+    display: none;
+    border: 0;
+    background: #F3F4F6;
+    color: #1A1A2E;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.2s ease;
+  }
+  .dp-close:hover { background: #E5E7EB; }
+  @media (max-width: 1100px) {
+    .dp-close { display: inline-flex; align-items: center; justify-content: center; }
+  }
+  /* Tappable backdrop — only visible on mobile when the panel is open. */
+  .dp-backdrop {
+    display: none;
+    position: fixed;
+    inset: 64px 0 0 0;
+    background: rgba(15,23,42,0.4);
+    z-index: 699;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .dp-backdrop.open { display: block; opacity: 1; }
+  @media (min-width: 1101px) {
+    .dp-backdrop { display: none !important; }
   }
   .dp-empty {
     flex: 1;
@@ -1189,9 +1226,16 @@
       </div>
     </main>
 
+    <!-- Backdrop behind the Deal Tracker drawer on mobile/tablet. Tapping
+         it closes the panel — mirrors the header close button. -->
+    <div class="dp-backdrop" id="dealBackdrop" onclick="toggleDealPanel()" aria-hidden="true"></div>
+
     <!-- RIGHT: Deal Tracker Panel -->
-    <aside class="deal-panel" id="dealPanel">
-      <div class="dp-head">Deal Tracker</div>
+    <aside class="deal-panel" id="dealPanel" role="complementary" aria-label="Deal Tracker">
+      <div class="dp-head">
+        <span>Deal Tracker</span>
+        <button type="button" class="dp-close" onclick="toggleDealPanel()" aria-label="Close Deal Tracker"><i class="fas fa-times" aria-hidden="true"></i></button>
+      </div>
       <div class="dp-empty" id="dpEmpty">Select a conversation to see deal details</div>
       <div id="dpContent" style="display:none;">
         <div id="dpItems"></div>
@@ -2079,19 +2123,12 @@
         '<button class="dp-btn danger" onclick="declineDeal(\'' + convId + '\')">Decline</button>' +
       '</div>';
     } else if (status === 'accepted') {
-      actionsHTML = '<div class="dp-negotiate">' +
-        '<div class="dp-section-title"><i class="fas fa-hand-holding-usd" style="color:#09B1BA;"></i> Adjust Cash</div>' +
-        '<div class="dp-chips">' +
-          [0, 25, 50, 100, 200, 500].map(function(v) {
-            return '<button class="dp-chip' + (dealCashAmount === v ? ' active' : '') + '" onclick="setCash(' + v + ')">' + (v === 0 ? 'No cash' : '+' + v) + '</button>';
-          }).join('') +
-        '</div>' +
-        '<input type="range" class="dp-slider" min="0" max="1000" step="25" value="' + dealCashAmount + '" oninput="setCashSlider(this.value)">' +
-        '<div class="dp-amount"><span class="dp-amount-val" id="cashDisplay">' + dealCashAmount + '</span><span class="dp-amount-cur">AED</span><div class="dp-amount-hint">Paid hand-to-hand at meetup</div></div>' +
-      '</div>' +
-      '<div class="dp-actions">' +
-        '<button class="dp-btn primary" onclick="sendCounter(\'' + convId + '\')"><i class="fas fa-paper-plane"></i> Send Counter-Offer</button>' +
-        '<button class="dp-btn outline" onclick="showQRConfirmation(\'' + convId + '\')"><i class="fas fa-qrcode"></i> Confirm Exchange</button>' +
+      // Once a deal is accepted, the cash side is locked in (it was part
+      // of the offer both parties said yes to). Editing the cash here was
+      // confusing — removed per Ahmed 2026-04-18. Counter-offers remain
+      // possible while the deal is still "pending", in the branch above.
+      actionsHTML = '<div class="dp-actions">' +
+        '<button class="dp-btn primary" onclick="showQRConfirmation(\'' + convId + '\')"><i class="fas fa-qrcode"></i> Confirm Exchange</button>' +
       '</div>';
     }
     document.getElementById('dpActions').innerHTML = actionsHTML;
@@ -2410,9 +2447,19 @@
   }
 
   // ═══ DEAL PANEL TOGGLE ═══
+  // Keeps the backdrop in sync with the panel state so the "tap outside
+  // to close" behaviour works on mobile. Also ESC closes the panel.
   function toggleDealPanel() {
-    document.getElementById('dealPanel').classList.toggle('open');
+    var panel = document.getElementById('dealPanel');
+    var backdrop = document.getElementById('dealBackdrop');
+    var opened = panel.classList.toggle('open');
+    if (backdrop) backdrop.classList.toggle('open', opened);
   }
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var panel = document.getElementById('dealPanel');
+    if (panel && panel.classList.contains('open')) toggleDealPanel();
+  });
 
   // ═══ PROFILE OPEN (per Ahmed 2026-04-18 — header avatar clickable) ═══
   window.openPartnerProfile = function () {
