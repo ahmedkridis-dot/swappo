@@ -1162,13 +1162,15 @@
         '<div class="swap-info-text"><strong>' + t('free_item') + '</strong><br>' + t('use_1_claim') + '</div>';
     } else {
       var priceVal = item.price || 0;
-      swapInfoHTML = '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">' +
-        '<span style="font-size:32px;font-weight:800;color:#1A1A2E;">' + priceVal.toLocaleString() + ' AED</span>' +
-        '</div>' +
-        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-          '<span class="mode-badge mode-buy" style="font-size:0.75rem;padding:3px 10px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>' +
-          '<span class="mode-badge mode-swap" style="font-size:0.75rem;padding:3px 10px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>' +
-        '</div>';
+      var priceLine = priceVal > 0
+        ? '<span style="font-size:32px;font-weight:800;color:#1A1A2E;">' + priceVal.toLocaleString() + ' AED</span>'
+        : '<span style="font-size:20px;font-weight:700;color:#6B7280;">No listed price — swap or make an offer</span>';
+      var modes = '<span class="mode-badge mode-swap" style="font-size:0.75rem;padding:3px 10px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>';
+      if (priceVal > 0) {
+        modes = '<span class="mode-badge mode-buy" style="font-size:0.75rem;padding:3px 10px;border-radius:999px;font-weight:600;background:#FEF3C7;color:#92400E;">Buy</span>' + modes;
+      }
+      swapInfoHTML = '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">' + priceLine + '</div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' + modes + '</div>';
     }
     var swapInfoEl = document.getElementById('swap-info');
     if (swapInfoEl) {
@@ -1190,9 +1192,15 @@
         '<div style="font-size:13px;color:#6B7280;margin-top:4px;">Estimated value: ' + ((item.price || 0).toLocaleString()) + ' AED</div></div>';
     } else {
       var p = item.price || 0;
-      priceDisplayEl.innerHTML = '<div style="background:linear-gradient(135deg,#F0FBFC,#E6F7F8);border:1px solid rgba(9,177,186,0.15);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:baseline;justify-content:center;gap:8px;">' +
-        '<span style="font-size:36px;font-weight:800;color:#1A1A2E;">' + p.toLocaleString() + '</span>' +
-        '<span style="font-size:16px;font-weight:600;color:#6B7280;">AED</span></div>';
+      if (p > 0) {
+        priceDisplayEl.innerHTML = '<div style="background:linear-gradient(135deg,#F0FBFC,#E6F7F8);border:1px solid rgba(9,177,186,0.15);border-radius:16px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:baseline;justify-content:center;gap:8px;">' +
+          '<span style="font-size:36px;font-weight:800;color:#1A1A2E;">' + p.toLocaleString() + '</span>' +
+          '<span style="font-size:16px;font-weight:600;color:#6B7280;">AED</span></div>';
+      } else {
+        priceDisplayEl.innerHTML = '<div style="background:linear-gradient(135deg,#F8FAFC,#EEF2F7);border:1px solid rgba(107,114,128,0.2);border-radius:16px;padding:20px 24px;margin-bottom:16px;text-align:center;">' +
+          '<div style="font-size:18px;font-weight:700;color:#1A1A2E;">Swap or make an offer</div>' +
+          '<div style="font-size:13px;color:#6B7280;margin-top:4px;">The seller hasn\'t set a buy price — propose a swap or your own cash amount.</div></div>';
+      }
     }
 
     // ── Item details card ──
@@ -1260,20 +1268,28 @@
           '<i class="fas fa-gift"></i> ' + t('claim_item') + '</button>';
       }
     } else {
-      // v5 Marketplace: Buy / Swap / Offer buttons (other users only)
+      // v5 Marketplace: Buy / Swap / Offer buttons (other users only).
+      // When the seller hasn't set a price (price <= 0), the "Buy at listed
+      // price" button makes no sense — hide it and only keep Swap + Offer.
       var itemPrice = (currentItem && currentItem.price) || 0;
+      var hasListedPrice = itemPrice > 0;
+      var loginHref = "window.location.href='login.html?redirect=' + encodeURIComponent(window.location.href)";
       if (isGuest) {
-        actionsHTML += '<button class="btn-primary" style="font-size:16px;" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+        actionsHTML += '<button class="btn-primary" style="font-size:16px;" onclick="' + loginHref + '">' +
           '<i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
-        actionsHTML += '<button class="btn-primary" style="background:#D97706;" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
-          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
-        actionsHTML += '<button class="btn-primary" style="background:var(--navy,#1A1A2E);" onclick="window.location.href=\'login.html?redirect=\' + encodeURIComponent(window.location.href)">' +
+        if (hasListedPrice) {
+          actionsHTML += '<button class="btn-primary" style="background:#D97706;" onclick="' + loginHref + '">' +
+            '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
+        }
+        actionsHTML += '<button class="btn-primary" style="background:var(--navy,#1A1A2E);" onclick="' + loginHref + '">' +
           '<i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
       } else {
         actionsHTML += '<button class="btn-primary" style="font-size:16px;" onclick="openSwapModal()">' +
           '<i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
-        actionsHTML += '<button class="btn-primary" style="background:#D97706;" onclick="startBuy()">' +
-          '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
+        if (hasListedPrice) {
+          actionsHTML += '<button class="btn-primary" style="background:#D97706;" onclick="startBuy()">' +
+            '<i class="fas fa-shopping-cart"></i> Buy for ' + itemPrice.toLocaleString() + ' AED</button>';
+        }
         actionsHTML += '<button class="btn-primary" style="background:var(--navy,#1A1A2E);" onclick="openOfferModal()">' +
           '<i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
       }
@@ -2068,7 +2084,7 @@
 
     if (fTitle) fTitle.textContent = title;
     if (fPrice) {
-      fPrice.textContent = item.is_giveaway ? 'FREE' : (item.price || 0).toLocaleString() + ' AED';
+      fPrice.textContent = item.is_giveaway ? 'FREE' : ((item.price || 0) > 0 ? (item.price).toLocaleString() + ' AED' : 'Open offer');
     }
     if (fImg) {
       var firstPhoto = (item.photos && item.photos[0]) || '';
@@ -2108,7 +2124,9 @@
         htmlA += '<button type="button" class="fchat-btn primary" onclick="claimGiveaway && claimGiveaway(); toggleFchat();"><i class="fas fa-gift"></i> Claim this gift</button>';
       } else {
         htmlA += '<button type="button" class="fchat-btn primary" onclick="toggleFchat(); openSwapModal();"><i class="fas fa-exchange-alt"></i> Propose a Swap</button>';
-        htmlA += '<button type="button" class="fchat-btn amber" onclick="toggleFchat(); startBuy();"><i class="fas fa-shopping-cart"></i> Buy for ' + (item.price || 0).toLocaleString() + ' AED</button>';
+        if ((item.price || 0) > 0) {
+          htmlA += '<button type="button" class="fchat-btn amber" onclick="toggleFchat(); startBuy();"><i class="fas fa-shopping-cart"></i> Buy for ' + (item.price || 0).toLocaleString() + ' AED</button>';
+        }
         htmlA += '<button type="button" class="fchat-btn outline" onclick="toggleFchat(); openOfferModal();"><i class="fas fa-hand-holding-usd"></i> Make an Offer</button>';
       }
       fActs.innerHTML = htmlA;

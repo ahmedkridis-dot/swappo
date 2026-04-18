@@ -92,22 +92,35 @@
 
     if (!convs || !convs.length) return [];
 
-    // Collect other user ids + item ids
+    // Collect other user ids + item ids + swap ids
     const otherIds = convs.map(c => c.user1_id === uid ? c.user2_id : c.user1_id);
     const itemIds = convs.map(c => c.item_id).filter(Boolean);
+    const swapIds = convs.map(c => c.swap_id).filter(Boolean);
 
-    const [usersResp, itemsResp] = await Promise.all([
-      // users_public exposes pseudo/display_name/avatar/badge/rating — no `name` column.
+    const [usersResp, itemsResp, swapsResp] = await Promise.all([
       global.db.from(USERS_TABLE).select('id,pseudo,display_name,avatar,plan,badge,swap_count').in('id', otherIds),
       itemIds.length
         ? global.db.from('items').select('id,brand,model,category,photos,price,is_giveaway').in('id', itemIds)
+        : Promise.resolve({ data: [] }),
+      swapIds.length
+        ? global.db.from('swaps').select('id,status,is_purchase,is_giveaway_claim,cash_amount,cash_direction,proposer_item_id,receiver_item_id,proposer_id,receiver_id').in('id', swapIds)
         : Promise.resolve({ data: [] })
     ]);
     const usersMap = Object.fromEntries((usersResp.data || []).map(u => [u.id, u]));
     const itemsMap = Object.fromEntries((itemsResp.data || []).map(i => [i.id, i]));
+    const swapsMap = Object.fromEntries((swapsResp.data || []).map(s => [s.id, s]));
 
     return convs.map(c => {
       const otherId = c.user1_id === uid ? c.user2_id : c.user1_id;
+      const swapRow = swapsMap[c.swap_id] || null;
+      // Intent derived from the linked swap: 'gift' | 'purchase' | 'swap'.
+      // Sidebar + deal tracker key their labels off this so the three
+      // flows stay unambiguous.
+      let dealType = 'swap';
+      if (swapRow) {
+        if (swapRow.is_giveaway_claim) dealType = 'gift';
+        else if (swapRow.is_purchase)  dealType = 'purchase';
+      }
       return {
         id: c.id,
         user1_id: c.user1_id,
@@ -117,8 +130,9 @@
         identity_revealed: c.identity_revealed,
         last_message: c.last_message_preview || '',
         last_message_at: c.last_message_at,
-        // Normalize the user so downstream code can always read `.pseudo`
-        // even when users_public only provided `display_name`.
+        swap: swapRow,
+        deal_type: dealType,
+        cash_amount: swapRow ? Number(swapRow.cash_amount || 0) : 0,
         other_user: (function (u) {
           if (!u) return { id: otherId, pseudo: 'Swapper', avatar: '', plan: 'free' };
           return {

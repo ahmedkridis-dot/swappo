@@ -1723,8 +1723,11 @@
       var item = c.item || null;
       var photo = item && item.photos ? item.photos[0] : '';
       var status = map.status || 'accepted';
-      var dealType = map.type || 'swap';
-      var cash = map.cash || 0;
+      // Prefer the real swap row that SwappoChat.getConversations joins in —
+      // the legacy CONV_ITEM_MAP is static demo data and only covers a
+      // handful of hardcoded IDs.
+      var dealType = c.deal_type || map.type || 'swap';
+      var cash = c.cash_amount || map.cash || 0;
       var preview = c.last_message || 'Start chatting...';
       var time = c.last_message_at ? timeAgo(c.last_message_at)
         : (c.messages && c.messages.length ? timeAgo(c.messages[c.messages.length - 1].created_at) : '');

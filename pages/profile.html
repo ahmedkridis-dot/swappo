@@ -2361,12 +2361,13 @@
                     pending:   { icon: 'clock',        label: 'Pending' },
                     accepted:  { icon: 'check-circle', label: 'Accepted' },
                     completed: { icon: 'check-double', label: 'Completed' },
-                    rejected:  { icon: 'times-circle', label: 'Rejected' },
+                    declined:  { icon: 'times-circle', label: 'Declined' },
+                    rejected:  { icon: 'times-circle', label: 'Declined' },
                     cancelled: { icon: 'ban',          label: 'Cancelled' },
                     expired:   { icon: 'hourglass-end',label: 'Expired' }
                 };
-                var s = map[status] || map.pending;
-                return '<span class="swap-status-badge ' + status + '"><i class="fas fa-' + s.icon + '"></i> ' + s.label + '</span>';
+                var s = map[status] || { icon: 'question-circle', label: status || 'Unknown' };
+                return '<span class="swap-status-badge ' + (status || 'unknown') + '"><i class="fas fa-' + s.icon + '"></i> ' + s.label + '</span>';
             }
 
             function daysAgo(dateStr) {
