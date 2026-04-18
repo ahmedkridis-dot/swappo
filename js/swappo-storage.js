@@ -20,10 +20,12 @@
 (function (global) {
   'use strict';
 
-  const MAX_FILES   = 8;           // iPhone carrousel = up to 8 photos per listing
-  const MAX_SIZE_MB = 2;           // AFTER resize/compression (the upload itself)
-  const MAX_SIDE_PX = 1920;        // enough for retina, respects iPhone 12MP source
-  const WEBP_QUALITY = 0.85;
+  const MAX_FILES   = 8;           // iPhone carousel = up to 8 photos per listing
+  const MAX_SIZE_MB = 3;            // AFTER resize/compression — bucket now
+                                    // allows 10 MB so we keep plenty of head-room
+                                    // and ship higher-quality WebP
+  const MAX_SIDE_PX = 1920;         // enough for retina, respects iPhone 12MP source
+  const WEBP_QUALITY = 0.88;        // slightly higher quality (was 0.85)
   const BUCKET = 'item-photos';
 
   /** Load an image file into an <img> / ImageBitmap. Handles HEIC, big iPhone
