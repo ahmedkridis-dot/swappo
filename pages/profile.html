@@ -1312,42 +1312,54 @@
                             </div>
 
                             <!-- Notifications Section -->
-                            <div class="settings-section">
+                            <!-- Each toggle saves to public.users via data-pref.
+                                 The master switch "notif_email_enabled" disables
+                                 ALL transactional emails when off; individual
+                                 kind-flags below only take effect when the
+                                 master is on. -->
+                            <div class="settings-section" id="notif-settings">
                                 <h3><i class="fas fa-bell"></i> Notifications</h3>
                                 <div class="setting-item">
                                     <div class="setting-label">
-                                        <div class="setting-label-title">Push Notifications</div>
-                                        <div class="setting-label-desc">Receive mobile notifications</div>
-                                    </div>
-                                    <button class="toggle-switch active"></button>
-                                </div>
-                                <div class="setting-item">
-                                    <div class="setting-label">
                                         <div class="setting-label-title">Email Notifications</div>
-                                        <div class="setting-label-desc">Receive emails for important updates</div>
+                                        <div class="setting-label-desc">Master switch — receive any email from Swappo</div>
                                     </div>
-                                    <button class="toggle-switch active"></button>
+                                    <button class="toggle-switch" data-pref="notif_email_enabled"></button>
                                 </div>
                                 <div class="setting-item">
                                     <div class="setting-label">
                                         <div class="setting-label-title">Swap Proposals</div>
-                                        <div class="setting-label-desc">Get notified of new swap offers</div>
+                                        <div class="setting-label-desc">Email me when someone proposes a swap on my item</div>
                                     </div>
-                                    <button class="toggle-switch active"></button>
+                                    <button class="toggle-switch" data-pref="notif_email_swap_proposed"></button>
                                 </div>
                                 <div class="setting-item">
                                     <div class="setting-label">
-                                        <div class="setting-label-title">Messages</div>
-                                        <div class="setting-label-desc">New messages from other users</div>
+                                        <div class="setting-label-title">Swap Accepted</div>
+                                        <div class="setting-label-desc">Email me when my offer is accepted</div>
                                     </div>
-                                    <button class="toggle-switch active"></button>
+                                    <button class="toggle-switch" data-pref="notif_email_swap_accepted"></button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Swap Declined</div>
+                                        <div class="setting-label-desc">Email me when my offer is declined</div>
+                                    </div>
+                                    <button class="toggle-switch" data-pref="notif_email_swap_declined"></button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-label">
+                                        <div class="setting-label-title">Counter Offers</div>
+                                        <div class="setting-label-desc">Email me when someone counters my offer</div>
+                                    </div>
+                                    <button class="toggle-switch" data-pref="notif_email_counter_offer"></button>
                                 </div>
                                 <div class="setting-item">
                                     <div class="setting-label">
                                         <div class="setting-label-title">Swap Quota Low</div>
                                         <div class="setting-label-desc">Alert when your monthly swap quota is almost used up</div>
                                     </div>
-                                    <button class="toggle-switch"></button>
+                                    <button class="toggle-switch" data-pref="notif_email_quota_low"></button>
                                 </div>
                             </div>
 
@@ -2703,7 +2715,60 @@
             // ── Tab switching (moved to separate block below for safety) ──
 
             // ── Toggle switches ──────────────────────────────────────────
-            document.querySelectorAll('.toggle-switch').forEach(t => t.addEventListener('click', () => t.classList.toggle('active')));
+            // Two flavours:
+            //   1. Toggles WITH data-pref persist to public.users.<pref>
+            //      so the backend email trigger can read the value.
+            //   2. Toggles WITHOUT data-pref keep the legacy local-only
+            //      behaviour (purely cosmetic).
+            (async function wireToggles() {
+              const nodes = document.querySelectorAll('.toggle-switch');
+              if (!nodes.length) return;
+
+              // Hydrate pref toggles from the users row (one round-trip).
+              let prefRow = null;
+              try {
+                if (window.db && user && user.id) {
+                  const { data } = await window.db.from('users')
+                    .select('notif_email_enabled, notif_email_swap_proposed, notif_email_swap_accepted, notif_email_swap_declined, notif_email_counter_offer, notif_email_quota_low')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                  prefRow = data || null;
+                }
+              } catch (_) { /* ignore — defaults will apply */ }
+
+              nodes.forEach((t) => {
+                const pref = t.dataset.pref;
+                if (pref) {
+                  // Reflect DB state (columns default to true server-side)
+                  const current = prefRow ? !!prefRow[pref] : true;
+                  t.classList.toggle('active', current);
+                  t.setAttribute('role', 'switch');
+                  t.setAttribute('aria-checked', String(current));
+                  t.addEventListener('click', async () => {
+                    const next = !t.classList.contains('active');
+                    t.classList.toggle('active', next);
+                    t.setAttribute('aria-checked', String(next));
+                    try {
+                      if (window.db && user && user.id) {
+                        const patch = {}; patch[pref] = next;
+                        const { error } = await window.db.from('users').update(patch).eq('id', user.id);
+                        if (error) throw error;
+                        if (window.Toast) Toast.show('Saved', 'success');
+                      }
+                    } catch (e) {
+                      // Roll back on failure
+                      t.classList.toggle('active', !next);
+                      t.setAttribute('aria-checked', String(!next));
+                      if (window.Toast) Toast.show('Could not save — try again.', 'error');
+                      console.warn('[notif-pref]', pref, e && e.message);
+                    }
+                  });
+                } else {
+                  // Legacy purely-visual toggle
+                  t.addEventListener('click', () => t.classList.toggle('active'));
+                }
+              });
+            })();
 
             // ── Navbar update ────────────────────────────────────────────
             const navProfile = document.querySelector('.navbar-profile');
