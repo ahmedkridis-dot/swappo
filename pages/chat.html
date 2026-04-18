@@ -584,6 +584,38 @@
   @keyframes qrFade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes qrPop { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
 
+  /* Badge celebration — big emoji, glow, "Swapped a tier!" */
+  .badge-burst {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 112px; height: 112px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #FFFFFF 0%, #E6F7F8 60%, #09B1BA 100%);
+    box-shadow: 0 16px 40px rgba(9,177,186,0.45), 0 0 0 8px rgba(9,177,186,0.12);
+    font-size: 56px;
+    animation: badgePop 0.6s cubic-bezier(0.34,1.56,0.64,1) both, badgeGlow 2s ease-in-out 0.6s infinite alternate;
+  }
+  @keyframes badgePop { from { opacity: 0; transform: scale(0.3) rotate(-20deg); } to { opacity: 1; transform: none; } }
+  @keyframes badgeGlow {
+    from { box-shadow: 0 16px 40px rgba(9,177,186,0.45), 0 0 0 8px rgba(9,177,186,0.12); }
+    to   { box-shadow: 0 20px 56px rgba(9,177,186,0.65), 0 0 0 14px rgba(9,177,186,0.18); }
+  }
+  /* Self-contained confetti — no dependency on animations.js */
+  .badge-confetti {
+    position: fixed;
+    width: 8px; height: 12px;
+    top: 50%; left: 50%;
+    pointer-events: none;
+    z-index: 1000;
+    border-radius: 2px;
+    animation: confettiFall var(--dur, 1.4s) cubic-bezier(0.16,0.84,0.44,1) forwards;
+  }
+  @keyframes confettiFall {
+    0%   { opacity: 1; transform: translate(0,0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--tx,0), var(--ty,120vh)) rotate(var(--tr,720deg)); }
+  }
+
   @keyframes smartCardIn {
     from { opacity: 0; transform: translateY(12px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
@@ -1292,6 +1324,13 @@
       <div class="qr-modal-card" id="rateModalCard"></div>
     </div>
 
+    <!-- Badge celebration — fired when public.bump_swap_count promotes
+         the user to a new tier and inserts a badge_earned notification. -->
+    <div class="qr-modal" id="badgeModal" role="dialog" aria-modal="true" aria-labelledby="badgeModalTitle" aria-hidden="true">
+      <div class="qr-modal-backdrop" onclick="closeBadgeCelebration()"></div>
+      <div class="qr-modal-card" id="badgeModalCard"></div>
+    </div>
+
     <!-- RIGHT: Deal Tracker Panel -->
     <aside class="deal-panel" id="dealPanel" role="complementary" aria-label="Deal Tracker">
       <div class="dp-head">
@@ -1862,6 +1901,85 @@
     return div;
   }
 
+  // ═══ BADGE CELEBRATION ══════════════════════════════════════════
+  // Emoji + copy per tier (matches bump_swap_count() thresholds).
+  var BADGE_META = {
+    newcomer: { emoji: '🌱', label: 'Newcomer',  sub: 'Welcome to Swappo!' },
+    swapper:  { emoji: '⭐', label: 'Swapper',  sub: 'First swap completed — you are officially in the club.' },
+    active:   { emoji: '🔥', label: 'Active',   sub: 'Five swaps in the bag. Community loves you already.' },
+    pro:      { emoji: '💎', label: 'Pro',      sub: 'Fifteen swaps! You are a Swappo veteran.' },
+    elite:    { emoji: '🏆', label: 'Elite',    sub: 'Thirty swaps — the UAE barter scene runs through you.' },
+    legend:   { emoji: '👑', label: 'Legend',   sub: 'Seventy-five swaps. Swappo would not be the same without you.' }
+  };
+
+  function _fireConfetti(durationMs) {
+    var colors = ['#09B1BA', '#FFB800', '#10B981', '#FF8C00', '#FF4B55', '#8B5CF6'];
+    var count  = 80;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('span');
+      p.className = 'badge-confetti';
+      p.style.background = colors[i % colors.length];
+      p.style.setProperty('--tx', (Math.random() - 0.5) * 700 + 'px');
+      p.style.setProperty('--ty', (Math.random() * 0.8 + 0.6) * 100 + 'vh');
+      p.style.setProperty('--tr', (Math.random() * 1440 - 720) + 'deg');
+      p.style.setProperty('--dur', (1.2 + Math.random() * 0.8) + 's');
+      document.body.appendChild(p);
+      setTimeout(function (el) { el.remove(); }, 2200, p);
+    }
+  }
+
+  function showBadgeCelebration(badge, opts) {
+    var meta = BADGE_META[badge] || BADGE_META.swapper;
+    opts = opts || {};
+    var modal = document.getElementById('badgeModal');
+    var slot = document.getElementById('badgeModalCard');
+    if (!modal || !slot) return;
+    slot.innerHTML =
+      '<div style="text-align:center;padding:16px 8px 8px;">' +
+        '<div class="badge-burst" aria-hidden="true">' + meta.emoji + '</div>' +
+        '<div id="badgeModalTitle" style="font-size:13px;font-weight:700;color:#09B1BA;letter-spacing:0.12em;text-transform:uppercase;margin-top:18px;">Badge unlocked</div>' +
+        '<div style="font-size:28px;font-weight:800;color:#1A1A2E;margin:6px 0 4px;letter-spacing:-0.02em;">' + meta.label + '</div>' +
+        '<div style="font-size:14px;color:#4A4A5A;line-height:1.5;margin:0 8px 14px;">' + meta.sub + '</div>' +
+        (opts.swap_count ? '<div style="font-size:12px;color:#6B7280;margin-bottom:18px;">Total swaps: <strong style="color:#1A1A2E;">' + opts.swap_count + '</strong></div>' : '') +
+        '<button class="sc-btn primary" style="background:linear-gradient(135deg,#09B1BA,#078A91);width:100%;" onclick="closeBadgeCelebration()"><i class="fas fa-check"></i> Awesome!</button>' +
+      '</div>';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    // Defer confetti a hair so the modal anim starts first.
+    setTimeout(_fireConfetti, 80);
+  }
+
+  function closeBadgeCelebration() {
+    var modal = document.getElementById('badgeModal');
+    var slot = document.getElementById('badgeModalCard');
+    if (modal) { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); }
+    if (slot) slot.innerHTML = '';
+  }
+
+  // Look for the most recent unread badge_earned notification for this
+  // user and, if there is one, fire the celebration + mark it read so
+  // it doesn't retrigger on every page load. Called from _onSwapCompleted
+  // AND on page init (so the QR scanner — redirected from confirm.html —
+  // still sees the celebration).
+  async function _checkPendingBadgePromotion(userId) {
+    if (!window.db || !userId) return;
+    try {
+      var r = await window.db.from('notifications')
+        .select('id, payload, created_at')
+        .eq('user_id', userId)
+        .eq('kind', 'badge_earned')
+        .eq('is_read', false)
+        .order('created_at', { ascending: false })
+        .limit(1);
+      var row = (r.data || [])[0];
+      if (!row) return;
+      var p = row.payload || {};
+      showBadgeCelebration(p.badge || 'swapper', { swap_count: p.swap_count });
+      // Mark read so we don't replay it on refresh
+      await window.db.from('notifications').update({ is_read: true }).eq('id', row.id);
+    } catch (e) { console.warn('[badge] check failed', e && e.message); }
+  }
+
   // Open / close the rating overlay. Both parties see this modal after
   // a successful confirm (shower via realtime, scanner via URL param).
   function openRatingModal(convId, swapId) {
@@ -2118,6 +2236,17 @@
     // leave the user without a way to rate. (Ahmed reported a swap
     // where the rating never appeared after QR success.)
     setTimeout(function () { openRatingModal(convId, swapId); }, 400);
+
+    // After the swap-count bump fires the badge_earned notification in
+    // the DB, poll briefly to catch it and play the celebration.
+    // The bump is synchronous inside the RPC but the notif INSERT may
+    // take a tick to be visible via REST → retry twice.
+    setTimeout(function () {
+      if (currentUser && currentUser.id) _checkPendingBadgePromotion(currentUser.id);
+    }, 1200);
+    setTimeout(function () {
+      if (currentUser && currentUser.id) _checkPendingBadgePromotion(currentUser.id);
+    }, 3000);
 
     // Best-effort: drop a system message so both sides see a trace
     // in the chat. Failures here must not block the rating UX.
@@ -2676,6 +2805,13 @@
     if (rateParam) {
       var convForRate = targetConv || (_convCache[0] && _convCache[0].id) || null;
       setTimeout(function () { openRatingModal(convForRate, rateParam); }, 500);
+    }
+
+    // Check for an unread badge_earned notification on any page load.
+    // This catches both the QR scanner (just redirected from confirm)
+    // AND anyone who left the app before the celebration could play.
+    if (currentUser && currentUser.id) {
+      setTimeout(function () { _checkPendingBadgePromotion(currentUser.id); }, 1500);
     }
   }
 
