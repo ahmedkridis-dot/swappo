@@ -904,6 +904,11 @@
         footer a { color: var(--primary-light); text-decoration: none; }
         footer a:hover { text-decoration: underline; }
 
+        /* Auto-decline is a Pro feature currently on hold.
+           Hidden from the UI site-wide; JS + DB schema preserved so it can
+           be re-enabled by removing this single rule. */
+        .my-auto-decline-host { display: none !important; }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             .profile-header {
@@ -936,11 +941,6 @@
             .tabs-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
             .tabs-nav::-webkit-scrollbar { display: none; }
             .tab-btn { white-space: nowrap; }
-
-            /* Auto-decline panel is a Pro advanced control — collapse to a
-               single-line summary on phones so it doesn't wrap character-
-               by-character inside the compact card. */
-            .my-auto-decline-host { display: none; }
 
             /* ── Profile 2-col layout stacks on mobile ────────────────── */
             .profile-body-layout { flex-direction: column !important; gap: 16px !important; }
