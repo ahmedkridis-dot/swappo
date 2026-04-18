@@ -651,9 +651,7 @@
 
         /* ========== SETTINGS ========== */
         .settings-container {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 24px;
+            display: block;
         }
 
         .settings-section {
@@ -1619,25 +1617,9 @@
                             </div>
                         </div>
 
-                        <!-- Sidebar: Subscription Management -->
-                        <div class="settings-sidebar">
-                            <div class="subscription-card" id="settings-subscription-card">
-                                <div class="subscription-title" id="settings-sub-title">Loading…</div>
-                                <div class="subscription-price" id="settings-sub-price"></div>
-
-                                <div style="text-align:left;margin-bottom:16px;" id="settings-sub-quotas">
-                                    <!-- Dynamically populated: swap/claim/boost quotas -->
-                                </div>
-
-                                <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;" id="settings-sub-renewal">
-                                    Renews on --
-                                </div>
-
-                                <a href="pricing.html" class="subscription-btn" style="display:block;text-align:center;text-decoration:none;background:var(--primary);">
-                                    <i class="fas fa-arrow-up"></i> Upgrade Plan
-                                </a>
-                            </div>
-                        </div>
+                        <!-- Subscription card moved to the permanent right-hand
+                             aside (#subscription-sidebar) to avoid duplicate
+                             "Free Plan" cards on the Settings tab. -->
                     </div>
                 </div>
             </div>
@@ -2029,21 +2011,8 @@
             var geWidget = document.getElementById('give-earn-widget');
             if (geWidget) geWidget.style.display = 'none';
 
-            // ── Settings subscription card ───────────────────────────────
-            const settingsSubCard = document.getElementById('settings-subscription-card');
-            if (planInfo.plan === 'premium') settingsSubCard.classList.add('premium');
-            document.getElementById('settings-sub-title').textContent = tierInfo.badge + ' ' + tierInfo.name + ' Plan';
-            document.getElementById('settings-sub-price').innerHTML = planInfo.plan === 'free' ? 'Free' : tierInfo.price + ' AED<span style="font-size:12px;color:var(--text-secondary);">/month</span>';
-            document.getElementById('settings-sub-quotas').innerHTML =
-                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;width:16px;"></i>' + swapsCompleted + ' swap' + (swapsCompleted === 1 ? '' : 's') + ' completed</div>' +
-                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-gift" style="color:var(--accent);margin-right:6px;width:16px;"></i>' + planInfo.claims_used + '/' + planInfo.claims_limit + ' claims used</div>' +
-                '<div style="margin-bottom:8px;font-size:13px;"><i class="fas fa-rocket" style="color:#FFB800;margin-right:6px;width:16px;"></i>' + planInfo.boosts_used + '/' + planInfo.boosts_limit + ' boosts used</div>';
-            const settingsRenewalEl = document.getElementById('settings-sub-renewal');
-            if (settingsRenewalEl) {
-              settingsRenewalEl.innerHTML = planInfo.plan === 'free'
-                ? '<i class="fas fa-infinity" style="margin-right:4px;"></i> Free — no renewal'
-                : '<i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Renews ' + renewalStr;
-            }
+            // ── Settings subscription card was removed to avoid duplication
+            //    with the permanent #subscription-sidebar on the right. ──
 
             // ── TAB: My Items ────────────────────────────────────────────
             // Pre-fetch the count of pending swaps that target each of my
