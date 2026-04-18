@@ -2691,25 +2691,66 @@
   async function renderDealPanel(convId) {
     var map = CONV_ITEM_MAP[convId] || {};
     var conv = _convCache.find(function(c) { return c.id === convId; }) || {};
-    var theirItem = conv.item || null;
-    var myItem = null;
     var status = map.status || (conv.identity_revealed ? 'accepted' : 'pending');
-    var cash = map.cash || 0;
-    dealCashAmount = cash;
 
     // If we have a swap_id on the conv, look up the swap once so we can
-    // render boxes on either side. Fetch is cached.
+    // render boxes on either side + know the intent. Fetch is cached.
     var swap = _swapRowCache[convId] || null;
     if (!swap && conv.swap_id && window.db) {
       try {
-        var r = await window.db.from('swaps').select('id,proposer_id,receiver_id,proposer_item_id,proposer_box_id,receiver_item_id,receiver_box_id,cash_amount').eq('id', conv.swap_id).maybeSingle();
+        var r = await window.db.from('swaps').select('id,proposer_id,receiver_id,proposer_item_id,proposer_box_id,receiver_item_id,receiver_box_id,cash_amount,cash_direction,is_purchase,is_giveaway_claim').eq('id', conv.swap_id).maybeSingle();
         if (r && r.data) { swap = r.data; _swapRowCache[convId] = swap; }
       } catch (_) {}
     }
+
+    // Derive intent + perspective. For pure cash purchases, the proposer
+    // brought cash (no item); for gift claims, the proposer brought a
+    // claim. In both cases conv.item points at the RECEIVER's listed
+    // item — which means the seller sees "their own" item on the
+    // "theirs" side unless we flip the labels.
+    var cash = Number((swap && swap.cash_amount) || map.cash || 0) || 0;
+    dealCashAmount = cash;
+    var intent = 'swap';
+    if (swap) {
+      if (swap.is_giveaway_claim) intent = 'gift';
+      else if (swap.is_purchase)  intent = 'purchase';
+    } else if (map.type === 'purchase') {
+      intent = 'purchase';
+    }
+    var isProposer = swap && currentUser ? (swap.proposer_id === currentUser.id) : false;
+
+    // Assign each side the right payload. `theirSide` is always the
+    // counter-party; `mySide` is always the current user's side.
+    var theirItem = null;
+    var myItem = null;
+    var theirKind = 'item';
+    var myKind = 'item';
+    if (intent === 'purchase') {
+      if (isProposer) {
+        // I'm the buyer — my side offers cash, their side is the item.
+        theirItem = conv.item || null;
+        myKind = 'cash';
+      } else {
+        // I'm the seller — my side is the item (conv.item), their side is cash.
+        myItem = conv.item || null;
+        theirKind = 'cash';
+      }
+    } else if (intent === 'gift') {
+      if (isProposer) {
+        theirItem = conv.item || null;
+        myKind = 'gift';
+      } else {
+        myItem = conv.item || null;
+        theirKind = 'gift';
+      }
+    } else {
+      // Regular swap — conv.item is the anchor listing (receiver's item).
+      theirItem = conv.item || null;
+    }
+
     var myBoxSnapshot = null;
     var theirBoxSnapshot = null;
     if (swap && currentUser) {
-      var isProposer = swap.proposer_id === currentUser.id;
       var myBoxId    = isProposer ? swap.proposer_box_id : swap.receiver_box_id;
       var theirBoxId = isProposer ? swap.receiver_box_id : swap.proposer_box_id;
       if (myBoxId)    myBoxSnapshot    = await _loadBoxSnapshot(myBoxId);
@@ -2737,46 +2778,71 @@
         '</div></div>';
     }
 
+    // Helpers shared by both sides of the Deal Tracker
+    function _dpRenderItem(item, side /* 'theirs' | 'yours' */) {
+      var label = side === 'yours' ? 'YOUR ITEM' : 'THEIR ITEM';
+      var photo = item.photos ? item.photos[0] : '';
+      var photoSafe = safeImgUrl(photo);
+      var idSafe = escapeHTML(item.id);
+      var name = escapeHTML(((item.brand || '') + ' ' + (item.model || item.type || '')).trim() || 'Item');
+      var cond = escapeHTML(item.condition || '');
+      var loc = escapeHTML(item.emirate || item.city || '');
+      var price = escapeHTML((item.price || 0).toLocaleString());
+      return '<div class="dp-item" onclick="window.open(\'product.html?id=' + idSafe + '\')">' +
+        (photoSafe ? '<img class="dp-item-photo" src="' + photoSafe + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
+        '<div class="dp-item-body"><div class="dp-item-label ' + side + '">' + label + '</div>' +
+          '<div class="dp-item-name">' + name + '</div>' +
+          '<div class="dp-item-meta">' + cond + (loc ? ' · ' + loc : '') + '</div>' +
+          '<div class="dp-item-price">' + price + ' AED</div>' +
+        '</div></div>';
+    }
+    function _dpRenderCash(amount, side /* 'theirs' | 'yours' */) {
+      var label = side === 'yours' ? 'YOUR CASH OFFER' : 'THEIR CASH OFFER';
+      var amt = escapeHTML(Number(amount || 0).toLocaleString());
+      return '<div class="dp-item">' +
+        '<div class="dp-item-photo" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);display:flex;align-items:center;justify-content:center;font-size:36px;">💰</div>' +
+        '<div class="dp-item-body">' +
+          '<div class="dp-item-label ' + side + '">' + label + '</div>' +
+          '<div class="dp-item-name">Cash only</div>' +
+          '<div class="dp-item-price">' + amt + ' AED</div>' +
+        '</div></div>';
+    }
+    function _dpRenderGift(side /* 'theirs' | 'yours' */) {
+      var label = side === 'yours' ? 'YOUR GIFT CLAIM' : 'THEIR GIFT CLAIM';
+      return '<div class="dp-item">' +
+        '<div class="dp-item-photo" style="background:linear-gradient(135deg,#FCE7F3,#FBCFE8);display:flex;align-items:center;justify-content:center;font-size:36px;">🎁</div>' +
+        '<div class="dp-item-body">' +
+          '<div class="dp-item-label ' + side + '">' + label + '</div>' +
+          '<div class="dp-item-name">Free gift</div>' +
+          '<div class="dp-item-price">0 AED</div>' +
+        '</div></div>';
+    }
+
     // Items — all user-controlled strings escaped (C-1 stored-XSS hardening)
     var itemsHTML = '<div class="dp-items">';
+
+    // Left side = THEIRS
     if (theirBoxSnapshot) {
       itemsHTML += _dpRenderBox(theirBoxSnapshot, 'THEIR OFFER', 'theirs');
+    } else if (theirKind === 'cash') {
+      itemsHTML += _dpRenderCash(cash, 'theirs');
+    } else if (theirKind === 'gift') {
+      itemsHTML += _dpRenderGift('theirs');
     } else if (theirItem) {
-      var theirPhoto = theirItem.photos ? theirItem.photos[0] : '';
-      var theirPhotoSafe = safeImgUrl(theirPhoto);
-      var theirIdSafe = escapeHTML(theirItem.id);
-      var theirName = escapeHTML(((theirItem.brand || '') + ' ' + (theirItem.model || '')).trim());
-      var theirCond = escapeHTML(theirItem.condition || '');
-      var theirLoc = escapeHTML(theirItem.emirate || theirItem.city || '');
-      var theirPrice = escapeHTML((theirItem.price || 0).toLocaleString());
-      itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + theirIdSafe + '\')">' +
-        (theirPhotoSafe ? '<img class="dp-item-photo" src="' + theirPhotoSafe + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
-        '<div class="dp-item-body"><div class="dp-item-label theirs">THEIR ITEM</div>' +
-        '<div class="dp-item-name">' + theirName + '</div>' +
-        '<div class="dp-item-meta">' + theirCond + ' · ' + theirLoc + '</div>' +
-        '<div class="dp-item-price">' + theirPrice + ' AED</div></div></div>';
-    } else if (map.type === 'purchase') {
-      var cashSafe = escapeHTML(cash.toLocaleString());
-      itemsHTML += '<div class="dp-item"><div class="dp-item-photo" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);display:flex;align-items:center;justify-content:center;font-size:36px;">💰</div>' +
-        '<div class="dp-item-body"><div class="dp-item-label theirs">CASH PURCHASE</div><div class="dp-item-name">Full cash offer</div><div class="dp-item-price">' + cashSafe + ' AED</div></div></div>';
+      itemsHTML += _dpRenderItem(theirItem, 'theirs');
     }
+
     itemsHTML += '<div class="dp-arrow"><span><i class="fas fa-exchange-alt"></i></span></div>';
+
+    // Right side = YOURS
     if (myBoxSnapshot) {
       itemsHTML += _dpRenderBox(myBoxSnapshot, 'YOUR OFFER', 'yours');
+    } else if (myKind === 'cash') {
+      itemsHTML += _dpRenderCash(cash, 'yours');
+    } else if (myKind === 'gift') {
+      itemsHTML += _dpRenderGift('yours');
     } else if (myItem) {
-      var myPhoto = myItem.photos ? myItem.photos[0] : '';
-      var myPhotoSafe = safeImgUrl(myPhoto);
-      var myIdSafe = escapeHTML(myItem.id);
-      var myName = escapeHTML(((myItem.brand || '') + ' ' + (myItem.model || '')).trim());
-      var myCond = escapeHTML(myItem.condition || '');
-      var myLoc = escapeHTML(myItem.emirate || myItem.city || '');
-      var myPrice = escapeHTML((myItem.price || 0).toLocaleString());
-      itemsHTML += '<div class="dp-item" onclick="window.open(\'product.html?id=' + myIdSafe + '\')">' +
-        (myPhotoSafe ? '<img class="dp-item-photo" src="' + myPhotoSafe + '" alt="" loading="lazy">' : '<div class="dp-item-photo" style="background:#F0FBFC;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>') +
-        '<div class="dp-item-body"><div class="dp-item-label yours">YOUR ITEM</div>' +
-        '<div class="dp-item-name">' + myName + '</div>' +
-        '<div class="dp-item-meta">' + myCond + ' · ' + myLoc + '</div>' +
-        '<div class="dp-item-price">' + myPrice + ' AED</div></div></div>';
+      itemsHTML += _dpRenderItem(myItem, 'yours');
     }
     itemsHTML += '</div>';
     document.getElementById('dpItems').innerHTML = itemsHTML;
