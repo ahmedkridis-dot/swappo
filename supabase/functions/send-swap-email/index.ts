@@ -50,6 +50,7 @@ type Ctx = {
   item_title: string;
   item_photo: string | null;
   amount_aed: number | null;
+  preview: string | null;   // short quote of the chat message (new_message kind)
   url: string;              // deep link into swappo.ae
   kind: string;
 };
@@ -57,7 +58,7 @@ type Ctx = {
 // ── email templates ───────────────────────────────────────
 function template(ctx: Ctx): { subject: string; html: string } {
   const cta =
-    ctx.kind === 'swap_accepted'
+    ctx.kind === 'swap_accepted' || ctx.kind === 'new_message'
       ? { label: 'Open chat', url: ctx.url }
       : ctx.kind === 'swap_declined'
       ? { label: 'Browse items', url: `${SITE_URL}/pages/catalogue.html` }
@@ -72,6 +73,8 @@ function template(ctx: Ctx): { subject: string; html: string } {
       ? `Your offer was declined`
       : ctx.kind === 'counter_offer'
       ? `${ctx.actor_name} sent you a counter-offer`
+      : ctx.kind === 'new_message'
+      ? `${ctx.actor_name} sent you a message`
       : `Swappo update`;
 
   const preheader =
@@ -81,6 +84,8 @@ function template(ctx: Ctx): { subject: string; html: string } {
       ? 'No worries — plenty more items waiting to be swapped.'
       : ctx.kind === 'counter_offer'
       ? 'Take a look and accept, decline, or counter back.'
+      : ctx.kind === 'new_message'
+      ? 'The chat went quiet for a while — here is what you missed.'
       : 'A fresh offer is waiting for you on Swappo.';
 
   const subject =
@@ -92,6 +97,8 @@ function template(ctx: Ctx): { subject: string; html: string } {
       ? `Your offer on ${ctx.item_title} was declined`
       : ctx.kind === 'counter_offer'
       ? `Counter-offer on ${ctx.item_title}`
+      : ctx.kind === 'new_message'
+      ? `New message about ${ctx.item_title}`
       : `Swappo — ${ctx.item_title}`;
 
   const photoHTML = ctx.item_photo
@@ -101,6 +108,13 @@ function template(ctx: Ctx): { subject: string; html: string } {
   const amountLine =
     ctx.amount_aed && ctx.amount_aed > 0
       ? `<p style="margin:0 0 12px;color:#4A4A5A;font-size:14px;">Cash included: <strong style="color:#1A1A2E;">${ctx.amount_aed.toLocaleString()} AED</strong></p>`
+      : '';
+
+  // For "new_message" emails we quote a short preview of what the other
+  // party wrote so the recipient knows whether it's worth re-opening.
+  const previewLine =
+    ctx.kind === 'new_message' && ctx.preview
+      ? `<blockquote style="margin:12px 16px 20px;padding:12px 16px;border-left:3px solid #09B1BA;background:#F8FAFA;border-radius:6px;color:#1A1A2E;font-size:14px;line-height:1.5;text-align:left;font-style:normal;">${esc(ctx.preview)}</blockquote>`
       : '';
 
   const html = `<!DOCTYPE html>
@@ -128,6 +142,7 @@ function template(ctx: Ctx): { subject: string; html: string } {
               <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;letter-spacing:-0.02em;color:#1A1A2E;line-height:1.3;">${esc(headline)}</h1>
               <p style="margin:0 0 20px;color:#4A4A5A;font-size:15px;line-height:1.5;">Hey ${esc(ctx.recipient_name || 'there')},<br/>${esc(preheader)}</p>
               ${amountLine}
+              ${previewLine}
             </td>
           </tr>
           <tr>
@@ -219,10 +234,13 @@ serve(async (req: Request) => {
     }
   }
 
+  // Anonymity rule: identities are hidden until mutual acceptance. After
+  // that, swap_accepted and any chat-triggered emails (new_message) can
+  // safely reveal the other party's name.
   const actorName =
-    notif.kind === 'swap_accepted'
+    notif.kind === 'swap_accepted' || notif.kind === 'new_message'
       ? ((payload.actor_name as string) ?? 'The other party')
-      : 'Someone'; // anonymity rule: identities hidden until mutual acceptance
+      : 'Someone';
 
   const url =
     typeof notif.url === 'string' && notif.url
@@ -238,6 +256,7 @@ serve(async (req: Request) => {
     item_title: itemTitle,
     item_photo: itemPhoto,
     amount_aed: typeof payload.cash_amount === 'number' ? (payload.cash_amount as number) : null,
+    preview: typeof payload.preview === 'string' ? (payload.preview as string) : null,
     url,
     kind: notif.kind,
   });

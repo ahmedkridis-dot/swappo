@@ -1356,6 +1356,13 @@
                                 </div>
                                 <div class="setting-item">
                                     <div class="setting-label">
+                                        <div class="setting-label-title">New Messages</div>
+                                        <div class="setting-label-desc">Email me if I receive a message after 30 min of chat silence</div>
+                                    </div>
+                                    <button class="toggle-switch" data-pref="notif_email_new_message"></button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-label">
                                         <div class="setting-label-title">Swap Quota Low</div>
                                         <div class="setting-label-desc">Alert when your monthly swap quota is almost used up</div>
                                     </div>
@@ -2729,7 +2736,7 @@
               try {
                 if (window.db && user && user.id) {
                   const { data } = await window.db.from('users')
-                    .select('notif_email_enabled, notif_email_swap_proposed, notif_email_swap_accepted, notif_email_swap_declined, notif_email_counter_offer, notif_email_quota_low')
+                    .select('notif_email_enabled, notif_email_swap_proposed, notif_email_swap_accepted, notif_email_swap_declined, notif_email_counter_offer, notif_email_quota_low, notif_email_new_message')
                     .eq('id', user.id)
                     .maybeSingle();
                   prefRow = data || null;
