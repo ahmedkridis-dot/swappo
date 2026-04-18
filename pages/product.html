@@ -1527,6 +1527,10 @@
         await window.db.from('notifications').insert({
           user_id: currentItem.user_id,
           kind: 'gift_claimed',
+          type: 'gift',
+          title: 'Someone claimed your gift',
+          message: 'Accept it to open the chat and arrange the hand-off.',
+          url: '/pages/profile.html?tab=swap-dashboard&sub=received',
           payload: { swap_id: swap.id, item_id: currentItem.id, claimer_id: currentUser.id }
         });
       } catch (nErr) { /* non-blocking */ }

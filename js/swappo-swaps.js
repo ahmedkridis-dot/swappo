@@ -150,7 +150,7 @@
         type: isPurchase ? 'offer' : 'swap',
         title: titleTxt,
         message: msgTxt,
-        url: '/pages/profile.html?tab=swap-dashboard&swap=' + data.id,
+        url: '/pages/profile.html?tab=swap-dashboard&sub=received',
         payload: {
           swap_id: data.id,
           item_id: targetItemId,

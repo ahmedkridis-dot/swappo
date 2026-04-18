@@ -2554,6 +2554,28 @@
 
             await renderSwapDashboard();
 
+            // Deep-link: activate the tab (and Swaps sub-tab) requested by
+            // the URL. Lets notification rows land directly on Received /
+            // Sent / History instead of always opening the dashboard.
+            (function applyDeepLink() {
+                var params = new URLSearchParams(location.search);
+                var wantedTab = params.get('tab');
+                var wantedSub = params.get('sub');
+                if (wantedTab) {
+                    var tabBtn = document.querySelector('[data-tab="' + wantedTab + '"]');
+                    if (tabBtn) tabBtn.click();
+                }
+                if (wantedSub) {
+                    // The sub-tabs only exist once the Swaps tab panel
+                    // is in the DOM — run after a tick so the click above
+                    // has had time to mount them.
+                    setTimeout(function () {
+                        var subBtn = document.querySelector('[data-swap-tab="' + wantedSub + '"]');
+                        if (subBtn) subBtn.click();
+                    }, 60);
+                }
+            })();
+
             // ── Notifications bell (reads public.notifications) ────────
             // Shows a count badge on the bell and a dropdown list of unread
             // notifications so the receiver of a swap/gift_claim/message
@@ -2612,24 +2634,44 @@
                     '<button onclick="markAllNotifsRead()" style="background:none;border:none;color:#09B1BA;font-weight:600;cursor:pointer;font-size:13px;"><i class="fas fa-check-double"></i> Mark all as read</button>' +
                   '</div>';
 
-                  // Click a row → mark it read + jump to the right page
+                  // Click a row → mark it read + jump to the right page.
+                  // Honor the stored url first (keeps per-notification deep
+                  // links — e.g. a new_message points at its specific
+                  // conversation); fall back to kind-based routing for
+                  // legacy rows with no url.
                   dropEl.querySelectorAll('.notif-row').forEach(function(row) {
                     row.addEventListener('click', async function() {
                       const nid = row.getAttribute('data-nid');
                       const notif = list.find(function(x) { return x.id === nid; });
-                      try { await window.db.from('notifications').update({ is_read: true }).eq('id', nid); } catch (e) {}
-                      // Route by kind
-                      if (notif && (notif.kind === 'swap_proposed' || notif.kind === 'offer_received' || notif.kind === 'gift_claimed')) {
-                        // Switch to Swaps tab, Received sub-tab
+                      try { await window.db.from('notifications').update({ is_read: true, read_at: new Date().toISOString() }).eq('id', nid); } catch (e) {}
+                      if (!notif) return;
+                      if (notif.url) {
+                        window.location.href = notif.url;
+                        return;
+                      }
+                      var payload = notif.payload || {};
+                      var k = notif.kind;
+                      if (k === 'new_message' || k === 'swap_accepted') {
+                        var cid = payload.conversation_id;
+                        window.location.href = 'chat.html' + (cid ? ('?conv=' + cid) : '');
+                      } else if (k === 'swap_proposed' || k === 'offer_received' || k === 'gift_claimed' || k === 'counter_offer') {
                         var swapsBtn = document.querySelector('[data-tab="swap-dashboard"]');
                         if (swapsBtn) swapsBtn.click();
-                        var receivedBtn = document.querySelector('[data-swap-tab="received"]');
-                        if (receivedBtn) receivedBtn.click();
+                        setTimeout(function () {
+                          var receivedBtn = document.querySelector('[data-swap-tab="received"]');
+                          if (receivedBtn) receivedBtn.click();
+                        }, 60);
                         dropEl.style.display = 'none';
-                      } else if (notif && notif.kind === 'swap_accepted') {
-                        window.location.href = 'chat.html';
-                      } else if (notif && notif.kind === 'new_message') {
-                        window.location.href = 'chat.html';
+                      } else if (k === 'swap_declined') {
+                        var swapsBtn2 = document.querySelector('[data-tab="swap-dashboard"]');
+                        if (swapsBtn2) swapsBtn2.click();
+                        setTimeout(function () {
+                          var historyBtn = document.querySelector('[data-swap-tab="history"]');
+                          if (historyBtn) historyBtn.click();
+                        }, 60);
+                        dropEl.style.display = 'none';
+                      } else if (k === 'badge_earned') {
+                        window.location.hash = 'badges';
                       }
                     });
                   });

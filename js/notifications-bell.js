@@ -92,6 +92,40 @@
     return map[type] || 'fa-bell';
   }
 
+  /** Fallback deep link used when a notification row has no `url`. Keyed
+   *  off type (legacy) or kind — keeps old rows routable. */
+  function fallbackUrlForKind(kind, row) {
+    var base = (location.pathname.indexOf('/pages/') === 0) ? '' : '/pages/';
+    var payload = (row && row.payload) || {};
+    switch (kind) {
+      case 'new_message':
+      case 'chat':
+        var cid = payload.conversation_id;
+        return base + 'chat.html' + (cid ? ('?conv=' + cid) : '');
+      case 'swap_accepted':
+        var cid2 = payload.conversation_id;
+        return base + 'chat.html' + (cid2 ? ('?conv=' + cid2) : '');
+      case 'swap_proposed':
+      case 'offer_received':
+      case 'offer':
+      case 'gift_claimed':
+      case 'gift':
+      case 'counter_offer':
+        return base + 'profile.html?tab=swap-dashboard&sub=received';
+      case 'swap_declined':
+      case 'swap':
+        return base + 'profile.html?tab=swap-dashboard&sub=history';
+      case 'badge_earned':
+      case 'badge':
+        return base + 'profile.html#badges';
+      case 'boost_expiring':
+      case 'boost':
+        return base + 'profile.html?tab=my-items';
+      default:
+        return base + 'profile.html';
+    }
+  }
+
   var state = { notifs: [], unread: 0, userId: null, sub: null };
 
   function render() {
@@ -246,7 +280,8 @@
       if (n.id && window.db) {
         window.db.from('notifications').update({ read_at: new Date().toISOString(), is_read: true }).eq('id', n.id).then(function () {});
       }
-      if (n.url) window.location.href = n.url;
+      var target = n.url || fallbackUrlForKind(n.type || n.kind, n);
+      if (target) window.location.href = target;
     });
     host.appendChild(card);
     setTimeout(function () {
@@ -289,6 +324,13 @@
         var now = new Date().toISOString();
         window.db.from('notifications').update({ read_at: now, is_read: true }).eq('id', id)
           .then(function () { /* refresh on realtime */ });
+      }
+      if (!url) {
+        // Older notifications were inserted without a url. Fall back
+        // to a sensible deep link keyed by kind so the row still routes
+        // to its context (instead of silently doing nothing).
+        var row = state.notifs.find(function (n) { return n.id === id; }) || {};
+        url = fallbackUrlForKind(row.type || row.kind, row);
       }
       if (url) { window.location.href = url; }
     });
