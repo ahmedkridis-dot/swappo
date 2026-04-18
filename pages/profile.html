@@ -1033,6 +1033,196 @@
             /* 2 cols on very small phones so text doesn't wrap too aggressively */
             .stats-row { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
         }
+
+        /* ─────────────────────────────────────────
+           ITEM DETAIL MODAL  (Ahmed 2026-04-18)
+           Opens when a user taps an item inside a
+           Swap Box preview. Glassmorphism + teal
+           accent + smooth pop-in animation.
+        ───────────────────────────────────────── */
+        .idm-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            padding-top: max(16px, env(safe-area-inset-top));
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+        }
+        .idm-modal.open { display: flex; }
+        .idm-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            animation: idmFade 0.22s ease-out;
+        }
+        .idm-card {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            max-height: calc(100vh - 40px);
+            background: #ffffff;
+            border-radius: 22px;
+            box-shadow: 0 32px 80px rgba(9,17,28,0.3), 0 4px 16px rgba(9,17,28,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: idmPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .idm-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: 0;
+            color: #1A1A2E;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.2s, background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .idm-close:hover { transform: scale(1.08); background: #ffffff; }
+        .idm-hero {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: linear-gradient(135deg, #F0FBFC, #E6F7F8);
+            overflow: hidden;
+        }
+        .idm-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .idm-hero-empty {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 72px;
+        }
+        .idm-price-chip {
+            position: absolute;
+            bottom: 16px; left: 16px;
+            background: rgba(9,177,186,0.95);
+            color: #fff;
+            font-weight: 800;
+            font-size: 15px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            box-shadow: 0 8px 24px rgba(9,177,186,0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .idm-price-chip.free {
+            background: linear-gradient(135deg, #10B981, #059669);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.4);
+        }
+        .idm-body {
+            padding: 22px 24px 28px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .idm-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1A1A2E;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin: 0 0 10px;
+        }
+        .idm-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .idm-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            background: #F3F4F6;
+            color: #4A4A5A;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .idm-chip.accent {
+            background: #E6F7F8;
+            color: #078A91;
+        }
+        .idm-thumbs {
+            display: flex;
+            gap: 8px;
+            margin: 0 0 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+        .idm-thumbs::-webkit-scrollbar { height: 3px; }
+        .idm-thumbs::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 2px; }
+        .idm-thumb {
+            flex: 0 0 64px;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .idm-thumb.active { border-color: #09B1BA; box-shadow: 0 0 0 3px rgba(9,177,186,0.18); }
+        .idm-thumb:hover { transform: translateY(-1px); }
+        .idm-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .idm-specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px 18px;
+            padding: 16px 18px;
+            background: #F8FAFA;
+            border: 1px solid #E5E7EB;
+            border-radius: 14px;
+        }
+        .idm-spec-label {
+            font-size: 11px;
+            color: #6B7280;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .idm-spec-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1A1A2E;
+        }
+        .idm-footer-link {
+            margin: 18px 0 0;
+            text-align: center;
+        }
+        .idm-footer-link a {
+            font-size: 13px;
+            color: #09B1BA;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(9,177,186,0.4);
+            padding-bottom: 2px;
+        }
+        .idm-footer-link a:hover { color: #078A91; border-bottom-style: solid; }
+
+        @keyframes idmFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes idmPop {
+            from { opacity: 0; transform: translateY(14px) scale(0.96); }
+            to   { opacity: 1; transform: none; }
+        }
+        @media (max-width: 480px) {
+            .idm-specs { grid-template-columns: 1fr; gap: 12px; }
+            .idm-title { font-size: 18px; }
+            .idm-card { max-height: calc(100vh - 20px); }
+        }
     </style>
 </head>
 <body>
@@ -1950,6 +2140,9 @@
             // Phase 2 hydration caches (populated by renderSwapDashboard)
             const _itemsCache = new Map();
             const _usersCache = new Map();
+            // Expose on window so the item-detail modal script can read it
+            // directly, without fighting over the closure scope.
+            window._itemsCache = _itemsCache;
 
             // Items + users are resolved ONLY from the Supabase caches that
             // _hydrateSwaps pre-fills via a batched SELECT .in('id', ids) call
@@ -2100,12 +2293,14 @@
                             + '<i class="fas fa-box-open" style="margin-right:4px;"></i> See ' + side.count + ' items'
                         + '</button>'
                         : '';
+                    // Each thumbnail opens the polished item-detail modal
+                    // so the user can eyeball photos + specs before deciding.
                     var itemsList = '<div id="' + panelId + '" style="display:none;margin-top:10px;grid-column:1/-1;">'
                         + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;">'
                         + side.items.map(function (it) {
                             var pphoto = (it.photos && it.photos[0]) || '';
                             var tt = ((it.brand || '') + ' ' + (it.model || '')).trim() || it.type || 'Item';
-                            return '<div style="background:#F8FAFA;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;">'
+                            return '<div tabindex="0" role="button" onclick="event.stopPropagation();openItemDetail(\'' + it.id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openItemDetail(\'' + it.id + '\')}" style="background:#F8FAFA;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform 0.15s,border-color 0.15s,box-shadow 0.15s;" onmouseenter="this.style.borderColor=\'#09B1BA\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 6px 16px rgba(9,177,186,0.15)\';" onmouseleave="this.style.borderColor=\'#E5E7EB\';this.style.transform=\'none\';this.style.boxShadow=\'none\';">'
                                 + (pphoto ? '<img src="' + pphoto + '" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;">' : '<div style="aspect-ratio:1;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:22px;">📦</div>')
                                 + '<div style="padding:4px 6px;font-size:10px;font-weight:600;color:#1A1A2E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tt + '</div>'
                             + '</div>';
@@ -2997,5 +3192,166 @@
   });
 })();
 </script>
+
+<!-- ============ ITEM DETAIL MODAL ============
+     Opens when a user taps any item inside a Swap Box preview.
+     Populated lazily by openItemDetail(itemId). -->
+<div class="idm-modal" id="idmModal" role="dialog" aria-modal="true" aria-labelledby="idmTitle" aria-hidden="true">
+  <div class="idm-backdrop" onclick="closeItemDetail()"></div>
+  <div class="idm-card" id="idmCard"></div>
+</div>
+
+<script>
+(function(){
+  // ──────────────────────────────────────────────────
+  // Small reusable lightbox for items living inside a
+  // Swap Box preview. The item data is pulled from the
+  // already-hydrated _itemsCache when possible; we fall
+  // back to a direct DB query if not.
+  // ──────────────────────────────────────────────────
+  var _escIdm = function(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  };
+  var _capIdm = function(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; };
+  var _condLabelIdm = function(c){
+    return { new: 'New', like_new: 'Like New', good: 'Good', fair: 'Fair' }[c] || _capIdm(c || '');
+  };
+
+  async function _resolveItemForModal(itemId) {
+    // 1. In-memory cache populated by _hydrateSwaps
+    try {
+      if (window._itemsCache && window._itemsCache.get) {
+        var cached = window._itemsCache.get(itemId);
+        if (cached) return cached;
+      }
+    } catch (_) {}
+    // 2. Fallback to a live Supabase read
+    if (!window.db) return null;
+    try {
+      var r = await window.db.from('items')
+        .select('id,brand,model,category,subcategory,type,photos,price,condition,is_giveaway,status,box_id,year,size,color,emirate,city')
+        .eq('id', itemId).maybeSingle();
+      return r && r.data ? r.data : null;
+    } catch (_) { return null; }
+  }
+
+  function _idmThumbsHTML(photos, activeIdx) {
+    if (!photos || photos.length < 2) return '';
+    return '<div class="idm-thumbs">' + photos.map(function (p, i) {
+      return '<div class="idm-thumb' + (i === activeIdx ? ' active' : '') + '" onclick="idmSwapHero(' + i + ')">'
+        + '<img src="' + _escIdm(p) + '" alt=""></div>';
+    }).join('') + '</div>';
+  }
+
+  window.idmSwapHero = function(idx) {
+    if (!window._idmPhotos || !window._idmPhotos[idx]) return;
+    var hero = document.querySelector('#idmCard .idm-hero img');
+    if (hero) hero.src = window._idmPhotos[idx];
+    document.querySelectorAll('#idmCard .idm-thumb').forEach(function (t, i) {
+      t.classList.toggle('active', i === idx);
+    });
+  };
+
+  window.openItemDetail = async function (itemId) {
+    if (!itemId) return;
+    var card = document.getElementById('idmCard');
+    var modal = document.getElementById('idmModal');
+    if (!card || !modal) return;
+
+    // Render a skeleton while we fetch.
+    card.innerHTML = '<div style="padding:60px 40px;text-align:center;color:#9CA3AF;"><i class="fas fa-circle-notch fa-spin" style="font-size:28px;"></i></div>';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+
+    var item = await _resolveItemForModal(itemId);
+    if (!item) {
+      card.innerHTML = '<div style="padding:48px 32px;text-align:center;">'
+        + '<button class="idm-close" onclick="closeItemDetail()" aria-label="Close"><i class="fas fa-times"></i></button>'
+        + '<div style="font-size:48px;margin-bottom:12px;">🤷</div>'
+        + '<div style="font-size:16px;font-weight:700;color:#1A1A2E;">Item unavailable</div>'
+        + '<div style="font-size:13px;color:#6B7280;margin-top:6px;">It may have been removed.</div>'
+        + '</div>';
+      return;
+    }
+
+    var photos = Array.isArray(item.photos) ? item.photos.filter(Boolean) : [];
+    window._idmPhotos = photos;
+    var heroSrc = photos[0] || '';
+    var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type || 'Item';
+    var priceChip = item.is_giveaway
+      ? '<div class="idm-price-chip free">🎁 FREE · Gift</div>'
+      : (item.price > 0
+          ? '<div class="idm-price-chip">' + Number(item.price).toLocaleString() + ' AED</div>'
+          : '');
+    var locationVal = item.emirate || item.city || '—';
+
+    var specs = [
+      { label: 'Condition', value: _condLabelIdm(item.condition) || '—' },
+      { label: 'Year',      value: item.year || '—' },
+      { label: 'Brand',     value: item.brand || '—' },
+      { label: 'Size',      value: item.size || '—' },
+      { label: 'Color',     value: item.color || '—' },
+      { label: 'Location',  value: locationVal }
+    ];
+
+    card.innerHTML =
+      '<button class="idm-close" onclick="closeItemDetail()" aria-label="Close"><i class="fas fa-times"></i></button>' +
+      '<div class="idm-hero">' +
+        (heroSrc
+          ? '<img src="' + _escIdm(heroSrc) + '" alt="' + _escIdm(title) + '">'
+          : '<div class="idm-hero-empty">📦</div>') +
+        priceChip +
+      '</div>' +
+      '<div class="idm-body">' +
+        _idmThumbsHTML(photos, 0) +
+        '<h2 id="idmTitle" class="idm-title">' + _escIdm(title) + '</h2>' +
+        '<div class="idm-chips">' +
+          (item.category ? '<span class="idm-chip accent"><i class="fas fa-tag"></i> ' + _escIdm(_capIdm(item.category)) + '</span>' : '') +
+          (item.box_id ? '<span class="idm-chip" style="background:#ECFDF5;color:#065F46;"><i class="fas fa-box"></i> Part of a Box</span>' : '') +
+          (item.is_giveaway ? '<span class="idm-chip" style="background:#FEF3C7;color:#92400E;"><i class="fas fa-gift"></i> Gift</span>' : '') +
+        '</div>' +
+        '<div class="idm-specs">' +
+          specs.map(function (s) {
+            return '<div><div class="idm-spec-label">' + _escIdm(s.label) + '</div>'
+                 + '<div class="idm-spec-value">' + _escIdm(s.value) + '</div></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="idm-footer-link"><a href="product.html?id=' + _escIdm(item.id) + '" target="_blank" rel="noopener">Open full product page <i class="fas fa-arrow-up-right-from-square" style="font-size:11px;"></i></a></div>' +
+      '</div>';
+  };
+
+  window.closeItemDetail = function () {
+    var modal = document.getElementById('idmModal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var m = document.getElementById('idmModal');
+    if (m && m.classList.contains('open')) closeItemDetail();
+  });
+
+  // Expose the items cache so the detail modal can read it without
+  // copy-pasting. The dashboard code writes into a closure-local
+  // `_itemsCache` map — we publish a reference on window.
+  var _hookTries = 0;
+  var _hook = setInterval(function () {
+    if (window._itemsCache || _hookTries > 20) { clearInterval(_hook); return; }
+    _hookTries++;
+    try {
+      // Probe: the dashboard init already ran if renderSwapDashboard exists.
+      if (typeof renderSwapDashboard === 'function' && typeof _itemsCache !== 'undefined') {
+        window._itemsCache = _itemsCache;
+        clearInterval(_hook);
+      }
+    } catch (_) {}
+  }, 300);
+})();
+</script>
+
 </body>
 </html>
