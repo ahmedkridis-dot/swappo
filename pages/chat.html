@@ -521,26 +521,20 @@
     padding: 20px;
   }
   .qr-code {
-    width: 160px;
-    height: 160px;
+    width: 180px;
+    height: 180px;
     margin: 16px auto;
-    background: #1A1A2E;
+    background: #fff;
+    border: 8px solid #fff;
     border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(9,177,186,0.15), 0 0 0 1px #E6F7F8;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 60px;
-    position: relative;
     overflow: hidden;
   }
-  .qr-code::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(255,255,255,0.05) 8px, rgba(255,255,255,0.05) 16px),
-                repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.05) 8px, rgba(255,255,255,0.05) 16px);
-  }
+  .qr-code img, .qr-code svg { display: block; width: 100%; height: 100%; }
+  .qr-code.loading { background: #1A1A2E; color: #fff; font-size: 48px; }
   .qr-timer {
     font-size: 28px;
     font-weight: 800;
@@ -1219,6 +1213,7 @@
   <script src="../js/i18n.js" defer></script>
   <script src="../js/register-sw.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="../js/vendor/qrcode.min.js" defer></script>
   <script src="../js/supabase.js" defer></script>
   <script src="../js/swappo-items.js" defer></script>
   <script src="../js/swappo-swaps.js" defer></script>
@@ -1695,18 +1690,22 @@
     return div;
   }
 
-  // QR Confirmation Card
+  // QR Confirmation Card — real QR handshake (10-second token)
+  // The other party scans this code with their phone's camera →
+  // opens confirm.html → RPC confirms the swap for both sides.
   function createQRCard(convId) {
     var div = document.createElement('div');
     div.className = 'smart-card success';
+    div.id = 'qrCard-' + convId;
     div.innerHTML =
       '<div class="qr-card">' +
         '<div style="font-size:16px;font-weight:700;color:#1A1A2E;margin-bottom:4px;">Ready to confirm?</div>' +
-        '<div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Show this code to the other party</div>' +
-        '<div class="qr-code"><i class="fas fa-qrcode"></i></div>' +
-        '<div class="qr-timer" id="qrTimer">10</div>' +
+        '<div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Let the other party scan this code with their phone camera</div>' +
+        '<div class="qr-code loading" id="qrCodeBox"><i class="fas fa-qrcode"></i></div>' +
+        '<div class="qr-timer" id="qrTimer">--</div>' +
         '<div style="font-size:11px;color:#6B7280;">seconds remaining</div>' +
-        '<button class="sc-btn primary" style="margin-top:16px;" onclick="confirmExchange(\'' + convId + '\')"><i class="fas fa-check-circle"></i> Simulate Scan</button>' +
+        '<div id="qrStatus" style="font-size:12px;color:#09B1BA;margin-top:10px;min-height:16px;"></div>' +
+        '<button class="sc-btn primary" style="margin-top:12px;" id="qrRegenBtn" onclick="showQRConfirmation(\'' + convId + '\')" disabled><i class="fas fa-sync-alt"></i> Generate new QR</button>' +
         '<button class="sc-btn ghost" onclick="cancelQR()">Cancel</button>' +
       '</div>';
     return div;
@@ -1822,64 +1821,164 @@
     renderDealPanel(convId);
   }
 
-  // ═══ QR CONFIRMATION ═══
-  function showQRConfirmation(convId) {
+  // ═══ QR CONFIRMATION (real handshake, 10-sec token) ═══
+  var _qrRtUnsub = null;   // realtime subscription on this swap row
+
+  async function _resolveSwapId(convId) {
+    // 1. in-memory map
+    var map = CONV_ITEM_MAP[convId] || {};
+    if (map.swap_id) return map.swap_id;
+    // 2. conversation row
+    try {
+      if (window.db) {
+        var r = await window.db.from('conversations').select('swap_id').eq('id', convId).maybeSingle();
+        if (r && r.data && r.data.swap_id) return r.data.swap_id;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  async function showQRConfirmation(convId) {
     var area = document.getElementById('msgArea');
     var typing = document.getElementById('typingIndicator');
+
+    // Remove any previous QR card for this conv
+    var existing = document.getElementById('qrCard-' + convId);
+    if (existing) existing.remove();
+
     area.insertBefore(createQRCard(convId), typing);
     area.scrollTop = area.scrollHeight;
 
-    // Start countdown
-    var remaining = 10;
-    var timerEl = document.getElementById('qrTimer');
+    var swapId = await _resolveSwapId(convId);
+    if (!swapId) {
+      Toast.show('No accepted swap to confirm yet.', 'error');
+      return;
+    }
+    if (!window.db) {
+      Toast.show('Service unavailable.', 'error');
+      return;
+    }
+
+    // 1. Ask the backend to mint a fresh 10-sec token
+    var gen = await window.db.rpc('generate_swap_qr', { p_swap_id: swapId });
+    if (gen.error) {
+      var msg = 'Could not generate QR.';
+      if (/swap_already_completed/.test(gen.error.message)) msg = 'Already confirmed.';
+      else if (/not_your_swap/.test(gen.error.message)) msg = 'Not your swap.';
+      else if (/swap_not_accepted/.test(gen.error.message)) msg = 'Swap not accepted yet.';
+      Toast.show(msg, 'error');
+      return;
+    }
+    var row = Array.isArray(gen.data) ? gen.data[0] : gen.data;
+    var token = row && row.qr_token;
+    var expiresAt = row && row.expires_at ? new Date(row.expires_at).getTime() : Date.now() + 10000;
+    if (!token) { Toast.show('QR generation failed.', 'error'); return; }
+
+    // 2. Render the real QR pointing at confirm.html
+    var origin = location.origin.replace(/\/$/, '');
+    var url = origin + '/pages/confirm.html?t=' + encodeURIComponent(token);
+    var box = document.getElementById('qrCodeBox');
+    if (box) {
+      try {
+        var qr = qrcode(0, 'M');            // type 0 = auto, error correction M
+        qr.addData(url);
+        qr.make();
+        box.classList.remove('loading');
+        box.innerHTML = qr.createSvgTag({ scalable: true, margin: 1 });
+      } catch (e) {
+        console.error('[qr] render failed', e);
+        box.textContent = 'QR render failed';
+      }
+    }
+
+    // 3. Live countdown based on server-side expiry
     if (qrTimerInterval) clearInterval(qrTimerInterval);
+    var timerEl = document.getElementById('qrTimer');
     qrTimerInterval = setInterval(function() {
-      remaining--;
+      var remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
       if (timerEl) {
         timerEl.textContent = remaining;
-        if (remaining <= 3) timerEl.className = 'qr-timer expiring';
+        timerEl.className = 'qr-timer' + (remaining <= 3 ? ' expiring' : '');
       }
       if (remaining <= 0) {
         clearInterval(qrTimerInterval);
-        if (timerEl) timerEl.textContent = 'Expired';
-        Toast.show('QR expired. Generate a new one.', 'info');
+        if (timerEl) timerEl.textContent = '0';
+        var status = document.getElementById('qrStatus');
+        if (status) status.textContent = 'QR expired — generate a new one.';
+        var btn = document.getElementById('qrRegenBtn');
+        if (btn) btn.disabled = false;
       }
-    }, 1000);
+    }, 200);
+
+    // 4. Subscribe to swap row: when receiver scans and RPC completes,
+    //    status flips to 'completed' → we show rating immediately.
+    _teardownQrRealtime();
+    try {
+      _qrRtUnsub = window.db
+        .channel('qr-swap-' + swapId)
+        .on('postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'swaps', filter: 'id=eq.' + swapId },
+            function(payload) {
+              var next = payload && payload.new;
+              if (next && next.status === 'completed') _onSwapCompleted(convId, swapId);
+            })
+        .subscribe();
+    } catch (e) { console.warn('[qr] realtime subscribe failed', e); }
   }
 
-  async function confirmExchange(convId) {
-    if (qrTimerInterval) clearInterval(qrTimerInterval);
-    if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'completed';
-    Toast.show('🎉 Exchange confirmed! Thank you!', 'success');
+  function _teardownQrRealtime() {
+    if (_qrRtUnsub) {
+      try { _qrRtUnsub.unsubscribe(); } catch (_) {}
+      try { window.db && window.db.removeChannel && window.db.removeChannel(_qrRtUnsub); } catch (_) {}
+      _qrRtUnsub = null;
+    }
+  }
 
-    // Emit the system "exchange completed" as a real Supabase message so
-    // both parties see it, not a synthetic row pushed into MOCK_CONVERSATIONS.
+  async function _onSwapCompleted(convId, swapId) {
+    if (qrTimerInterval) clearInterval(qrTimerInterval);
+    _teardownQrRealtime();
+    if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'completed';
+    Toast.show('🎉 Exchange confirmed!', 'success');
+
+    // Drop a system message so both sides see a trace in the chat
     try {
       if (window.db) {
         await window.db.from('messages').insert({
           conversation_id: convId,
           sender_id: null,
-          content: '🎉 Exchange completed successfully! Both parties confirmed.',
+          content: '🎉 Exchange completed successfully! Both parties confirmed via QR.',
           is_system: true
         });
       }
-    } catch (e) { console.warn('[confirmExchange] system msg insert failed:', e); }
+    } catch (e) { console.warn('[qr] system msg insert failed:', e); }
     await loadMessages(convId);
 
-    // Show rating card
+    // Rating prompt
     setTimeout(function() {
       var area = document.getElementById('msgArea');
       var typing = document.getElementById('typingIndicator');
+      if (!area) return;
       area.insertBefore(createRatingCard(convId), typing);
       area.scrollTop = area.scrollHeight;
-    }, 800);
+    }, 600);
 
     renderDealPanel(convId);
     renderSidebar();
   }
 
+  // Kept for the rating flow ("Simulate Scan" removed — confirmation now
+  // only happens through a real scan of the QR by the counterparty).
+  async function confirmExchange(convId) {
+    // No-op legacy shim: older code paths may still call this.
+    // Kick off a fresh QR so the user sees the real flow instead.
+    return showQRConfirmation(convId);
+  }
+
   function cancelQR() {
     if (qrTimerInterval) clearInterval(qrTimerInterval);
+    _teardownQrRealtime();
+    var card = document.querySelector('[id^="qrCard-"]');
+    if (card) card.remove();
     Toast.show('QR cancelled.', 'info');
   }
 

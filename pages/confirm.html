@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#09B1BA">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Confirm a Swappo exchange by scanning a QR code.">
+  <link rel="icon" type="image/x-icon" href="../assets/brand/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/swappo-logo-32.png">
+  <title>Confirm Exchange — Swappo</title>
+
+  <link rel="preconnect" href="https://cbhdjqionkvqiflmqchu.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #E6F7F8 0%, #FFFFFF 100%);
+      color: #1A1A2E;
+    }
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px env(safe-area-inset-right) max(24px, env(safe-area-inset-bottom)) env(safe-area-inset-left);
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(9,177,186,0.12), 0 2px 8px rgba(0,0,0,0.04);
+      padding: 32px 28px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      color: #09B1BA;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 8px 0 4px;
+      letter-spacing: -0.02em;
+    }
+    p.lead {
+      color: #4A4A5A;
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 0 0 24px;
+    }
+    .status-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 16px 0 20px;
+      transition: all 0.3s ease;
+    }
+    .status-icon.loading {
+      background: linear-gradient(135deg,#E6F7F8,#d0f0f2);
+      color: #09B1BA;
+    }
+    .status-icon.loading i { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-icon.success {
+      background: linear-gradient(135deg,#10B981,#059669);
+      color: white;
+      box-shadow: 0 8px 24px rgba(16,185,129,0.35);
+    }
+    .status-icon.error {
+      background: linear-gradient(135deg,#FEE2E2,#FCA5A5);
+      color: #B91C1C;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #09B1BA, #078A91);
+      color: white;
+      box-shadow: 0 4px 16px rgba(9,177,186,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(9,177,186,0.4); }
+    .btn-ghost {
+      background: transparent;
+      color: #4A4A5A;
+      border: 1px solid #E5E7EB;
+    }
+    .btn-ghost:hover { background: #F5F7FA; }
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+    .detail {
+      background: #F5F7FA;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #4A4A5A;
+      margin: 16px 0 4px;
+      text-align: left;
+      font-family: 'SF Mono', 'Monaco', monospace;
+      word-break: break-all;
+    }
+    .detail strong { color: #1A1A2E; font-family: 'Inter', sans-serif; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card" role="main" aria-live="polite">
+      <div class="brand">Swappo</div>
+      <div id="iconSlot" class="status-icon loading" aria-hidden="true"><i class="fas fa-circle-notch"></i></div>
+      <h1 id="heading">Confirming your swap…</h1>
+      <p class="lead" id="subhead">Please wait while we validate the QR code.</p>
+      <div class="actions" id="actions"></div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="../js/supabase.js" defer></script>
+  <script src="../js/swappo-auth.js" defer></script>
+  <script defer>
+  (function(){
+    'use strict';
+
+    function setState(state, h, s, extra) {
+      var icon = document.getElementById('iconSlot');
+      icon.className = 'status-icon ' + state;
+      icon.innerHTML = state === 'loading'  ? '<i class="fas fa-circle-notch"></i>'
+                     : state === 'success'  ? '<i class="fas fa-check"></i>'
+                     :                        '<i class="fas fa-exclamation"></i>';
+      document.getElementById('heading').textContent = h;
+      document.getElementById('subhead').textContent = s;
+      var actions = document.getElementById('actions');
+      actions.innerHTML = '';
+      (extra || []).forEach(function(a){
+        var el = document.createElement(a.href ? 'a' : 'button');
+        el.className = 'btn ' + (a.primary ? 'btn-primary' : 'btn-ghost');
+        if (a.href) el.href = a.href;
+        el.textContent = a.label;
+        if (a.onClick) el.addEventListener('click', a.onClick);
+        actions.appendChild(el);
+      });
+    }
+
+    function getToken() {
+      var u = new URL(window.location.href);
+      var t = u.searchParams.get('t') || u.searchParams.get('token');
+      return (t || '').trim();
+    }
+
+    async function run() {
+      var token = getToken();
+      if (!token || token.length < 16) {
+        setState('error', 'Invalid QR link', 'This QR code is malformed or incomplete. Ask the other party to show you a fresh code.', [
+          { label: 'Open Swappo', href: '/', primary: true }
+        ]);
+        return;
+      }
+
+      // Wait for Supabase + auth
+      var tries = 0;
+      while (!window.db && tries < 40) { await new Promise(function(r){ setTimeout(r, 100); }); tries++; }
+      if (!window.db) {
+        setState('error', 'Network issue', 'We could not reach Swappo. Check your connection and try again.', [
+          { label: 'Retry', primary: true, onClick: function(){ location.reload(); } }
+        ]);
+        return;
+      }
+
+      // Require a logged-in session — otherwise bounce to login and come back
+      var sess;
+      try { sess = await window.db.auth.getSession(); } catch (e) {}
+      if (!sess || !sess.data || !sess.data.session) {
+        var back = encodeURIComponent('/pages/confirm.html?t=' + token);
+        setState('error', 'Please sign in', 'You need to be logged into Swappo on this phone to confirm a swap.', [
+          { label: 'Sign in', href: '/pages/login.html?redirect=' + back, primary: true }
+        ]);
+        return;
+      }
+
+      // Optional pre-flight: peek_swap_qr gives a friendly error before we commit
+      try {
+        var peek = await window.db.rpc('peek_swap_qr', { p_token: token });
+        if (peek && peek.data && peek.data.valid === false) {
+          var reason = peek.data.reason;
+          if (reason === 'expired')      return setState('error','QR expired','The 10-second window passed. Ask the other party to generate a new code.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+          if (reason === 'own_qr')       return setState('error','That\u2019s your own QR','You cannot scan a code you issued. Hand your phone to the other party.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+          if (reason === 'not_yours')    return setState('error','Not your swap','This QR belongs to a swap you are not part of.', [{ label:'Open Swappo', href:'/', primary:true }]);
+          if (reason === 'not_found')    return setState('error','QR already used or unknown','Either this code was already scanned or it no longer exists. Generate a new one.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+          if (reason === 'auth')         return setState('error','Please sign in','You need to be logged in to confirm.', [{ label:'Sign in', href:'/pages/login.html', primary:true }]);
+        }
+      } catch (_) { /* fall through to the real RPC — it's the source of truth anyway */ }
+
+      // Commit
+      var res = await window.db.rpc('confirm_swap_qr', { p_token: token });
+      if (res.error) {
+        var m = String(res.error.message || '');
+        if (/qr_expired/.test(m))            return setState('error','QR expired','The 10-second window passed. Ask the other party to regenerate.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+        if (/qr_not_found/.test(m))          return setState('error','QR already used','This code was already consumed. Only one scan is allowed.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+        if (/cannot_scan_own_qr/.test(m))    return setState('error','That\u2019s your own QR','Hand your phone to the other party so they can scan.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+        if (/not_your_swap/.test(m))         return setState('error','Not your swap','This QR belongs to a swap you are not part of.', [{ label:'Open Swappo', href:'/', primary:true }]);
+        if (/swap_not_accepted/.test(m))     return setState('error','Swap not ready','The swap is not in the accepted state.', [{ label:'Open dashboard', href:'/pages/profile.html', primary:true }]);
+        if (/swap_already_completed/.test(m))return setState('error','Already completed','This swap was already confirmed.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
+        return setState('error','Could not confirm', m || 'Please try again.', [{ label:'Retry', primary:true, onClick:function(){ location.reload(); } }]);
+      }
+
+      var data = res.data || {};
+      var convId = data.conversation_id || null;
+      var swapId = data.swap_id || null;
+      var chatHref = '/pages/chat.html' + (convId ? ('?conv=' + convId) : '');
+      setState('success', 'Exchange confirmed!', 'Nice one \u2014 both sides are now locked in. Leave a rating to finish.', [
+        { label: 'Open chat', href: chatHref, primary: true },
+        { label: 'View my dashboard', href: '/pages/profile.html' }
+      ]);
+
+      // A tiny reassurance for the user: show the swap id
+      if (swapId) {
+        var d = document.createElement('div');
+        d.className = 'detail';
+        d.innerHTML = '<strong>Swap ID:</strong> ' + swapId;
+        document.getElementById('actions').parentNode.insertBefore(d, document.getElementById('actions'));
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', run);
+  })();
+  </script>
+</body>
+</html>
