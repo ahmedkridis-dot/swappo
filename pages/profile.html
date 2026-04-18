@@ -924,7 +924,11 @@
             .stats-row { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
 
             .items-grid,
-            .saved-grid { grid-template-columns: repeat(2, 1fr); }
+            .saved-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+            /* Settings: always single column on mobile (sidebar stacks below) */
+            .settings-container { grid-template-columns: 1fr !important; gap: 16px !important; }
+            .settings-sidebar { width: 100% !important; max-width: 100% !important; }
 
             /* Reduce paddings so cards don't crush on 375px */
             .profile-card { padding: 16px !important; }
@@ -932,6 +936,11 @@
             .tabs-nav { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
             .tabs-nav::-webkit-scrollbar { display: none; }
             .tab-btn { white-space: nowrap; }
+
+            /* Auto-decline panel is a Pro advanced control — collapse to a
+               single-line summary on phones so it doesn't wrap character-
+               by-character inside the compact card. */
+            .my-auto-decline-host { display: none; }
 
             .swap-request-items { flex-direction: column; }
             .swap-arrow-icon { transform: rotate(90deg); }
