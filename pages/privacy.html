@@ -29,7 +29,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="dns-prefetch" href="https://unpkg.com">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/regular.min.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     .legal-page { padding: 40px 0 60px; }
@@ -116,7 +119,7 @@
   <nav class="navbar">
     <div class="container">
       <div class="navbar-inner">
-        <a href="../index.html" class="site-logo">Swappo</a>
+        <a href="../dev-a7f3k9mz2q.html" class="site-logo">Swappo</a>
         <div class="navbar-search">
           <i class="fas fa-search"></i>
           <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
@@ -149,13 +152,14 @@
   <div id="mega-menu-mount"></div>
   <script src="../js/mega-menu.js" defer></script>
   <script>
-    (function(){
+    // mega-menu.js is deferred → wait for parse so renderMegaMenuBar / initMegaMenu exist.
+    document.addEventListener('DOMContentLoaded', function () {
       var mount = document.getElementById('mega-menu-mount');
       if (mount && typeof renderMegaMenuBar === 'function') {
         mount.innerHTML = renderMegaMenuBar(true);
         if (typeof initMegaMenu === 'function') initMegaMenu();
       }
-    })();
+    });
   </script>
 
   <!-- ========== LEGAL CONTENT ========== -->

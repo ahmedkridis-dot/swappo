@@ -60,7 +60,10 @@
   <link rel="stylesheet" href="css/swappo-visual.css">
   <link rel="stylesheet" href="css/swappo-modern-2026.css">
   <link rel="stylesheet" href="css/landing-upgrade.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/regular.min.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -75,7 +78,7 @@
   <nav class="navbar">
     <div class="container">
       <div class="navbar-inner">
-        <a href="index.html" class="site-logo">Swappo</a>
+        <a href="dev-a7f3k9mz2q.html" class="site-logo">Swappo</a>
 
         <div class="navbar-search">
           <i class="fas fa-search"></i>
@@ -112,15 +115,17 @@
 
   <!-- ========== MEGA MENU ========== -->
   <div id="mega-menu-mount"></div>
-  <script src="js/mega-menu.js"></script>
+  <script src="js/mega-menu.js" defer></script>
   <script>
-    (function(){
+    // mega-menu.js is deferred → wait until the document is parsed so
+    // renderMegaMenuBar / initMegaMenu are defined before we call them.
+    document.addEventListener('DOMContentLoaded', function () {
       var mount = document.getElementById('mega-menu-mount');
       if (mount && typeof renderMegaMenuBar === 'function') {
         mount.innerHTML = renderMegaMenuBar(false);
         if (typeof initMegaMenu === 'function') initMegaMenu();
       }
-    })();
+    });
   </script>
 
   <!-- ═══════════ HERO — Cluster BG + Floating Video ═══════════ -->
@@ -498,13 +503,8 @@
   <script src="js/swappo-modern-2026.js" defer></script>
   <script src="js/i18n/en.js" defer></script>
   <script src="js/i18n.js" defer></script>
+  <script src="js/register-sw.js" defer></script>
   <script>
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('SW registered:', reg.scope))
-        .catch(err => console.error('SW failed:', err));
-    }
 
     // ── Render items into a grid ──
     function renderGrid(gridEl, items) {
