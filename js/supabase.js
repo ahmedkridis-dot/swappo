@@ -306,7 +306,11 @@ const SwappoAuth = {
     try {
       const { data, error } = await db.from('users').update(payload).eq('id', u.id).select('*').single();
       if (error) return { success: false, error: error.message || 'Update failed.' };
-      // Refresh mirror so navbar/dashboard reflect new pseudo/avatar immediately.
+      // Write back into the shared profile cache so any module that reads
+      // it afterwards (avatar chip, bell popup, chat header) sees the new
+      // values without another round-trip.
+      _profileCache.set(u.id, data);
+      _profileInflight.delete(u.id);
       _mirrorFromSupabase(u, data);
       return { success: true, profile: data };
     } catch (e) {
@@ -415,6 +419,12 @@ const SwappoAuth = {
     }
   }
 };
+// Expose the cached profile API so consumers (dashboard-link.js,
+// messages-icon.js, notifications-bell.js, chat page init, etc.)
+// share one network round-trip instead of firing redundant
+// `users?id=eq.<uid>` queries during cold page boot.
+SwappoAuth.getUserProfile       = getUserProfile;
+SwappoAuth.invalidateProfileCache = _invalidateProfileCache;
 try { window.SwappoAuth = SwappoAuth; } catch (e) {}
 
 // ---- Session helpers (kept for backwards compat) ----
@@ -456,32 +466,55 @@ async function getCurrentSession() {
   }
 }
 
-async function _fetchProfile(userId) {
-  if (!db || !userId) return null;
-  try {
-    // 3s timeout so the whole site can't be hung by a slow profile SELECT
-    const res = await Promise.race([
-      db.from('users').select('*').eq('id', userId).single(),
-      new Promise((resolve) => setTimeout(
-        () => resolve({ data: null, error: { message: 'profile fetch timeout' } }), 3000
-      ))
-    ]);
-    if (res.error) {
-      console.warn('[_fetchProfile] supabase error:', res.error.message || res.error);
-      return null;
-    }
-    return res.data;
-  } catch (e) {
-    console.warn('[_fetchProfile] exception:', e.message || e);
-    return null;
-  }
+// In-memory profile cache. Multiple modules boot in parallel
+// (dashboard-link, messages-icon, notifications-bell, chat page init)
+// and used to fire `users?id=eq.<uid>` 4-5× back-to-back. A shared
+// Promise-per-userId coalesces the requests so the first call does
+// the network work and everyone else awaits the same Promise.
+const _profileCache = new Map();       // userId → resolved profile (or null)
+const _profileInflight = new Map();    // userId → Promise<profile|null>
+
+function _invalidateProfileCache(userId) {
+  if (userId) { _profileCache.delete(userId); _profileInflight.delete(userId); }
+  else        { _profileCache.clear();        _profileInflight.clear(); }
 }
 
-async function getUserProfile(userId) {
+async function _fetchProfile(userId, { force } = {}) {
+  if (!db || !userId) return null;
+  if (!force && _profileCache.has(userId)) return _profileCache.get(userId);
+  if (!force && _profileInflight.has(userId)) return _profileInflight.get(userId);
+
+  const promise = (async () => {
+    try {
+      // 3s timeout so the whole site can't be hung by a slow profile SELECT
+      const res = await Promise.race([
+        db.from('users').select('*').eq('id', userId).single(),
+        new Promise((resolve) => setTimeout(
+          () => resolve({ data: null, error: { message: 'profile fetch timeout' } }), 3000
+        ))
+      ]);
+      if (res.error) {
+        console.warn('[_fetchProfile] supabase error:', res.error.message || res.error);
+        return null;
+      }
+      _profileCache.set(userId, res.data);
+      return res.data;
+    } catch (e) {
+      console.warn('[_fetchProfile] exception:', e.message || e);
+      return null;
+    } finally {
+      _profileInflight.delete(userId);
+    }
+  })();
+  _profileInflight.set(userId, promise);
+  return promise;
+}
+
+async function getUserProfile(userId, opts) {
   try {
     const uid = userId || (await getCurrentUser())?.id;
     if (!uid) return null;
-    return _fetchProfile(uid);
+    return _fetchProfile(uid, opts);
   } catch (e) {
     console.warn('[getUserProfile] error:', e.message || e);
     return null;

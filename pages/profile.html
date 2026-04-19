@@ -2852,8 +2852,10 @@
               let profile = null;
               if (window.db) {
                 try {
-                  const { data } = await window.db.from('users').select('*').eq('id', user.id).maybeSingle();
-                  profile = data || null;
+                  // Shared profile cache (supabase.js) — one fetch across all modules
+                  profile = (window.SwappoAuth && window.SwappoAuth.getUserProfile)
+                    ? await window.SwappoAuth.getUserProfile(user.id)
+                    : null;
                 } catch (e) { /* use `user` as fallback */ }
               }
               const p = profile || user || {};

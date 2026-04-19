@@ -36,6 +36,42 @@
   .eco-ticker { display: none !important; }
   #mega-menu-mount { display: none !important; }
 
+  /* Skeleton — painted on first frame so the user sees structure
+     instead of a white screen while auth + conversations load. */
+  #chat-skeleton {
+    position: fixed; inset: 64px 0 0 0;
+    background: #F5F7FA; z-index: 50;
+    display: grid; grid-template-columns: minmax(260px, 300px) 1fr minmax(300px, 360px);
+    overflow: hidden; pointer-events: none;
+  }
+  #chat-skeleton.hidden { display: none; }
+  @keyframes swpSkelShimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+  .skel-block {
+    background: linear-gradient(90deg, #EEF1F6 0%, #F7F9FC 50%, #EEF1F6 100%);
+    background-size: 800px 100%;
+    animation: swpSkelShimmer 1.4s linear infinite;
+    border-radius: 10px;
+  }
+  .skel-col { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .skel-col.sidebar { border-right: 1px solid #E5E7EB; background: #fff; }
+  .skel-col.thread  { background: #F5F7FA; gap: 18px; }
+  .skel-col.deals   { border-left: 1px solid #E5E7EB; background: #fff; }
+  .skel-row { display: flex; gap: 12px; align-items: center; }
+  .skel-avatar { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+  .skel-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .skel-line { height: 12px; }
+  .skel-line.w-70 { width: 70%; }
+  .skel-line.w-50 { width: 50%; }
+  .skel-line.w-90 { width: 90%; }
+  .skel-bubble-right { margin-left: auto; padding: 10px 14px; border-radius: 14px 14px 2px 14px;
+                       min-width: 120px; height: 36px; }
+  .skel-bubble-left  { margin-right: auto; padding: 10px 14px; border-radius: 14px 14px 14px 2px;
+                       min-width: 160px; height: 36px; }
+  @media (max-width: 768px) {
+    #chat-skeleton { grid-template-columns: 1fr; }
+    #chat-skeleton .skel-col.deals { display: none; }
+  }
+
   /* ═══════════════════════════════════════════
      3-COLUMN GRID — Deal Hub Layout
      ═══════════════════════════════════════════ */
@@ -1341,6 +1377,36 @@
 <body>
   <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
   <h1 class="sr-only">SwapChat — in-app messaging on Swappo</h1>
+
+  <!-- First-paint skeleton (removed once chatInit() finishes). -->
+  <div id="chat-skeleton" aria-hidden="true">
+    <div class="skel-col sidebar">
+      <div class="skel-block skel-line w-50" style="height:28px;"></div>
+      <div class="skel-block" style="height:38px;border-radius:999px;"></div>
+      <div class="skel-row"><div class="skel-block skel-avatar"></div><div class="skel-lines"><div class="skel-block skel-line w-70"></div><div class="skel-block skel-line w-50"></div></div></div>
+      <div class="skel-row"><div class="skel-block skel-avatar"></div><div class="skel-lines"><div class="skel-block skel-line w-90"></div><div class="skel-block skel-line w-50"></div></div></div>
+      <div class="skel-row"><div class="skel-block skel-avatar"></div><div class="skel-lines"><div class="skel-block skel-line w-70"></div><div class="skel-block skel-line w-50"></div></div></div>
+      <div class="skel-row"><div class="skel-block skel-avatar"></div><div class="skel-lines"><div class="skel-block skel-line w-90"></div><div class="skel-block skel-line w-70"></div></div></div>
+    </div>
+    <div class="skel-col thread">
+      <div class="skel-row" style="padding-bottom:16px;border-bottom:1px solid #E5E7EB;">
+        <div class="skel-block skel-avatar"></div>
+        <div class="skel-lines"><div class="skel-block skel-line w-50"></div><div class="skel-block skel-line w-70"></div></div>
+      </div>
+      <div class="skel-block skel-bubble-left"></div>
+      <div class="skel-block skel-bubble-right"></div>
+      <div class="skel-block skel-bubble-left"></div>
+      <div class="skel-block skel-bubble-right"></div>
+      <div style="margin-top:auto;"><div class="skel-block" style="height:44px;border-radius:999px;"></div></div>
+    </div>
+    <div class="skel-col deals">
+      <div class="skel-block skel-line w-50" style="height:16px;"></div>
+      <div class="skel-block" style="height:200px;"></div>
+      <div class="skel-block skel-line w-70"></div>
+      <div class="skel-block skel-line w-90"></div>
+      <div class="skel-block" style="height:48px;border-radius:10px;"></div>
+    </div>
+  </div>
   <!-- Navbar -->
   <nav class="navbar">
     <div class="container">
@@ -3232,22 +3298,44 @@
   };
 
   // ═══ INIT ═══
+  function _hideChatSkeleton() {
+    var s = document.getElementById('chat-skeleton');
+    if (s) s.classList.add('hidden');
+  }
+
   async function chatInit() {
-    // Resolve via SwappoAuth (Supabase session). No legacy-auth fallback.
-    // Retry once after 600ms to survive the session-restore race on cold
-    // page load.
+    // Resolve via SwappoAuth (Supabase session). Poll every 100ms up to
+    // 1.2s — faster than the old fixed 600ms sleep on warm loads, still
+    // tolerant to the cold-session-restore race.
     async function _resolve() {
       if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return null;
       try { return await window.SwappoAuth.getCurrentUser(); } catch (e) { return null; }
     }
     currentUser = await _resolve();
-    if (!currentUser) {
-      await new Promise(r => setTimeout(r, 600));
+    var waited = 0;
+    while (!currentUser && waited < 1200) {
+      await new Promise(r => setTimeout(r, 100));
+      waited += 100;
       currentUser = await _resolve();
+    }
+    // Soft fallback: if still null after the polling window, wait a bit
+    // more on an auth state change before the hard redirect. Covers the
+    // "Supabase was slow to restore the JWT" edge case without bouncing
+    // an already-logged-in user to /login.
+    if (!currentUser && window.db && window.db.auth) {
+      currentUser = await new Promise(function (resolve) {
+        var done = false;
+        var sub = window.db.auth.onAuthStateChange(function (_evt, session) {
+          if (done) return;
+          if (session && session.user) { done = true; try { sub.data.subscription.unsubscribe(); } catch (_) {} resolve(session.user); }
+        });
+        setTimeout(function () { if (!done) { done = true; try { sub.data.subscription.unsubscribe(); } catch (_) {} resolve(null); } }, 1500);
+      });
     }
     if (!currentUser) { window.location.href = 'login.html'; return; }
 
     await renderSidebar();
+    _hideChatSkeleton();
 
     var convs = _convCache;
     var params = new URLSearchParams(window.location.search);

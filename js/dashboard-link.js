@@ -92,10 +92,13 @@
     if (!link || !user) return;
     let pseudo = user.email ? user.email.split('@')[0] : 'You';
     let avatarUrl = '';
+    // Use the shared SwappoAuth profile cache — other modules booting in
+    // parallel (bell, messages icon, chat init) hit the same endpoint,
+    // so coalesce to a single round-trip.
     try {
-      const { data } = await window.db.from('users')
-        .select('pseudo, avatar, display_name')
-        .eq('id', user.id).maybeSingle();
+      const data = (window.SwappoAuth && window.SwappoAuth.getUserProfile)
+        ? await window.SwappoAuth.getUserProfile(user.id)
+        : null;
       if (data) {
         pseudo = data.pseudo || data.display_name || pseudo;
         avatarUrl = data.avatar || '';
