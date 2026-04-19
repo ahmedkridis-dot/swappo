@@ -126,9 +126,15 @@
 
   function init() {
     mount();
-    setTimeout(async function () {
+    // Await the SDK's "session restored" signal instead of a fixed 400 ms
+    // timeout. Fires ~10-50 ms on warm loads, up to 2.5 s worst case —
+    // either way the chip populates as soon as the real state is known.
+    (async function () {
       if (!window.db) return;
       try {
+        if (window.SwappoAuth && window.SwappoAuth.whenReady) {
+          await window.SwappoAuth.whenReady();
+        }
         const res = await Promise.race([
           window.db.auth.getSession(),
           new Promise(function (resolve) { setTimeout(function () { resolve({ data: { session: null } }); }, 1500); })
@@ -141,7 +147,7 @@
         await renderProfile(user);
         refreshBadge(user);
       } catch (e) {}
-    }, 400);
+    })();
 
     if (window.db && window.db.auth && window.db.auth.onAuthStateChange) {
       window.db.auth.onAuthStateChange(function (_event, session) {

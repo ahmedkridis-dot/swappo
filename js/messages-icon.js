@@ -126,9 +126,12 @@
 
   function init() {
     mount();
-    setTimeout(async function () {
+    (async function () {
       if (!window.db) return;
       try {
+        if (window.SwappoAuth && window.SwappoAuth.whenReady) {
+          await window.SwappoAuth.whenReady();
+        }
         var res = await Promise.race([
           window.db.auth.getSession(),
           new Promise(function (r) { setTimeout(function () { r({ data: { session: null } }); }, 1500); })
@@ -136,7 +139,7 @@
         var user = res && res.data && res.data.session ? res.data.session.user : null;
         await activateForUser(user);
       } catch (e) {}
-    }, 400);
+    })();
 
     if (window.db && window.db.auth && window.db.auth.onAuthStateChange) {
       window.db.auth.onAuthStateChange(function (_event, session) {

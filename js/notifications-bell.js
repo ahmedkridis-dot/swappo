@@ -350,11 +350,16 @@
     mount.insertBefore(bellEl, mount.firstChild);
     bindEvents(bellEl);
 
-    // Attach Supabase user (async) + realtime.
+    // Attach Supabase user (async) + realtime. Awaiting whenReady() lets
+    // us use getSession() (local JWT read, no network) instead of
+    // getUser() (server roundtrip) — saves ~300-600 ms on cold loads.
     try {
       if (!window.db) return;
-      var res = await window.db.auth.getUser();
-      var user = res && res.data ? res.data.user : null;
+      if (window.SwappoAuth && window.SwappoAuth.whenReady) {
+        await window.SwappoAuth.whenReady();
+      }
+      var res = await window.db.auth.getSession();
+      var user = res && res.data && res.data.session ? res.data.session.user : null;
       if (!user) return; // anonymous — no notifications
       state.userId = user.id;
       await loadNotifs();

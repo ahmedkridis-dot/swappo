@@ -425,6 +425,11 @@ const SwappoAuth = {
 // `users?id=eq.<uid>` queries during cold page boot.
 SwappoAuth.getUserProfile       = getUserProfile;
 SwappoAuth.invalidateProfileCache = _invalidateProfileCache;
+// Promise that resolves once the SDK has finished restoring the persisted
+// session (or after the 2.5 s safety-net). Consumers that normally waited
+// 400 ms with setTimeout can await this instead — it fires as soon as the
+// real session state is known, which on warm loads is ~10-50 ms.
+SwappoAuth.whenReady            = function () { return _authReady; };
 try { window.SwappoAuth = SwappoAuth; } catch (e) {}
 
 // ---- Session helpers (kept for backwards compat) ----
@@ -494,7 +499,10 @@ async function _fetchProfile(userId, { force } = {}) {
         ))
       ]);
       if (res.error) {
-        console.warn('[_fetchProfile] supabase error:', res.error.message || res.error);
+        // The 3s timeout is expected graceful degradation — not worth
+        // flooding the console on every cold load. Surface real errors.
+        var msg = res.error.message || String(res.error);
+        if (!/timeout/i.test(msg)) console.warn('[_fetchProfile] supabase error:', msg);
         return null;
       }
       _profileCache.set(userId, res.data);
