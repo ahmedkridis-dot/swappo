@@ -2025,12 +2025,16 @@
     // ── Price row ─────────────────────────
     var priceEl = document.getElementById('price-amount');
     var tagsEl  = document.getElementById('price-tags');
+    var priceVal = Number(item.price) || 0;
     if (priceEl) {
       if (item.is_giveaway) {
         priceEl.innerHTML = '<span style="color:#10B981;">FREE</span>';
+      } else if (priceVal > 0) {
+        priceEl.innerHTML = '<span class="price-ccy">AED</span>' + priceVal.toLocaleString();
       } else {
-        var p = (item.price || 0).toLocaleString();
-        priceEl.innerHTML = '<span class="price-ccy">AED</span>' + p;
+        // No listed price — don't show "AED 0". Prompt the user to swap
+        // or make an offer instead (mirrors swap-info / price-display).
+        priceEl.innerHTML = '<span style="font-size:0.55em;font-weight:700;color:#6B7280;">Make an offer</span>';
       }
     }
     if (tagsEl) {
@@ -2039,7 +2043,9 @@
         chips.push('<span class="meta-chip" style="background:#D1FAE5;color:#065F46;">🎁 Gift</span>');
       } else {
         chips.push('<span class="meta-chip" style="background:#E6F7F8;color:#078A91;">🔄 Swap</span>');
-        chips.push('<span class="meta-chip" style="background:#FEF3C7;color:#92400E;">🛒 Buy</span>');
+        if (priceVal > 0) {
+          chips.push('<span class="meta-chip" style="background:#FEF3C7;color:#92400E;">🛒 Buy</span>');
+        }
       }
       tagsEl.innerHTML = chips.join('');
     }
@@ -2056,23 +2062,40 @@
     } catch (_) {}
 
     // ── Side thumbnails (desktop gallery) ──
+    // Only render slots that correspond to REAL additional photos
+    // (photos[1], photos[2]). Falling back to photos[0] would duplicate
+    // the hero image — ugly on items with only one photo. When the
+    // item has a single photo, the side column is hidden entirely
+    // and the hero expands to fill .pg.
     var side = document.getElementById('pg-side');
+    var pg = document.querySelector('.pg');
     if (side) {
       var photos = (item.photos || []).slice(0, 8);
-      var t1 = photos[1] || photos[0] || '';
-      var t2 = photos[2] || photos[1] || photos[0] || '';
+      var t1 = photos[1] || '';
+      var t2 = photos[2] || '';
       var more = Math.max(0, photos.length - 2);
       var html = '';
       if (t1) {
         html += '<div class="pg-side-thumb" onclick="swapHeroTo(1)"><img src="' + t1 + '" alt=""></div>';
       }
       if (t2) {
-        html += '<div class="pg-side-thumb" onclick="swapHeroTo(' + (photos[2] ? 2 : 1) + ')">' +
+        html += '<div class="pg-side-thumb" onclick="swapHeroTo(2)">' +
           '<img src="' + t2 + '" alt="">' +
           (more > 1 ? '<div class="pg-side-more"><i class="fas fa-images"></i>' + photos.length + '</div>' : '') +
         '</div>';
       }
       side.innerHTML = html;
+      // Collapse the gallery to a single-column layout when there's
+      // nothing to show on the right.
+      if (pg) {
+        if (html) {
+          side.style.display = '';
+          pg.style.gridTemplateColumns = '2fr 1fr';
+        } else {
+          side.style.display = 'none';
+          pg.style.gridTemplateColumns = '1fr';
+        }
+      }
     }
 
     // ── Floating chat widget hydration ──
