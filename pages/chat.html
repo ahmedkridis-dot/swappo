@@ -1759,10 +1759,20 @@
     var filtered = convs.filter(function(c) {
       var o = c.other_user || {};
       var map = CONV_ITEM_MAP[c.id] || {};
-      var status = map.status || c.status || 'accepted';
+      // Source of truth: the joined swap row (see SwappoChat.getConversations).
+      // Fall back to legacy fixtures only when no swap is linked.
+      var swapStatus = (c.swap && c.swap.status) || map.status || c.status || 'pending';
 
       // Filter by tab
-      if (currentSbFilter !== 'all' && status !== currentSbFilter) return false;
+      //   'accepted' (Active) → swap in progress (accepted)
+      //   'pending'            → offer still open
+      //   'completed' (Done)   → terminal states: completed / cancelled / declined / expired
+      if (currentSbFilter === 'accepted' && swapStatus !== 'accepted') return false;
+      if (currentSbFilter === 'pending'  && swapStatus !== 'pending')  return false;
+      if (currentSbFilter === 'completed') {
+        if (swapStatus !== 'completed' && swapStatus !== 'cancelled'
+            && swapStatus !== 'declined'  && swapStatus !== 'expired') return false;
+      }
 
       // Filter by search
       if (search) {
@@ -2014,7 +2024,6 @@
         '<div class="sc-option" onclick="chooseExchangeMethod(\'' + convId + '\', \'meet\')">' +
           '<span class="sc-option-icon">📍</span>' +
           '<div class="sc-option-text"><div class="sc-option-label">Meet in Person</div><div class="sc-option-desc">Pick a safe public spot nearby</div></div>' +
-          '<span class="sc-option-price free">FREE</span>' +
         '</div>' +
         // DELIVERY: Coming Soon (Phase 2 — logistics partnerships not live yet)
         '<div class="sc-option" title="Launches with our partner network" style="opacity:0.75;cursor:default;border:1.5px dashed #09B1BA;background:#F0FBFC;">' +
@@ -2969,16 +2978,17 @@
         // the partner network is onboarded. We render them so users know
         // what's in the pipeline, but disable clicks.
 
-        // Meet in person — PRIMARY (promoted to a teal gradient card)
+        // Meet in person — PRIMARY (promoted to a teal gradient card).
+        // "Meet in person" isn't a paid service, it's a choice — no FREE
+        // badge or "Free ·" prefix (per Ahmed 2026-04-19).
         servicesHTML +=
           '<div class="dp-service-card dp-primary" onclick="chooseExchangeMethod(\'' + convId + '\', \'meet\')" ' +
             'style="background:linear-gradient(135deg,#09B1BA,#0891B2);color:#fff;border:0;padding:18px;margin-bottom:8px;position:relative;cursor:pointer;">' +
             '<div class="dp-service-icon" style="background:rgba(255,255,255,0.18);color:#fff;">📍</div>' +
             '<div class="dp-service-text">' +
               '<div class="dp-service-label" style="color:#fff;font-size:15px;">' + _trP('mode_meeting_alt','Meet in person') + '</div>' +
-              '<div class="dp-service-desc" style="color:rgba(255,255,255,0.85);">Free · pick a public, well-lit spot</div>' +
+              '<div class="dp-service-desc" style="color:rgba(255,255,255,0.85);">Pick a public, well-lit spot</div>' +
             '</div>' +
-            '<span class="dp-service-price" style="color:#fff;font-weight:800;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:999px;">FREE</span>' +
           '</div>';
 
         // Swappo Delivery — COMING SOON (teal dashed, disabled)

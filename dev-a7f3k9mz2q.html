@@ -486,6 +486,7 @@
   <!-- Core runtime (Supabase-only, Demo engine archived in _archive/) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="js/supabase.js" defer></script>
+  <script src="js/swappo-items.js" defer></script>
   <script src="js/constants.js" defer></script>
   <script src="js/toast.js" defer></script>
   <script src="js/a11y-helpers.js" defer></script>
@@ -505,25 +506,53 @@
   <script src="js/register-sw.js" defer></script>
   <script>
 
-    // ── Render items into a grid ──
+    // ── Render items into a grid (Supabase-powered) ──
     function renderGrid(gridEl, items) {
-      if (!gridEl) return;
-      gridEl.innerHTML = items.map(item => DemoItems.renderCard(item)).join('');
+      if (!gridEl || !window.SwappoItems) return;
+      gridEl.innerHTML = items.map(item => window.SwappoItems.renderCard(item)).join('');
     }
 
     // ── Populate all grids ──
-    function populateGrids() {
-      // Popular: sorted by favorites
-      var popular = DemoItems.browse({ sortBy: 'popular' });
-      renderGrid(document.getElementById('popular-grid'), popular.items.slice(0, 10));
+    async function populateGrids() {
+      if (!window.SwappoItems || !window.SwappoItems.browse) return;
 
-      // Gift Corner teaser (4 gift items)
+      // Popular grid — try "popular" sort first, fall back to any recent
+      // available item so the section is NEVER empty while the catalogue
+      // is still small.
+      var popularGrid = document.getElementById('popular-grid');
+      if (popularGrid) {
+        try {
+          var popularRes = await window.SwappoItems.browse({ sortBy: 'popular' });
+          var items = (popularRes && popularRes.items) || [];
+          // Fallback: newest items (available only), still up to 10
+          if (items.length < 4) {
+            var recentRes = await window.SwappoItems.browse({ sortBy: 'recent' });
+            var extras = ((recentRes && recentRes.items) || [])
+              .filter(function (i) { return !items.find(function (p) { return p.id === i.id; }); });
+            items = items.concat(extras).slice(0, 10);
+          } else {
+            items = items.slice(0, 10);
+          }
+          if (items.length) {
+            renderGrid(popularGrid, items);
+          } else {
+            popularGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#6B7280;">'
+              + '<i class="fas fa-box-open" style="font-size:28px;color:#09B1BA;margin-bottom:8px;display:block;"></i>'
+              + 'The catalogue is warming up — be the first to list an item.</div>';
+          }
+        } catch (e) { console.warn('[populateGrids] popular failed', e); }
+      }
+
+      // Gift Corner teaser (up to 4 giveaways)
       var giftGrid = document.getElementById('gift-teaser-grid');
-      if (giftGrid && DemoItems.getGiveaways) {
-        var gifts = DemoItems.getGiveaways().slice(0, 4);
-        if (gifts.length > 0) {
-          giftGrid.innerHTML = gifts.map(function(item) { return DemoItems.renderCard(item); }).join('');
-        }
+      if (giftGrid && window.SwappoItems.getGiveaways) {
+        try {
+          var gifts = (await window.SwappoItems.getGiveaways()) || [];
+          gifts = gifts.slice(0, 4);
+          if (gifts.length > 0) {
+            giftGrid.innerHTML = gifts.map(function (item) { return window.SwappoItems.renderCard(item); }).join('');
+          }
+        } catch (e) { /* quiet */ }
       }
     }
 
@@ -590,8 +619,14 @@
           e.preventDefault();
           links.forEach(function(l) { l.classList.remove('active'); });
           link.classList.add('active');
-          var popular = DemoItems.browse({ category: cat, sortBy: 'popular', limit: 10 });
-          renderGrid(document.getElementById('popular-grid'), popular.items);
+          (async function () {
+            if (!window.SwappoItems || !window.SwappoItems.browse) return;
+            try {
+              var res = await window.SwappoItems.browse({ category: cat, sortBy: 'popular' });
+              var items = ((res && res.items) || []).slice(0, 10);
+              renderGrid(document.getElementById('popular-grid'), items);
+            } catch (e) { /* quiet */ }
+          })();
           // removed: recent-grid and explore-grid no longer exist
         });
       });

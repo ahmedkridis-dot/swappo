@@ -2090,6 +2090,29 @@
             // Pre-fetch the count of pending swaps that target each of my
             // items so we can show a "N pending offer(s)" badge and hint
             // the owner that action is needed. One round-trip, small payload.
+            // Map each RESERVED item of mine → the active swap + its
+            // conversation so the card can deep-link straight to chat.
+            var convByReservedItem = {};
+            try {
+                const { data: acceptedRows } = await window.db.from('swaps')
+                    .select('id,proposer_item_id,receiver_item_id,proposer_id,receiver_id')
+                    .or('proposer_id.eq.' + user.id + ',receiver_id.eq.' + user.id)
+                    .eq('status', 'accepted');
+                const swapIds = (acceptedRows || []).map(function (s) { return s.id; });
+                var convMap = {};
+                if (swapIds.length) {
+                    const { data: convs } = await window.db.from('conversations')
+                        .select('id,swap_id').in('swap_id', swapIds);
+                    (convs || []).forEach(function (c) { convMap[c.swap_id] = c.id; });
+                }
+                (acceptedRows || []).forEach(function (s) {
+                    var cid = convMap[s.id];
+                    if (!cid) return;
+                    if (s.proposer_item_id) convByReservedItem[s.proposer_item_id] = cid;
+                    if (s.receiver_item_id) convByReservedItem[s.receiver_item_id] = cid;
+                });
+            } catch (e) { /* best-effort */ }
+
             var pendingByItem = {};
             try {
                 const { data: pendingRows } = await window.db.from('swaps')
@@ -2127,7 +2150,25 @@
                 const pendingBadge = pendingCount > 0
                     ? '<span class="pending-offer-badge" onclick="event.stopPropagation(); document.querySelector(\'[data-tab=swap-dashboard]\').click(); setTimeout(function(){var b=document.querySelector(\'[data-swap-tab=received]\');if(b)b.click();},50);">🔔 ' + pendingCount + ' pending offer' + (pendingCount > 1 ? 's' : '') + '</span>'
                     : '';
-                return '<div class="product-card' + terminalCls + '" data-my-item-id="' + item.id + '" data-mi-bucket="' + bucket + '" data-status="' + itemStatus + '">' +
+                // Reserved card → clicking the whole card opens the chat for
+                // the active swap, and the action row replaces Boost/Delete
+                // with a single "Open chat" CTA.
+                const reservedConvId = bucket === 'reserved' ? (convByReservedItem[item.id] || null) : null;
+                const cardOnclick = reservedConvId
+                    ? ' onclick="if(!event.target.closest(\'.product-action-btn\'))window.location.href=\'chat.html?conv=' + reservedConvId + '\'" role="button" tabindex="0" style="cursor:pointer;"'
+                    : '';
+                let actions;
+                if (bucket === 'reserved' && reservedConvId) {
+                    actions =
+                        '<button class="product-action-btn" style="color:#09B1BA;border-color:#09B1BA;" onclick="event.stopPropagation(); window.location.href=\'chat.html?conv=' + reservedConvId + '\'"><i class="fas fa-comments"></i> Open chat</button>' +
+                        '<button class="product-action-btn" onclick="event.stopPropagation(); window.location.href=\'product.html?id=' + item.id + '\'"><i class="fas fa-eye"></i> View</button>';
+                } else {
+                    actions =
+                        '<button class="product-action-btn" onclick="window.location.href=\'product.html?id=' + item.id + '\'"><i class="fas fa-eye"></i> View</button>' +
+                        '<button class="product-action-btn" style="color:#F59E0B;border-color:#F59E0B;" onclick="showBoostPicker(\'' + item.id + '\')"><i class="fas fa-rocket"></i> Boost</button>' +
+                        '<button class="product-action-btn" onclick="deleteItem(\'' + item.id + '\')"><i class="fas fa-trash"></i> Delete</button>';
+                }
+                return '<div class="product-card' + terminalCls + '" data-my-item-id="' + item.id + '" data-mi-bucket="' + bucket + '" data-status="' + itemStatus + '"' + cardOnclick + '>' +
                     '<div class="product-image">' +
                         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '') +
                         '<span class="product-status ' + statusClass + '">' + statusLabel + '</span>' +
@@ -2137,11 +2178,7 @@
                         '<div class="product-title">' + title + '</div>' +
                         '<div class="product-category">' + (item.category || '') + '</div>' +
                         (item.price ? '<div class="product-price" style="font-size:15px;font-weight:700;color:var(--primary,#09B1BA);margin-bottom:6px;">' + item.price.toLocaleString() + ' AED</div>' : '') +
-                    '<div class="product-actions">' +
-                            '<button class="product-action-btn" onclick="window.location.href=\'product.html?id=' + item.id + '\'"><i class="fas fa-eye"></i> View</button>' +
-                            '<button class="product-action-btn" style="color:#F59E0B;border-color:#F59E0B;" onclick="showBoostPicker(\'' + item.id + '\')"><i class="fas fa-rocket"></i> Boost</button>' +
-                            '<button class="product-action-btn" onclick="deleteItem(\'' + item.id + '\')"><i class="fas fa-trash"></i> Delete</button>' +
-                        '</div>' +
+                    '<div class="product-actions">' + actions + '</div>' +
                         '<div class="my-auto-decline-host" data-item-id="' + item.id + '"></div>' +
                     '</div>' +
                 '</div>';
@@ -2504,18 +2541,28 @@
                 }
                 var intentBadgeHTML = '<span class="swap-intent-badge swap-intent-' + intent.cls + '">' + intent.label + '</span>';
 
+                // The "rating" stored on the swap row is split by side:
+                // proposer_rating (what the proposer gave) and
+                // receiver_rating (what the receiver gave). Use the one
+                // that belongs to the current user when deciding whether
+                // to show the rating widget vs the stars-display.
+                var myRating = isProposer ? swap.proposer_rating : swap.receiver_rating;
                 var actionsHTML = '';
                 if (perspective === 'sent' && swap.status === 'pending') {
                     actionsHTML = '<div class="swap-actions"><button class="btn-cancel" onclick="cancelSwap(\'' + swap.id + '\')"><i class="fas fa-times"></i> Cancel</button></div>';
                 } else if (perspective === 'received' && swap.status === 'pending') {
                     actionsHTML = '<div class="swap-actions"><button class="btn-accept" onclick="acceptSwap(\'' + swap.id + '\', \'' + intent.cls + '\')"><i class="fas fa-check"></i> ' + intent.accept + '</button><button class="btn-reject" onclick="rejectSwap(\'' + swap.id + '\')"><i class="fas fa-times"></i> Decline</button></div>';
-                } else if (perspective === 'history' && (swap.status === 'completed' || swap.status === 'accepted') && !swap.rating) {
+                } else if (perspective === 'history' && swap.status === 'completed' && !myRating) {
                     actionsHTML = '<div class="swap-rating-input" data-swap="' + swap.id + '">' +
                         [1,2,3,4,5].map(function(n) {
                             return '<span class="star" data-star="' + n + '" onclick="rateSwap(\'' + swap.id + '\',' + n + ')">&#9733;</span>';
                         }).join('') + '</div>';
-                } else if (swap.rating) {
-                    actionsHTML = '<div class="swap-rating" style="color:#FFB800;">' + '\u2605'.repeat(swap.rating) + '<span style="color:#DDD;">' + '\u2605'.repeat(5 - swap.rating) + '</span></div>';
+                } else if (myRating) {
+                    var filled = Number(myRating) || 0;
+                    actionsHTML = '<div class="swap-rating" style="color:#FFB800;" title="Your rating">'
+                        + '\u2605'.repeat(filled)
+                        + '<span style="color:#DDD;">' + '\u2605'.repeat(5 - filled) + '</span>'
+                        + '</div>';
                 }
 
                 // Per Ahmed 2026-04-18: the counter-party card must be clickable
