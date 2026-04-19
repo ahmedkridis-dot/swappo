@@ -57,7 +57,11 @@
     a.innerHTML =
       '<i class="fas fa-comment-dots" aria-hidden="true"></i>' +
       '<span class="swp-msg-badge" aria-hidden="true">0</span>';
-    a.style.display = 'none'; // hidden until auth confirmed
+    // Paint immediately when the inline head script detected a session.
+    // CSS (html.swp-auth-out #swp-msg-link) hides it for anonymous
+    // visitors until the real auth check resolves.
+    var authHint = document.documentElement.classList.contains('swp-auth-in');
+    a.style.display = authHint ? '' : 'none';
     placeAfterBell(nav, a);
   }
 

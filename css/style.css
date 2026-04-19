@@ -1489,3 +1489,32 @@ a.site-logo:hover { color: #078A91 !important; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   First-paint auth state (set by inline <head> script that reads
+   the Supabase session from localStorage synchronously). Lets us
+   show the correct navbar shape on the very first frame instead
+   of flashing "Join the Swap" → chips.
+   ───────────────────────────────────────────────────────────── */
+html.swp-auth-in  .navbar-actions [data-i18n="join_swap"] { display: none !important; }
+html.swp-auth-out .swp-bell,
+html.swp-auth-out #swp-bell-root,
+html.swp-auth-out #swp-msg-link,
+html.swp-auth-out #swp-dash-link { display: none !important; }
+
+/* Shimmer skeleton used while the avatar / pseudo fetch is in-flight
+   (dashboard-link.js swaps it out when data lands). */
+@keyframes swpShimmerBg {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.swp-skel {
+  display: inline-block;
+  background: linear-gradient(90deg, #E5E7EB 0%, #F3F4F6 50%, #E5E7EB 100%);
+  background-size: 200% 100%;
+  animation: swpShimmerBg 1.4s linear infinite;
+  border-radius: 6px;
+  color: transparent !important;
+}
+.swp-skel.swp-skel-avatar { border-radius: 50%; }
+.swp-skel.swp-skel-text { min-width: 56px; height: 12px; vertical-align: middle; }

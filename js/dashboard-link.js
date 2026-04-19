@@ -44,12 +44,16 @@
     link.href = base + 'profile.html';
     link.setAttribute('aria-label', tr('dashboard_title', 'Dashboard'));
     link.setAttribute('data-i18n-aria-label', 'dashboard_title');
+    // Skeleton-first: if the inline auth-detection script set
+    // html.swp-auth-in, the chip paints immediately with a shimmer
+    // so the user sees the final shape on first frame instead of
+    // a "Join the Swap" button that pops into an avatar chip.
     link.innerHTML =
-      '<span class="swp-dash-avatar" aria-hidden="true">?</span>' +
-      '<span class="swp-dash-pseudo"></span>' +
+      '<span class="swp-dash-avatar swp-skel swp-skel-avatar" aria-hidden="true">A</span>' +
+      '<span class="swp-dash-pseudo swp-skel swp-skel-text">username</span>' +
       '<span class="swp-dash-badge" aria-hidden="true">0</span>';
-    link.style.display = 'none'; // hidden until auth confirmed
-    // Insert as the FIRST item so it sits on the top-right of the navbar actions.
+    var authHint = document.documentElement.classList.contains('swp-auth-in');
+    link.style.display = authHint ? '' : 'none';
     nav.insertBefore(link, nav.firstChild);
   }
 
@@ -105,7 +109,10 @@
       }
     } catch (e) { /* fall back to email prefix */ }
     const pseudoEl = link.querySelector('.swp-dash-pseudo');
-    if (pseudoEl) pseudoEl.textContent = pseudo;
+    if (pseudoEl) {
+      pseudoEl.textContent = pseudo;
+      pseudoEl.classList.remove('swp-skel', 'swp-skel-text');
+    }
     setAvatar(link, avatarUrl, pseudo);
   }
 
