@@ -1124,6 +1124,10 @@
     var isGuest = !currentUser;
     var owner = await _resolveOwner(item.user_id);
     var isOwner = !!(currentUser && item.user_id && currentUser.id === item.user_id);
+
+    // Track view (session-deduped, skips the owner). Feeds the Trending
+    // tab ranking in feed-tabs.js. Fire-and-forget — we don't await.
+    try { window.SwappoItems.bumpViews(item.id, { ownerId: item.user_id }); } catch (e) {}
     var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type;
     var interestedCount = Math.floor(Math.random() * 15) + 1;
 

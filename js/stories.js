@@ -209,10 +209,16 @@
         if (viewed.indexOf(story.id) === -1) viewed.push(story.id);
         localStorage.setItem('swappo_viewed_stories', JSON.stringify(viewed.slice(-200)));
       } catch (e) {}
-      // Best-effort views_count++
+      // Record the view via RPC — the old direct UPDATE on stories was
+      // silently blocked by RLS (no UPDATE policy) and had a race on
+      // concurrent viewers anyway. The RPC inserts into story_views with
+      // ON CONFLICT DO NOTHING (one view per viewer per story), and a DB
+      // trigger keeps stories.views_count in sync. Own-story views are
+      // dropped server-side.
       if (window.db && story.id) {
-        window.db.rpc ? null : null;
-        window.db.from('stories').update({ views_count: (story.views_count || 0) + 1 }).eq('id', story.id).then(function () {});
+        window.db.rpc('record_story_view', { p_story_id: story.id })
+          .then(function () {})
+          .catch(function () { /* best-effort */ });
       }
     }
 

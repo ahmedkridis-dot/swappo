@@ -263,13 +263,37 @@
   }
 
   // ---------- VIEWS COUNTER ----------
-  async function bumpViews(itemId) {
+  // Any new page that displays a single product detail MUST call this on
+  // mount (see pages/product.html for the reference pattern). The counter
+  // feeds the "Trending" tab ranking in feed-tabs.js, so forgetting to
+  // call it biases the whole catalogue ordering.
+  //
+  // Built-in guards:
+  //   • Session dedup — a user refreshing the same product 10× in one
+  //     session counts as one view. Key lives in sessionStorage so it
+  //     resets per tab.
+  //   • Owner skip — passing opts.ownerId lets us drop views where the
+  //     current user is the listing owner, so a seller checking their
+  //     own item doesn't inflate the count.
+  async function bumpViews(itemId, opts) {
     if (!global.db || !itemId) return;
-    // best-effort RPC-less increment via SQL — uses the supabase rpc if we add one,
-    // otherwise skip silently (counter is optional)
+    opts = opts || {};
+    // Session dedup: never bump the same item twice in one tab.
+    try {
+      var key = 'swp_view_' + itemId;
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, String(Date.now()));
+    } catch (e) { /* sessionStorage unavailable — fall through */ }
+    // Owner skip: pass the listing owner id and we drop self-views.
+    if (opts.ownerId && global.SwappoAuth && global.SwappoAuth.getFastUser) {
+      try {
+        var me = global.SwappoAuth.getFastUser();
+        if (me && me.id === opts.ownerId) return;
+      } catch (e) { /* best-effort */ }
+    }
     try {
       await global.db.rpc('bump_views', { item_id_in: itemId });
-    } catch (e) { /* no-op */ }
+    } catch (e) { /* no-op — counter is best-effort */ }
   }
 
   // ---------- RENDER CARD ----------
