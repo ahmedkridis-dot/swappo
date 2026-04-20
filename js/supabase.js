@@ -34,6 +34,108 @@ let db = null;
 // Expose for other scripts
 try { window.db = db; } catch (e) {}
 
+// ---- FAST PATH: synchronous session + profile read ----------------------
+// The Supabase SDK restores the session asynchronously AFTER createClient
+// returns (see _authReady below). But the JWT + user object are already
+// sitting in localStorage under `sb-<projectRef>-auth-token` as JSON.
+// Every page that waits for `_authReady` takes the full 2.5 s timeout on
+// cold loads — even though we could have answered "who is this user?" in
+// < 1 ms by reading localStorage directly.
+//
+// These helpers let cold-load code paths (profile.html, chat.html, navbar
+// chips) render the right shell on the first frame and fire their
+// Supabase queries immediately — the SDK attaches the JWT from localStorage
+// to each request automatically, so the queries authenticate correctly
+// even before `_authReady` has resolved.
+//
+// Caveat: a stale/expired token in localStorage will make the fast path
+// return a "user" that Supabase will then 401 on. We gate on `expires_at`
+// to avoid that, and any failed query falls back to the normal auth flow.
+
+function _getSupabaseStorageKey() {
+  // Supabase derives its storage key from the project URL's host prefix.
+  try {
+    var ref = String(SUPABASE_URL).replace(/^https?:\/\//, '').split('.')[0];
+    return 'sb-' + ref + '-auth-token';
+  } catch (e) { return null; }
+}
+
+function _readFastSession() {
+  try {
+    var key = _getSupabaseStorageKey();
+    if (!key) return null;
+    var raw = localStorage.getItem(key);
+    if (!raw) return null;
+    var parsed = JSON.parse(raw);
+    if (!parsed || !parsed.user || !parsed.user.id) return null;
+    // expires_at is seconds since epoch. Give 30 s buffer so a request
+    // that lands just before expiry doesn't 401 halfway through.
+    var exp = Number(parsed.expires_at || 0);
+    if (exp && (Date.now() / 1000) > (exp - 30)) return null;
+    return parsed;
+  } catch (e) { return null; }
+}
+
+/**
+ * Synchronous user accessor for cold-load code paths. Returns the user
+ * object from localStorage (id + email + user_metadata) when the JWT is
+ * present and not expired, else null. Never awaits, never touches the
+ * network.
+ */
+function getFastUser() {
+  var s = _readFastSession();
+  return s && s.user ? s.user : null;
+}
+try { window.getFastUser = getFastUser; } catch (e) {}
+
+// ---- SwappoCache: tiny localStorage wrapper (stale-while-revalidate) -----
+// Used to survive cold reloads: pages paint from cache on the first frame
+// then refresh in the background. Keys are versioned so we can invalidate
+// the whole cache by bumping _CACHE_VERSION when the shape changes.
+var _CACHE_VERSION = 1;
+var _CACHE_PREFIX = 'swp_cache_v' + _CACHE_VERSION + '_';
+
+var SwappoCache = {
+  get: function (key, maxAgeMs) {
+    try {
+      var raw = localStorage.getItem(_CACHE_PREFIX + key);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed.t !== 'number') return null;
+      if (maxAgeMs && (Date.now() - parsed.t) > maxAgeMs) return null;
+      return parsed.v;
+    } catch (e) { return null; }
+  },
+  getWithAge: function (key) {
+    try {
+      var raw = localStorage.getItem(_CACHE_PREFIX + key);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed.t !== 'number') return null;
+      return { value: parsed.v, ageMs: Date.now() - parsed.t };
+    } catch (e) { return null; }
+  },
+  set: function (key, value) {
+    try {
+      localStorage.setItem(_CACHE_PREFIX + key, JSON.stringify({ t: Date.now(), v: value }));
+    } catch (e) { /* quota — ignore */ }
+  },
+  remove: function (key) {
+    try { localStorage.removeItem(_CACHE_PREFIX + key); } catch (e) {}
+  },
+  clearAll: function () {
+    try {
+      var keys = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(_CACHE_PREFIX) === 0) keys.push(k);
+      }
+      keys.forEach(function (k) { localStorage.removeItem(k); });
+    } catch (e) {}
+  }
+};
+try { window.SwappoCache = SwappoCache; } catch (e) {}
+
 // ---- Auth-ready gate ------------------------------------------------------
 // The Supabase JS SDK restores persisted sessions asynchronously AFTER
 // createClient returns. If any page calls SwappoAuth.getCurrentUser() before
@@ -424,6 +526,8 @@ const SwappoAuth = {
 // share one network round-trip instead of firing redundant
 // `users?id=eq.<uid>` queries during cold page boot.
 SwappoAuth.getUserProfile       = getUserProfile;
+SwappoAuth.getCachedProfile     = getCachedProfile;
+SwappoAuth.getFastUser          = getFastUser;
 SwappoAuth.invalidateProfileCache = _invalidateProfileCache;
 // Promise that resolves once the SDK has finished restoring the persisted
 // session (or after the 2.5 s safety-net). Consumers that normally waited
@@ -489,6 +593,14 @@ async function _fetchProfile(userId, { force } = {}) {
   if (!force && _profileCache.has(userId)) return _profileCache.get(userId);
   if (!force && _profileInflight.has(userId)) return _profileInflight.get(userId);
 
+  // Warm the in-memory cache from localStorage so subsequent sync reads
+  // via getCachedProfile() return immediately, even on the very first
+  // call after boot.
+  if (!force && !_profileCache.has(userId)) {
+    var cached = SwappoCache.get('profile_' + userId);
+    if (cached) _profileCache.set(userId, cached);
+  }
+
   const promise = (async () => {
     try {
       // 3s timeout so the whole site can't be hung by a slow profile SELECT
@@ -503,13 +615,15 @@ async function _fetchProfile(userId, { force } = {}) {
         // flooding the console on every cold load. Surface real errors.
         var msg = res.error.message || String(res.error);
         if (!/timeout/i.test(msg)) console.warn('[_fetchProfile] supabase error:', msg);
-        return null;
+        return _profileCache.get(userId) || null;
       }
       _profileCache.set(userId, res.data);
+      // Mirror into localStorage for next cold load.
+      SwappoCache.set('profile_' + userId, res.data);
       return res.data;
     } catch (e) {
       console.warn('[_fetchProfile] exception:', e.message || e);
-      return null;
+      return _profileCache.get(userId) || null;
     } finally {
       _profileInflight.delete(userId);
     }
@@ -517,6 +631,20 @@ async function _fetchProfile(userId, { force } = {}) {
   _profileInflight.set(userId, promise);
   return promise;
 }
+
+/**
+ * Synchronous accessor for a profile we've already fetched (in-memory or
+ * localStorage). Returns null if we have nothing cached yet. Callers use
+ * this to paint on the first frame before awaiting the fresh fetch.
+ */
+function getCachedProfile(userId) {
+  if (!userId) return null;
+  if (_profileCache.has(userId)) return _profileCache.get(userId);
+  var cached = SwappoCache.get('profile_' + userId);
+  if (cached) { _profileCache.set(userId, cached); return cached; }
+  return null;
+}
+try { window.getCachedProfile = getCachedProfile; } catch (e) {}
 
 async function getUserProfile(userId, opts) {
   try {
@@ -588,6 +716,10 @@ if (db) {
       // Navbar also doesn't need a refresh on token rotation.
     } else if (event === 'SIGNED_OUT') {
       _clearMirror();
+      // Drop all localStorage caches so the next user (or the login page
+      // itself) never sees a snapshot of the old user's dashboard.
+      try { SwappoCache.clearAll(); } catch (e) {}
+      _invalidateProfileCache();
       updateNavbarAuth();
     }
   });

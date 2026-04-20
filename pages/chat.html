@@ -1415,6 +1415,17 @@
         <a href="../dev-a7f3k9mz2q.html" class="site-logo">Swappo</a>
         <div class="navbar-search" style="visibility:hidden;"><input type="text" placeholder="Search…" autocomplete="off"></div>
         <div class="navbar-actions">
+          <div id="swp-bell-root" class="swp-bell">
+            <button class="swp-bell-btn" type="button" aria-label="Notifications" data-i18n-aria-label="notif_bell_aria">
+              <i class="fas fa-bell" aria-hidden="true"></i>
+              <span class="swp-bell-badge" aria-hidden="true">0</span>
+            </button>
+          </div>
+          <a id="swp-dash-link" class="swp-dash-link" href="profile.html" aria-label="Dashboard" data-i18n-aria-label="dashboard_title">
+            <span class="swp-dash-avatar swp-skel swp-skel-avatar" aria-hidden="true"></span>
+            <span class="swp-dash-pseudo swp-skel swp-skel-text">&nbsp;</span>
+            <span class="swp-dash-badge" aria-hidden="true">0</span>
+          </a>
           <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
           <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
         </div>
@@ -1618,6 +1629,12 @@
         });
       } catch (e) {
         console.error('fetchConversations error', e);
+        // Fall back to cached convs from the previous session so the
+        // sidebar isn't blank when the API is slow/unreachable.
+        if (window.SwappoCache && currentUser && currentUser.id) {
+          var cached = window.SwappoCache.get('convs_' + currentUser.id);
+          if (cached && cached.length) return cached;
+        }
         return [];
       }
     }
@@ -3315,38 +3332,47 @@
   }
 
   async function chatInit() {
-    // Resolve via SwappoAuth (Supabase session). Poll every 100ms up to
-    // 1.2s — faster than the old fixed 600ms sleep on warm loads, still
-    // tolerant to the cold-session-restore race.
-    async function _resolve() {
-      if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return null;
-      try { return await window.SwappoAuth.getCurrentUser(); } catch (e) { return null; }
-    }
-    currentUser = await _resolve();
-    var waited = 0;
-    while (!currentUser && waited < 1200) {
-      await new Promise(r => setTimeout(r, 100));
-      waited += 100;
+    // ── Auth — FAST PATH ────────────────────────────────────────────────
+    // Read the JWT + user sync from localStorage instead of polling the
+    // SDK for up to 2.7 s. The Supabase client attaches the JWT to each
+    // request automatically, so queries authenticate without awaiting
+    // _authReady first.
+    currentUser = (window.SwappoAuth && window.SwappoAuth.getFastUser)
+      ? window.SwappoAuth.getFastUser()
+      : null;
+    if (!currentUser) {
+      // No JWT → fall back to the async path (may be first cold load
+      // after email confirmation, or storage was cleared).
+      async function _resolve() {
+        if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) return null;
+        try { return await window.SwappoAuth.getCurrentUser(); } catch (e) { return null; }
+      }
       currentUser = await _resolve();
-    }
-    // Soft fallback: if still null after the polling window, wait a bit
-    // more on an auth state change before the hard redirect. Covers the
-    // "Supabase was slow to restore the JWT" edge case without bouncing
-    // an already-logged-in user to /login.
-    if (!currentUser && window.db && window.db.auth) {
-      currentUser = await new Promise(function (resolve) {
-        var done = false;
-        var sub = window.db.auth.onAuthStateChange(function (_evt, session) {
-          if (done) return;
-          if (session && session.user) { done = true; try { sub.data.subscription.unsubscribe(); } catch (_) {} resolve(session.user); }
+      var waited = 0;
+      while (!currentUser && waited < 1200) {
+        await new Promise(r => setTimeout(r, 100));
+        waited += 100;
+        currentUser = await _resolve();
+      }
+      if (!currentUser && window.db && window.db.auth) {
+        currentUser = await new Promise(function (resolve) {
+          var done = false;
+          var sub = window.db.auth.onAuthStateChange(function (_evt, session) {
+            if (done) return;
+            if (session && session.user) { done = true; try { sub.data.subscription.unsubscribe(); } catch (_) {} resolve(session.user); }
+          });
+          setTimeout(function () { if (!done) { done = true; try { sub.data.subscription.unsubscribe(); } catch (_) {} resolve(null); } }, 1500);
         });
-        setTimeout(function () { if (!done) { done = true; try { sub.data.subscription.unsubscribe(); } catch (_) {} resolve(null); } }, 1500);
-      });
+      }
+      if (!currentUser) { window.location.href = 'login.html'; return; }
     }
-    if (!currentUser) { window.location.href = 'login.html'; return; }
 
     await renderSidebar();
     _hideChatSkeleton();
+    // Persist conversations for next cold load (stale-while-revalidate).
+    if (window.SwappoCache && _convCache && _convCache.length) {
+      window.SwappoCache.set('convs_' + currentUser.id, _convCache);
+    }
 
     var convs = _convCache;
     var params = new URLSearchParams(window.location.search);

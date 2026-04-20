@@ -1,9 +1,11 @@
 /* ============================================
    Swappo — Global Notifications Bell
-   Injects a bell + dropdown into the navbar of every page.
-   Reads from Supabase `notifications` table (fallback: empty).
-   Realtime subscription to unread count.
-   Requires: supabase.js (exposes window.db), i18n.js optional, toast.js optional.
+   The bell BUTTON placeholder lives in each page's HTML (inside
+   .navbar-actions) so it paints in final shape on the first frame.
+   This script appends the dropdown panel, binds events, and wires up
+   the Supabase realtime feed.
+   Legacy pages without the placeholder still work — we fall back to
+   building the full node and inserting it into .navbar-actions.
    ============================================ */
 (function () {
   if (window.__SwappoBellLoaded) return;
@@ -17,35 +19,6 @@
     return (typeof t === 'function') ? t(key) : (fallback || key);
   }
 
-  function injectStyles() {
-    if (document.getElementById('swp-bell-style')) return;
-    var style = document.createElement('style');
-    style.id = 'swp-bell-style';
-    style.textContent = [
-      '.swp-bell { position: relative; display: inline-flex; align-items: center; margin: 0 6px; }',
-      '.swp-bell button.swp-bell-btn { background: transparent; border: 1px solid transparent; border-radius: 10px; padding: 8px 10px; font-size: 18px; cursor: pointer; color: #171717; position: relative; line-height: 1; transition: background 0.15s, border-color 0.15s; }',
-      '.swp-bell button.swp-bell-btn:hover { background: #F3F4F6; border-color: #EBEBEB; }',
-      '.swp-bell .swp-bell-badge { position: absolute; top: 2px; right: 2px; background: #DC2626; color: #fff; font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; display: none; align-items: center; justify-content: center; font-family: Inter, sans-serif; }',
-      '.swp-bell .swp-bell-badge.visible { display: inline-flex; }',
-      '.swp-bell-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: min(360px, 92vw); max-height: 440px; overflow-y: auto; background: #fff; border: 1px solid #EBEBEB; border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.15); padding: 8px; z-index: 9000; display: none; }',
-      '.swp-bell-dropdown.open { display: block; animation: swpBellFade 0.18s ease; }',
-      '@keyframes swpBellFade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }',
-      '.swp-bell-dropdown .swp-notif-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 10px; border-bottom: 1px solid #F3F4F6; font-weight: 700; font-size: 0.9rem; color: #171717; }',
-      '.swp-bell-dropdown .swp-notif-header a { color: #09B1BA; font-size: 0.8rem; font-weight: 600; text-decoration: none; cursor: pointer; }',
-      '.swp-bell-dropdown .swp-notif-empty { padding: 30px 16px; text-align: center; color: #999; font-size: 0.9rem; }',
-      '.swp-bell-dropdown .swp-notif-item { display: flex; gap: 10px; padding: 10px; border-radius: 10px; cursor: pointer; transition: background 0.15s; align-items: flex-start; }',
-      '.swp-bell-dropdown .swp-notif-item:hover { background: #F3F4F6; }',
-      '.swp-bell-dropdown .swp-notif-item.unread { background: #E6F7F8; }',
-      '.swp-bell-dropdown .swp-notif-icon { width: 32px; height: 32px; border-radius: 10px; background: #09B1BA; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }',
-      '.swp-bell-dropdown .swp-notif-body { flex: 1; min-width: 0; }',
-      '.swp-bell-dropdown .swp-notif-title { font-size: 0.88rem; font-weight: 600; color: #171717; margin-bottom: 2px; line-height: 1.3; }',
-      '.swp-bell-dropdown .swp-notif-msg { font-size: 0.82rem; color: #555; line-height: 1.3; }',
-      '.swp-bell-dropdown .swp-notif-time { font-size: 0.75rem; color: #999; margin-top: 3px; }',
-      '@media (max-width: 480px) { .swp-bell-dropdown { position: fixed; top: 64px; right: 8px; left: 8px; width: auto; max-height: 70vh; } }'
-    ].join('\n');
-    document.head.appendChild(style);
-  }
-
   function findNavbarMount() {
     var mount = document.querySelector('.navbar-actions');
     if (mount) return mount;
@@ -53,7 +26,23 @@
     return mount;
   }
 
-  function buildBellDOM() {
+  function buildDropdown() {
+    var dd = document.createElement('div');
+    dd.className = 'swp-bell-dropdown';
+    dd.id = DROPDOWN_ID;
+    dd.setAttribute('role', 'menu');
+    dd.innerHTML =
+      '<div class="swp-notif-header">' +
+        '<span>' + tr('notif_bell_title', 'Notifications') + '</span>' +
+        '<a data-mark-read>' + tr('notif_bell_mark_read', 'Mark all read') + '</a>' +
+      '</div>' +
+      '<div class="swp-notif-body-list">' +
+        '<div class="swp-notif-empty">' + tr('notif_bell_empty', 'No notifications yet') + '</div>' +
+      '</div>';
+    return dd;
+  }
+
+  function buildBellDOMFallback() {
     var wrap = document.createElement('div');
     wrap.className = 'swp-bell';
     wrap.id = BELL_ID;
@@ -61,16 +50,8 @@
       '<button class="swp-bell-btn" type="button" aria-label="' + tr('notif_bell_aria', 'Notifications') + '">' +
         '<i class="fas fa-bell"></i>' +
         '<span class="swp-bell-badge" aria-hidden="true">0</span>' +
-      '</button>' +
-      '<div class="swp-bell-dropdown" id="' + DROPDOWN_ID + '" role="menu">' +
-        '<div class="swp-notif-header">' +
-          '<span>' + tr('notif_bell_title', 'Notifications') + '</span>' +
-          '<a data-mark-read>' + tr('notif_bell_mark_read', 'Mark all read') + '</a>' +
-        '</div>' +
-        '<div class="swp-notif-body-list">' +
-          '<div class="swp-notif-empty">' + tr('notif_bell_empty', 'No notifications yet') + '</div>' +
-        '</div>' +
-      '</div>';
+      '</button>';
+    wrap.appendChild(buildDropdown());
     return wrap;
   }
 
@@ -191,12 +172,32 @@
       state.notifs = (res.data || []).map(_normalizeNotif);
       state.unread = state.notifs.filter(function (n) { return !n.read_at; }).length;
       render();
+      // Persist for fast paint on the next cold load.
+      if (window.SwappoCache) {
+        window.SwappoCache.set('unread_notif_' + state.userId, { count: state.unread });
+      }
     } catch (err) {
       console.error('[bell.loadNotifs]', err);
       state.notifs = [];
       state.unread = 0;
       render();
     }
+  }
+
+  function fastPaintBadge() {
+    try {
+      var fastUser = (window.SwappoAuth && window.SwappoAuth.getFastUser)
+        ? window.SwappoAuth.getFastUser() : null;
+      if (!fastUser) return null;
+      state.userId = fastUser.id;
+      var cached = window.SwappoCache ? window.SwappoCache.get('unread_notif_' + fastUser.id) : null;
+      var badge = document.querySelector('#' + BELL_ID + ' .swp-bell-badge');
+      if (badge && cached && cached.count != null) {
+        badge.textContent = cached.count > 99 ? '99+' : String(cached.count);
+        badge.classList.toggle('visible', cached.count > 0);
+      }
+      return fastUser;
+    } catch (e) { return null; }
   }
 
   async function markAllRead() {
@@ -304,6 +305,7 @@
   function bindEvents(root) {
     var btn = root.querySelector('.swp-bell-btn');
     var dd = root.querySelector('.swp-bell-dropdown');
+    if (!btn || !dd) return;
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
       var willOpen = !dd.classList.contains('open');
@@ -340,15 +342,23 @@
     // Don't inject on auth pages where the navbar is minimal.
     if (PAGE_PATH === 'login.html' || PAGE_PATH === 'reset-password.html') return;
 
-    var mount = findNavbarMount();
-    if (!mount) return;
-    if (document.getElementById(BELL_ID)) return; // already mounted
-
-    injectStyles();
-    var bellEl = buildBellDOM();
-    // Insert BEFORE the last button (usually "Drop an Item") so it appears next to the profile avatar.
-    mount.insertBefore(bellEl, mount.firstChild);
+    var bellEl = document.getElementById(BELL_ID);
+    if (bellEl) {
+      // Placeholder already in HTML — attach the dropdown and bind events.
+      if (!document.getElementById(DROPDOWN_ID)) {
+        bellEl.appendChild(buildDropdown());
+      }
+    } else {
+      // Fallback: legacy pages without the placeholder.
+      var mount = findNavbarMount();
+      if (!mount) return;
+      bellEl = buildBellDOMFallback();
+      mount.insertBefore(bellEl, mount.firstChild);
+    }
     bindEvents(bellEl);
+
+    // Paint the cached badge count on the first frame (stale-while-revalidate).
+    fastPaintBadge();
 
     // Attach Supabase user (async) + realtime. Awaiting whenReady() lets
     // us use getSession() (local JWT read, no network) instead of
@@ -360,7 +370,12 @@
       }
       var res = await window.db.auth.getSession();
       var user = res && res.data && res.data.session ? res.data.session.user : null;
-      if (!user) return; // anonymous — no notifications
+      if (!user) {
+        // `swp-auth-in` may have been a false positive — hide the chip.
+        bellEl.style.display = 'none';
+        return;
+      }
+      bellEl.style.display = '';
       state.userId = user.id;
       await loadNotifs();
       subscribeRealtime();

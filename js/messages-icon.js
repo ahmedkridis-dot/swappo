@@ -1,8 +1,11 @@
 /* ============================================
    Swappo — Messages icon (navbar)
-   Injects a direct link to SwapChat with an unread-count badge.
-   Realtime-updates the badge when new messages land or are read.
-   Requires: supabase.js (window.db). Hidden for anonymous visitors.
+   Populates a direct link to SwapChat with an unread-count badge.
+   The placeholder lives in each page's HTML so the icon paints in
+   final shape on the first frame; this script only fills the badge
+   and keeps it in sync via realtime.
+   Legacy pages without a placeholder still work — we fall back to
+   injecting the node into .navbar-actions.
    ============================================ */
 (function () {
   if (window.__SwappoMsgLink) return;
@@ -15,19 +18,6 @@
     return (typeof t === 'function') ? t(key) : (fallback || key);
   }
 
-  function injectStyle() {
-    if (document.getElementById('swp-msg-style')) return;
-    var s = document.createElement('style');
-    s.id = 'swp-msg-style';
-    s.textContent = [
-      '.swp-msg-link { position: relative; display: inline-flex; align-items: center; justify-content: center; margin: 0 4px; padding: 8px 10px; border-radius: 10px; border: 1px solid transparent; color: #171717; font-size: 18px; line-height: 1; cursor: pointer; text-decoration: none; transition: background 0.15s, border-color 0.15s; }',
-      '.swp-msg-link:hover { background: #F3F4F6; border-color: #EBEBEB; color: #171717; }',
-      '.swp-msg-link .swp-msg-badge { position: absolute; top: 2px; right: 2px; background: #DC2626; color: #fff; font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; display: none; align-items: center; justify-content: center; font-family: Inter, sans-serif; }',
-      '.swp-msg-link .swp-msg-badge.visible { display: inline-flex; }'
-    ].join('\n');
-    document.head.appendChild(s);
-  }
-
   function placeAfterBell(nav, node) {
     var bell = nav.querySelector('#swp-bell-root');
     if (bell) {
@@ -38,11 +28,7 @@
     }
   }
 
-  function mount() {
-    if (PAGE === 'login.html' || PAGE === 'reset-password.html' || PAGE === 'chat.html') return;
-    var nav = document.querySelector('.navbar-actions');
-    if (!nav || document.getElementById(ID)) return;
-    injectStyle();
+  function createFallbackNode() {
     var inPages = location.pathname.indexOf('/pages/') === 0;
     var href = inPages ? 'chat.html' : 'pages/chat.html';
     var a = document.createElement('a');
@@ -57,12 +43,17 @@
     a.innerHTML =
       '<i class="fas fa-comment-dots" aria-hidden="true"></i>' +
       '<span class="swp-msg-badge" aria-hidden="true">0</span>';
-    // Paint immediately when the inline head script detected a session.
-    // CSS (html.swp-auth-out #swp-msg-link) hides it for anonymous
-    // visitors until the real auth check resolves.
-    var authHint = document.documentElement.classList.contains('swp-auth-in');
-    a.style.display = authHint ? '' : 'none';
-    placeAfterBell(nav, a);
+    return a;
+  }
+
+  function mount() {
+    if (PAGE === 'login.html' || PAGE === 'reset-password.html' || PAGE === 'chat.html') return;
+    // Placeholder already in HTML → nothing to do.
+    if (document.getElementById(ID)) return;
+    // Fallback: legacy pages without the placeholder.
+    var nav = document.querySelector('.navbar-actions');
+    if (!nav) return;
+    placeAfterBell(nav, createFallbackNode());
   }
 
   var state = { userId: null, sub: null, convIds: [] };
@@ -92,6 +83,10 @@
     if (!badge) return;
     badge.textContent = count > 99 ? '99+' : String(count);
     badge.classList.toggle('visible', count > 0);
+    // Persist for fast paint on next cold load.
+    if (state.userId && window.SwappoCache) {
+      window.SwappoCache.set('unread_msg_' + state.userId, { count: count });
+    }
   }
 
   function subscribeRealtime() {
@@ -128,8 +123,32 @@
     subscribeRealtime();
   }
 
+  function fastPaintBadge() {
+    // Synchronous path: read last-known unread count from localStorage so
+    // the badge paints on the first frame instead of after the SDK's
+    // session restoration + conversations round-trip.
+    try {
+      var fastUser = (window.SwappoAuth && window.SwappoAuth.getFastUser)
+        ? window.SwappoAuth.getFastUser() : null;
+      if (!fastUser) return null;
+      state.userId = fastUser.id;
+      var cached = window.SwappoCache ? window.SwappoCache.get('unread_msg_' + fastUser.id) : null;
+      var link = document.getElementById(ID);
+      if (link && cached && cached.count != null) {
+        var badge = link.querySelector('.swp-msg-badge');
+        if (badge) {
+          badge.textContent = cached.count > 99 ? '99+' : String(cached.count);
+          badge.classList.toggle('visible', cached.count > 0);
+        }
+      }
+      return fastUser;
+    } catch (e) { return null; }
+  }
+
   function init() {
     mount();
+    fastPaintBadge();
+
     (async function () {
       if (!window.db) return;
       try {

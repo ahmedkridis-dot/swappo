@@ -1301,6 +1301,16 @@
             <input type="text" placeholder="Search items…" data-i18n-placeholder="search_placeholder" autocomplete="off">
           </div>
           <div class="navbar-actions">
+            <div id="swp-bell-root" class="swp-bell">
+              <button class="swp-bell-btn" type="button" aria-label="Notifications" data-i18n-aria-label="notif_bell_aria">
+                <i class="fas fa-bell" aria-hidden="true"></i>
+                <span class="swp-bell-badge" aria-hidden="true">0</span>
+              </button>
+            </div>
+            <a id="swp-msg-link" class="swp-msg-link" href="chat.html" aria-label="Messages" title="Messages" data-i18n-aria-label="msg_icon_aria" data-i18n-title="msg_icon_aria">
+              <i class="fas fa-comment-dots" aria-hidden="true"></i>
+              <span class="swp-msg-badge" aria-hidden="true">0</span>
+            </a>
             <a href="login.html" class="btn btn-outline btn-sm" data-i18n="join_swap">Join the Swap</a>
             <a href="publier.html" class="btn btn-primary btn-sm" data-i18n="drop_item">Drop an Item</a>
           </div>
@@ -1819,16 +1829,45 @@
           // B-022: wrap the full profile render in try/catch so failures are
           // logged and surfaced via toast instead of leaving a blank page.
           try {
-            // ── Auth check (retry once to beat the Supabase restore race) ──
-            let user = await _getCurrentUser();
-            if (!user) {
-                // Brief wait + retry — SDK may still be restoring the session.
-                await new Promise(r => setTimeout(r, 600));
-                user = await _getCurrentUser();
+            // ── Auth check — FAST PATH ──────────────────────────────────
+            // Read the JWT + user object synchronously from localStorage so
+            // we don't wait 2.5 s for the Supabase SDK's async session
+            // restoration. The Supabase client still attaches the JWT to
+            // each request automatically, so the Promise.all below
+            // authenticates correctly without us having awaited anything.
+            let user = (window.SwappoAuth && window.SwappoAuth.getFastUser)
+              ? window.SwappoAuth.getFastUser()
+              : null;
+            // Merge cached profile (pseudo / display_name / rating / plan /
+            // swap_count) so the header paints real values on the first
+            // frame. Background refresh below replaces any stale fields.
+            if (user) {
+              var _cachedProfile = (window.SwappoAuth && window.SwappoAuth.getCachedProfile)
+                ? window.SwappoAuth.getCachedProfile(user.id)
+                : null;
+              if (_cachedProfile) {
+                user = Object.assign({}, user, _cachedProfile, { id: user.id, email: user.email });
+              }
             }
             if (!user) {
+              // No valid JWT in storage — fall back to the async path
+              // (first-ever load after email confirmation, or expired token).
+              user = await _getCurrentUser();
+              if (!user) {
+                await new Promise(r => setTimeout(r, 600));
+                user = await _getCurrentUser();
+              }
+              if (!user) {
                 window.location.href = 'login.html';
                 return;
+              }
+            }
+            // Fire a fresh profile fetch in the background so any updated
+            // pseudo / rating / swap_count lands shortly after first paint.
+            // We deliberately don't await this — the rest of the dashboard
+            // can render from cache + JWT immediately.
+            if (window.SwappoAuth && window.SwappoAuth.getUserProfile) {
+              window.SwappoAuth.getUserProfile(user.id).catch(function () {});
             }
 
             // ── Profile header ───────────────────────────────────────────
@@ -1964,6 +2003,12 @@
             var _monthStart = new Date(); _monthStart.setDate(1); _monthStart.setHours(0,0,0,0);
             var _monthStartISO = _monthStart.toISOString();
 
+            // Stale-while-revalidate: read last-known values from localStorage
+            // so the dashboard paints real numbers on the first frame.
+            var _cachedItems   = window.SwappoCache ? (window.SwappoCache.get('items_'   + user.id) || []) : [];
+            var _cachedFavs    = window.SwappoCache ? (window.SwappoCache.get('favs_'    + user.id) || []) : [];
+            var _cachedCounts  = window.SwappoCache ? (window.SwappoCache.get('counts_'  + user.id) || { claims: 0, boosts: 0, unreadChat: 0 }) : { claims: 0, boosts: 0, unreadChat: 0 };
+
             const [
               claimsRes,
               boostsRes,
@@ -1974,17 +2019,24 @@
               window.db.from('swaps').select('id', { count: 'exact', head: true })
                 .eq('proposer_id', user.id).eq('is_giveaway_claim', true)
                 .gte('created_at', _monthStartISO)
-                .then(function(r) { return r.count || 0; }).catch(function() { return 0; }),
+                .then(function(r) { return r.count || 0; }).catch(function() { return _cachedCounts.claims || 0; }),
               window.db.from('items').select('id', { count: 'exact', head: true })
                 .eq('user_id', user.id).eq('is_boosted', true)
                 .gte('boost_expires_at', new Date().toISOString())
-                .then(function(r) { return r.count || 0; }).catch(function() { return 0; }),
-              _getItemsByUser(user.id).catch(function() { return []; }),
-              _getFavoriteItems().catch(function() { return []; }),
+                .then(function(r) { return r.count || 0; }).catch(function() { return _cachedCounts.boosts || 0; }),
+              _getItemsByUser(user.id).catch(function() { return _cachedItems; }),
+              _getFavoriteItems().catch(function() { return _cachedFavs; }),
               (window.SwappoChat && window.SwappoChat.getUnreadCount)
-                ? window.SwappoChat.getUnreadCount().catch(function() { return 0; })
-                : Promise.resolve(0)
+                ? window.SwappoChat.getUnreadCount().catch(function() { return _cachedCounts.unreadChat || 0; })
+                : Promise.resolve(_cachedCounts.unreadChat || 0)
             ]);
+
+            // Persist for next cold load (stale-while-revalidate).
+            if (window.SwappoCache) {
+              window.SwappoCache.set('items_'  + user.id, userItems || []);
+              window.SwappoCache.set('favs_'   + user.id, favoriteItems || []);
+              window.SwappoCache.set('counts_' + user.id, { claims: claimsRes, boosts: boostsRes, unreadChat: unreadChat });
+            }
             var _claimsUsed = claimsRes;
             var _boostsUsed = boostsRes;
             let _unread = unreadChat;

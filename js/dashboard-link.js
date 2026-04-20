@@ -1,8 +1,12 @@
 /* ============================================
    Swappo — Profile shortcut in navbar (top-right, persistent)
-   Renders an avatar + pseudo chip that links to the real dashboard
-   (pages/profile.html). Hidden on the dashboard page itself + on auth pages.
-   Displays unread-notifications badge. Hidden for anonymous visitors.
+   Populates an avatar + pseudo chip that links to the real dashboard
+   (pages/profile.html). The placeholder lives in each page's HTML so
+   the chip paints in final shape on the first frame; this script only
+   fills in the real pseudo / avatar / badge once auth resolves.
+   Legacy pages without a placeholder still work — we fall back to
+   injecting the node into .navbar-actions, and the chip styles already
+   live in css/style.css.
    ============================================ */
 (function () {
   if (window.__SwappoDashLink) return;
@@ -15,28 +19,7 @@
     return (typeof t === 'function') ? t(key) : (fallback || key);
   }
 
-  function injectStyle() {
-    if (document.getElementById('swp-dash-style')) return;
-    const s = document.createElement('style');
-    s.id = 'swp-dash-style';
-    s.textContent = [
-      '.swp-dash-link { display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px 3px 3px; border-radius: 999px; font-family: Inter, sans-serif; font-size: 0.85rem; font-weight: 700; color: #09B1BA; background: #E6F7F8; border: 1px solid transparent; text-decoration: none; transition: background-color 0.15s, border-color 0.15s, transform 0.1s; white-space: nowrap; line-height: 1; }',
-      '.swp-dash-link:hover { background: #B7EAED; border-color: #09B1BA; transform: translateY(-1px); }',
-      '.swp-dash-link .swp-dash-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; background: #09B1BA; color: #fff; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0; }',
-      '.swp-dash-link .swp-dash-pseudo { display: inline-block; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }',
-      '.swp-dash-link .swp-dash-badge { background: #DC2626; color: #fff; font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; display: none; align-items: center; justify-content: center; margin-left: 2px; line-height: 1; }',
-      '.swp-dash-link .swp-dash-badge.visible { display: inline-flex; }',
-      '@media (max-width: 640px) { .swp-dash-link .swp-dash-pseudo { display: none; } .swp-dash-link { padding: 3px; gap: 0; } }'
-    ].join('\n');
-    document.head.appendChild(s);
-  }
-
-  function mount() {
-    // Skip on dashboard itself + auth pages (to avoid redundancy)
-    if (PAGE === 'profile.html' || PAGE === 'login.html' || PAGE === 'reset-password.html' || PAGE === 'onboarding.html') return;
-    const nav = document.querySelector('.navbar-actions');
-    if (!nav || document.getElementById(ID)) return;
-    injectStyle();
+  function createFallbackNode() {
     const base = location.pathname.indexOf('/pages/') === 0 ? '' : 'pages/';
     const link = document.createElement('a');
     link.id = ID;
@@ -44,17 +27,22 @@
     link.href = base + 'profile.html';
     link.setAttribute('aria-label', tr('dashboard_title', 'Dashboard'));
     link.setAttribute('data-i18n-aria-label', 'dashboard_title');
-    // Skeleton-first: if the inline auth-detection script set
-    // html.swp-auth-in, the chip paints immediately with a shimmer
-    // so the user sees the final shape on first frame instead of
-    // a "Join the Swap" button that pops into an avatar chip.
     link.innerHTML =
       '<span class="swp-dash-avatar swp-skel swp-skel-avatar" aria-hidden="true">A</span>' +
       '<span class="swp-dash-pseudo swp-skel swp-skel-text">username</span>' +
       '<span class="swp-dash-badge" aria-hidden="true">0</span>';
-    var authHint = document.documentElement.classList.contains('swp-auth-in');
-    link.style.display = authHint ? '' : 'none';
-    nav.insertBefore(link, nav.firstChild);
+    return link;
+  }
+
+  function mount() {
+    // Skip on dashboard itself + auth pages (to avoid redundancy)
+    if (PAGE === 'profile.html' || PAGE === 'login.html' || PAGE === 'reset-password.html' || PAGE === 'onboarding.html') return;
+    // Placeholder already in HTML → nothing to do.
+    if (document.getElementById(ID)) return;
+    // Fallback: legacy pages without the placeholder.
+    const nav = document.querySelector('.navbar-actions');
+    if (!nav) return;
+    nav.insertBefore(createFallbackNode(), nav.firstChild);
   }
 
   function firstLetter(s) {
@@ -87,7 +75,11 @@
         span.setAttribute('aria-hidden', 'true');
         current.replaceWith(span);
       }
-      link.querySelector('.swp-dash-avatar').textContent = firstLetter(pseudo);
+      const avatarEl = link.querySelector('.swp-dash-avatar');
+      // Strip skeleton classes once real content lands.
+      avatarEl.className = 'swp-dash-avatar';
+      avatarEl.setAttribute('aria-hidden', 'true');
+      avatarEl.textContent = firstLetter(pseudo);
     }
   }
 
@@ -131,11 +123,40 @@
     } catch (e) { /* silent */ }
   }
 
+  function fastPaintFromCache() {
+    // Synchronous path: read the JWT's user object + cached profile from
+    // localStorage and paint the chip on the very first frame. Avoids
+    // waiting for the SDK's async session restoration (~2.5 s on cold).
+    try {
+      const link = document.getElementById(ID);
+      if (!link) return null;
+      const fastUser = (window.SwappoAuth && window.SwappoAuth.getFastUser)
+        ? window.SwappoAuth.getFastUser() : null;
+      if (!fastUser) return null;
+      const cached = (window.SwappoAuth && window.SwappoAuth.getCachedProfile)
+        ? window.SwappoAuth.getCachedProfile(fastUser.id) : null;
+      const meta = fastUser.user_metadata || {};
+      const pseudo = (cached && (cached.pseudo || cached.display_name))
+        || meta.pseudo
+        || (fastUser.email ? fastUser.email.split('@')[0] : 'You');
+      const avatarUrl = (cached && cached.avatar) || meta.avatar || '';
+      const pseudoEl = link.querySelector('.swp-dash-pseudo');
+      if (pseudoEl) {
+        pseudoEl.textContent = pseudo;
+        pseudoEl.classList.remove('swp-skel', 'swp-skel-text');
+      }
+      setAvatar(link, avatarUrl, pseudo);
+      return fastUser;
+    } catch (e) { return null; }
+  }
+
   function init() {
     mount();
-    // Await the SDK's "session restored" signal instead of a fixed 400 ms
-    // timeout. Fires ~10-50 ms on warm loads, up to 2.5 s worst case —
-    // either way the chip populates as soon as the real state is known.
+    // 1) Paint from cache immediately — no await, no network.
+    const fastUser = fastPaintFromCache();
+
+    // 2) In the background, refresh from Supabase so any stale pseudo /
+    //    avatar / badge count lands as soon as the real data is there.
     (async function () {
       if (!window.db) return;
       try {
@@ -149,9 +170,25 @@
         const user = res && res.data && res.data.session ? res.data.session.user : null;
         const link = document.getElementById(ID);
         if (!link) return;
-        if (!user) { link.style.display = 'none'; return; }
+        if (!user) {
+          // `swp-auth-in` was a false positive (expired token in localStorage).
+          // Hide via inline style so it wins over the auth-in CSS rule.
+          link.style.display = 'none';
+          return;
+        }
         link.style.display = '';
-        await renderProfile(user);
+        // Only re-render profile if we didn't already paint from cache, or
+        // if the cached data came from a different user. Otherwise keep the
+        // synchronous fast paint — re-rendering would strip + restore the
+        // same DOM and cause a brief flicker.
+        if (!fastUser || fastUser.id !== user.id) {
+          await renderProfile(user);
+        } else {
+          // Refresh in the background (writes-through to cache) without
+          // repainting if nothing changed — the setAvatar / pseudo calls
+          // are idempotent on identical values.
+          renderProfile(user);
+        }
         refreshBadge(user);
       } catch (e) {}
     })();
