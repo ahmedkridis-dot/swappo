@@ -1602,6 +1602,20 @@
   function _saveDeliveryChoice() {
     try { localStorage.setItem('swappo_delivery_choice', JSON.stringify(deliveryChoice)); } catch (e) {}
   }
+
+  // "Exchange method" card = one-shot: show the first time the user
+  // opens an accepted conversation, then never inline in messages again.
+  // The same choice is always accessible in the Deal Tracker panel to
+  // the right, so hiding it from the message thread on re-open just
+  // stops the "card re-appears every time" annoyance Ahmed flagged.
+  let exchangeCardShown = {};
+  try {
+    exchangeCardShown = JSON.parse(localStorage.getItem('swappo_exchange_card_shown') || '{}');
+  } catch (e) { exchangeCardShown = {}; }
+  function _markExchangeCardShown(convId) {
+    exchangeCardShown[convId] = Date.now();
+    try { localStorage.setItem('swappo_exchange_card_shown', JSON.stringify(exchangeCardShown)); } catch (e) {}
+  }
   let qrTimerInterval = null;
   let _rtUnsub = null; // Realtime unsubscribe fn for current conv
   let _convCache = []; // last fetched conversations (Swappo or Demo shape)
@@ -2000,12 +2014,15 @@
       area.appendChild(div);
     });
 
-    // Show the exchange-method choice card once the swap is accepted
-    // (identity_revealed on the Supabase conversation row is the source of
-    // truth; the legacy CONV_ITEM_MAP.status is kept as a fallback).
+    // Show the exchange-method choice card ONCE per conversation the
+    // first time the user opens it after the swap is accepted. After
+    // that the same options remain in the Deal Tracker panel — the
+    // inline card was re-inserted on every re-open which cluttered
+    // the thread (Ahmed 2026-04-21).
     var isAcceptedDeal = (conv && conv.identity_revealed === true) || map.status === 'accepted';
-    if (isAcceptedDeal && !deliveryChoice[convId]) {
+    if (isAcceptedDeal && !deliveryChoice[convId] && !exchangeCardShown[convId]) {
       area.appendChild(createExchangeMethodCard(convId));
+      _markExchangeCardShown(convId);
     }
 
     // Re-add typing indicator
