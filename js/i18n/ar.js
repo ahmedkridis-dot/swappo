@@ -50,6 +50,7 @@
     dashboard_title: "لوحة التحكم",
     dash_active_listings: "إعلانات نشطة",
     dash_active_chats: "محادثات نشطة",
+    dash_unread_suffix: "غير مقروءة",
     dash_your_rating: "تقييمك",
     dash_exchanges_month: "التبادلات هذا الشهر",
 

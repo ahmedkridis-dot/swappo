@@ -2072,15 +2072,30 @@
               var s = i.status || 'available';
               return s === 'available' || s === 'active';
             }).length;
-            // "Active chats" = conversations whose swap is status='accepted'
-            // (in progress). Completed / declined are archived and don't
-            // count. Keep the unread-messages number on the chat badge
-            // as a separate signal.
+            // "Active chats" card shows BOTH signals the user needs to see:
+            //   • big number = conversations with an in-progress swap
+            //     (status='accepted'). Archives don't count.
+            //   • red unread badge in the top-right corner — pops in when
+            //     any of those chats has unread messages waiting.
+            //   • label suffix "· N unread" so the info is reachable even
+            //     for users who don't notice the small badge.
             document.getElementById('stat-donated').textContent = activeChats;
             var chatBadge = document.getElementById('chat-badge-count');
             if (chatBadge) {
               chatBadge.textContent = _unread;
+              // Switch to red for unread (more visible) vs teal for zero.
+              chatBadge.style.background = _unread > 0 ? '#DC2626' : 'var(--teal,#09B1BA)';
               chatBadge.style.display = _unread > 0 ? '' : 'none';
+            }
+            // Augment the label with unread count when there's anything
+            // to read. Translations live in js/i18n/*.js (dash_*).
+            var chatLabelEl = document.querySelector('[data-i18n="dash_active_chats"]');
+            if (chatLabelEl) {
+              var baseLabel     = (typeof t === 'function' ? t('dash_active_chats')   : 'Active chats');
+              var unreadSuffix  = (typeof t === 'function' ? t('dash_unread_suffix')  : 'unread');
+              chatLabelEl.textContent = _unread > 0
+                ? baseLabel + ' · ' + _unread + ' ' + unreadSuffix
+                : baseLabel;
             }
             // Rating: show "—" for new users (no ratings yet), never fake 4.9
             var ratingAvg = Number(user.rating_avg || user.rating || 0);

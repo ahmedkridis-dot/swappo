@@ -50,6 +50,7 @@
     dashboard_title: "ڈیش بورڈ",
     dash_active_listings: "فعال اشتہارات",
     dash_active_chats: "فعال چیٹس",
+    dash_unread_suffix: "غیر پڑھے",
     dash_your_rating: "آپ کی درجہ بندی",
     dash_exchanges_month: "اس ماہ کے تبادلے",
 

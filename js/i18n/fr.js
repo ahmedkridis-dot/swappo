@@ -50,6 +50,7 @@
     dashboard_title: "Tableau de bord",
     dash_active_listings: "Annonces actives",
     dash_active_chats: "Discussions actives",
+    dash_unread_suffix: "non lus",
     dash_your_rating: "Votre note",
     dash_exchanges_month: "Échanges ce mois",
 

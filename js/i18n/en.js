@@ -41,6 +41,7 @@
     dashboard_title: "Dashboard",
     dash_active_listings: "Active listings",
     dash_active_chats: "Active chats",
+    dash_unread_suffix: "unread",
     dash_your_rating: "Your rating",
     dash_exchanges_month: "Exchanges this month",
 

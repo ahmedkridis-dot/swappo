@@ -21,6 +21,7 @@
     dashboard_title: "Панель управления",
     dash_active_listings: "Активные объявления",
     dash_active_chats: "Активные чаты",
+    dash_unread_suffix: "непрочитано",
     dash_your_rating: "Ваш рейтинг",
     dash_exchanges_month: "Обмены за месяц",
 
