@@ -209,6 +209,30 @@
     return count || 0;
   }
 
+  /**
+   * Count conversations the user is party to where the backing swap is
+   * still in progress (status='accepted') — i.e. "active chats" on the
+   * dashboard. Completed / declined / cancelled swaps are archived and
+   * don't count. Dashboard card was showing the unread-message count by
+   * mistake (Ahmed 2026-04-21).
+   *
+   * Every accepted swap has a matching conversation (accept_swap RPC
+   * creates one) so counting accepted swaps directly is equivalent to
+   * counting active chats, and avoids the PostgREST inner-join
+   * head-count quirk.
+   */
+  async function getActiveConvCount() {
+    if (!global.db) return 0;
+    const uid = await _currentUserId();
+    if (!uid) return 0;
+    const { count, error } = await global.db.from('swaps')
+      .select('id', { count: 'exact', head: true })
+      .or(`proposer_id.eq.${uid},receiver_id.eq.${uid}`)
+      .eq('status', 'accepted');
+    if (error) return 0;
+    return count || 0;
+  }
+
   // ---------- REALTIME SUBSCRIPTIONS ----------
   /** Subscribe to new messages for ONE conversation. Returns an unsubscribe fn. */
   function subscribe(convId, onMessage) {
@@ -239,6 +263,6 @@
   global.SwappoChat = {
     getConversations, getMessages, sendMessage, markRead,
     subscribe, subscribeAll,
-    filterContactInfo, getUnreadCount, openOrCreate
+    filterContactInfo, getUnreadCount, getActiveConvCount, openOrCreate
   };
 })(window);

@@ -2007,14 +2007,15 @@
             // so the dashboard paints real numbers on the first frame.
             var _cachedItems   = window.SwappoCache ? (window.SwappoCache.get('items_'   + user.id) || []) : [];
             var _cachedFavs    = window.SwappoCache ? (window.SwappoCache.get('favs_'    + user.id) || []) : [];
-            var _cachedCounts  = window.SwappoCache ? (window.SwappoCache.get('counts_'  + user.id) || { claims: 0, boosts: 0, unreadChat: 0 }) : { claims: 0, boosts: 0, unreadChat: 0 };
+            var _cachedCounts  = window.SwappoCache ? (window.SwappoCache.get('counts_'  + user.id) || { claims: 0, boosts: 0, unreadChat: 0, activeChats: 0 }) : { claims: 0, boosts: 0, unreadChat: 0, activeChats: 0 };
 
             const [
               claimsRes,
               boostsRes,
               userItems,
               favoriteItems,
-              unreadChat
+              unreadChat,
+              activeChats
             ] = await Promise.all([
               window.db.from('swaps').select('id', { count: 'exact', head: true })
                 .eq('proposer_id', user.id).eq('is_giveaway_claim', true)
@@ -2028,14 +2029,17 @@
               _getFavoriteItems().catch(function() { return _cachedFavs; }),
               (window.SwappoChat && window.SwappoChat.getUnreadCount)
                 ? window.SwappoChat.getUnreadCount().catch(function() { return _cachedCounts.unreadChat || 0; })
-                : Promise.resolve(_cachedCounts.unreadChat || 0)
+                : Promise.resolve(_cachedCounts.unreadChat || 0),
+              (window.SwappoChat && window.SwappoChat.getActiveConvCount)
+                ? window.SwappoChat.getActiveConvCount().catch(function() { return _cachedCounts.activeChats || 0; })
+                : Promise.resolve(_cachedCounts.activeChats || 0)
             ]);
 
             // Persist for next cold load (stale-while-revalidate).
             if (window.SwappoCache) {
               window.SwappoCache.set('items_'  + user.id, userItems || []);
               window.SwappoCache.set('favs_'   + user.id, favoriteItems || []);
-              window.SwappoCache.set('counts_' + user.id, { claims: claimsRes, boosts: boostsRes, unreadChat: unreadChat });
+              window.SwappoCache.set('counts_' + user.id, { claims: claimsRes, boosts: boostsRes, unreadChat: unreadChat, activeChats: activeChats });
             }
             var _claimsUsed = claimsRes;
             var _boostsUsed = boostsRes;
@@ -2068,7 +2072,11 @@
               var s = i.status || 'available';
               return s === 'available' || s === 'active';
             }).length;
-            document.getElementById('stat-donated').textContent = _unread;
+            // "Active chats" = conversations whose swap is status='accepted'
+            // (in progress). Completed / declined are archived and don't
+            // count. Keep the unread-messages number on the chat badge
+            // as a separate signal.
+            document.getElementById('stat-donated').textContent = activeChats;
             var chatBadge = document.getElementById('chat-badge-count');
             if (chatBadge) {
               chatBadge.textContent = _unread;
