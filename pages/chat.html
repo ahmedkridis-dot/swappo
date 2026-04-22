@@ -3404,7 +3404,23 @@
       var match = convs.find(function(c) { return c.other_user && c.other_user.id === targetUser; });
       if (match) { await openConv(match.id); opened = true; }
     }
-    if (!opened && convs.length > 0) await openConv(convs[0].id);
+    // On mobile, if no conv was already opened via URL params, default
+    // to the sidebar (list view) so the user can pick which conversation
+    // to open. Auto-opening the first conv on mobile hid the list
+    // entirely and left the user stuck on an empty chat screen
+    // (Ahmed 2026-04-22). Desktop keeps auto-open behaviour.
+    // Match the CSS breakpoint that turns the sidebar into a drawer (768px).
+    var isMobile = (typeof window.matchMedia === 'function')
+      ? window.matchMedia('(max-width: 768px)').matches
+      : (window.innerWidth <= 768);
+    if (!opened) {
+      if (isMobile) {
+        var sb = document.getElementById('chatSidebar');
+        if (sb) sb.classList.add('open');
+      } else if (convs.length > 0) {
+        await openConv(convs[0].id);
+      }
+    }
 
     // Wire input
     document.getElementById('sendBtn').addEventListener('click', sendMsg);
