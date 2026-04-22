@@ -406,12 +406,22 @@ const SwappoAuth = {
     });
     if (!Object.keys(payload).length) return { success: false, error: 'Nothing to update.' };
     try {
-      const { data, error } = await db.from('users').update(payload).eq('id', u.id).select('*').single();
+      // The UPDATE itself is fine (users_update_self RLS). We don't
+      // ask for the row back with `.select('*')` anymore because the
+      // column grants post-migration-021 would reject a wildcard.
+      // Instead we re-fetch via the get_my_user_row RPC which returns
+      // the full row (PII + prefs) for auth.uid() only.
+      const { error } = await db.from('users').update(payload).eq('id', u.id);
       if (error) return { success: false, error: error.message || 'Update failed.' };
+      const fresh = await db.rpc('get_my_user_row');
+      const data = fresh && !fresh.error
+        ? (Array.isArray(fresh.data) ? fresh.data[0] : fresh.data)
+        : null;
       // Write back into the shared profile cache so any module that reads
       // it afterwards (avatar chip, bell popup, chat header) sees the new
       // values without another round-trip.
       _profileCache.set(u.id, data);
+      SwappoCache.set('profile_' + u.id, data);
       _profileInflight.delete(u.id);
       _mirrorFromSupabase(u, data);
       return { success: true, profile: data };
@@ -603,9 +613,25 @@ async function _fetchProfile(userId, { force } = {}) {
 
   const promise = (async () => {
     try {
-      // 3s timeout so the whole site can't be hung by a slow profile SELECT
+      // Use the get_my_user_row RPC (SECURITY DEFINER) for self so we get
+      // the full row including PII / preferences. For any other user we
+      // read via the users_public view which exposes only safe columns.
+      // Both paths keep the users table locked down at the column level
+      // (migration 021 — Supabase advisor: Security Definer View).
+      const mySession = _readFastSession();
+      const isSelf = mySession && mySession.user && mySession.user.id === userId;
+
+      const query = isSelf
+        ? db.rpc('get_my_user_row').then(function (r) {
+            // RPC returns a single row (SETOF-like) or object. Normalize.
+            if (r.error) return r;
+            var row = Array.isArray(r.data) ? r.data[0] : r.data;
+            return { data: row || null, error: null };
+          })
+        : db.from('users_public').select('*').eq('id', userId).single();
+
       const res = await Promise.race([
-        db.from('users').select('*').eq('id', userId).single(),
+        query,
         new Promise((resolve) => setTimeout(
           () => resolve({ data: null, error: { message: 'profile fetch timeout' } }), 3000
         ))

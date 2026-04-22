@@ -3230,17 +3230,18 @@
               (async function preload() {
                 if (!window.db) return;
                 try {
-                  var u = await window.db.auth.getUser();
-                  var uid = u && u.data && u.data.user ? u.data.user.id : null;
-                  if (!uid) return;
-                  var res = await window.db.from('users')
-                    .select('recovery_email,recovery_phone')
-                    .eq('id', uid).single();
-                  if (res.data) {
-                    emailEl.value = res.data.recovery_email || '';
-                    phoneEl.value = res.data.recovery_phone || '';
+                  // PII access goes through get_my_user_row RPC (migration
+                  // 021) — direct SELECT of recovery_* now denied by
+                  // column-level grants.
+                  var rpc = await window.db.rpc('get_my_user_row');
+                  var row = rpc && !rpc.error
+                    ? (Array.isArray(rpc.data) ? rpc.data[0] : rpc.data)
+                    : null;
+                  if (row) {
+                    emailEl.value = row.recovery_email || '';
+                    phoneEl.value = row.recovery_phone || '';
                   }
-                } catch (e) { /* column may not exist on very old schemas */ }
+                } catch (e) { /* best-effort preload */ }
               })();
 
               btn.addEventListener('click', async function () {
@@ -3362,14 +3363,17 @@
               if (!nodes.length) return;
 
               // Hydrate pref toggles from the users row (one round-trip).
+              // notif_email_* columns are self-only and protected by the
+              // column-level grants in migration 021, so we read via the
+              // get_my_user_row RPC which returns the full row for the
+              // current user.
               let prefRow = null;
               try {
                 if (window.db && user && user.id) {
-                  const { data } = await window.db.from('users')
-                    .select('notif_email_enabled, notif_email_swap_proposed, notif_email_swap_accepted, notif_email_swap_declined, notif_email_counter_offer, notif_email_quota_low, notif_email_new_message')
-                    .eq('id', user.id)
-                    .maybeSingle();
-                  prefRow = data || null;
+                  const rpc = await window.db.rpc('get_my_user_row');
+                  prefRow = (rpc && !rpc.error)
+                    ? (Array.isArray(rpc.data) ? rpc.data[0] : rpc.data)
+                    : null;
                 }
               } catch (_) { /* ignore — defaults will apply */ }
 
