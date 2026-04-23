@@ -39,7 +39,7 @@ Swappo (swappo.ae) est la **première marketplace UAE dédiée au swap, achat, v
 ### 3. PAS DE PAIEMENT sur Swappo
 Swappo ne touche JAMAIS l'argent des deals entre users.
 - Revenue = delivery fees + Pro subs + boosts + transport commission + vehicle inspection + ads
-- Pour l'extra-cash entre users : on affiche 3 options (Cash au meetup / Aani / COD), on ne traite rien
+- Pour l'extra-cash entre users : on affiche 2 options (Cash au meetup / COD). Swappo ne traite rien et ne promeut aucun payment provider gratuitement. Slot sponsorisé futur.
 - Stripe = UNIQUEMENT pour Pro (29 AED/mois) + boosts + delivery fees Swappo
 
 ### 4. FIND A TRUCK = canal business permanent

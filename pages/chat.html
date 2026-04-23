@@ -1251,7 +1251,6 @@
   .dp-pay-btn.active { background: #09B1BA; color: #fff; cursor: default; }
   .dp-pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .dp-pay-notice { font-size: 11px; color: #6B7280; margin-top: 10px; line-height: 1.4; font-style: italic; }
-  .dp-pay-aani-cta { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; background: linear-gradient(135deg, #7C3AED, #C084FC); color: #fff; font-weight: 700; font-size: 12px; text-decoration: none; margin-top: 8px; border: 0; cursor: pointer; font-family: inherit; }
 
   /* P3 — TRUCK CTA permanent card in Deal Tracker */
   .dp-truck-cta { padding: 14px 16px; border-top: 1px solid #F3F4F6; }
@@ -3095,8 +3094,12 @@
     if (status !== 'accepted' && status !== 'completed') { container.innerHTML = ''; return; }
     if (cash <= 0) { container.innerHTML = ''; return; }
 
+    // Default to cash_meetup (Swappo doesn't promote any third-party
+    // payment rail for free — providers like Aani / Ziina / Tabby will
+    // pay to be featured in the Deal Tracker once the platform has
+    // traction). For now only user-to-user options remain.
     var state = paymentState[convId] || (paymentState[convId] = {
-      method: (map && map.payment_method) || (deliveryChoice[convId] && deliveryChoice[convId].me === 'meet' ? 'cash_meetup' : 'aani'),
+      method: (map && map.payment_method) || 'cash_meetup',
       payerConfirmed: !!(map && map.payer_confirmed_at),
       payeeConfirmed: !!(map && map.payee_confirmed_at)
     });
@@ -3105,17 +3108,13 @@
     var me = currentUser && currentUser.id;
     var isPayer = me && map && map.proposer_id === me;
 
-    var aaniDeeplink = 'aani://send?amount=' + encodeURIComponent(cash) + '&ref=SWP-' + (map && map.swap_id ? String(map.swap_id).slice(0,8) : 'deal');
-
     container.innerHTML =
       '<div class="dp-payment">' +
         '<h4>💳 ' + _trP('payment_method_title', 'Payment method') + ' · ' + cash + ' AED</h4>' +
         '<div class="dp-pay-opts">' +
           payOpt(convId, 'cash_meetup', '🤝', _trP('payment_cash_meetup', 'Cash at meetup'), '', state.method) +
-          payOpt(convId, 'aani',        '📱', _trP('payment_aani', 'Aani Instant Transfer'), _trP('payment_aani_cta', 'Pay via Aani'), state.method) +
           payOpt(convId, 'cod',         '🚚', _trP('payment_cod', 'Cash on Delivery (+5 AED)'), _trP('payment_cod_fee', 'Courier collects cash (+5 AED)'), state.method) +
         '</div>' +
-        (state.method === 'aani' ? '<a href="' + aaniDeeplink + '" class="dp-pay-aani-cta" id="aaniOpenBtn">💸 ' + _trP('payment_aani_cta', 'Pay via Aani') + ' · ' + cash + ' AED</a>' : '') +
         '<div class="dp-pay-confirm">' +
           (isPayer ? '<button id="payIPaid" class="dp-pay-btn' + (state.payerConfirmed ? ' active' : '') + '" onclick="confirmPayment(\'' + convId + '\', \'payer\')"' + (state.payerConfirmed ? ' disabled' : '') + '>✅ ' + _trP('payment_i_paid', 'I paid') + '</button>'
                     : '<button class="dp-pay-btn" disabled>' + (state.payerConfirmed ? '✅ ' + _trP('payment_i_paid', 'I paid') : '⏳ ' + _trP('offer_awaiting', 'Awaiting payer')) + '</button>') +
