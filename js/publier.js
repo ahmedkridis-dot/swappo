@@ -796,8 +796,13 @@ window.publishItem = async function(e) {
       'Fujairah':  { lat: 25.1288, lng: 56.3264 },
       'UAQ':       { lat: 25.5647, lng: 55.5553 }
     };
-    var liveLat = window.Swappo && Number(Swappo.userLat);
-    var liveLng = window.Swappo && Number(Swappo.userLng);
+    // Swappo.userLat / userLng are getter FUNCTIONS defined in app.js
+    // (Swappo.userLat = () => userLat). Calling Number() on the function
+    // reference itself returned NaN, so every item fell through to the
+    // emirate-center fallback — all Dubai items ended up pinned at
+    // (25.2048, 55.2708). Invoke with () to get the live GPS value.
+    var liveLat = (window.Swappo && typeof Swappo.userLat === 'function') ? Number(Swappo.userLat()) : null;
+    var liveLng = (window.Swappo && typeof Swappo.userLng === 'function') ? Number(Swappo.userLng()) : null;
     var fallback = EMIRATE_CENTERS[emirateChoice] || EMIRATE_CENTERS['Dubai'];
     var finalLat = (liveLat && !isNaN(liveLat)) ? liveLat : fallback.lat;
     var finalLng = (liveLng && !isNaN(liveLng)) ? liveLng : fallback.lng;
