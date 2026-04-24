@@ -1248,8 +1248,20 @@
       if (!mapEl || !window.L) return;
 
       if (!catalogueMapInstance) {
-        catalogueMapInstance = L.map('catalogueMap', { zoomControl: true, attributionControl: false }).setView([25.2, 55.27], 10);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(catalogueMapInstance);
+        // Airbnb-style clean base map (CartoDB Positron): light-grey
+        // canvas, thin roads, minimal POI labels — the teal item pins
+        // stay the center of attention instead of competing with
+        // street names and buildings. CartoDB's free tier requires
+        // the attribution badge, so we re-enable Leaflet's small
+        // bottom-right control with a joint OSM + CartoDB credit.
+        // {r} is the retina token — the @2x tile variant ships on
+        // high-density screens (Mac / iPhone) so the map looks crisp.
+        catalogueMapInstance = L.map('catalogueMap', { zoomControl: true }).setView([25.2, 55.27], 10);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 20,
+          subdomains: 'abcd',
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(catalogueMapInstance);
       } else {
         catalogueMapInstance.invalidateSize();
       }
