@@ -531,19 +531,31 @@
     }
 
     // ── Populate all grids ──
+    // The popular and gift-corner queries are independent — fire them in
+    // parallel via Promise.all so the homepage waits on max(query) instead
+    // of sum(queries). The "recent" fallback is a second round-trip but
+    // only fires when popular returned <4 rows (small catalogue today).
     async function populateGrids() {
       if (!window.SwappoItems || !window.SwappoItems.browse) return;
 
-      // Popular grid — try "popular" sort first, fall back to any recent
-      // available item so the section is NEVER empty while the catalogue
-      // is still small.
       var popularGrid = document.getElementById('popular-grid');
+      var giftGrid    = document.getElementById('gift-teaser-grid');
+
+      var [popularRes, giftsRes] = await Promise.all([
+        popularGrid
+          ? window.SwappoItems.browse({ sortBy: 'popular' }).catch(function () { return null; })
+          : Promise.resolve(null),
+        (giftGrid && window.SwappoItems.getGiveaways)
+          ? window.SwappoItems.getGiveaways().catch(function () { return null; })
+          : Promise.resolve(null)
+      ]);
+
+      // Popular grid render
       if (popularGrid) {
         try {
-          var popularRes = await window.SwappoItems.browse({ sortBy: 'popular' });
           var items = (popularRes && popularRes.items) || [];
-          // Fallback: newest items (available only), still up to 10
           if (items.length < 4) {
+            // Catalogue still small — top up with newest available items.
             var recentRes = await window.SwappoItems.browse({ sortBy: 'recent' });
             var extras = ((recentRes && recentRes.items) || [])
               .filter(function (i) { return !items.find(function (p) { return p.id === i.id; }); });
@@ -561,12 +573,10 @@
         } catch (e) { console.warn('[populateGrids] popular failed', e); }
       }
 
-      // Gift Corner teaser (up to 4 giveaways)
-      var giftGrid = document.getElementById('gift-teaser-grid');
-      if (giftGrid && window.SwappoItems.getGiveaways) {
+      // Gift Corner teaser
+      if (giftGrid) {
         try {
-          var gifts = (await window.SwappoItems.getGiveaways()) || [];
-          gifts = gifts.slice(0, 4);
+          var gifts = (giftsRes || []).slice(0, 4);
           if (gifts.length > 0) {
             giftGrid.innerHTML = gifts.map(function (item) { return window.SwappoItems.renderCard(item); }).join('');
           }

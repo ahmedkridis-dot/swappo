@@ -9,6 +9,24 @@
   'use strict';
 
   var POLL_MS = 30000;
+  // Cross-page cache: stats are aggregate counters that don't move much
+  // in 30 s. Skip the RPC on a fresh navigation if we already pulled
+  // recent numbers in this browser session.
+  var STATS_CACHE_KEY = 'swp_live_stats_cache';
+  var STATS_TTL_MS = 30000;
+  function _readStatsCache() {
+    try {
+      var raw = sessionStorage.getItem(STATS_CACHE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed.t !== 'number') return null;
+      if ((Date.now() - parsed.t) > STATS_TTL_MS) return null;
+      return parsed.v;
+    } catch (e) { return null; }
+  }
+  function _writeStatsCache(stats) {
+    try { sessionStorage.setItem(STATS_CACHE_KEY, JSON.stringify({ t: Date.now(), v: stats })); } catch (e) {}
+  }
   // Counter order in the eco-ticker markup:
   //   0 → CO2 kg saved       (suffix " kg")
   //   1 → items swapped
@@ -74,17 +92,28 @@
 
   async function tick() {
     var stats = await fetchStats();
-    if (stats) applyStats(stats);
+    if (stats) {
+      applyStats(stats);
+      _writeStatsCache(stats);
+    }
   }
 
   function start() {
     if (!document.getElementById('ecoTicker')) return;
 
-    // First fetch — retry briefly while window.db boots
-    (function waitForDb(attempts) {
-      if (window.db && window.db.rpc) { tick(); return; }
-      if (attempts > 0) setTimeout(function () { waitForDb(attempts - 1); }, 200);
-    })(25);
+    // 1) Paint from sessionStorage immediately — zero network on a warm
+    //    in-session navigation.
+    var cached = _readStatsCache();
+    if (cached) applyStats(cached);
+
+    // 2) If cache was fresh, skip the first RPC and let the poll handle
+    //    the next refresh in (POLL_MS - cache_age). Otherwise fetch now.
+    if (!cached) {
+      (function waitForDb(attempts) {
+        if (window.db && window.db.rpc) { tick(); return; }
+        if (attempts > 0) setTimeout(function () { waitForDb(attempts - 1); }, 200);
+      })(25);
+    }
 
     setInterval(tick, POLL_MS);
   }

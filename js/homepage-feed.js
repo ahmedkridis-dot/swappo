@@ -157,6 +157,25 @@
     }
   }
 
+  // Recent swaps + testimonials change at most a few times an hour.
+  // localStorage cache (vs sessionStorage) keeps the feed warm across
+  // browser restarts so first paint after a return visit costs zero.
+  var FEED_CACHE_KEY = 'swp_homepage_feed_cache_v1';
+  var FEED_TTL_MS = 5 * 60 * 1000;
+  function _readFeedCache() {
+    try {
+      var raw = localStorage.getItem(FEED_CACHE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed.t !== 'number') return null;
+      if ((Date.now() - parsed.t) > FEED_TTL_MS) return null;
+      return parsed.v;
+    } catch (e) { return null; }
+  }
+  function _writeFeedCache(data) {
+    try { localStorage.setItem(FEED_CACHE_KEY, JSON.stringify({ t: Date.now(), v: data })); } catch (e) {}
+  }
+
   async function fetchFeed() {
     if (!window.db || !window.db.rpc) return null;
     try {
@@ -174,9 +193,19 @@
 
   async function start() {
     if (!findSection()) return;
+
+    // Paint from cache first if we have something fresh.
+    var cached = _readFeedCache();
+    if (cached) {
+      apply(cached);
+      return; // skip the network round-trip while cache is still valid
+    }
+
     (function waitForDb(attempts) {
       if (window.db && window.db.rpc) {
-        fetchFeed().then(function (data) { if (data) apply(data); });
+        fetchFeed().then(function (data) {
+          if (data) { apply(data); _writeFeedCache(data); }
+        });
         return;
       }
       if (attempts > 0) setTimeout(function () { waitForDb(attempts - 1); }, 200);

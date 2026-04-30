@@ -598,17 +598,30 @@ function _invalidateProfileCache(userId) {
   else        { _profileCache.clear();        _profileInflight.clear(); }
 }
 
+// Profile rows change rarely (pseudo, avatar, swap_count, badge, rating).
+// 5 min cache means each navigation within a session skips the network
+// entirely after the first fetch. SIGNED_IN / SIGNED_OUT / updateProfile
+// invalidate the cache so this never serves a stale identity.
+var _PROFILE_TTL_MS = 5 * 60 * 1000;
+
 async function _fetchProfile(userId, { force } = {}) {
   if (!db || !userId) return null;
   if (!force && _profileCache.has(userId)) return _profileCache.get(userId);
   if (!force && _profileInflight.has(userId)) return _profileInflight.get(userId);
 
-  // Warm the in-memory cache from localStorage so subsequent sync reads
-  // via getCachedProfile() return immediately, even on the very first
-  // call after boot.
-  if (!force && !_profileCache.has(userId)) {
-    var cached = SwappoCache.get('profile_' + userId);
-    if (cached) _profileCache.set(userId, cached);
+  // Skip the network entirely if the localStorage copy is fresh —
+  // covers the most common "user just navigated to another page" case.
+  if (!force) {
+    var fresh = SwappoCache.getWithAge('profile_' + userId);
+    if (fresh && fresh.value && fresh.ageMs < _PROFILE_TTL_MS) {
+      _profileCache.set(userId, fresh.value);
+      return fresh.value;
+    }
+    if (fresh && fresh.value) {
+      // Stale but usable — hydrate in-memory so the synchronous
+      // getCachedProfile() returns something while the fresh fetch flies.
+      _profileCache.set(userId, fresh.value);
+    }
   }
 
   const promise = (async () => {
