@@ -1,0 +1,22 @@
+{
+  "appId": "ae.swappo.app",
+  "appName": "Swappo",
+  "webDir": "www",
+  "server": {
+    "url": "https://swappo.ae/dev-a7f3k9mz2q.html",
+    "cleartext": false
+  },
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#FFFFFF",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_CROP",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
+  }
+}

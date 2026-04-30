@@ -504,6 +504,10 @@
   <!-- Core runtime (Supabase-only, Demo engine archived in _archive/) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="js/supabase.js" defer></script>
+  <!-- Capacitor native bridge: detect iOS/Android wrapper + register push
+       device tokens. No-ops on the web (window.Capacitor absent). -->
+  <script src="js/platform.js" defer></script>
+  <script src="js/push-notifications.js" defer></script>
   <script src="js/swappo-items.js" defer></script>
   <script src="js/constants.js" defer></script>
   <script src="js/toast.js" defer></script>
