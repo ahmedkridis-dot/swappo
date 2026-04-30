@@ -943,7 +943,12 @@
     var megaArea = document.querySelector('.mega-menu-wrapper');
     if (!megaArea) megaArea = bar.parentElement;
 
-    // Hover on Level 1 items with subs
+    // Hover on Level 1 items with subs — opens the dropdown so the user
+    // can preview subcategories without committing. The CLICK on the
+    // parent link now navigates directly to its "See All" page (href on
+    // the <a>) — Ahmed 2026-04-24: "en cliquant ça ouvre [see all]".
+    // Subcategory links inside the dropdown still work as before because
+    // they're separate <a> elements with their own hrefs.
     var catItems = bar.querySelectorAll('.mega-menu-item--has-subs');
     for (var i = 0; i < catItems.length; i++) {
       (function (item) {
@@ -951,15 +956,6 @@
           if (isMobile()) return;
           var catKey = item.getAttribute('data-category');
           openDropdown(catKey);
-        });
-        // Prevent click default on parent link if has subs (allow navigating via sub links)
-        item.querySelector('.mega-menu-item__link').addEventListener('click', function (e) {
-          if (isMobile()) return;
-          if (item.classList.contains('mega-menu-item--has-subs')) {
-            e.preventDefault();
-            var catKey = item.getAttribute('data-category');
-            openDropdown(catKey);
-          }
         });
       })(catItems[i]);
     }
