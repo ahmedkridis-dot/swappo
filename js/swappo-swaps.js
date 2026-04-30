@@ -31,6 +31,12 @@
   const MSG_TABLE = 'messages';
 
   async function _currentUserId() {
+    // Fast path via the synchronous JWT reader — same race fix as
+    // swappo-chat.js. Avoids returning null while the SDK hydrates.
+    if (global.SwappoAuth && global.SwappoAuth.getFastUser) {
+      var fast = global.SwappoAuth.getFastUser();
+      if (fast && fast.id) return fast.id;
+    }
     if (!global.SwappoAuth || !global.SwappoAuth.isReady()) return null;
     const u = await global.SwappoAuth.getCurrentUser();
     return u ? u.id : null;

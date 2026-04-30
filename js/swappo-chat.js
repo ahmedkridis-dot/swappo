@@ -27,6 +27,16 @@
   const USERS_TABLE = 'users_public';
 
   async function _currentUserId() {
+    // Fast path: read the JWT user from localStorage synchronously so we
+    // don't race the SDK's INITIAL_SESSION event (up to 2.5 s on cold).
+    // Without this, getConversations would fire BEFORE the SDK hydrates
+    // its in-memory session, return [] silently, and the chat sidebar
+    // would render "No conversations yet" for users who actually have
+    // active swaps. Reported by Ahmed 2026-04-24.
+    if (global.SwappoAuth && global.SwappoAuth.getFastUser) {
+      var fast = global.SwappoAuth.getFastUser();
+      if (fast && fast.id) return fast.id;
+    }
     if (!global.SwappoAuth || !global.SwappoAuth.isReady()) return null;
     const u = await global.SwappoAuth.getCurrentUser();
     return u ? u.id : null;
@@ -86,10 +96,17 @@
     const uid = await _currentUserId();
     if (!uid) return [];
 
-    const { data: convs } = await global.db.from(CONV_TABLE).select('*')
+    const convsResp = await global.db.from(CONV_TABLE).select('*')
       .or(`user1_id.eq.${uid},user2_id.eq.${uid}`)
       .order('last_message_at', { ascending: false });
-
+    if (convsResp.error) {
+      // Surface the actual cause when the sidebar is mysteriously empty
+      // (was silently swallowed before — Ahmed flagged "No conversations
+      // yet" while having 6 in the DB).
+      console.error('[SwappoChat.getConversations]', convsResp.error.message || convsResp.error);
+      return [];
+    }
+    const convs = convsResp.data;
     if (!convs || !convs.length) return [];
 
     // Collect other user ids + item ids + swap ids
