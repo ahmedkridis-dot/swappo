@@ -249,7 +249,7 @@
 </head>
 <body>
   <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
-  <h1 class="sr-only">Swap Market — browse items available for swap, buy, or gift across the UAE</h1>
+  <h1 class="sr-only" data-i18n="catalogue_h1_seo">Swap Market — browse items available for swap, buy, or gift across the UAE</h1>
 
   <!-- ========== NAVBAR ========== -->
   <nav class="navbar">
@@ -388,27 +388,27 @@
       </select>
 
       <select id="filter-emirate">
-        <option value="">All UAE</option>
-        <option value="Dubai">Dubai</option>
-        <option value="Abu Dhabi">Abu Dhabi</option>
-        <option value="Sharjah">Sharjah</option>
-        <option value="Ajman">Ajman</option>
-        <option value="RAK">Ras Al Khaimah</option>
-        <option value="Fujairah">Fujairah</option>
-        <option value="UAQ">Umm Al Quwain</option>
+        <option value="" data-i18n="emirate_all">All UAE</option>
+        <option value="Dubai" data-i18n="emirate_dubai">Dubai</option>
+        <option value="Abu Dhabi" data-i18n="emirate_abu_dhabi">Abu Dhabi</option>
+        <option value="Sharjah" data-i18n="emirate_sharjah">Sharjah</option>
+        <option value="Ajman" data-i18n="emirate_ajman">Ajman</option>
+        <option value="RAK" data-i18n="emirate_rak">Ras Al Khaimah</option>
+        <option value="Fujairah" data-i18n="emirate_fujairah">Fujairah</option>
+        <option value="UAQ" data-i18n="emirate_uaq">Umm Al Quwain</option>
       </select>
 
       <div style="display:flex;align-items:center;gap:6px;">
-        <input type="number" id="filter-price-min" min="0" placeholder="Min AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;" autocomplete="off">
+        <input type="number" id="filter-price-min" min="0" placeholder="Min AED" data-i18n-placeholder="catalogue_min_price" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;" autocomplete="off">
         <span style="color:#9CA3AF;">–</span>
-        <input type="number" id="filter-price-max" min="0" placeholder="Max AED" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;" autocomplete="off">
+        <input type="number" id="filter-price-max" min="0" placeholder="Max AED" data-i18n-placeholder="catalogue_max_price" style="width:90px;padding:10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;" autocomplete="off">
       </div>
 
       <select id="filter-sort">
         <option value="newest" data-i18n="newest_first">Newest first</option>
         <option value="popular" data-i18n="most_popular">Most popular</option>
-        <option value="price_asc">Price ↑</option>
-        <option value="price_desc">Price ↓</option>
+        <option value="price_asc" data-i18n="catalogue_sort_price_asc">Price ↑</option>
+        <option value="price_desc" data-i18n="catalogue_sort_price_desc">Price ↓</option>
         <option value="closest" data-i18n="nearest_first">Nearest first</option>
       </select>
 
@@ -439,18 +439,18 @@
       <div id="ai-suggestions-scroll" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;"></div>
     </div>
     <div id="ai-free-teaser" style="display:none;background:var(--teal-bg,#E6F7F8);border:1px solid rgba(9,177,186,0.15);border-radius:var(--radius-md,12px);padding:16px 20px;margin:16px 0;display:none;">
-      <span style="font-size:14px;color:var(--navy,#1A1A2E);"><i class="fas fa-magic" style="color:var(--teal,#09B1BA);margin-right:6px;"></i> <strong>Want AI-powered suggestions?</strong> Upgrade to Pro for smart matchmaking!</span>
-      <a href="pricing.html" style="margin-left:12px;color:var(--teal,#09B1BA);font-weight:600;font-size:13px;text-decoration:none;">Go Pro →</a>
+      <span style="font-size:14px;color:var(--navy,#1A1A2E);"><i class="fas fa-magic" style="color:var(--teal,#09B1BA);margin-right:6px;"></i> <strong data-i18n="catalogue_ai_teaser_q">Want AI-powered suggestions?</strong> <span data-i18n="catalogue_ai_teaser_a">Upgrade to Pro for smart matchmaking!</span></span>
+      <a href="pricing.html" style="margin-left:12px;color:var(--teal,#09B1BA);font-weight:600;font-size:13px;text-decoration:none;" data-i18n="catalogue_go_pro">Go Pro →</a>
     </div>
   </div>
 
   <!-- ========== MAIN CONTENT ========== -->
   <div class="container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <span class="result-count" id="item-count">Loading…</span>
+      <span class="result-count" id="item-count" data-i18n="loading">Loading…</span>
       <div class="view-toggle" id="viewToggle">
-        <button class="active" onclick="setView('grid')"><i class="fas fa-th-large"></i> Grid</button>
-        <button onclick="setView('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
+        <button class="active" onclick="setView('grid')"><i class="fas fa-th-large"></i> <span data-i18n="catalogue_view_grid">Grid</span></button>
+        <button onclick="setView('map')"><i class="fas fa-map-marked-alt"></i> <span data-i18n="catalogue_view_map">Map</span></button>
       </div>
     </div>
     <div class="catalogue-split" id="catalogueSplit">
@@ -459,15 +459,15 @@
         <div id="truck-banner" style="display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#FDF2F8,#FCE7F3);border:1.5px dashed #F9A8D4;border-radius:14px;padding:14px 20px;margin-bottom:16px;opacity:0.92;cursor:default;" title="Truck partners joining soon">
           <span style="font-size:28px;">🚛</span>
           <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;color:#9D174D;">Find a Truck</div>
-            <div style="font-size:12px;color:#BE185D;">Partner trucks joining soon</div>
+            <div style="font-weight:700;font-size:14px;color:#9D174D;" data-i18n="truck_footer_link">Find a Truck</div>
+            <div style="font-size:12px;color:#BE185D;" data-i18n="catalogue_truck_partners_soon">Partner trucks joining soon</div>
           </div>
-          <span style="background:#fff;color:#9D174D;border:1px solid #F9A8D4;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;">COMING SOON</span>
+          <span style="background:#fff;color:#9D174D;border:1px solid #F9A8D4;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.03em;" data-i18n="coming_soon">COMING SOON</span>
         </div>
         <div class="products-grid" id="catalogue-grid" data-stagger-grid></div>
         <!-- Load more -->
         <div id="load-more-wrap" class="load-more-wrap" style="display:none;">
-          <button id="load-more-btn" class="btn-pill btn-pill-outline">Load more items</button>
+          <button id="load-more-btn" class="btn-pill btn-pill-outline" data-i18n="catalogue_load_more">Load more items</button>
         </div>
       </div>
       <div class="catalogue-map" id="catalogueMap"></div>
