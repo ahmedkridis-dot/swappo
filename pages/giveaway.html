@@ -760,7 +760,7 @@
 </head>
 <body>
   <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
-    <h1 class="sr-only">Gift Corner — free items from the Swappo community</h1>
+    <h1 class="sr-only" data-i18n="gift_h1_sr">Gift Corner — free items from the Swappo community</h1>
     <!-- Navbar -->
     <nav class="navbar">
       <div class="container">
@@ -880,40 +880,40 @@
             <!-- Karma Bar -->
             <div id="karma-bar" style="max-width:400px;margin:0 auto 24px;padding:0 16px;">
               <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:6px;">
-                <span>🌱 Your Karma: <span id="karma-points">0</span> pts</span>
-                <span id="karma-level">Level 1 — Newcomer</span>
+                <span>🌱 <span data-i18n="karma_your">Your Karma:</span> <span id="karma-points">0</span> <span data-i18n="karma_pts">pts</span></span>
+                <span id="karma-level" data-i18n="karma_level1">Level 1 — Newcomer</span>
               </div>
               <div style="height:8px;background:#E8E8E8;border-radius:4px;overflow:hidden;">
                 <div id="karma-fill" style="height:100%;width:10%;background:linear-gradient(90deg,var(--primary,#09B1BA),#10B981);border-radius:4px;transition:width 0.5s ease;"></div>
               </div>
-              <div id="karma-next" style="font-size:11px;color:var(--text-muted,#999);margin-top:4px;">Keep giving to level up!</div>
+              <div id="karma-next" style="font-size:11px;color:var(--text-muted,#999);margin-top:4px;" data-i18n="karma_keep_giving">Keep giving to level up!</div>
             </div>
 
             <!-- Info Banner -->
             <div class="giveaway-info-banner">
-                <h2>&#127873; Gift Corner</h2>
-                <p>Claim free items from generous donors. Claims included in your plan.</p>
+                <h2>&#127873; <span data-i18n="gift_corner">Gift Corner</span></h2>
+                <p data-i18n="gift_banner_subtitle">Claim free items from generous donors. Claims included in your plan.</p>
                 <div class="claims-counter">
-                    <span id="claims-remaining">1</span>/<span id="claims-max">1</span> claims remaining this month
+                    <span id="claims-remaining">1</span>/<span id="claims-max">1</span> <span data-i18n="gift_claims_remaining_text">claims remaining this month</span>
                 </div>
             </div>
 
             <!-- Filter Bar -->
             <div class="filter-bar">
                 <div class="category-chips">
-                    <button class="chip active" data-category="all">All</button>
-                    <button class="chip" data-category="kids">Kids</button>
-                    <button class="chip" data-category="clothing">Clothing</button>
-                    <button class="chip" data-category="electronics">Electronics</button>
-                    <button class="chip" data-category="furniture">Furniture</button>
-                    <button class="chip" data-category="sports">Sports</button>
-                    <button class="chip" data-category="books">Books</button>
-                    <button class="chip" data-category="plants">Plants</button>
-                    <button class="chip" data-category="other">Other</button>
+                    <button class="chip active" data-category="all" data-i18n="all">All</button>
+                    <button class="chip" data-category="kids" data-i18n="gift_chip_kids">Kids</button>
+                    <button class="chip" data-category="clothing" data-i18n="clothing">Clothing</button>
+                    <button class="chip" data-category="electronics" data-i18n="electronics">Electronics</button>
+                    <button class="chip" data-category="furniture" data-i18n="furniture">Furniture</button>
+                    <button class="chip" data-category="sports" data-i18n="gift_chip_sports">Sports</button>
+                    <button class="chip" data-category="books" data-i18n="gift_chip_books">Books</button>
+                    <button class="chip" data-category="plants" data-i18n="plants">Plants</button>
+                    <button class="chip" data-category="other" data-i18n="gift_chip_other">Other</button>
                 </div>
                 <select class="sort-select" id="sort-select">
-                    <option value="newest">Newest first</option>
-                    <option value="nearest">Nearest first</option>
+                    <option value="newest" data-i18n="newest_first">Newest first</option>
+                    <option value="nearest" data-i18n="nearest_first">Nearest first</option>
                 </select>
             </div>
 
@@ -925,22 +925,22 @@
 
             <!-- Info Section -->
             <div class="info-section">
-                <h2>How Gift Corner Works</h2>
+                <h2 data-i18n="gift_how_works">How Gift Corner Works</h2>
                 <div class="steps-grid">
                     <div class="step">
                         <div class="step-number">1</div>
-                        <h3>Donate your items</h3>
-                        <p>List items you no longer need and help the community.</p>
+                        <h3 data-i18n="gift_step1_title">Donate your items</h3>
+                        <p data-i18n="gift_step1_desc">List items you no longer need and help the community.</p>
                     </div>
                     <div class="step">
                         <div class="step-number">2</div>
-                        <h3>Browse free items</h3>
-                        <p>Discover items other Swappers are giving away in your area.</p>
+                        <h3 data-i18n="gift_step2_title">Browse free items</h3>
+                        <p data-i18n="gift_step2_desc">Discover items other Swappers are giving away in your area.</p>
                     </div>
                     <div class="step">
                         <div class="step-number">3</div>
-                        <h3>Claim & collect</h3>
-                        <p>Use your monthly claims to grab items, arrange pickup, and collect.</p>
+                        <h3 data-i18n="gift_step3_title">Claim & collect</h3>
+                        <p data-i18n="gift_step3_desc">Use your monthly claims to grab items, arrange pickup, and collect.</p>
                     </div>
                 </div>
 
@@ -958,8 +958,8 @@
 
             <!-- Final CTA -->
             <div class="final-cta reveal">
-                <h2>Have something to give? Donate it!</h2>
-                <a href="publier.html" class="btn-primary-coral">Add a free item</a>
+                <h2 data-i18n="gift_have_something">Have something to give? Donate it!</h2>
+                <a href="publier.html" class="btn-primary-coral" data-i18n="gift_add_free">Add a free item</a>
             </div>
         </div>
         <!-- Adoption Banner — Coming Soon -->
@@ -1067,6 +1067,11 @@
         // Track claimed items in this session for UI updates
         const claimedItems = new Set();
 
+        // i18n helper: t() may not be ready when this script parses; fall back to literal.
+        function _giftT(key, fallback) {
+            return (typeof t === 'function') ? t(key) : (fallback || key);
+        }
+
         // Supabase session resolver (no Demo*auth fallback — this page is 100%
         // backed by Supabase. If the session can't be read, the page falls
         // through to the guest overlay.)
@@ -1158,9 +1163,9 @@
                 grid.innerHTML =
                   '<div style="grid-column:1/-1;text-align:center;padding:64px 24px;color:#6B7280;background:#F9FAFB;border:1px dashed #E5E7EB;border-radius:16px;">' +
                     '<div style="font-size:56px;margin-bottom:14px;">🎁</div>' +
-                    '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">No gifts available right now</h3>' +
-                    '<p style="font-size:14px;color:#6B7280;margin:0 0 18px;max-width:380px;margin-left:auto;margin-right:auto;">Be the first to share — donate an item and help start the Gift Corner!</p>' +
-                    '<a href="publier.html" style="display:inline-block;background:#09B1BA;color:#fff;padding:10px 22px;border-radius:999px;font-weight:700;text-decoration:none;font-size:14px;">Drop a gift →</a>' +
+                    '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">' + _giftT('gift_empty_title', 'No gifts available right now') + '</h3>' +
+                    '<p style="font-size:14px;color:#6B7280;margin:0 0 18px;max-width:380px;margin-left:auto;margin-right:auto;">' + _giftT('gift_empty_subtitle', 'Be the first to share — donate an item and help start the Gift Corner!') + '</p>' +
+                    '<a href="publier.html" style="display:inline-block;background:#09B1BA;color:#fff;padding:10px 22px;border-radius:999px;font-weight:700;text-decoration:none;font-size:14px;">' + _giftT('gift_empty_cta', 'Drop a gift →') + '</a>' +
                   '</div>';
                 return;
             }
@@ -1336,12 +1341,12 @@
         function showNeedsListingModal() {
             var html =
                 '<div style="font-size:52px;margin-bottom:14px;">🎁</div>' +
-                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">Almost there!</h3>' +
-                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 8px;">To claim a free gift, you need to share something first.</p>' +
-                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">That\'s the heart of Swappo — <strong style="color:var(--teal,#09B1BA);">everyone gives, everyone gets</strong>. Start by listing at least one item (to swap or to give away), and your first claim will unlock instantly.</p>' +
+                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">' + _giftT('gift_almost_title', 'Almost there!') + '</h3>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 8px;">' + _giftT('gift_almost_p1', 'To claim a free gift, you need to share something first.') + '</p>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">' + _giftT('gift_almost_p2_html', 'That\'s the heart of Swappo — <strong>everyone gives, everyone gets</strong>. Start by listing at least one item (to swap or to give away), and your first claim will unlock instantly.') + '</p>' +
                 '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
-                    '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--gray-bg,#F8F9FA);border:none;padding:12px 22px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">Maybe later</button>' +
-                    '<button onclick="window.location.href=\'publier.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 26px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">Drop an item now →</button>' +
+                    '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--gray-bg,#F8F9FA);border:none;padding:12px 22px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">' + _giftT('gift_maybe_later', 'Maybe later') + '</button>' +
+                    '<button onclick="window.location.href=\'publier.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 26px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">' + _giftT('gift_drop_now', 'Drop an item now →') + '</button>' +
                 '</div>';
             _buildModal(html);
         }
@@ -1350,23 +1355,25 @@
         function showFreeQuotaSoftPaywall() {
             var html =
                 '<div style="font-size:52px;margin-bottom:14px;">🎉</div>' +
-                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">You\'ve claimed your free gift this month</h3>' +
-                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">Come back next month for another free claim, or upgrade to <strong style="color:var(--teal,#09B1BA);">Swappo Pro</strong> to claim up to 5 gifts per month, plus no ads, analytics, and Pro boosts included.</p>' +
+                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">' + _giftT('gift_claimed_month_title', "You've claimed your free gift this month") + '</h3>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">' + _giftT('gift_claimed_month_p_html', 'Come back next month for another free claim, or upgrade to <strong>Swappo Pro</strong> to claim up to 5 gifts per month, plus no ads, analytics, and Pro boosts included.') + '</p>' +
                 '<div style="display:flex;flex-direction:column;gap:10px;align-items:center;">' +
-                    '<button onclick="window.location.href=\'pricing.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:13px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">Upgrade to Pro — 29 AED/mo</button>' +
-                    '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:transparent;border:none;padding:10px 22px;font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">I\'ll come back next month</button>' +
-                    '<a href="pricing.html" style="font-size:13px;color:var(--teal,#09B1BA);text-decoration:none;font-weight:600;margin-top:4px;">See all Pro benefits →</a>' +
+                    '<button onclick="window.location.href=\'pricing.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:13px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">' + _giftT('gift_upgrade_pro', 'Upgrade to Pro — 29 AED/mo') + '</button>' +
+                    '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:transparent;border:none;padding:10px 22px;font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">' + _giftT('gift_back_next_month', "I'll come back next month") + '</button>' +
+                    '<a href="pricing.html" style="font-size:13px;color:var(--teal,#09B1BA);text-decoration:none;font-weight:600;margin-top:4px;">' + _giftT('gift_see_pro_benefits', 'See all Pro benefits →') + '</a>' +
                 '</div>';
             _buildModal(html);
         }
 
         /** STEP 5 — Pro user used all 5 claims */
         function showProQuotaInfoModal(limit) {
+            var n = String(limit || 5);
+            var bodyTpl = _giftT('gift_pro_used_p_html', "You've used all {n} Pro claims this month. Come back next month for {n} more!");
             var html =
                 '<div style="font-size:52px;margin-bottom:14px;">👑</div>' +
-                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">All Pro claims used</h3>' +
-                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">You\'ve used all ' + (limit || 5) + ' Pro claims this month. Come back next month for ' + (limit || 5) + ' more!</p>' +
-                '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;">Got it</button>';
+                '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">' + _giftT('gift_pro_used_title', 'All Pro claims used') + '</h3>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">' + bodyTpl.split('{n}').join(n) + '</p>' +
+                '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;">' + _giftT('gift_got_it', 'Got it') + '</button>';
             _buildModal(html);
         }
 
@@ -1390,7 +1397,7 @@
                     '<div style="font-size:48px;margin-bottom:12px;">🎁</div>' +
                     '<h3 style="font-size:20px;font-weight:700;color:var(--navy,#1A1A2E);margin:0 0 8px;" data-i18n="gift_claimed_title">Item claimed!</h3>' +
                     '<p style="font-size:14px;color:var(--gray-text,#6B7280);margin:0 0 20px;" data-i18n="gift_thank_prompt">Want to say thanks to the giver?</p>' +
-                    '<textarea id="thank-you-text" maxlength="140" placeholder="Write a short thank you…" style="width:100%;height:70px;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-md,12px);padding:12px;font-family:inherit;font-size:14px;resize:none;margin-bottom:16px;"></textarea>' +
+                    '<textarea id="thank-you-text" maxlength="140" placeholder="' + _giftT('gift_thanks_placeholder', 'Write a short thank you…') + '" style="width:100%;height:70px;border:1px solid var(--gray-border,#E5E7EB);border-radius:var(--radius-md,12px);padding:12px;font-family:inherit;font-size:14px;resize:none;margin-bottom:16px;"></textarea>' +
                     '<div style="display:flex;gap:10px;justify-content:center;">' +
                         '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--gray-bg,#F8F9FA);border:none;padding:10px 24px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);" data-i18n="gift_thank_skip">Skip</button>' +
                         '<button onclick="sendThanks(this)" style="background:var(--teal,#09B1BA);color:white;border:none;padding:10px 24px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;" data-i18n="gift_thank_send">Send thanks 💚</button>' +
@@ -1475,9 +1482,9 @@
             var overlay = document.createElement('div');
             overlay.className = 'guest-overlay-message';
             overlay.innerHTML =
-                '<h2>\uD83D\uDD12 Sign up to access Gift Corner</h2>' +
-                '<p>Create a free account to browse and claim giveaway items.</p>' +
-                '<a href="login.html" class="btn-primary-coral">Join the Swap</a>';
+                '<h2>\uD83D\uDD12 ' + _giftT('gift_signin_title', 'Sign up to access Gift Corner') + '</h2>' +
+                '<p>' + _giftT('gift_signin_p', 'Create a free account to browse and claim giveaway items.') + '</p>' +
+                '<a href="login.html" class="btn-primary-coral">' + _giftT('join_swap', 'Join the Swap') + '</a>';
 
             container.style.position = 'relative';
             container.appendChild(overlay);
@@ -1524,7 +1531,7 @@
     (function() {
       var btn = document.createElement('button');
       btn.className = 'surprise-me-btn gift-variant';
-      btn.innerHTML = '<i class="fas fa-gift"></i> Surprise Gift!';
+      btn.innerHTML = '<i class="fas fa-gift"></i> ' + _giftT('gift_surprise_btn', 'Surprise Gift!');
       btn.onclick = async function() {
         var items = [];
         try {
@@ -1532,9 +1539,9 @@
             items = await window.SwappoItems.getGiveaways();
           }
         } catch (e) { items = []; }
-        if (!items.length) { Toast.show('No gifts available right now!', 'info'); return; }
+        if (!items.length) { Toast.show(_giftT('gift_empty_title', 'No gifts available right now') + '!', 'info'); return; }
         var item = items[Math.floor(Math.random() * items.length)];
-        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Gift';
+        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || _giftT('gift_mystery', 'Mystery Gift');
         var photo = (item.photos && item.photos[0]) || '';
         var overlay = document.createElement('div');
         overlay.className = 'surprise-overlay';
@@ -1544,11 +1551,11 @@
             '<div style="font-size:48px;margin-bottom:12px;">🎁</div>' +
             (photo ? '<img src="' + photo + '" style="width:100%;height:180px;object-fit:cover;border-radius:12px;margin-bottom:16px;" alt="">' : '') +
             '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">' + title + '</h3>' +
-            '<p style="font-size:13px;color:#9CA3AF;margin:0 0 4px;">FREE · ' + (item.category || '') + '</p>' +
-            '<p style="font-size:12px;color:#6B7280;font-style:italic;margin:0 0 20px;">A gift that might make your day!</p>' +
+            '<p style="font-size:13px;color:#9CA3AF;margin:0 0 4px;">' + _giftT('gift_free_label', 'FREE') + ' · ' + (item.category || '') + '</p>' +
+            '<p style="font-size:12px;color:#6B7280;font-style:italic;margin:0 0 20px;">' + _giftT('gift_might_make_day', 'A gift that might make your day!') + '</p>' +
             '<div style="display:flex;gap:10px;justify-content:center;">' +
-              '<button onclick="this.closest(\'.surprise-overlay\').remove();btn.click();" class="btn-pill btn-pill-outline" style="font-size:13px;padding:10px 20px;"><i class="fas fa-gift"></i> Another</button>' +
-              '<a href="product.html?id=' + item.id + '" class="btn-pill btn-pill-coral" style="font-size:13px;padding:10px 20px;background:#FF6B6B;color:white;border-color:#FF6B6B;">View gift →</a>' +
+              '<button onclick="this.closest(\'.surprise-overlay\').remove();btn.click();" class="btn-pill btn-pill-outline" style="font-size:13px;padding:10px 20px;"><i class="fas fa-gift"></i> ' + _giftT('gift_another', 'Another') + '</button>' +
+              '<a href="product.html?id=' + item.id + '" class="btn-pill btn-pill-coral" style="font-size:13px;padding:10px 20px;background:#FF6B6B;color:white;border-color:#FF6B6B;">' + _giftT('gift_view_btn', 'View gift →') + '</a>' +
             '</div>' +
           '</div>';
         document.body.appendChild(overlay);
