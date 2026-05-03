@@ -2,6 +2,13 @@
 // PUBLIER.JS — Drop an Item page logic
 // ========================
 
+// Tiny i18n helper — falls back to the English literal if the runtime
+// dictionary isn't loaded yet (cold reload race) so toast messages
+// never silently turn into raw key strings.
+function _pubT(key, fallback) {
+  return (typeof t === 'function') ? t(key) : (fallback || key);
+}
+
 // SAFE — escape HTML for use in text AND attributes (blocks XSS H-4)
 function _pubEsc(s) {
   if (s == null) return '';
@@ -191,7 +198,7 @@ window.yearOptions = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
 // ========================
 window.nextStep = function() {
   if (formState.currentStep === 1 && !formState.category) {
-    Toast.show('Please select a category first.', 'warning');
+    Toast.show(_pubT('toast_pub_select_category_first', 'Please select a category first.'), 'warning');
     return;
   }
   if (formState.currentStep < 4) {
@@ -447,7 +454,7 @@ window.handlePhotoFiles = async function(e) {
   if (!files.length) return;
 
   if (!window.SwappoStorage) {
-    Toast.show('Photo module not loaded. Please refresh.', 'error');
+    Toast.show(_pubT('toast_pub_photo_module_failed', 'Photo module not loaded. Please refresh.'), 'error');
     return;
   }
 
@@ -466,7 +473,7 @@ window.handlePhotoFiles = async function(e) {
       }
     }
     if (slotIdx === -1) {
-      Toast.show('Max ' + maxSlots + ' photos reached.', 'warning');
+      Toast.show(_pubT('toast_pub_max_photos_reached', 'Maximum photos reached.') + ' (' + maxSlots + ')', 'warning');
       break;
     }
     var slotEl = document.querySelector('.photo-slot[data-index="' + slotIdx + '"]');
@@ -495,7 +502,7 @@ window.handlePhotoFiles = async function(e) {
         uploadedUrl: null
       };
     } catch (err) {
-      Toast.show('Could not read ' + (files[i].name || 'image') + '.', 'error');
+      Toast.show(_pubT('toast_pub_could_not_read', 'Could not read this photo.') + ' (' + (files[i].name || 'image') + ')', 'error');
     } finally {
       if (slotEl) slotEl.classList.remove('uploading');
     }
@@ -519,7 +526,7 @@ window.refreshPhotoGrid = function() {
     if (entry && entry.preview) {
       slot.classList.add('filled');
       var img = document.createElement('img');
-      img.alt = 'Photo ' + (idx + 1);
+      img.alt = _pubT('toast_pub_image_alt', 'Photo') + ' ' + (idx + 1);
       img.src = entry.preview;
       slot.insertBefore(img, slot.firstChild);
 
@@ -586,7 +593,7 @@ window.populateReview = function() {
   var priceEl = document.getElementById('reviewPriceValue');
   if (priceEl) {
     if (formState.isGiveaway) {
-      priceEl.textContent = 'Free (Giveaway)';
+      priceEl.textContent = _pubT('toast_pub_free_giveaway', 'Free (Giveaway)');
     } else if (priceValue > 0) {
       priceEl.textContent = priceValue + ' AED';
     } else {
@@ -727,7 +734,7 @@ window.publishItem = async function(e) {
     // and fail silently. Safer to require a real Supabase session.
     if (!user) {
       console.warn('[publish] no Supabase session → redirecting to login');
-      Toast.show('Please sign in to publish.', 'warning');
+      Toast.show(_pubT('toast_pub_signin_required', 'Please sign in to publish.'), 'warning');
       setTimeout(function() {
         window.location.href = 'login.html?redirect=/pages/publier.html';
       }, 800);
@@ -736,14 +743,14 @@ window.publishItem = async function(e) {
 
     if (!formState.category) {
       console.warn('[publish] no category selected');
-      Toast.show('Please select a category.', 'warning');
+      Toast.show(_pubT('toast_pub_select_category', 'Please select a category.'), 'warning');
       return;
     }
 
     var entries = (formState.photoBlobs || []).filter(function(p) { return p && p.processed; });
     console.log('[publish] photo entries count:', entries.length);
     if (!entries.length) {
-      Toast.show('Please add at least one photo.', 'warning');
+      Toast.show(_pubT('toast_pub_add_photo', 'Please add at least one photo.'), 'warning');
       return;
     }
 
@@ -769,7 +776,7 @@ window.publishItem = async function(e) {
       }
     } catch (err) {
       console.error('[publish] upload failed:', err);
-      Toast.show('Upload failed: ' + (err.message || 'unknown error'), 'error');
+      Toast.show(_pubT('toast_pub_upload_failed', 'Upload failed') + ': ' + (err.message || 'unknown error'), 'error');
       btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
       btn.disabled = false;
       btn.style.opacity = '1';
@@ -838,7 +845,7 @@ window.publishItem = async function(e) {
     console.log('[publish] insert result:', result);
 
     if (!result || !result.success) {
-      Toast.show('Publish failed: ' + ((result && result.error) || 'unknown'), 'error');
+      Toast.show(_pubT('toast_pub_publish_failed', 'Publish failed') + ': ' + ((result && result.error) || 'unknown'), 'error');
       btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
       btn.disabled = false;
       btn.style.opacity = '1';
@@ -863,14 +870,14 @@ window.publishItem = async function(e) {
           });
           if (boxResp.error) {
             console.warn('[publish] gift-box bundle failed', boxResp.error);
-            Toast.show('Item published, but Gift Box bundling failed: ' + boxResp.error.message, 'warning');
+            Toast.show(_pubT('toast_pub_giftbox_failed', 'Item published, but Gift Box bundling failed') + ': ' + boxResp.error.message, 'warning');
           } else {
-            Toast.show('Gift Box of ' + allIds.length + ' items published! 🎁', 'success');
+            Toast.show(_pubT('toast_pub_giftbox_success', 'Gift Box published! 🎁') + ' (' + allIds.length + ')', 'success');
           }
         }
       } catch (e) { console.warn('[publish] gift-box error', e); }
     } else {
-      Toast.show('Item published! \uD83C\uDF89', 'success');
+      Toast.show(_pubT('toast_pub_published', 'Item published! \uD83C\uDF89'), 'success');
     }
     setTimeout(function() {
       window.location.href = 'catalogue.html';
@@ -878,7 +885,7 @@ window.publishItem = async function(e) {
 
   } catch (outerErr) {
     console.error('[publish] fatal error in publishItem:', outerErr);
-    try { Toast.show('Something went wrong: ' + (outerErr.message || outerErr), 'error'); } catch(e){}
+    try { Toast.show(_pubT('toast_pub_generic_error', 'Something went wrong') + ': ' + (outerErr.message || outerErr), 'error'); } catch(e){}
     var btn = document.getElementById('btnPublish');
     if (btn) {
       btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
