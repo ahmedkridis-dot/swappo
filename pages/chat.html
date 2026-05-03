@@ -1376,7 +1376,7 @@
 </head>
 <body>
   <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
-  <h1 class="sr-only">SwapChat — in-app messaging on Swappo</h1>
+  <h1 class="sr-only" data-i18n="chat_h1_seo">SwapChat — in-app messaging on Swappo</h1>
 
   <!-- First-paint skeleton (removed once chatInit() finishes). -->
   <div id="chat-skeleton" aria-hidden="true">
@@ -1412,7 +1412,7 @@
     <div class="container">
       <div class="navbar-inner">
         <a href="../dev-a7f3k9mz2q.html" class="site-logo">Swappo</a>
-        <div class="navbar-search" style="visibility:hidden;"><input type="text" placeholder="Search…" autocomplete="off"></div>
+        <div class="navbar-search" style="visibility:hidden;"><input type="text" placeholder="Search…" data-i18n-placeholder="search_placeholder" autocomplete="off"></div>
         <div class="navbar-actions">
           <div id="swp-bell-root" class="swp-bell">
             <button class="swp-bell-btn" type="button" aria-label="Notifications" data-i18n-aria-label="notif_bell_aria">
@@ -1440,16 +1440,16 @@
     <aside class="chat-sb" id="chatSidebar">
       <div class="sb-head">
         <div class="sb-head-row">
-          <h2>Messages</h2>
+          <h2 data-i18n="chat_messages_title">Messages</h2>
           <span class="sb-badge" id="totalUnread">0</span>
         </div>
-        <input class="sb-search" placeholder="Search conversations…" id="sbSearch" oninput="filterConversations()" autocomplete="off">
+        <input class="sb-search" placeholder="Search conversations…" data-i18n-placeholder="chat_search_placeholder" id="sbSearch" oninput="filterConversations()" autocomplete="off">
       </div>
       <div class="sb-filters">
-        <button class="sb-filter active" onclick="setSbFilter('all')">All</button>
-        <button class="sb-filter" onclick="setSbFilter('accepted')"><i class="fas fa-comments" style="margin-right:4px;"></i>Active</button>
-        <button class="sb-filter" onclick="setSbFilter('pending')"><i class="fas fa-clock" style="margin-right:4px;"></i>Pending</button>
-        <button class="sb-filter" onclick="setSbFilter('completed')"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Done</button>
+        <button class="sb-filter active" onclick="setSbFilter('all')" data-i18n="chat_filter_all">All</button>
+        <button class="sb-filter" onclick="setSbFilter('accepted')"><i class="fas fa-comments" style="margin-right:4px;"></i><span data-i18n="chat_filter_active">Active</span></button>
+        <button class="sb-filter" onclick="setSbFilter('pending')"><i class="fas fa-clock" style="margin-right:4px;"></i><span data-i18n="chat_filter_pending">Pending</span></button>
+        <button class="sb-filter" onclick="setSbFilter('completed')"><i class="fas fa-check-circle" style="margin-right:4px;"></i><span data-i18n="chat_filter_done">Done</span></button>
       </div>
       <div class="sb-list" id="sbList"></div>
     </aside>
@@ -1458,7 +1458,7 @@
     <main id="main" class="chat-center">
       <div class="ch-header" id="chatHeader" style="display:none;">
         <button class="qa-btn" onclick="document.getElementById('chatSidebar').classList.add('open')" style="display:none;" id="mobileBackBtn" aria-label="Back" data-i18n-aria-label="action_back"><i class="fas fa-arrow-left"></i></button>
-        <button type="button" id="chHeaderOpenProfile" class="ch-header-user" onclick="openPartnerProfile()" aria-label="View profile" style="display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;flex:1;min-width:0;text-align:left;font-family:inherit;">
+        <button type="button" id="chHeaderOpenProfile" class="ch-header-user" onclick="openPartnerProfile()" aria-label="View profile" data-i18n-aria-label="chat_view_profile_aria" style="display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;flex:1;min-width:0;text-align:left;font-family:inherit;">
           <div class="ch-header-avatar" id="chAvatar"></div>
           <div class="ch-header-info">
             <div class="ch-header-name" id="chName"></div>
@@ -1466,15 +1466,15 @@
           </div>
         </button>
         <div class="ch-header-actions">
-          <button class="ch-deal-btn" id="dealToggleBtn" onclick="toggleDealPanel()"><i class="fas fa-handshake"></i> Deal</button>
+          <button class="ch-deal-btn" id="dealToggleBtn" onclick="toggleDealPanel()"><i class="fas fa-handshake"></i> <span data-i18n="chat_deal_btn">Deal</span></button>
           <button onclick="Toast.show('Report submitted.','info')" aria-label="Report" data-i18n-aria-label="action_report"><i class="fas fa-flag"></i></button>
         </div>
       </div>
 
       <div class="ch-empty" id="chatEmpty">
         <i class="fas fa-comments"></i>
-        <div style="font-size:17px;font-weight:700;color:#1A1A2E;">Your Deal Hub</div>
-        <div style="font-size:13px;">Select a conversation to start negotiating</div>
+        <div style="font-size:17px;font-weight:700;color:#1A1A2E;" data-i18n="chat_empty_title">Your Deal Hub</div>
+        <div style="font-size:13px;" data-i18n="chat_empty_msg">Select a conversation to start negotiating</div>
       </div>
 
       <div class="ch-msgs" id="msgArea" style="display:none;">
@@ -1488,10 +1488,10 @@
 
       <div class="ch-input" id="inputBar" style="display:none;">
         <div class="ch-input-row">
-          <input type="text" class="ch-text" id="chatInput" placeholder="Type a message…" autocomplete="off">
+          <input type="text" class="ch-text" id="chatInput" placeholder="Type a message…" data-i18n-placeholder="chat_input_placeholder" autocomplete="off">
           <button class="ch-send" id="sendBtn" disabled aria-label="Send" data-i18n-aria-label="action_send"><i class="fas fa-paper-plane"></i></button>
         </div>
-        <div class="ch-hint"><i class="fas fa-shield-alt"></i> Contact info is filtered for safety</div>
+        <div class="ch-hint"><i class="fas fa-shield-alt"></i> <span data-i18n="chat_safety_hint">Contact info is filtered for safety</span></div>
       </div>
     </main>
 
@@ -1540,12 +1540,12 @@
     </div>
 
     <!-- RIGHT: Deal Tracker Panel -->
-    <aside class="deal-panel" id="dealPanel" role="complementary" aria-label="Deal Tracker">
+    <aside class="deal-panel" id="dealPanel" role="complementary" aria-label="Deal Tracker" data-i18n-aria-label="chat_deal_tracker">
       <div class="dp-head">
-        <span>Deal Tracker</span>
-        <button type="button" class="dp-close" onclick="toggleDealPanel()" aria-label="Close Deal Tracker"><i class="fas fa-times" aria-hidden="true"></i></button>
+        <span data-i18n="chat_deal_tracker">Deal Tracker</span>
+        <button type="button" class="dp-close" onclick="toggleDealPanel()" aria-label="Close Deal Tracker" data-i18n-aria-label="chat_close_deal_aria"><i class="fas fa-times" aria-hidden="true"></i></button>
       </div>
-      <div class="dp-empty" id="dpEmpty">Select a conversation to see deal details</div>
+      <div class="dp-empty" id="dpEmpty" data-i18n="chat_deal_empty">Select a conversation to see deal details</div>
       <div id="dpContent" style="display:none;">
         <div id="dpItems"></div>
         <div id="dpStatus"></div>
