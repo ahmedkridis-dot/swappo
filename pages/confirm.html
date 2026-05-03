@@ -167,6 +167,11 @@
       });
     }
 
+    // i18n helper — t() may not be loaded when this script runs.
+    function _confT(key, fallback) {
+      return (typeof t === 'function') ? t(key) : (fallback || key);
+    }
+
     function getToken() {
       var u = new URL(window.location.href);
       var t = u.searchParams.get('t') || u.searchParams.get('token');
@@ -176,8 +181,8 @@
     async function run() {
       var token = getToken();
       if (!token || token.length < 16) {
-        setState('error', 'Invalid QR link', 'This QR code is malformed or incomplete. Ask the other party to show you a fresh code.', [
-          { label: 'Open Swappo', href: '/', primary: true }
+        setState('error', _confT('confirm_invalid_qr_title','Invalid QR link'), _confT('confirm_invalid_qr_body','This QR code is malformed or incomplete. Ask the other party to show you a fresh code.'), [
+          { label: _confT('confirm_btn_open_swappo','Open Swappo'), href: '/', primary: true }
         ]);
         return;
       }
@@ -186,8 +191,8 @@
       var tries = 0;
       while (!window.db && tries < 40) { await new Promise(function(r){ setTimeout(r, 100); }); tries++; }
       if (!window.db) {
-        setState('error', 'Network issue', 'We could not reach Swappo. Check your connection and try again.', [
-          { label: 'Retry', primary: true, onClick: function(){ location.reload(); } }
+        setState('error', _confT('confirm_network_title','Network issue'), _confT('confirm_network_body','We could not reach Swappo. Check your connection and try again.'), [
+          { label: _confT('confirm_btn_retry','Retry'), primary: true, onClick: function(){ location.reload(); } }
         ]);
         return;
       }
@@ -197,8 +202,8 @@
       try { sess = await window.db.auth.getSession(); } catch (e) {}
       if (!sess || !sess.data || !sess.data.session) {
         var back = encodeURIComponent('/pages/confirm.html?t=' + token);
-        setState('error', 'Please sign in', 'You need to be logged into Swappo on this phone to confirm a swap.', [
-          { label: 'Sign in', href: '/pages/login.html?redirect=' + back, primary: true }
+        setState('error', _confT('confirm_signin_title','Please sign in'), _confT('confirm_signin_body','You need to be logged into Swappo on this phone to confirm a swap.'), [
+          { label: _confT('confirm_btn_signin','Sign in'), href: '/pages/login.html?redirect=' + back, primary: true }
         ]);
         return;
       }
@@ -208,11 +213,11 @@
         var peek = await window.db.rpc('peek_swap_qr', { p_token: token });
         if (peek && peek.data && peek.data.valid === false) {
           var reason = peek.data.reason;
-          if (reason === 'expired')      return setState('error','QR expired','The 30-second window passed. Ask the other party to generate a new code.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
-          if (reason === 'own_qr')       return setState('error','That\u2019s your own QR','You cannot scan a code you issued. Hand your phone to the other party.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
-          if (reason === 'not_yours')    return setState('error','Not your swap','This QR belongs to a swap you are not part of.', [{ label:'Open Swappo', href:'/', primary:true }]);
-          if (reason === 'not_found')    return setState('error','QR already used or unknown','Either this code was already scanned or it no longer exists. Generate a new one.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
-          if (reason === 'auth')         return setState('error','Please sign in','You need to be logged in to confirm.', [{ label:'Sign in', href:'/pages/login.html', primary:true }]);
+          if (reason === 'expired')      return setState('error', _confT('confirm_qr_expired_title','QR expired'), _confT('confirm_qr_expired_body','The 30-second window passed. Ask the other party to generate a new code.'), [{ label: _confT('confirm_btn_open_chat','Open chat'), href:'/pages/chat.html', primary:true }]);
+          if (reason === 'own_qr')       return setState('error', _confT('confirm_own_qr_title','That\u2019s your own QR'), _confT('confirm_own_qr_body','You cannot scan a code you issued. Hand your phone to the other party.'), [{ label: _confT('confirm_btn_open_chat','Open chat'), href:'/pages/chat.html', primary:true }]);
+          if (reason === 'not_yours')    return setState('error', _confT('confirm_not_yours_title','Not your swap'), _confT('confirm_not_yours_body','This QR belongs to a swap you are not part of.'), [{ label: _confT('confirm_btn_open_swappo','Open Swappo'), href:'/', primary:true }]);
+          if (reason === 'not_found')    return setState('error', _confT('confirm_qr_used_title','QR already used or unknown'), _confT('confirm_qr_used_body','Either this code was already scanned or it no longer exists. Generate a new one.'), [{ label: _confT('confirm_btn_open_chat','Open chat'), href:'/pages/chat.html', primary:true }]);
+          if (reason === 'auth')         return setState('error', _confT('confirm_signin_title','Please sign in'), _confT('confirm_signin_short_body','You need to be logged in to confirm.'), [{ label: _confT('confirm_btn_signin','Sign in'), href:'/pages/login.html', primary:true }]);
         }
       } catch (_) { /* fall through to the real RPC — it's the source of truth anyway */ }
 
@@ -220,13 +225,13 @@
       var res = await window.db.rpc('confirm_swap_qr', { p_token: token });
       if (res.error) {
         var m = String(res.error.message || '');
-        if (/qr_expired/.test(m))            return setState('error','QR expired','The 30-second window passed. Ask the other party to regenerate.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
-        if (/qr_not_found/.test(m))          return setState('error','QR already used','This code was already consumed. Only one scan is allowed.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
-        if (/cannot_scan_own_qr/.test(m))    return setState('error','That\u2019s your own QR','Hand your phone to the other party so they can scan.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
-        if (/not_your_swap/.test(m))         return setState('error','Not your swap','This QR belongs to a swap you are not part of.', [{ label:'Open Swappo', href:'/', primary:true }]);
-        if (/swap_not_accepted/.test(m))     return setState('error','Swap not ready','The swap is not in the accepted state.', [{ label:'Open dashboard', href:'/pages/profile.html', primary:true }]);
-        if (/swap_already_completed/.test(m))return setState('error','Already completed','This swap was already confirmed.', [{ label:'Open chat', href:'/pages/chat.html', primary:true }]);
-        return setState('error','Could not confirm', m || 'Please try again.', [{ label:'Retry', primary:true, onClick:function(){ location.reload(); } }]);
+        if (/qr_expired/.test(m))            return setState('error', _confT('confirm_qr_expired_title','QR expired'), _confT('confirm_qr_expired_short_body','The 30-second window passed. Ask the other party to regenerate.'), [{ label: _confT('confirm_btn_open_chat','Open chat'), href:'/pages/chat.html', primary:true }]);
+        if (/qr_not_found/.test(m))          return setState('error', _confT('confirm_qr_already_used_title','QR already used'), _confT('confirm_qr_already_used_body','This code was already consumed. Only one scan is allowed.'), [{ label: _confT('confirm_btn_open_chat','Open chat'), href:'/pages/chat.html', primary:true }]);
+        if (/cannot_scan_own_qr/.test(m))    return setState('error', _confT('confirm_own_qr_title','That\u2019s your own QR'), _confT('confirm_own_qr_short_body','Hand your phone to the other party so they can scan.'), [{ label: _confT('confirm_btn_open_chat','Open chat'), href:'/pages/chat.html', primary:true }]);
+        if (/not_your_swap/.test(m))         return setState('error', _confT('confirm_not_yours_title','Not your swap'), _confT('confirm_not_yours_body','This QR belongs to a swap you are not part of.'), [{ label: _confT('confirm_btn_open_swappo','Open Swappo'), href:'/', primary:true }]);
+        if (/swap_not_accepted/.test(m))     return setState('error', _confT('confirm_swap_not_ready_title','Swap not ready'), _confT('confirm_swap_not_ready_body','The swap is not in the accepted state.'), [{ label: _confT('confirm_btn_open_dashboard','Open dashboard'), href:'/pages/profile.html', primary:true }]);
+        if (/swap_already_completed/.test(m))return setState('error', _confT('confirm_already_completed_title','Already completed'), _confT('confirm_already_completed_body','This swap was already confirmed.'), [{ label: _confT('confirm_btn_open_chat','Open chat'), href:'/pages/chat.html', primary:true }]);
+        return setState('error', _confT('confirm_generic_error_title','Could not confirm'), m || _confT('confirm_generic_error_body','Please try again.'), [{ label: _confT('confirm_btn_retry','Retry'), primary:true, onClick:function(){ location.reload(); } }]);
       }
 
       var data = res.data || {};
@@ -245,11 +250,11 @@
 
       setState(
         'success',
-        'Exchange confirmed!',
-        'Nice one \u2014 redirecting you to the chat to leave a rating\u2026',
+        _confT('confirm_success_title','Exchange confirmed!'),
+        _confT('confirm_success_body','Nice one \u2014 redirecting you to the chat to leave a rating\u2026'),
         [
-          { label: 'Open chat now', href: chatHref, primary: true },
-          { label: 'View my dashboard', href: '/pages/profile.html' }
+          { label: _confT('confirm_btn_open_chat_now','Open chat now'), href: chatHref, primary: true },
+          { label: _confT('confirm_btn_view_dashboard','View my dashboard'), href: '/pages/profile.html' }
         ]
       );
 
