@@ -108,39 +108,39 @@
     <div class="card">
       <div class="header">
         <img src="../assets/brand/swappo-logo-teal.png" alt="Swappo">
-        <div class="step-counter">Step 1 of 1 — Quick setup</div>
-        <h1>Welcome to Swappo</h1>
-        <p>Pick a username and avatar — these stay on your profile until swaps are accepted (we keep identities private by default).</p>
+        <div class="step-counter" data-i18n="onboarding_step">Step 1 of 1 — Quick setup</div>
+        <h1 data-i18n="onboarding_welcome">Welcome to Swappo</h1>
+        <p data-i18n="onboarding_intro">Pick a username and avatar — these stay on your profile until swaps are accepted (we keep identities private by default).</p>
       </div>
 
       <!-- ── PSEUDO ─────────────────────────────────────────────── -->
       <div class="section">
-        <h3 class="section-title">Choose a username</h3>
+        <h3 class="section-title" data-i18n="onboarding_choose_username">Choose a username</h3>
         <div class="input-wrap">
           <span class="input-prefix">@</span>
-          <input class="input" type="text" id="ob-pseudo" autocomplete="off" placeholder="e.g. ahmed_k, sarah2024" maxlength="20" autocapitalize="off">
+          <input class="input" type="text" id="ob-pseudo" autocomplete="off" placeholder="e.g. ahmed_k, sarah2024" data-i18n-placeholder="onboarding_username_placeholder" maxlength="20" autocapitalize="off">
         </div>
-        <div class="hint" id="ob-pseudo-hint">3–20 letters, numbers and underscores.</div>
+        <div class="hint" id="ob-pseudo-hint" data-i18n="onboarding_username_hint">3–20 letters, numbers and underscores.</div>
       </div>
 
       <!-- ── AVATAR ─────────────────────────────────────────────── -->
       <div class="section">
-        <h3 class="section-title">Choose an avatar</h3>
+        <h3 class="section-title" data-i18n="onboarding_choose_avatar">Choose an avatar</h3>
         <div class="avatar-grid" id="ob-avatar-grid"></div>
-        <div class="divider"><span>or</span></div>
+        <div class="divider"><span data-i18n="auth_or">or</span></div>
         <label class="btn" style="background:#fff;border:1.5px solid #E5E7EB;color:#1A1A2E;cursor:pointer;">
           <i class="fas fa-cloud-upload-alt" style="color:#09B1BA;"></i>
-          <span id="ob-upload-label">Upload your own photo (max 500 KB)</span>
+          <span id="ob-upload-label" data-i18n="onboarding_upload_photo">Upload your own photo (max 500 KB)</span>
           <input type="file" id="ob-upload" class="upload-input" accept="image/png,image/jpeg,image/webp">
         </label>
       </div>
 
       <button type="button" class="btn btn-primary" id="ob-submit" disabled>
-        <span id="ob-submit-label">Enter Swappo</span>
+        <span id="ob-submit-label" data-i18n="onboarding_enter_swappo">Enter Swappo</span>
         <i class="fas fa-arrow-right"></i>
       </button>
 
-      <p class="hint" style="text-align:center;margin-top:14px;">You can change these anytime from Settings.</p>
+      <p class="hint" style="text-align:center;margin-top:14px;" data-i18n="onboarding_change_anytime">You can change these anytime from Settings.</p>
     </div>
   </div>
 
