@@ -1354,10 +1354,10 @@
             </div>
             <div style="display:flex;gap:10px;align-items:center;">
                 <button class="edit-profile-btn" onclick="document.querySelector('[data-tab=settings]').click();">
-                    <i class="fas fa-cog"></i> Settings
+                    <i class="fas fa-cog"></i> <span data-i18n="settings">Settings</span>
                 </button>
                 <button class="edit-profile-btn" id="logout-btn" style="background:var(--secondary);">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Logout</span>
                 </button>
                 <a href="publier.html" class="btn-pill btn-pill-teal" style="font-size:14px;padding:10px 24px;">
                     <i class="fas fa-plus"></i> <span data-i18n="list_new_item">List new item</span>
@@ -1370,7 +1370,7 @@
             <div id="profile-avatar">?</div>
             <h2 id="profile-name">Loading…</h2>
             <p id="profile-location"><i class="fas fa-map-marker-alt"></i> <span>—</span></p>
-            <p id="profile-member-since">Member since —</p>
+            <p id="profile-member-since"><span data-i18n="profile_member_since">Member since</span> —</p>
             <p id="profile-email"></p>
             <div id="tier-badge"><span>Loading…</span></div>
             <div id="tier-progress"></div>
@@ -1409,7 +1409,7 @@
             <!-- Exchanges this month (plan card — colored bg) -->
             <a href="pricing.html" class="stat-card" style="text-align:left;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-color:#C7D2FE;text-decoration:none;color:inherit;cursor:pointer;">
                 <div style="margin-bottom:12px;">
-                    <span id="stat-plan-badge" style="background:#6366F1;color:white;font-size:12px;font-weight:600;padding:4px 12px;border-radius:var(--radius-pill,999px);">Free</span>
+                    <span id="stat-plan-badge" style="background:#6366F1;color:white;font-size:12px;font-weight:600;padding:4px 12px;border-radius:var(--radius-pill,999px);" data-i18n="profile_free_badge">Free</span>
                 </div>
                 <div class="stat-number" id="stat-plan" style="text-align:left;font-size:28px;">0</div>
                 <div class="stat-label" style="text-align:left;" data-i18n="dash_exchanges_month">Swaps completed</div>
@@ -1444,26 +1444,26 @@
                      public.swaps via SwappoSwaps (Supabase). -->
                 <div class="tabs-nav">
                     <button class="tab-btn active" data-tab="my-items">
-                        <i class="fas fa-box"></i> My Items
+                        <i class="fas fa-box"></i> <span data-i18n="my_items">My Items</span>
                     </button>
                     <button class="tab-btn" data-tab="swap-dashboard">
-                        <i class="fas fa-exchange-alt"></i> Swaps
+                        <i class="fas fa-exchange-alt"></i> <span data-i18n="profile_tab_swaps">Swaps</span>
                     </button>
                     <button class="tab-btn" data-tab="saved-items">
-                        <i class="fas fa-heart"></i> Saved
+                        <i class="fas fa-heart"></i> <span data-i18n="saved">Saved</span>
                     </button>
                     <button class="tab-btn" data-tab="settings">
-                        <i class="fas fa-cog"></i> Settings
+                        <i class="fas fa-cog"></i> <span data-i18n="settings">Settings</span>
                     </button>
                 </div>
 
                 <!-- ========== TAB: MY ITEMS ========== -->
                 <div class="tab-content active" id="my-items">
                     <div class="my-items-filters" id="my-items-filters" role="tablist" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-                        <button type="button" class="mi-filter active" data-mi-filter="active" role="tab" aria-selected="true">Active <span class="mi-filter-count" data-mi-count="active">0</span></button>
-                        <button type="button" class="mi-filter" data-mi-filter="reserved" role="tab" aria-selected="false">Reserved <span class="mi-filter-count" data-mi-count="reserved">0</span></button>
-                        <button type="button" class="mi-filter" data-mi-filter="swapped" role="tab" aria-selected="false">Swapped <span class="mi-filter-count" data-mi-count="swapped">0</span></button>
-                        <button type="button" class="mi-filter" data-mi-filter="sold" role="tab" aria-selected="false">Sold <span class="mi-filter-count" data-mi-count="sold">0</span></button>
+                        <button type="button" class="mi-filter active" data-mi-filter="active" role="tab" aria-selected="true"><span data-i18n="profile_filter_active">Active</span> <span class="mi-filter-count" data-mi-count="active">0</span></button>
+                        <button type="button" class="mi-filter" data-mi-filter="reserved" role="tab" aria-selected="false"><span data-i18n="profile_filter_reserved">Reserved</span> <span class="mi-filter-count" data-mi-count="reserved">0</span></button>
+                        <button type="button" class="mi-filter" data-mi-filter="swapped" role="tab" aria-selected="false"><span data-i18n="profile_filter_swapped">Swapped</span> <span class="mi-filter-count" data-mi-count="swapped">0</span></button>
+                        <button type="button" class="mi-filter" data-mi-filter="sold" role="tab" aria-selected="false"><span data-i18n="profile_filter_sold">Sold</span> <span class="mi-filter-count" data-mi-count="sold">0</span></button>
                     </div>
                     <div class="items-grid reveal" id="my-items-grid">
                         <!-- Skeleton placeholder while Supabase responds.
@@ -1479,13 +1479,13 @@
                     <!-- Sub-tabs -->
                     <div class="swap-tabs">
                         <button class="swap-tab active" data-swap-tab="sent" onclick="switchSwapTab('sent', this)">
-                            <i class="fas fa-paper-plane"></i> Sent <span class="swap-tab-count" id="sent-count"></span>
+                            <i class="fas fa-paper-plane"></i> <span data-i18n="profile_swap_sent">Sent</span> <span class="swap-tab-count" id="sent-count"></span>
                         </button>
                         <button class="swap-tab" data-swap-tab="received" onclick="switchSwapTab('received', this)">
-                            <i class="fas fa-inbox"></i> Received <span class="swap-tab-count" id="received-count"></span>
+                            <i class="fas fa-inbox"></i> <span data-i18n="profile_swap_received">Received</span> <span class="swap-tab-count" id="received-count"></span>
                         </button>
                         <button class="swap-tab" data-swap-tab="history" onclick="switchSwapTab('history', this)">
-                            <i class="fas fa-history"></i> History
+                            <i class="fas fa-history"></i> <span data-i18n="profile_swap_history">History</span>
                         </button>
                     </div>
 
@@ -1518,46 +1518,46 @@
                         <div>
                             <!-- Profile Settings -->
                             <div class="settings-section">
-                                <h3><i class="fas fa-user"></i> Profile Settings</h3>
+                                <h3><i class="fas fa-user"></i> <span data-i18n="profile_settings_title">Profile Settings</span></h3>
                                 <div style="display:flex;flex-direction:column;gap:14px;">
                                     <!-- Avatar picker -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Avatar</label>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;" data-i18n="profile_avatar_label">Avatar</label>
                                         <div id="settings-avatar-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px;"></div>
                                         <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--primary);cursor:pointer;">
-                                            <i class="fas fa-cloud-upload-alt"></i> Upload my own photo
+                                            <i class="fas fa-cloud-upload-alt"></i> <span data-i18n="profile_upload_photo">Upload my own photo</span>
                                             <input type="file" id="settings-avatar-upload" accept="image/png,image/jpeg,image/webp" style="display:none;">
                                         </label>
                                     </div>
                                     <!-- Pseudo -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Username <span style="color:var(--text-muted);font-weight:400;">(public)</span></label>
-                                        <input type="text" id="settings-pseudo" maxlength="20" placeholder="e.g. ahmed_k" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="username">
-                                        <span id="settings-pseudo-hint" style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">3–20 letters, numbers and underscores.</span>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;"><span data-i18n="profile_username_label">Username</span> <span style="color:var(--text-muted);font-weight:400;" data-i18n="profile_username_public">(public)</span></label>
+                                        <input type="text" id="settings-pseudo" maxlength="20" placeholder="e.g. ahmed_k" data-i18n-placeholder="onboarding_username_placeholder" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="username">
+                                        <span id="settings-pseudo-hint" style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;" data-i18n="onboarding_username_hint">3–20 letters, numbers and underscores.</span>
                                     </div>
                                     <!-- Name -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Full name <span style="color:var(--text-muted);font-weight:400;">(shown only after swap accepted)</span></label>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;" data-i18n="profile_fullname_label">Full name</label>
                                         <input type="text" id="settings-name" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="name">
                                     </div>
                                     <!-- Email -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Email <span style="color:var(--text-muted);font-weight:400;">(read-only)</span></label>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;"><span data-i18n="profile_email_label">Email</span> <span style="color:var(--text-muted);font-weight:400;" data-i18n="profile_email_readonly">(read-only)</span></label>
                                         <input type="email" id="settings-email" disabled style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg-light);color:var(--text-muted);" autocomplete="email">
                                     </div>
                                     <!-- Phone -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">Phone <span style="color:var(--text-muted);font-weight:400;">(UAE 5XXXXXXXX)</span></label>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;" data-i18n="profile_phone_label">Phone</label>
                                         <div style="display:flex;align-items:center;gap:8px;">
                                             <span style="padding:10px 12px;background:var(--bg-light);border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;color:var(--text);">🇦🇪 +971</span>
-                                            <input type="tel" id="settings-phone" maxlength="9" pattern="^5[0-9]{8}$" placeholder="5X XXX XXXX" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="tel">
+                                            <input type="tel" id="settings-phone" maxlength="9" pattern="^5[0-9]{8}$" placeholder="5X XXX XXXX" data-i18n-placeholder="auth_phone_placeholder" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;" autocomplete="tel">
                                         </div>
                                     </div>
                                     <!-- City -->
                                     <div>
-                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;">City</label>
+                                        <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px;" data-i18n="profile_city_label">City</label>
                                         <select id="settings-city" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
-                                            <option value="">Select city</option>
+                                            <option value="" data-i18n="profile_city_select">Select city</option>
                                             <option value="Dubai Marina">Dubai Marina</option>
                                             <option value="Downtown Dubai">Downtown Dubai</option>
                                             <option value="JBR">JBR</option>
@@ -1576,7 +1576,7 @@
                                         </select>
                                     </div>
                                     <button id="save-settings-btn" style="padding:12px;background:var(--primary);color:var(--bg);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
-                                        <i class="fas fa-save"></i> Save Settings
+                                        <i class="fas fa-save"></i> <span data-i18n="profile_save_btn">Save Settings</span>
                                     </button>
                                 </div>
                             </div>
@@ -1588,7 +1588,7 @@
                                  kind-flags below only take effect when the
                                  master is on. -->
                             <div class="settings-section" id="notif-settings">
-                                <h3><i class="fas fa-bell"></i> Notifications</h3>
+                                <h3><i class="fas fa-bell"></i> <span data-i18n="profile_notifications_title">Notifications</span></h3>
                                 <div class="setting-item">
                                     <div class="setting-label">
                                         <div class="setting-label-title">Email Notifications</div>
@@ -1642,10 +1642,10 @@
 
                             <!-- Language Section -->
                             <div class="settings-section">
-                                <h3><i class="fas fa-globe"></i> Language</h3>
+                                <h3><i class="fas fa-globe"></i> <span data-i18n="profile_language_title">Language</span></h3>
                                 <div class="setting-item">
                                     <div class="setting-label">
-                                        <div class="setting-label-title">Interface Language</div>
+                                        <div class="setting-label-title" data-i18n="profile_language_label">Interface Language</div>
                                         <div class="setting-label-desc">Choose your preferred language</div>
                                     </div>
                                     <select class="select-language">
