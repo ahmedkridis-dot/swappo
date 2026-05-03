@@ -792,16 +792,16 @@
      shortcuts to the same modals the main action-buttons already use. -->
 <aside class="fchat" id="fchat" role="complementary" aria-label="Quick actions">
   <button class="fchat-toggle" type="button" onclick="toggleFchat()">
-    <i class="fas fa-comments"></i><span>Make an offer</span>
+    <i class="fas fa-comments"></i><span data-i18n="product_make_offer">Make an offer</span>
   </button>
   <div class="fchat-panel" role="dialog" aria-label="Quick actions panel">
     <div class="fchat-header">
       <div class="fchat-avatar" id="fchat-avatar"><i class="fas fa-user"></i></div>
       <div class="fchat-who">
-        <div class="fchat-name" id="fchat-name">Anonymous Swapper</div>
-        <div class="fchat-sub" id="fchat-sub">Identity revealed after acceptance</div>
+        <div class="fchat-name" id="fchat-name" data-i18n="anonymous_swapper">Anonymous Swapper</div>
+        <div class="fchat-sub" id="fchat-sub" data-i18n="identity_revealed">Identity revealed after acceptance</div>
       </div>
-      <button class="fchat-close" type="button" onclick="toggleFchat()" aria-label="Close"><i class="fas fa-times"></i></button>
+      <button class="fchat-close" type="button" onclick="toggleFchat()" aria-label="Close" data-i18n-aria-label="action_close"><i class="fas fa-times"></i></button>
     </div>
     <div class="fchat-product">
       <img class="fchat-product-img" id="fchat-product-img" src="" alt="">
@@ -811,7 +811,7 @@
       </div>
     </div>
     <div class="fchat-body">
-      <p class="fchat-hint">Pick how you'd like to start. Offers and chat open up once both sides accept.</p>
+      <p class="fchat-hint" data-i18n="product_fchat_hint">Pick how you'd like to start. Offers and chat open up once both sides accept.</p>
     </div>
     <div class="fchat-actions" id="fchat-actions">
       <!-- Rendered by hydrateFchatActions() after renderItem() resolves -->
@@ -827,7 +827,7 @@
 <div id="swapModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2 class="modal-title" id="swapModalTitle">Choose items to offer</h2>
+      <h2 class="modal-title" id="swapModalTitle" data-i18n="product_choose_items">Choose items to offer</h2>
       <div style="display:flex;gap:6px;align-items:center;">
         <span class="wizard-dot" id="wiz-dot-1" aria-hidden="true"></span>
         <span class="wizard-dot" id="wiz-dot-2" aria-hidden="true"></span>
@@ -841,16 +841,16 @@
     <div id="wizStep1">
       <div class="modal-info" id="modal-info">
         <i class="fas fa-info-circle"></i>
-        Pick one item — or select <strong>2 or more</strong> to offer a <strong>Swap Box</strong>. Both parties use 1 swap from their monthly quota.
+        <span data-i18n="product_picker_info">Pick one item — or select 2 or more to offer a Swap Box. Both parties use 1 swap from their monthly quota.</span>
       </div>
 
       <div class="user-items-grid" id="my-items-grid"></div>
 
       <div id="emptyState" class="modal-empty" style="display: none;">
         <div class="modal-empty-icon">📦</div>
-        <p>You don't have any items listed yet.</p>
+        <p data-i18n="product_no_items_yet">You don't have any items listed yet.</p>
         <a href="publier.html" class="modal-empty-link">
-          <i class="fas fa-plus"></i> List your first item
+          <i class="fas fa-plus"></i> <span data-i18n="product_list_first">List your first item</span>
         </a>
       </div>
 
@@ -858,13 +858,13 @@
         <div style="font-size:24px;">📦</div>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:700;color:#065F6A;">Swap Box — <span id="swapBoxCount">0</span> items bundled</div>
-          <div style="font-size:11px;color:#078A91;">The other party gets a single "Swap Box" offer. Accept as one unit.</div>
+          <div style="font-size:11px;color:#078A91;" data-i18n="product_swap_box_info">The other party gets a single "Swap Box" offer. Accept as one unit.</div>
         </div>
       </div>
 
       <div class="modal-actions" style="padding-top:16px;">
         <button class="btn-primary" onclick="wizardNext()" id="wiz-next-btn" style="width:100%;padding:18px 32px;font-size:17px;font-weight:700;border-radius:14px;letter-spacing:0.3px;display:flex;align-items:center;justify-content:center;gap:10px;opacity:0.5;cursor:not-allowed;" disabled>
-          <span id="wiz-next-label">Continue</span><i class="fas fa-arrow-right"></i>
+          <span id="wiz-next-label" data-i18n="product_continue">Continue</span><i class="fas fa-arrow-right"></i>
         </button>
       </div>
     </div>
@@ -873,7 +873,7 @@
     <div id="wizStep2" style="display:none;">
       <div class="modal-info" style="background:linear-gradient(135deg,#FFF8E1,#FEF3C7);border-color:#FDE68A;">
         <i class="fas fa-coins" style="color:#D97706;"></i>
-        Want to balance the deal? Add some cash — it's paid <strong>hand-to-hand at the meetup</strong>, never through Swappo.
+        <span data-i18n="product_cash_balance">Want to balance the deal? Add some cash — it's paid hand-to-hand at the meetup, never through Swappo.</span>
       </div>
 
       <!-- Recap strip -->
@@ -882,7 +882,7 @@
       <!-- Cash slider block (identical logic to the previous inline block) -->
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:16px;">
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="cash-chips">
-          <button type="button" class="cash-chip-active" onclick="selectCashAmount(0,this)"   style="padding:6px 14px;border-radius:999px;border:2px solid var(--primary);background:var(--primary);color:white;font-weight:600;font-size:12px;cursor:pointer;">No cash</button>
+          <button type="button" class="cash-chip-active" onclick="selectCashAmount(0,this)"   style="padding:6px 14px;border-radius:999px;border:2px solid var(--primary);background:var(--primary);color:white;font-weight:600;font-size:12px;cursor:pointer;" data-i18n="product_cash_no_cash">No cash</button>
           <button type="button" onclick="selectCashAmount(25,this)"  style="padding:6px 14px;border-radius:999px;border:2px solid #E5E7EB;background:white;color:#333;font-weight:600;font-size:12px;cursor:pointer;">+25 AED</button>
           <button type="button" onclick="selectCashAmount(100,this)" style="padding:6px 14px;border-radius:999px;border:2px solid #E5E7EB;background:white;color:#333;font-weight:600;font-size:12px;cursor:pointer;">+100 AED</button>
           <button type="button" onclick="selectCashAmount(200,this)" style="padding:6px 14px;border-radius:999px;border:2px solid #E5E7EB;background:white;color:#333;font-weight:600;font-size:12px;cursor:pointer;">+200 AED</button>
@@ -891,13 +891,13 @@
         <input type="range" id="cash-slider" min="0" max="1000" step="25" value="0" style="width:100%;accent-color:var(--primary);" oninput="updateCashFromSlider(this.value)">
         <div style="text-align:center;margin-top:12px;">
           <div style="font-size:30px;font-weight:800;color:var(--primary);line-height:1.1;" id="cash-display">0 AED</div>
-          <div style="font-size:11px;color:#6B7280;font-style:italic;margin-top:4px;">💵 Paid in person — not processed by Swappo</div>
+          <div style="font-size:11px;color:#6B7280;font-style:italic;margin-top:4px;" data-i18n="product_cash_paid_in_person">💵 Paid in person — not processed by Swappo</div>
         </div>
       </div>
 
       <div class="modal-actions" style="display:flex;gap:10px;padding-top:16px;">
         <button type="button" onclick="wizardBack()" style="flex:0 0 auto;padding:14px 18px;background:transparent;border:1.5px solid var(--border);border-radius:12px;font-weight:600;color:#4A4A5A;cursor:pointer;display:flex;align-items:center;gap:6px;">
-          <i class="fas fa-arrow-left"></i> Back
+          <i class="fas fa-arrow-left"></i> <span data-i18n="product_back">Back</span>
         </button>
         <button class="btn-primary" onclick="confirmSwap()" id="confirm-swap-btn" style="flex:1;padding:16px 20px;font-size:16px;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:10px;">
           <i class="fas fa-paper-plane"></i> Send Swap Request
