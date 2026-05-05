@@ -378,6 +378,105 @@ const SwappoAuth = {
   },
 
   /**
+   * Phone-first signup with password. Creates the auth user and triggers
+   * an SMS OTP — the caller must follow up with verifyPhoneOtp() to
+   * activate the session, then collect an email and call
+   * addEmailToAccount() to attach + verify it.
+   *
+   * @param {string} phone    — E.164, e.g. '+971501234567'
+   * @param {string} password — min 8 chars (Supabase enforces)
+   * @param {string} name     — full name (stored in raw_user_meta_data → users.name via trigger)
+   * @returns {Promise<{success:boolean, error?:string, notConfigured?:boolean, user?:object}>}
+   */
+  signUpWithPhone: async function (phone, password, name) {
+    if (!db) return { success: false, error: 'Auth service unavailable. Please refresh.' };
+    if (!phone) return { success: false, error: 'Phone number required.' };
+    if (!password || password.length < 8) return { success: false, error: 'Password must be at least 8 characters.' };
+    try {
+      const { data, error } = await db.auth.signUp({
+        phone: phone,
+        password: password,
+        options: {
+          data: {
+            name: name || '',
+            phone: phone
+          }
+        }
+      });
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('sms') && (msg.includes('provider') || msg.includes('not configured') || msg.includes('not enabled'))) {
+          return { success: false, notConfigured: true, error: 'SMS verification coming soon — please use email for now.' };
+        }
+        return { success: false, error: error.message || 'Signup failed.' };
+      }
+      // No session yet — caller must verify the OTP before login completes.
+      return { success: true, user: data.user };
+    } catch (e) {
+      return { success: false, error: e.message || 'Signup failed.' };
+    }
+  },
+
+  /**
+   * Sign in with phone + password (post-OTP, returning users).
+   * Same shape as signIn() but for phone-first accounts.
+   *
+   * @param {string} phone    — E.164
+   * @param {string} password
+   */
+  signInWithPhonePassword: async function (phone, password) {
+    if (!db) return { success: false, error: 'Auth service unavailable. Please refresh.' };
+    if (!phone || !password) return { success: false, error: 'Phone and password are required.' };
+    try {
+      const { data, error } = await db.auth.signInWithPassword({ phone: phone, password: password });
+      if (error) return { success: false, error: error.message || 'Invalid credentials.' };
+      try {
+        const profile = await Promise.race([
+          _fetchProfile(data.user.id),
+          new Promise((r) => setTimeout(() => r(null), 3000))
+        ]);
+        _mirrorFromSupabase(data.user, profile);
+      } catch (e) { _mirrorFromSupabase(data.user, null); }
+      return { success: true, user: data.user };
+    } catch (e) {
+      return { success: false, error: e.message || 'Login failed.' };
+    }
+  },
+
+  /**
+   * Attach an email to a phone-verified account. Supabase sends a
+   * verification email automatically — the address remains unconfirmed
+   * (auth.users.email_confirmed_at stays NULL) until the user clicks
+   * the link. We still mirror the address into public.users.email so
+   * notification dispatch knows where to send mail. The auth-state
+   * listener resyncs email_confirmed_at later when the user returns.
+   *
+   * @param {string} email
+   * @returns {Promise<{success:boolean, error?:string}>}
+   */
+  addEmailToAccount: async function (email) {
+    if (!db) return { success: false, error: 'Auth service unavailable.' };
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return { success: false, error: 'Please enter a valid email.' };
+    }
+    try {
+      const { data, error } = await db.auth.updateUser({ email: email });
+      if (error) return { success: false, error: error.message || 'Could not attach email.' };
+      // Mirror into public.users so app code (notifs, profile screen) sees it
+      // immediately. Email stays unverified until user clicks the link.
+      try {
+        const cur = data && data.user ? data.user : await SwappoAuth.getCurrentUser();
+        if (cur && cur.id) {
+          await db.from('users').update({ email: email }).eq('id', cur.id);
+        }
+      } catch (e) { /* RLS guarded — non-critical */ }
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message || 'Could not attach email.' };
+    }
+  },
+
+  /**
    * Check if a pseudo is available (case-insensitive, strict charset).
    * Uses RPC is_pseudo_available which is SECURITY DEFINER so any client
    * can check without leaking the full users table via SELECT.

@@ -395,26 +395,42 @@
           <p data-i18n="auth_subtitle">Swap, buy, sell, gift — across the UAE.</p>
         </div>
 
-        <!-- ── Phone-first signup ─────────────────────────────── -->
+        <!-- ── Phone-first signup (3 steps: phone+pwd → OTP → email) ─── -->
         <form class="auth-form" id="signup-phone-form" onsubmit="handlePhoneSignup(event)" style="margin-bottom:12px;">
-          <div class="form-group">
-            <label class="form-label" for="su-phone-name" data-i18n="auth_full_name">Full name</label>
-            <input class="form-input" type="text" id="su-phone-name" name="name" placeholder="Ahmed Mohammed" data-i18n-placeholder="auth_name_placeholder" required minlength="2" maxlength="50" autocomplete="tel">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="su-phone" data-i18n="auth_phone">Phone number</label>
-            <div class="phone-input-group">
-              <span class="phone-prefix">🇦🇪 +971</span>
-              <input class="form-input" type="tel" id="su-phone" placeholder="5X XXX XXXX" data-i18n-placeholder="auth_phone_placeholder" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required autocomplete="tel">
+
+          <!-- STEP 1: name + phone + password -->
+          <div id="su-step-credentials">
+            <div class="form-group">
+              <label class="form-label" for="su-phone-name" data-i18n="auth_full_name">Full name</label>
+              <input class="form-input" type="text" id="su-phone-name" name="name" placeholder="Ahmed Mohammed" data-i18n-placeholder="auth_name_placeholder" required minlength="2" maxlength="50" autocomplete="name">
             </div>
-            <span style="font-size:11px;color:#9CA3AF;margin-top:4px;display:block;" data-i18n="auth_sms_code_hint">We'll send a 6-digit code via SMS</span>
+            <div class="form-group">
+              <label class="form-label" for="su-phone" data-i18n="auth_phone">Phone number</label>
+              <div class="phone-input-group">
+                <span class="phone-prefix">🇦🇪 +971</span>
+                <input class="form-input" type="tel" id="su-phone" placeholder="5X XXX XXXX" data-i18n-placeholder="auth_phone_placeholder" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required autocomplete="tel">
+              </div>
+              <span style="font-size:11px;color:#9CA3AF;margin-top:4px;display:block;" data-i18n="auth_sms_code_hint">We'll send a 6-digit code via SMS</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="su-phone-password" data-i18n="auth_password">Password</label>
+              <input class="form-input" type="password" id="su-phone-password" placeholder="At least 8 characters" data-i18n-placeholder="auth_password_placeholder" minlength="8" required autocomplete="new-password">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="su-phone-password-confirm" data-i18n="auth_password_confirm">Confirm password</label>
+              <input class="form-input" type="password" id="su-phone-password-confirm" placeholder="Repeat password" data-i18n-placeholder="auth_password_confirm_placeholder" minlength="8" required autocomplete="new-password">
+            </div>
+            <div class="auth-checkbox" style="margin-top:10px;">
+              <input type="checkbox" id="su-phone-terms" required>
+              <label for="su-phone-terms" data-i18n-html="auth_terms_agree">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></label>
+            </div>
           </div>
 
-          <!-- OTP verification step (revealed after "Send code") -->
-          <div id="su-otp-section" style="display:none;">
+          <!-- STEP 2: OTP verification (revealed after "Send code") -->
+          <div id="su-step-otp" style="display:none;">
             <div class="form-group" style="margin-top:12px;">
               <label class="form-label" for="su-otp-code" data-i18n="auth_verification_code">Verification code</label>
-              <input class="form-input code-input" type="text" id="su-otp-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$" inputmode="numeric" style="text-align:center;font-size:24px;letter-spacing:6px;">
+              <input class="form-input code-input" type="text" id="su-otp-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$" inputmode="numeric" style="text-align:center;font-size:24px;letter-spacing:6px;" autocomplete="one-time-code">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
                 <span style="font-size:12px;color:#6B7280;"><span data-i18n="auth_code_sent_to">Code sent to</span> <span id="su-otp-phone-display" style="font-weight:600;"></span></span>
                 <button type="button" class="resend-link" onclick="resendPhoneOtp()" style="background:none;border:none;color:var(--teal,#09B1BA);font-weight:600;font-size:12px;cursor:pointer;padding:0;" data-i18n="auth_resend">Resend</button>
@@ -422,41 +438,19 @@
             </div>
           </div>
 
-          <div class="auth-checkbox" style="margin-top:10px;">
-            <input type="checkbox" id="su-phone-terms" required autocomplete="tel">
-            <label for="su-phone-terms" data-i18n-html="auth_terms_agree">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></label>
+          <!-- STEP 3: email collection (revealed after OTP verified) -->
+          <div id="su-step-email" style="display:none;">
+            <div style="background:#E6F7F8;border:1px solid #09B1BA;border-radius:8px;padding:12px;margin-top:12px;">
+              <p style="margin:0;font-size:13px;color:#171717;font-weight:600;" data-i18n="auth_phone_verified">📱 Phone verified ✓</p>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+              <label class="form-label" for="su-email" data-i18n="auth_email_for_notif">Email for notifications</label>
+              <input class="form-input" type="email" id="su-email" placeholder="you@example.com" data-i18n-placeholder="auth_email_placeholder" autocomplete="email">
+              <span style="font-size:11px;color:#9CA3AF;margin-top:4px;display:block;" data-i18n="auth_email_notif_hint">We'll send a verification link to confirm your address.</span>
+            </div>
           </div>
 
           <button type="submit" class="auth-btn auth-btn-primary" id="su-phone-btn" data-i18n="auth_send_code_btn">Send verification code</button>
-        </form>
-
-        <!-- ── Divider ─────────────────────────────────────────── -->
-        <div class="auth-divider" data-i18n="auth_or">or</div>
-
-        <!-- ── Email signup toggle ─────────────────────────────── -->
-        <button type="button" class="auth-email-btn" id="su-email-toggle" onclick="toggleEmailSignup()">
-          <i class="fas fa-envelope"></i> <span data-i18n="auth_signup_email">Sign up with email</span>
-        </button>
-
-        <!-- ── Email signup form (initially hidden) ────────────── -->
-        <form class="auth-form" id="signup-email-form" onsubmit="handleEmailSignup(event)" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed #E5E7EB;">
-          <div class="form-group">
-            <label class="form-label" for="su-email-name" data-i18n="auth_full_name">Full name</label>
-            <input class="form-input" type="text" id="su-email-name" placeholder="Ahmed Mohammed" data-i18n-placeholder="auth_name_placeholder" required minlength="2" maxlength="50" autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="su-email" data-i18n="auth_email">Email address</label>
-            <input class="form-input" type="email" id="su-email" placeholder="you@example.com" data-i18n-placeholder="auth_email_placeholder" required autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="su-email-password" data-i18n="auth_password">Password</label>
-            <input class="form-input" type="password" id="su-email-password" placeholder="At least 8 characters" data-i18n-placeholder="auth_password_placeholder" minlength="8" required autocomplete="new-password">
-          </div>
-          <div class="auth-checkbox">
-            <input type="checkbox" id="su-email-terms" required autocomplete="email">
-            <label for="su-email-terms" data-i18n-html="auth_terms_agree">I agree to <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></label>
-          </div>
-          <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_create_account">Create account</button>
         </form>
 
         <div class="auth-footer-link">
@@ -471,7 +465,13 @@
           <h2 data-i18n="auth_welcome_back">Welcome back</h2>
         </div>
 
-        <!-- ── Phone login (primary) ──────────────────────────── -->
+        <!-- ── Login method switcher ──────────────────────────── -->
+        <div class="auth-tabs" style="margin-bottom:18px;">
+          <button type="button" class="auth-tab active" id="li-method-phone" onclick="switchLoginMethod('phone')" data-i18n="auth_login_with_phone">Phone</button>
+          <button type="button" class="auth-tab" id="li-method-email" onclick="switchLoginMethod('email')" data-i18n="auth_login_with_email">Email</button>
+        </div>
+
+        <!-- ── Phone login (primary): phone + password ────────── -->
         <form class="auth-form" id="login-phone-form" onsubmit="handlePhoneLogin(event)" style="margin-bottom:12px;">
           <div class="form-group">
             <label class="form-label" for="li-phone" data-i18n="auth_phone">Phone number</label>
@@ -480,31 +480,18 @@
               <input class="form-input" type="tel" id="li-phone" placeholder="5X XXX XXXX" data-i18n-placeholder="auth_phone_placeholder" pattern="^5[0-9]{8}$" maxlength="9" inputmode="numeric" required autocomplete="tel">
             </div>
           </div>
-
-          <div id="li-otp-section" style="display:none;">
-            <div class="form-group" style="margin-top:12px;">
-              <label class="form-label" for="li-otp-code" data-i18n="auth_verification_code">Verification code</label>
-              <input class="form-input code-input" type="text" id="li-otp-code" placeholder="– – – – – –" maxlength="6" pattern="^[0-9]{6}$" inputmode="numeric" style="text-align:center;font-size:24px;letter-spacing:6px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-                <span style="font-size:12px;color:#6B7280;"><span data-i18n="auth_code_sent_to">Code sent to</span> <span id="li-otp-phone-display" style="font-weight:600;"></span></span>
-                <button type="button" onclick="resendLoginOtp()" style="background:none;border:none;color:var(--teal,#09B1BA);font-weight:600;font-size:12px;cursor:pointer;padding:0;" data-i18n="auth_resend">Resend</button>
-              </div>
-            </div>
+          <div class="form-group">
+            <label class="form-label" for="li-phone-password" data-i18n="auth_password">Password</label>
+            <input class="form-input" type="password" id="li-phone-password" placeholder="Your password" data-i18n-placeholder="auth_login_password_placeholder" required autocomplete="current-password">
           </div>
-
-          <button type="submit" class="auth-btn auth-btn-primary" id="li-phone-btn" data-i18n="auth_send_code_btn">Send verification code</button>
+          <div class="auth-forgot">
+            <a href="#" onclick="handleForgotPassword(event,'phone')" data-i18n="auth_forgot_password">Forgot password?</a>
+          </div>
+          <button type="submit" class="auth-btn auth-btn-primary" id="li-phone-btn" data-i18n="auth_login_btn">Log in</button>
         </form>
 
-        <!-- ── Divider ─────────────────────────────────────────── -->
-        <div class="auth-divider" data-i18n="auth_or">or</div>
-
-        <!-- ── Email login toggle ──────────────────────────────── -->
-        <button type="button" class="auth-email-btn" id="li-email-toggle" onclick="toggleEmailLogin()">
-          <i class="fas fa-envelope"></i> <span data-i18n="auth_login_email_btn">Log in with email</span>
-        </button>
-
-        <!-- ── Email login form (initially hidden) ─────────────── -->
-        <form class="auth-form" id="login-email-form" onsubmit="handleLogin(event)" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed #E5E7EB;">
+        <!-- ── Email login: email + password ───────────────────── -->
+        <form class="auth-form" id="login-email-form" onsubmit="handleLogin(event)" style="display:none;margin-bottom:12px;">
           <div class="form-group">
             <label class="form-label" for="login-email" data-i18n="auth_email">Email address</label>
             <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" data-i18n-placeholder="auth_email_placeholder" required autocomplete="email">
@@ -514,7 +501,7 @@
             <input class="form-input" type="password" id="login-password" name="password" placeholder="Your password" data-i18n-placeholder="auth_login_password_placeholder" required autocomplete="current-password">
           </div>
           <div class="auth-forgot">
-            <a href="#" data-i18n="auth_forgot_password">Forgot password?</a>
+            <a href="#" onclick="handleForgotPassword(event,'email')" data-i18n="auth_forgot_password">Forgot password?</a>
           </div>
           <button type="submit" class="auth-btn auth-btn-primary" data-i18n="auth_login_btn">Log in</button>
         </form>
@@ -677,211 +664,206 @@
     const _PHONE_PREFIX = '+971';
     function _uaePhone(input) { return _PHONE_PREFIX + String(input || '').replace(/\s+/g, ''); }
 
-    // Tracks whether we're in step 1 (send code) or step 2 (verify code).
-    let _signupPhoneSent = false;
-    let _loginPhoneSent = false;
+    // i18n helper — falls back to literal when t() isn't loaded yet.
+    function _authT(key, fallback) {
+      return (typeof t === 'function') ? t(key) : (fallback || key);
+    }
+
+    // Signup is a 3-step flow: 'credentials' → 'otp' → 'email'.
+    // Login uses phone+pwd or email+pwd (no OTP, returning users only).
+    let _signupStep = 'credentials';
+    let _signupPhone = null;
+    let _signupName = null;
 
     async function handlePhoneSignup(event) {
       event.preventDefault();
       var btn = document.getElementById('su-phone-btn');
-      var name = document.getElementById('su-phone-name').value.trim();
-      var rawPhone = document.getElementById('su-phone').value.trim();
-      var terms = document.getElementById('su-phone-terms').checked;
-
-      if (name.length < 2) { showToast('Please enter your full name.', 'error'); return; }
-      if (!/^5[0-9]{8}$/.test(rawPhone)) { showToast('Please enter a valid UAE mobile number (5XXXXXXXX).', 'error'); return; }
-      if (!terms) { showToast('Please agree to Terms + Privacy.', 'error'); return; }
       if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
-        showToast('Auth service unavailable. Please refresh.', 'error');
+        showToast(_authT('auth_service_unavailable','Auth service unavailable. Please refresh.'), 'error');
         return;
       }
 
-      var fullPhone = _uaePhone(rawPhone);
+      // ── STEP 1: phone + password → trigger SMS OTP ───────────────────
+      if (_signupStep === 'credentials') {
+        var name = document.getElementById('su-phone-name').value.trim();
+        var rawPhone = document.getElementById('su-phone').value.trim();
+        var pwd = document.getElementById('su-phone-password').value;
+        var pwdConfirm = document.getElementById('su-phone-password-confirm').value;
+        var terms = document.getElementById('su-phone-terms').checked;
 
-      // Step 2: verify the OTP code
-      if (_signupPhoneSent) {
-        var code = document.getElementById('su-otp-code').value.trim();
-        if (!/^[0-9]{6}$/.test(code)) { showToast('Please enter the 6-digit code.', 'error'); return; }
+        if (name.length < 2) { showToast(_authT('auth_err_name','Please enter your full name.'), 'error'); return; }
+        if (!/^5[0-9]{8}$/.test(rawPhone)) { showToast(_authT('auth_err_phone','Please enter a valid UAE mobile number (5XXXXXXXX).'), 'error'); return; }
+        if (pwd.length < 8) { showToast(_authT('auth_err_password_short','Password must be at least 8 characters.'), 'error'); return; }
+        if (pwd !== pwdConfirm) { showToast(_authT('auth_err_password_match','Passwords do not match.'), 'error'); return; }
+        if (!terms) { showToast(_authT('auth_err_terms','Please agree to Terms + Privacy.'), 'error'); return; }
+
+        var fullPhone = _uaePhone(rawPhone);
         setLoading(btn, true);
         try {
-          var verify = await window.SwappoAuth.verifyPhoneOtp(fullPhone, code);
-          if (!verify.success) { showToast(verify.error || 'Invalid code.', 'error'); setLoading(btn, false); return; }
-          // Update the profile row with the full name from the form (trigger set it blank)
-          try { await window.SwappoAuth.updateProfile({ name: name, phone: fullPhone }); } catch (e) {}
-          showToast('Welcome to Swappo!', 'success');
-          // Phone-only users always need onboarding (pseudo + avatar)
-          setTimeout(function() { window.location.href = 'onboarding.html'; }, 900);
+          var res = await window.SwappoAuth.signUpWithPhone(fullPhone, pwd, name);
+          if (res.notConfigured) {
+            showToast(res.error || _authT('auth_sms_coming_soon','SMS verification coming soon.'), 'info');
+            setLoading(btn, false);
+            return;
+          }
+          if (!res.success) {
+            showToast(res.error || _authT('auth_err_signup','Signup failed.'), 'error');
+            setLoading(btn, false);
+            return;
+          }
+          // Stash for later steps + reveal OTP UI
+          _signupPhone = fullPhone;
+          _signupName = name;
+          _signupStep = 'otp';
+          document.getElementById('su-step-credentials').style.display = 'none';
+          document.getElementById('su-step-otp').style.display = '';
+          document.getElementById('su-otp-phone-display').textContent = fullPhone;
+          btn.textContent = _authT('auth_verify_code_btn','Verify code');
+          setLoading(btn, false);
+          setTimeout(function () { document.getElementById('su-otp-code').focus(); }, 50);
         } catch (err) {
-          showToast(err.message || 'Verification failed.', 'error');
+          showToast(err.message || _authT('auth_err_signup','Signup failed.'), 'error');
           setLoading(btn, false);
         }
         return;
       }
 
-      // Step 1: send OTP
-      setLoading(btn, true);
-      try {
-        var res = await window.SwappoAuth.signInWithPhone(fullPhone);
-        if (res.notConfigured) {
-          showToast(res.error || 'SMS verification coming soon — please use email for now.', 'info');
+      // ── STEP 2: verify OTP → reveal email form ──────────────────────
+      if (_signupStep === 'otp') {
+        var code = document.getElementById('su-otp-code').value.trim();
+        if (!/^[0-9]{6}$/.test(code)) { showToast(_authT('auth_err_otp','Please enter the 6-digit code.'), 'error'); return; }
+        setLoading(btn, true);
+        try {
+          var verify = await window.SwappoAuth.verifyPhoneOtp(_signupPhone, code);
+          if (!verify.success) {
+            showToast(verify.error || _authT('auth_err_invalid_code','Invalid code.'), 'error');
+            setLoading(btn, false);
+            return;
+          }
+          // Mirror name + phone into public.users (trigger leaves them blank).
+          try { await window.SwappoAuth.updateProfile({ name: _signupName, phone: _signupPhone }); } catch (e) {}
+          _signupStep = 'email';
+          document.getElementById('su-step-otp').style.display = 'none';
+          document.getElementById('su-step-email').style.display = '';
+          btn.textContent = _authT('auth_send_email_verif_btn','Send verification email');
           setLoading(btn, false);
+          setTimeout(function () { document.getElementById('su-email').focus(); }, 50);
+        } catch (err) {
+          showToast(err.message || _authT('auth_err_verify','Verification failed.'), 'error');
+          setLoading(btn, false);
+        }
+        return;
+      }
+
+      // ── STEP 3: collect email + send confirmation link ──────────────
+      if (_signupStep === 'email') {
+        var email = document.getElementById('su-email').value.trim();
+        // Email is optional — user may skip and add later in Settings.
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showToast(_authT('auth_err_email','Please enter a valid email.'), 'error');
           return;
         }
-        if (!res.success) {
-          showToast(res.error || 'Could not send the verification code.', 'error');
-          setLoading(btn, false);
-          return;
+        setLoading(btn, true);
+        if (email) {
+          try {
+            var emailRes = await window.SwappoAuth.addEmailToAccount(email);
+            if (!emailRes.success) {
+              showToast(emailRes.error || _authT('auth_err_email_attach','Could not attach email.'), 'error');
+              setLoading(btn, false);
+              return;
+            }
+            showToast(_authT('auth_email_verif_sent','Check your inbox to verify your email!'), 'success');
+          } catch (err) {
+            showToast(err.message || _authT('auth_err_email_attach','Could not attach email.'), 'error');
+            setLoading(btn, false);
+            return;
+          }
+        } else {
+          showToast(_authT('auth_welcome','Welcome to Swappo!'), 'success');
         }
-        // Reveal OTP input + flip button label
-        document.getElementById('su-otp-section').style.display = '';
-        document.getElementById('su-otp-phone-display').textContent = fullPhone;
-        _signupPhoneSent = true;
-        btn.textContent = 'Verify & create account';
-        setLoading(btn, false);
-        setTimeout(function() { document.getElementById('su-otp-code').focus(); }, 50);
-      } catch (err) {
-        showToast(err.message || 'Could not send the code.', 'error');
-        setLoading(btn, false);
+        setTimeout(function () { window.location.href = 'onboarding.html'; }, 900);
+        return;
       }
     }
     window.handlePhoneSignup = handlePhoneSignup;
 
     async function resendPhoneOtp() {
-      var rawPhone = document.getElementById('su-phone').value.trim();
-      if (!/^5[0-9]{8}$/.test(rawPhone)) return;
+      var phone = _signupPhone;
+      if (!phone) {
+        var rawPhone = document.getElementById('su-phone').value.trim();
+        if (!/^5[0-9]{8}$/.test(rawPhone)) return;
+        phone = _uaePhone(rawPhone);
+      }
       try {
-        var res = await window.SwappoAuth.signInWithPhone(_uaePhone(rawPhone));
-        if (res.success) showToast('Code resent.', 'info');
+        // Re-trigger via signInWithOtp — Supabase resends the code for the
+        // existing user. (signUp would error with "user already exists".)
+        var res = await window.SwappoAuth.signInWithPhone(phone);
+        if (res.success) showToast(_authT('auth_code_resent','Code resent.'), 'info');
         else if (res.error) showToast(res.error, 'error');
-      } catch (e) { showToast('Could not resend the code.', 'error'); }
+      } catch (e) { showToast(_authT('auth_err_resend','Could not resend the code.'), 'error'); }
     }
     window.resendPhoneOtp = resendPhoneOtp;
 
     /* ========================
-       Phone-first login flow (same 2-step pattern)
+       Login: phone+password OR email+password
        ======================== */
+    function switchLoginMethod(method) {
+      var phoneBtn = document.getElementById('li-method-phone');
+      var emailBtn = document.getElementById('li-method-email');
+      var phoneForm = document.getElementById('login-phone-form');
+      var emailForm = document.getElementById('login-email-form');
+      if (method === 'email') {
+        phoneBtn.classList.remove('active'); emailBtn.classList.add('active');
+        phoneForm.style.display = 'none'; emailForm.style.display = '';
+      } else {
+        emailBtn.classList.remove('active'); phoneBtn.classList.add('active');
+        emailForm.style.display = 'none'; phoneForm.style.display = '';
+      }
+    }
+    window.switchLoginMethod = switchLoginMethod;
+
     async function handlePhoneLogin(event) {
       event.preventDefault();
       var btn = document.getElementById('li-phone-btn');
       var rawPhone = document.getElementById('li-phone').value.trim();
-      if (!/^5[0-9]{8}$/.test(rawPhone)) { showToast('Please enter a valid UAE mobile number.', 'error'); return; }
+      var pwd = document.getElementById('li-phone-password').value;
+      if (!/^5[0-9]{8}$/.test(rawPhone)) { showToast(_authT('auth_err_phone','Please enter a valid UAE mobile number.'), 'error'); return; }
+      if (!pwd) { showToast(_authT('auth_err_password_required','Password required.'), 'error'); return; }
       if (!(window.SwappoAuth && window.SwappoAuth.isReady && window.SwappoAuth.isReady())) {
-        showToast('Auth service unavailable. Please refresh.', 'error'); return;
+        showToast(_authT('auth_service_unavailable','Auth service unavailable. Please refresh.'), 'error'); return;
       }
-      var fullPhone = _uaePhone(rawPhone);
-
-      if (_loginPhoneSent) {
-        var code = document.getElementById('li-otp-code').value.trim();
-        if (!/^[0-9]{6}$/.test(code)) { showToast('Please enter the 6-digit code.', 'error'); return; }
-        setLoading(btn, true);
-        try {
-          var verify = await window.SwappoAuth.verifyPhoneOtp(fullPhone, code);
-          if (!verify.success) { showToast(verify.error || 'Invalid code.', 'error'); setLoading(btn, false); return; }
-          showToast('Welcome back!', 'success');
-          var needs = await window.SwappoAuth.needsOnboarding();
-          setTimeout(function() {
-            window.location.href = needs ? 'onboarding.html' : safeRedirect('../dev-a7f3k9mz2q.html');
-          }, 900);
-        } catch (err) {
-          showToast(err.message || 'Verification failed.', 'error');
-          setLoading(btn, false);
-        }
-        return;
-      }
-
       setLoading(btn, true);
       try {
-        var res = await window.SwappoAuth.signInWithPhone(fullPhone);
-        if (res.notConfigured) {
-          showToast(res.error || 'SMS verification coming soon — please use email for now.', 'info');
-          setLoading(btn, false);
-          return;
-        }
+        var res = await window.SwappoAuth.signInWithPhonePassword(_uaePhone(rawPhone), pwd);
         if (!res.success) {
-          showToast(res.error || 'Could not send the code.', 'error');
+          showToast(res.error || _authT('auth_err_credentials','Invalid credentials.'), 'error');
           setLoading(btn, false);
           return;
         }
-        document.getElementById('li-otp-section').style.display = '';
-        document.getElementById('li-otp-phone-display').textContent = fullPhone;
-        _loginPhoneSent = true;
-        btn.textContent = 'Verify & log in';
-        setLoading(btn, false);
-        setTimeout(function() { document.getElementById('li-otp-code').focus(); }, 50);
+        showToast(_authT('auth_welcome_back','Welcome back!'), 'success');
+        var needs = false;
+        try { needs = await window.SwappoAuth.needsOnboarding(); } catch (e) {}
+        setTimeout(function () {
+          window.location.href = needs ? 'onboarding.html' : safeRedirect('../dev-a7f3k9mz2q.html');
+        }, 700);
       } catch (err) {
-        showToast(err.message || 'Could not send the code.', 'error');
+        showToast(err.message || _authT('auth_err_login','Login failed.'), 'error');
         setLoading(btn, false);
       }
     }
     window.handlePhoneLogin = handlePhoneLogin;
 
-    async function resendLoginOtp() {
-      var rawPhone = document.getElementById('li-phone').value.trim();
-      if (!/^5[0-9]{8}$/.test(rawPhone)) return;
-      try {
-        var res = await window.SwappoAuth.signInWithPhone(_uaePhone(rawPhone));
-        if (res.success) showToast('Code resent.', 'info');
-      } catch (e) {}
-    }
-    window.resendLoginOtp = resendLoginOtp;
-
-    /* ========================
-       Email signup (secondary, inline)
-       ======================== */
-    function toggleEmailSignup() {
-      var form = document.getElementById('signup-email-form');
-      var open = form.style.display !== 'none';
-      form.style.display = open ? 'none' : '';
-      document.getElementById('su-email-toggle').innerHTML = open
-        ? '<i class="fas fa-envelope"></i> Sign up with email'
-        : '<i class="fas fa-times"></i> Hide email signup';
-    }
-    window.toggleEmailSignup = toggleEmailSignup;
-
-    async function handleEmailSignup(event) {
-      event.preventDefault();
-      var btn = event.target.querySelector('button[type="submit"]');
-      var name = document.getElementById('su-email-name').value.trim();
-      var email = document.getElementById('su-email').value.trim();
-      var password = document.getElementById('su-email-password').value;
-      var terms = document.getElementById('su-email-terms').checked;
-
-      if (name.length < 2) { showToast('Please enter your full name.', 'error'); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Please enter a valid email.', 'error'); return; }
-      if (password.length < 8) { showToast('Password must be at least 8 characters.', 'error'); return; }
-      if (!terms) { showToast('Please agree to Terms + Privacy.', 'error'); return; }
-
-      setLoading(btn, true);
-      try {
-        var res = await window.SwappoAuth.signUp(email, password, name, {});
-        if (!res.success) { showToast(res.error || 'Signup failed.', 'error'); setLoading(btn, false); return; }
-        if (res.needsVerification) {
-          showToast('Check your inbox — click the verification link to finish signup.', 'success');
-          setLoading(btn, false);
-          return;
-        }
-        // Auto-confirmed path — always send to onboarding first (pseudo + avatar)
-        showToast('Welcome to Swappo!', 'success');
-        setTimeout(function() { window.location.href = 'onboarding.html'; }, 900);
-      } catch (err) {
-        showToast(err.message || 'Signup failed.', 'error');
-        setLoading(btn, false);
+    function handleForgotPassword(event, channel) {
+      if (event) event.preventDefault();
+      // Phone-account password recovery uses SMS OTP as a one-shot login;
+      // email recovery uses the existing reset-password.html flow.
+      if (channel === 'email') {
+        window.location.href = 'reset-password.html';
+      } else {
+        showToast(_authT('auth_phone_reset_hint','Enter your phone, tap Resend below to receive a one-time login code.'), 'info');
       }
     }
-    window.handleEmailSignup = handleEmailSignup;
-
-    /* ========================
-       Email login (secondary, inline)
-       ======================== */
-    function toggleEmailLogin() {
-      var form = document.getElementById('login-email-form');
-      var open = form.style.display !== 'none';
-      form.style.display = open ? 'none' : '';
-      document.getElementById('li-email-toggle').innerHTML = open
-        ? '<i class="fas fa-envelope"></i> Log in with email'
-        : '<i class="fas fa-times"></i> Hide email login';
-    }
-    window.toggleEmailLogin = toggleEmailLogin;
+    window.handleForgotPassword = handleForgotPassword;
 
     async function handleLogin(event) {
       event.preventDefault();
