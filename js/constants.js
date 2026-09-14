@@ -80,8 +80,15 @@ const GAMING_SUBCATEGORIES = {
 // ---- UAE emirates ----
 const EMIRATES = ['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah','Fujairah','Umm Al Quwain','Al Ain'];
 
+// ---- Feature flags ----
+// Flip a flag → commit → push. No migration, no UI refactor needed.
+const FEATURES = {
+  PHONE_VERIFICATION: false, // ← true once Twilio Phone Auth is enabled in Supabase
+};
+
 // ---- Expose globally (browser) ----
 try {
+  window.FEATURES = FEATURES;
   window.SUBSCRIPTION_TIERS = SUBSCRIPTION_TIERS;
   window.BOOST_PRICES = BOOST_PRICES;
   window.BADGE_TIERS = BADGE_TIERS;

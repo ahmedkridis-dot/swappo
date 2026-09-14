@@ -53,12 +53,12 @@
     if (!userId || !window.db) return null;
     try {
       const res = await window.db.from('users_public')
-        .select('id,display_name,avatar,plan,is_pro,swap_count,badge,rating_avg,rating_count,created_at')
+        .select('id,display_name,avatar,plan,is_pro,swap_count,badge,rating_avg,rating_count,created_at,is_verified')
         .eq('id', userId).maybeSingle();
       if (res.error || !res.data) {
         // Fallback: read the raw users row if we are allowed.
         const raw = await window.db.from('users')
-          .select('id,display_name,pseudo,avatar,plan,is_pro,swap_count,badge,rating_avg,rating_count,created_at')
+          .select('id,display_name,pseudo,avatar,plan,is_pro,swap_count,badge,rating_avg,rating_count,created_at,is_verified')
           .eq('id', userId).maybeSingle();
         if (raw.error || !raw.data) return null;
         return {
@@ -150,6 +150,18 @@
     badgeChip.className = 'swp-chip';
     badgeChip.textContent = tierEmoji(badge) + ' ' + badge.charAt(0).toUpperCase() + badge.slice(1);
     line2.appendChild(badgeChip);
+    // ✓ Verified — shown in BOTH anonymous and revealed states: it's a trust
+    // signal that reveals nothing about identity. Only ever true once
+    // FEATURES.PHONE_VERIFICATION is live and the user verified a number.
+    if (profile && profile.is_verified === true) {
+      const verified = document.createElement('span');
+      verified.className = 'swp-chip swp-chip-verified';
+      verified.style.background = 'var(--primary-light, #E6F7F8)';
+      verified.style.color = 'var(--primary-dark, #078A91)';
+      verified.style.fontWeight = '700';
+      verified.textContent = '✓ ' + tr('badge_verified', 'Verified');
+      line2.appendChild(verified);
+    }
     if (isRevealed && profile && profile.is_pro) {
       const pro = document.createElement('span');
       pro.className = 'swp-chip';

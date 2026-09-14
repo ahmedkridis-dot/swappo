@@ -1335,11 +1335,19 @@
     <!-- ========== MAIN CONTAINER ========== -->
     <div id="main" class="container" style="padding-top:24px;padding-bottom:40px;">
 
+        <!-- Verify-phone invitation — rendered only when FEATURES.PHONE_VERIFICATION
+             is on AND the user is not verified (js/phone-verify.js). -->
+        <div id="verify-banner" hidden style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--primary-light,#E6F7F8);border:1px solid var(--primary,#09B1BA);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:14px;color:var(--text,#171717);">
+            <span style="flex:1;min-width:220px;">🔒 <span data-i18n="verify_banner">Verify your phone to get the Verified badge — it takes 30 seconds.</span></span>
+            <a href="#verify" data-verify-cta class="btn-pill btn-pill-teal" style="font-size:13px;padding:8px 18px;" data-i18n="verify_banner_cta">Verify now</a>
+            <button type="button" data-verify-dismiss aria-label="Close" style="background:none;border:none;font-size:18px;line-height:1;color:var(--text-muted,#999);cursor:pointer;padding:4px;">×</button>
+        </div>
+
         <!-- ========== DASHBOARD HEADER (Figma style) ========== -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
             <div>
                 <h1 style="font-size:28px;font-weight:700;color:var(--navy,#1A1A2E);margin:0;" data-i18n="dashboard_title">Dashboard</h1>
-                <p style="font-size:14px;color:var(--gray-text,#6B7280);margin:4px 0 0;" id="dashboard-welcome">Welcome back</p>
+                <p style="font-size:14px;color:var(--gray-text,#6B7280);margin:4px 0 0;" id="dashboard-welcome">Welcome back <span id="verified-badge-slot" style="margin-left:6px;vertical-align:middle;"></span></p>
             </div>
 
             <!-- Notifications bell (populated by JS) — opens a dropdown listing
@@ -1657,6 +1665,39 @@
                                 </div>
                             </div>
 
+                            <!-- Phone verification — hidden until FEATURES.PHONE_VERIFICATION
+                                 (js/phone-verify.js un-hides it and wires the form). -->
+                            <div class="settings-section" id="verify" data-feature="phone_verification" hidden>
+                                <h3><i class="fas fa-shield-alt"></i> <span data-i18n="verify_phone_title">Verify your phone number</span></h3>
+                                <p style="font-size:13px;color:var(--text-muted);max-width:520px;line-height:1.5;margin:0 0 12px;" data-i18n="verify_phone_desc">Get the ✓ Verified badge and build trust with other swappers. Your number is never shown to anyone.</p>
+
+                                <form id="verify-form" style="display:grid;gap:10px;max-width:420px;">
+                                    <div style="display:flex;gap:8px;align-items:stretch;">
+                                        <select id="verify-country" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--bg-light);">
+                                            <option value="ae" selected>🇦🇪 +971</option>
+                                            <option value="sa">🇸🇦 +966</option>
+                                            <option value="om">🇴🇲 +968</option>
+                                            <option value="qa">🇶🇦 +974</option>
+                                            <option value="bh">🇧🇭 +973</option>
+                                            <option value="kw">🇰🇼 +965</option>
+                                        </select>
+                                        <input type="tel" id="verify-phone" inputmode="numeric" autocomplete="tel-national" placeholder="5X XXX XXXX" data-i18n-placeholder="verify_phone_placeholder" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+                                    </div>
+
+                                    <div id="verify-code-wrap" hidden>
+                                        <label for="verify-code" style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;"><span data-i18n="verify_enter_code">Enter the 6-digit code</span> — <span data-i18n="verify_code_sent_to">Code sent to</span> <strong id="verify-sent-to"></strong></label>
+                                        <input type="text" id="verify-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="^[0-9]{6}$" placeholder="– – – – – –" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:22px;letter-spacing:6px;text-align:center;font-family:inherit;">
+                                        <button type="button" id="verify-resend" style="background:none;border:none;color:var(--primary);font-weight:600;font-size:12px;cursor:pointer;padding:6px 0 0;" data-i18n="verify_resend">Resend code</button>
+                                    </div>
+
+                                    <button id="verify-submit" type="submit" class="account-btn" style="margin-top:2px;">
+                                        <i class="fas fa-sms"></i> <span data-i18n="verify_send_code">Send code</span>
+                                    </button>
+                                </form>
+
+                                <div id="verify-done" hidden style="background:var(--primary-light,#E6F7F8);border:1px solid var(--primary,#09B1BA);border-radius:8px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--primary-dark,#078A91);" data-i18n="verify_success">✓ Your number is verified</div>
+                            </div>
+
                             <!-- Account Section — Change Password -->
                             <div class="settings-section">
                                 <h3><i class="fas fa-key"></i> <span data-i18n="settings_change_pwd">Change password</span></h3>
@@ -1772,6 +1813,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="../js/supabase.js" defer></script>
     <script src="../js/stripe.js" defer></script>
+    <script src="../js/phone-verify.js" defer></script>
     <!-- Capacitor native bridge (iOS/Android wrapper + push tokens). -->
     <script src="../js/platform.js" defer></script>
     <script src="../js/push-notifications.js" defer></script>

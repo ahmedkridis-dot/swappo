@@ -359,6 +359,8 @@
         priceHTML +
         (locSafe ? '<div class="product-location" style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:#6B7280;margin-top:4px;font-weight:500;"><i class="fas fa-map-marker-alt" style="color:#09B1BA;font-size:0.7rem;"></i> ' + locSafe + '</div>' : '') +
         '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">' + modesHTML +
+          // ✓ Verified owner — only when the feed attaches owner_is_verified (users_public.is_verified).
+          (item.owner_is_verified === true ? '<span class="swp-chip-verified" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:700;background:var(--primary-light,#E6F7F8);color:var(--primary-dark,#078A91);">✓ ' + _esc((typeof t === 'function') ? t('badge_verified') : 'Verified') + '</span>' : '') +
           (item.shipping_enabled ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E0F2FE;color:#075985;">\u{1F69A} Delivery</span>' : '') +
           (['furniture', 'vehicles', 'sports'].includes(item.category) ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FDF2F8;color:#9D174D;">\u{1F69B} Truck</span>' : '') +
         '</div>' +
