@@ -644,11 +644,12 @@
           return;
         }
         if (res.needsVerification) {
-          // Supabase sent a confirmation email — the account exists but is
-          // unverified until the user clicks the link. We stay on the login
-          // page (no session yet).
+          // Supabase sent a confirmation email. The link may be opened on
+          // another device (phone), so THIS tab waits and signs in by itself
+          // the moment the address is confirmed.
           showToast(_authT('auth_email_verif_sent','Check your inbox to verify your email!'), 'success');
           setLoading(btn, false);
+          _showVerifyWaiting(email, pwd);
           return;
         }
         // Auto-confirmed path (email verification disabled) → onboarding.
@@ -660,6 +661,58 @@
       }
     }
     window.handleEmailSignup = handleEmailSignup;
+
+    /* ========================
+       Waiting for email confirmation (cross-device)
+       The confirmation link is usually opened on the phone, which gets the
+       session. This tab keeps the credentials in memory and retries
+       signIn() every 5 s: Supabase answers "Email not confirmed" until the
+       link is clicked, then the sign-in succeeds and we move on.
+       ======================== */
+    var _verifyTimer = null;
+    function _showVerifyWaiting(email, pwd) {
+      var form = document.getElementById('signup-email-form');
+      if (!form) return;
+      var body = _authT('auth_verify_wait_body', 'We sent a confirmation link to <strong>{email}</strong>. Open it on any device — this page will continue by itself.')
+        .split('{email}').join('<strong>' + email.replace(/</g, '&lt;') + '</strong>');
+      form.innerHTML =
+        '<div style="text-align:center;padding:8px 0 4px;">' +
+          '<div style="font-size:44px;margin-bottom:8px;">✉️</div>' +
+          '<h3 style="font-size:18px;font-weight:800;color:#171717;margin:0 0 8px;">' + _authT('auth_verify_wait_title', 'Check your inbox') + '</h3>' +
+          '<p style="font-size:14px;color:#555;line-height:1.5;margin:0 0 14px;">' + body + '</p>' +
+          '<p id="su-verify-status" style="font-size:13px;color:#09B1BA;font-weight:600;margin:0 0 18px;"><i class="fas fa-circle-notch fa-spin"></i> ' + _authT('auth_verify_waiting', 'Waiting for confirmation…') + '</p>' +
+          '<button type="button" class="auth-btn auth-btn-primary" id="su-verify-continue">' + _authT('auth_verify_continue', "I've confirmed — continue") + '</button>' +
+          '<button type="button" id="su-verify-resend" style="margin-top:10px;background:none;border:none;color:#09B1BA;font-weight:600;font-size:13px;cursor:pointer;">' + _authT('auth_verify_resend', 'Resend email') + '</button>' +
+        '</div>';
+
+      async function attempt(manual) {
+        try {
+          var r = await window.SwappoAuth.signIn(email, pwd);
+          if (r && r.success) {
+            clearInterval(_verifyTimer);
+            showToast(_authT('auth_email_verified_toast', 'Email verified! Welcome to Swappo.'), 'success');
+            var needs = true;
+            try { needs = await window.SwappoAuth.needsOnboarding(); } catch (e) {}
+            setTimeout(function () { window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html')); }, 600);
+            return true;
+          }
+          if (manual) showToast(_authT('auth_verify_not_yet', 'Not confirmed yet — click the link in the email first.'), 'info');
+        } catch (e) { /* network hiccup → next tick */ }
+        return false;
+      }
+
+      document.getElementById('su-verify-continue').addEventListener('click', function () { attempt(true); });
+      document.getElementById('su-verify-resend').addEventListener('click', async function () {
+        var b = this; setLoading(b, true);
+        var r = await window.SwappoAuth.resendSignupEmail(email);
+        setLoading(b, false);
+        showToast(r && r.success ? _authT('auth_verify_resent', 'Email sent again.') : (r && r.error) || _authT('auth_err_resend', 'Could not resend the code.'), r && r.success ? 'success' : 'error');
+      });
+
+      clearInterval(_verifyTimer);
+      _verifyTimer = setInterval(function () { if (document.visibilityState !== 'hidden') attempt(false); }, 5000);
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') attempt(false); });
+    }
 
     async function handleLogin(event) {
       event.preventDefault();
@@ -697,18 +750,19 @@
       if (new URLSearchParams(location.search).get('verified') !== '1') return;
       showToast(_authT('auth_email_verified_toast', 'Email verified! Welcome to Swappo.'), 'success');
       switchTab('login');
+      // Supabase parses the #access_token hash asynchronously — retry the
+      // session read for ~5 s before concluding there is none (link opened
+      // in another browser → the user simply logs in here).
       var tries = 0;
       (function poll() {
-        if (window.SwappoAuth && SwappoAuth.isReady && SwappoAuth.isReady()) {
-          SwappoAuth.getCurrentUser().then(function (u) {
-            if (!u) return; // no session (link opened in another browser) → just log in
-            return SwappoAuth.needsOnboarding().then(function (needs) {
-              window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html'));
-            });
-          }).catch(function () {});
-        } else if (tries++ < 40) {
-          setTimeout(poll, 150);
-        }
+        var ready = window.SwappoAuth && SwappoAuth.isReady && SwappoAuth.isReady();
+        if (!ready) { if (tries++ < 40) setTimeout(poll, 150); return; }
+        SwappoAuth.getCurrentUser().then(function (u) {
+          if (!u) { if (tries++ < 40) setTimeout(poll, 250); return; }
+          return SwappoAuth.needsOnboarding().then(function (needs) {
+            window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html'));
+          });
+        }).catch(function () { if (tries++ < 40) setTimeout(poll, 250); });
       })();
     });
 

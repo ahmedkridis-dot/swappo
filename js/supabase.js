@@ -259,7 +259,9 @@ const SwappoAuth = {
           emailRedirectTo: verifiedLanding,
           data: {
             name: name,
-            pseudo: (extras.pseudo || '').toLowerCase(),
+            // Only send a pseudo when one was actually chosen — an empty
+            // string would be stored as-is by the DB trigger and skip onboarding.
+            pseudo: extras.pseudo ? String(extras.pseudo).toLowerCase() : undefined,
             avatar: extras.avatar || '',
             phone: extras.phone || ''
           }
@@ -316,6 +318,25 @@ const SwappoAuth = {
       return { success: true, user: data.user };
     } catch (e) {
       return { success: false, error: e.message || 'Login failed.' };
+    }
+  },
+
+  /**
+   * Re-send the "Confirm your signup" email (rate-limited by Supabase to one
+   * per smtp_max_frequency seconds per address).
+   */
+  resendSignupEmail: async function (email) {
+    if (!db) return { success: false, error: 'Auth service unavailable.' };
+    if (!email) return { success: false, error: 'Email required.' };
+    try {
+      const landing = (typeof location !== 'undefined')
+        ? location.origin + '/pages/login.html?verified=1'
+        : 'https://swappo.ae/pages/login.html?verified=1';
+      const { error } = await db.auth.resend({ type: 'signup', email: email, options: { emailRedirectTo: landing } });
+      if (error) return { success: false, error: error.message || 'Could not resend.' };
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message || 'Could not resend.' };
     }
   },
 
