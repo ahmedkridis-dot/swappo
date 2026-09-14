@@ -1568,6 +1568,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="../js/vendor/qrcode.min.js" defer></script>
   <script src="../js/supabase.js" defer></script>
+  <script src="../js/stripe.js" defer></script>
   <!-- Capacitor native bridge (iOS/Android wrapper + push tokens). -->
   <script src="../js/platform.js" defer></script>
   <script src="../js/push-notifications.js" defer></script>
@@ -3073,7 +3074,7 @@
       proHTML = '<div class="dp-pro-banner">' +
         '<h4>💎 Upgrade to Pro</h4>' +
         '<p>0% service fees · 3 free boosts · Priority support</p>' +
-        '<button class="dp-pro-btn" onclick="window.location.href=\'pricing.html\'">29 AED/month →</button>' +
+        '<button class="dp-pro-btn" data-pay-cta="pro" onclick="window.location.href=\'pricing.html\'">29 AED/month →</button>' +
       '</div>';
     }
     document.getElementById('dpProBanner').innerHTML = proHTML;

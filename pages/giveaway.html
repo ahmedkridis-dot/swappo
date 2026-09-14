@@ -1041,6 +1041,7 @@
     <script src="../js/register-sw.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="../js/supabase.js" defer></script>
+    <script src="../js/stripe.js" defer></script>
     <script src="../js/swappo-items.js" defer></script>
     <script src="../js/toast.js" defer></script>
   <script src="../js/a11y-helpers.js" defer></script>
@@ -1346,7 +1347,7 @@
                 '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">' + _giftT('gift_claimed_month_title', "You've claimed your free gift this month") + '</h3>' +
                 '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">' + _giftT('gift_claimed_month_p_html', 'Come back next month for another free claim, or upgrade to <strong>Swappo Pro</strong> to claim up to 5 gifts per month, plus no ads, analytics, and Pro boosts included.') + '</p>' +
                 '<div style="display:flex;flex-direction:column;gap:10px;align-items:center;">' +
-                    '<button onclick="window.location.href=\'pricing.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:13px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">' + _giftT('gift_upgrade_pro', 'Upgrade to Pro — 29 AED/mo') + '</button>' +
+                    '<button data-pay-cta="pro" onclick="window.location.href=\'pricing.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:13px 28px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">' + _giftT('gift_upgrade_pro', 'Upgrade to Pro — 29 AED/mo') + '</button>' +
                     '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:transparent;border:none;padding:10px 22px;font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">' + _giftT('gift_back_next_month', "I'll come back next month") + '</button>' +
                     '<a href="pricing.html" style="font-size:13px;color:var(--teal,#09B1BA);text-decoration:none;font-weight:600;margin-top:4px;">' + _giftT('gift_see_pro_benefits', 'See all Pro benefits →') + '</a>' +
                 '</div>';

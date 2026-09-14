@@ -395,6 +395,7 @@
       <div class="pricing-card-price">29 <span>AED/mo</span></div>
       <div class="pricing-card-subtitle" style="margin-bottom:4px;" data-i18n="plan_pro_subtitle">For power swappers</div>
       <div style="font-size:12px;color:var(--teal,#09B1BA);font-weight:600;margin-bottom:20px;" data-i18n="plan_pro_price_annual">or 249 AED/year (Save 28%)</div>
+      <div data-pay-soon-note hidden style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:600;line-height:1.45;margin-bottom:14px;">🔒 <span data-i18n="pay_pro_soon_note">Swappo Pro launches very soon — everything listed below unlocks the moment payments go live.</span></div>
       <div style="font-size:13px;color:var(--gray-text,#6B7280);margin-bottom:12px;font-weight:500;">Everything in Free, plus:</div>
       <ul class="pricing-features">
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_no_ads">No ads</span></li>
@@ -407,8 +408,8 @@
         <li><i class="fas fa-check" style="color:#10B981;"></i> <strong style="color:#065F46;" data-i18n="feat_pro_zero_fee">0% service fee on delivery purchases</strong></li>
         <li style="font-size:12px;color:#9CA3AF;"><i class="fas fa-clock" style="color:#D1D5DB;"></i> <span data-i18n="delivery_coming_soon_note">Swappo Delivery is coming soon — for now, all exchanges are in person.</span></li>
       </ul>
-      <button onclick="if(window.SwappoPayment){SwappoPayment.subscribePro('month')}else{window.location.href='login.html'}" class="btn btn-primary pricing-cta" data-i18n="cta_pro">Go Pro — 29 AED/mo</button>
-      <button onclick="if(window.SwappoPayment){SwappoPayment.subscribePro('year')}else{window.location.href='login.html'}" class="btn btn-outline pricing-cta" style="margin-top:8px;font-size:13px;padding:10px 20px;border:1px solid var(--teal);color:var(--teal);background:transparent;border-radius:var(--radius-pill,999px);cursor:pointer;" data-i18n="cta_pro_yearly">Or 249 AED/year (save 28%)</button>
+      <button onclick="if(window.SwappoPayment){SwappoPayment.subscribePro('month')}else{window.location.href='login.html'}" class="btn btn-primary pricing-cta" data-pay-cta="pro" data-i18n="cta_pro">Go Pro — 29 AED/mo</button>
+      <button onclick="if(window.SwappoPayment){SwappoPayment.subscribePro('year')}else{window.location.href='login.html'}" class="btn btn-outline pricing-cta" style="margin-top:8px;font-size:13px;padding:10px 20px;border:1px solid var(--teal);color:var(--teal);background:transparent;border-radius:var(--radius-pill,999px);cursor:pointer;" data-pay-cta="pro" data-i18n="cta_pro_yearly">Or 249 AED/year (save 28%)</button>
     </div>
 
   </div>

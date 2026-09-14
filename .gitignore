@@ -25,3 +25,6 @@ android/.idea/
 
 # OS
 Thumbs.db
+
+# Supabase CLI link cache (project ref, pooler url) — never commit
+supabase/.temp/

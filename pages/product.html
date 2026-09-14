@@ -1266,7 +1266,7 @@
       '</div>';
       actionsHTML += '<button class="btn-primary" style="font-size:15px;" onclick="window.location.href=\'profile.html\'">' +
         '<i class="fas fa-cog"></i> Manage in My Swaps</button>';
-      actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" onclick="if(window.SwappoPayment){SwappoPayment.buyBoost(\'' + item.id + '\')}else{window.location.href=\'pricing.html\'}">' +
+      actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" data-pay-cta="boost" onclick="if(window.SwappoPayment){SwappoPayment.buyBoost(\'' + item.id + '\')}else{window.location.href=\'pricing.html\'}">' +
         '<i class="fas fa-rocket"></i> ' + t('pay_choose_boost') + '</button>';
     } else if (item.is_giveaway) {
       // Giveaway: Claim button
@@ -1527,7 +1527,7 @@
             '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">You\'ve claimed your free gift this month</h3>' +
             '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">Come back next month for another free claim, or upgrade to <strong style="color:#09B1BA;">Swappo Pro</strong> to claim up to 5 gifts per month, plus no ads, analytics, and Pro boosts included.</p>' +
             '<div style="display:flex;flex-direction:column;gap:10px;align-items:center;">' +
-              '<button onclick="window.location.href=\'pricing.html\'" style="background:#09B1BA;color:white;border:none;padding:13px 28px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">Upgrade to Pro — 29 AED/mo</button>' +
+              '<button data-pay-cta="pro" onclick="window.location.href=\'pricing.html\'" style="background:#09B1BA;color:white;border:none;padding:13px 28px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);width:100%;max-width:280px;">Upgrade to Pro — 29 AED/mo</button>' +
               '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:transparent;border:none;padding:10px 22px;font-weight:600;cursor:pointer;color:#6B7280;font-size:14px;">I\'ll come back next month</button>' +
               '<a href="pricing.html" style="font-size:13px;color:#09B1BA;text-decoration:none;font-weight:600;">See all Pro benefits →</a>' +
             '</div>'

@@ -129,10 +129,59 @@
     });
   }
 
+  // ── Feature flag: FEATURES.PAYMENTS (js/constants.js) ─────
+  // While false, Pro + boosts stay fully visible (prices, benefits) but every
+  // payment entry point renders "Coming soon" and only toasts on click.
+  function _paymentsEnabled() {
+    return !!(window.FEATURES && window.FEATURES.PAYMENTS === true);
+  }
+
+  function _comingSoon() {
+    _toast(_payT('pay_coming_soon_toast', 'Swappo Pro and boosts are coming soon — payments are being finalised.'), 'info');
+    return false;
+  }
+
+  // Any element marked data-pay-cta="pro|boost|manage" is relabelled while
+  // payments are off; data-pay-soon-note elements are un-hidden. Works for
+  // static markup AND modals injected later (MutationObserver below).
+  function _decorate(root) {
+    if (_paymentsEnabled()) return;
+    var scope = root && root.querySelectorAll ? root : document;
+    var label = _payT('pay_cta_soon', 'Coming soon 🔒');
+    scope.querySelectorAll('[data-pay-cta]:not([data-pay-decorated])').forEach(function (el) {
+      el.setAttribute('data-pay-decorated', '1');
+      el.setAttribute('aria-disabled', 'true');
+      el.setAttribute('title', label);
+      el.style.opacity = '0.7';
+      el.style.cursor = 'not-allowed';
+      el.removeAttribute('data-i18n'); // stop applyTranslations() from restoring the original label
+      el.textContent = label;
+      if (el.tagName === 'BUTTON') {
+        el.onclick = null;
+        el.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); _comingSoon(); });
+      }
+    });
+    scope.querySelectorAll('[data-pay-soon-note]').forEach(function (el) { el.hidden = false; });
+  }
+
+  function _observe() {
+    if (_paymentsEnabled() || !window.MutationObserver) return;
+    var mo = new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) {
+        var added = muts[i].addedNodes;
+        for (var j = 0; j < added.length; j++) {
+          if (added[j].nodeType === 1) _decorate(added[j]);
+        }
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  }
+
   // ── Public API ────────────────────────────────────────────
   var SwappoPayment = {
 
     subscribePro: async function (interval) {
+      if (!_paymentsEnabled()) return _comingSoon();
       var user = await _requireUser();
       if (!user) return false;
       if (user.is_pro || user.plan === 'pro') {
@@ -143,6 +192,7 @@
     },
 
     buyBoost: async function (itemId, tier) {
+      if (!_paymentsEnabled()) return _comingSoon();
       var user = await _requireUser();
       if (!user) return false;
       if (!itemId) { _toast(_payT('pay_error', 'Payment could not be started.'), 'error'); return false; }
@@ -152,6 +202,7 @@
     },
 
     manageSubscription: async function () {
+      if (!_paymentsEnabled()) return _comingSoon();
       var user = await _requireUser();
       if (!user) return false;
       return _checkout({ kind: 'portal', return_url: location.href.split('?')[0] });
@@ -191,9 +242,18 @@
     }
   };
 
+  SwappoPayment.enabled = _paymentsEnabled;
+  SwappoPayment.comingSoon = _comingSoon;
   window.SwappoPayment = SwappoPayment;
 
   function _boot() {
+    _decorate(document);
+    _observe();
+    // Re-label in the new language when the user switches.
+    document.addEventListener('languageChanged', function () {
+      document.querySelectorAll('[data-pay-decorated]').forEach(function (el) { el.removeAttribute('data-pay-decorated'); });
+      _decorate(document);
+    });
     // Give supabase.js a beat to restore the session before we read it.
     setTimeout(function () { SwappoPayment.handleReturn(); }, 400);
   }
