@@ -1520,6 +1520,13 @@
 
     <!-- Badge celebration — fired when public.bump_swap_count promotes
          the user to a new tier and inserts a badge_earned notification. -->
+    <!-- "How swaps get confirmed" explainer — shown once per user when a deal
+         is accepted, re-openable from the QR card. -->
+    <div class="qr-modal" id="howModal" role="dialog" aria-modal="true" aria-labelledby="howModalTitle" aria-hidden="true">
+      <div class="qr-modal-backdrop" onclick="closeHowItWorks()"></div>
+      <div class="qr-modal-card" id="howModalCard"></div>
+    </div>
+
     <div class="qr-modal" id="badgeModal" role="dialog" aria-modal="true" aria-labelledby="badgeModalTitle" aria-hidden="true">
       <div class="qr-modal-backdrop" onclick="closeBadgeCelebration()"></div>
       <div class="qr-modal-card" id="badgeModalCard"></div>
@@ -2027,6 +2034,12 @@
       area.appendChild(createExchangeMethodCard(convId));
       _markExchangeCardShown(convId);
     }
+    // First accepted deal ever for this user → explain the QR handshake once.
+    if (isAcceptedDeal && map.status !== 'completed' && !_howItWorksSeen()) {
+      setTimeout(function () { showHowItWorks(); }, 600);
+    }
+    // Always-visible reminder above the thread while the swap awaits its scan.
+    _renderQrReminder(area, isAcceptedDeal && map.status !== 'completed');
 
     // Re-add typing indicator
     if (typing) area.appendChild(typing);
@@ -2131,7 +2144,7 @@
     div.innerHTML =
       '<div class="qr-card">' +
         '<div style="font-size:16px;font-weight:700;color:#1A1A2E;margin-bottom:4px;">Ready to confirm?</div>' +
-        '<div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Let the other party scan this code with their phone camera</div>' +
+        '<div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Let the other party scan this code with their phone camera · <button type="button" onclick="showHowItWorks(true)" style="background:none;border:none;padding:0;color:#09B1BA;font-weight:600;font-size:12px;cursor:pointer;">' + _chatT('qr_how_link', 'How it works ⓘ') + '</button></div>' +
         '<div class="qr-code loading" id="qrCodeBox"><i class="fas fa-qrcode"></i></div>' +
         '<div class="qr-timer" id="qrTimer">--</div>' +
         '<div style="font-size:11px;color:#6B7280;">seconds remaining</div>' +
@@ -2142,23 +2155,8 @@
     return div;
   }
 
-  // Boost Suggestion Card
-  function createBoostCard() {
-    var div = document.createElement('div');
-    div.className = 'smart-card promo';
-    div.innerHTML =
-      '<div class="sc-header">' +
-        '<div class="sc-icon purple">💡</div>' +
-        '<div><div class="sc-title">Boost your item</div>' +
-        '<div class="sc-subtitle">Get more offers, faster</div></div>' +
-      '</div>' +
-      '<p style="font-size:12px;color:#4A4A5A;margin-bottom:12px;">This item hasn\'t had new offers recently. A boost puts it at the top of the catalogue.</p>' +
-      '<div style="display:flex;gap:8px;">' +
-        '<button class="sc-btn outline" style="flex:1;" onclick="Toast.show(\'24h Boost activated!\',\'success\')">5 AED · 24h</button>' +
-        '<button class="sc-btn primary" style="flex:1;" onclick="Toast.show(\'7-day Featured Boost!\',\'success\')">25 AED · 7d ⭐</button>' +
-      '</div>';
-    return div;
-  }
+  // (Boost suggestion card removed — it was unused demo code that faked a
+  //  purchase via Toast. Real boosts go through SwappoPayment.buyBoost.)
 
   // Rating Card — Swappo branded "Swapped!" celebration.
   // Rendered inside the rating modal AND (legacy) directly in the chat.
@@ -2234,6 +2232,65 @@
     // Defer confetti a hair so the modal anim starts first.
     setTimeout(_fireConfetti, 80);
   }
+
+  // ═══ HOW SWAPS GET CONFIRMED (QR explainer) ═══
+  // Shown once per user the first time a deal is accepted (UI preference in
+  // localStorage), re-openable from the QR card. Goal: every swap ends with a
+  // scan → instant confirmation for both sides + swap_count / badge progress.
+  if (typeof _chatT !== 'function') {
+    window._chatT = function (key, fallback) { return (typeof t === 'function') ? t(key) : (fallback || key); };
+  }
+  var HOW_SEEN_KEY = 'swappo_qr_howto_seen';
+  function _howItWorksSeen() {
+    try { return localStorage.getItem(HOW_SEEN_KEY) === '1'; } catch (e) { return false; }
+  }
+  function showHowItWorks(force) {
+    if (!force && _howItWorksSeen()) return;
+    var modal = document.getElementById('howModal');
+    var card  = document.getElementById('howModalCard');
+    if (!modal || !card) return;
+    card.innerHTML =
+      '<div class="smart-card success" style="text-align:left;">' +
+        '<div style="font-size:44px;text-align:center;margin-bottom:6px;">📱✓</div>' +
+        '<h3 id="howModalTitle" style="font-size:18px;font-weight:800;color:#1A1A2E;margin:0 0 6px;text-align:center;">' + _chatT('qr_how_title', 'Every swap ends with a QR scan') + '</h3>' +
+        '<p style="font-size:13px;color:#6B7280;margin:0 0 14px;text-align:center;">' + _chatT('qr_how_intro', 'It takes 10 seconds and keeps every deal smooth for both of you.') + '</p>' +
+        '<ol style="margin:0 0 14px;padding-left:20px;font-size:13px;color:#4A4A5A;line-height:1.6;">' +
+          '<li>' + _chatT('qr_how_step1', 'When you meet, one of you taps <strong>Confirm Exchange</strong> — a 30-second QR code appears.') + '</li>' +
+          '<li>' + _chatT('qr_how_step2', 'The other scans it with the phone camera. Done — the swap is confirmed for both sides instantly, no forms.') + '</li>' +
+          '<li>' + _chatT('qr_how_step3', '<strong>It boosts your profile:</strong> every confirmed swap raises your swap count, unlocks badges (⭐ Swapper → 🔥 Active → 💎 Pro…) and lets you rate each other. More confirmed swaps = more trust = more offers.') + '</li>' +
+        '</ol>' +
+        '<p style="font-size:12px;color:#9CA3AF;margin:0 0 16px;">' + _chatT('qr_how_note', 'Swaps that are not scanned do not count towards your profile.') + '</p>' +
+        '<button class="sc-btn primary" style="width:100%;" onclick="closeHowItWorks()">' + _chatT('qr_how_cta', 'Got it') + '</button>' +
+      '</div>';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    try { localStorage.setItem(HOW_SEEN_KEY, '1'); } catch (e) {}
+  }
+  // Persistent reminder pinned above the message thread while a deal is
+  // accepted but not yet scanned. Removed as soon as the swap completes.
+  function _renderQrReminder(area, show) {
+    var rem = document.getElementById('qrReminder');
+    if (!show) { if (rem) rem.remove(); return; }
+    if (!area || !area.parentNode) return;
+    if (!rem) {
+      rem = document.createElement('div');
+      rem.id = 'qrReminder';
+      rem.setAttribute('role', 'note');
+      rem.style.cssText = 'display:flex;align-items:center;gap:10px;margin:0 0 8px;padding:10px 12px;background:var(--primary-light,#E6F7F8);border:1px solid var(--primary,#09B1BA);border-radius:12px;font-size:13px;color:var(--text,#171717);line-height:1.4;';
+      area.parentNode.insertBefore(rem, area);
+    }
+    rem.innerHTML =
+      '<span style="font-size:20px;line-height:1;" aria-hidden="true">📱</span>' +
+      '<span style="flex:1;">' + _chatT('qr_reminder', '<strong>When you meet, scan the QR code</strong> to confirm this swap — 10 seconds, and it boosts both profiles.') + '</span>' +
+      '<button type="button" onclick="showHowItWorks(true)" style="background:none;border:none;color:var(--primary,#09B1BA);font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;">' + _chatT('qr_how_link', 'How it works ⓘ') + '</button>';
+  }
+
+  function closeHowItWorks() {
+    var m = document.getElementById('howModal');
+    if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); }
+  }
+  window.showHowItWorks = showHowItWorks;
+  window.closeHowItWorks = closeHowItWorks;
 
   function closeBadgeCelebration() {
     var modal = document.getElementById('badgeModal');
