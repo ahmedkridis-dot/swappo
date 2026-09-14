@@ -541,6 +541,25 @@ const SwappoAuth = {
   },
 
   /**
+   * Force-reload the current user's profile row (bypasses every cache) and
+   * re-mirror it. Used after Stripe returns so is_pro / plan are fresh.
+   */
+  refreshProfile: async function () {
+    if (!db) return null;
+    const u = await SwappoAuth.getCurrentUser();
+    if (!u || !u.id) return null;
+    try {
+      const profile = await _fetchProfile(u.id, { force: true });
+      SwappoCache.set('profile_' + u.id, profile);
+      _mirrorFromSupabase(u, profile);
+      return profile;
+    } catch (e) {
+      console.warn('[refreshProfile]', e.message || e);
+      return null;
+    }
+  },
+
+  /**
    * OAuth sign-in via a third-party provider (google / apple / facebook).
    * Deprecated for Swappo launch — kept in code in case providers are added later.
    *

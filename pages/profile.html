@@ -1722,9 +1722,32 @@
                         Renews on --
                     </div>
 
-                    <a href="pricing.html" class="sub-upgrade-btn">
-                        <i class="fas fa-arrow-up"></i> Upgrade Plan
+                    <a href="pricing.html" class="sub-upgrade-btn" id="sidebar-upgrade-btn">
+                        <i class="fas fa-arrow-up"></i> <span data-i18n="sub_upgrade_plan">Upgrade Plan</span>
                     </a>
+                    <button type="button" class="sub-upgrade-btn" id="sidebar-manage-btn" hidden
+                            onclick="if(window.SwappoPayment){SwappoPayment.manageSubscription()}">
+                        <i class="fas fa-credit-card"></i> <span data-i18n="pay_manage_subscription">Manage subscription</span>
+                    </button>
+                    <script>
+                      // Pro members manage billing in the Stripe portal; Free members see Upgrade.
+                      document.addEventListener('DOMContentLoaded', function () {
+                        var tries = 0;
+                        (function poll() {
+                          if (window.SwappoAuth && SwappoAuth.isReady && SwappoAuth.isReady()) {
+                            SwappoAuth.getCurrentUser().then(function (u) {
+                              var pro = !!(u && (u.is_pro || u.plan === 'pro'));
+                              var up = document.getElementById('sidebar-upgrade-btn');
+                              var mg = document.getElementById('sidebar-manage-btn');
+                              if (up) up.hidden = pro;
+                              if (mg) mg.hidden = !pro;
+                            }).catch(function () {});
+                          } else if (tries++ < 40) {
+                            setTimeout(poll, 100);
+                          }
+                        })();
+                      });
+                    </script>
 
                     <!-- Give & Earn Widget -->
                     <div id="give-earn-widget" style="margin-top:20px;"></div>
@@ -1748,6 +1771,7 @@
     <script src="../js/register-sw.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="../js/supabase.js" defer></script>
+    <script src="../js/stripe.js" defer></script>
     <!-- Capacitor native bridge (iOS/Android wrapper + push tokens). -->
     <script src="../js/platform.js" defer></script>
     <script src="../js/push-notifications.js" defer></script>

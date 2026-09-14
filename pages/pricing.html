@@ -405,9 +405,10 @@
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_priority">Priority in search results</span></li>
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_support">Priority support</span></li>
         <li><i class="fas fa-check" style="color:#10B981;"></i> <strong style="color:#065F46;" data-i18n="feat_pro_zero_fee">0% service fee on delivery purchases</strong></li>
+        <li style="font-size:12px;color:#9CA3AF;"><i class="fas fa-clock" style="color:#D1D5DB;"></i> <span data-i18n="delivery_coming_soon_note">Swappo Delivery is coming soon — for now, all exchanges are in person.</span></li>
       </ul>
-      <button onclick="if(window.DemoPayment){DemoPayment.subscribePro('monthly')}else{window.location.href='login.html'}" class="btn btn-primary pricing-cta" data-i18n="cta_pro">Go Pro — 29 AED/mo</button>
-      <button onclick="if(window.DemoPayment){DemoPayment.subscribePro('yearly')}else{window.location.href='login.html'}" class="btn btn-outline pricing-cta" style="margin-top:8px;font-size:13px;padding:10px 20px;border:1px solid var(--teal);color:var(--teal);background:transparent;border-radius:var(--radius-pill,999px);cursor:pointer;" data-i18n="cta_pro_yearly">Or 249 AED/year (save 28%)</button>
+      <button onclick="if(window.SwappoPayment){SwappoPayment.subscribePro('month')}else{window.location.href='login.html'}" class="btn btn-primary pricing-cta" data-i18n="cta_pro">Go Pro — 29 AED/mo</button>
+      <button onclick="if(window.SwappoPayment){SwappoPayment.subscribePro('year')}else{window.location.href='login.html'}" class="btn btn-outline pricing-cta" style="margin-top:8px;font-size:13px;padding:10px 20px;border:1px solid var(--teal);color:var(--teal);background:transparent;border-radius:var(--radius-pill,999px);cursor:pointer;" data-i18n="cta_pro_yearly">Or 249 AED/year (save 28%)</button>
     </div>
 
   </div>
@@ -550,6 +551,7 @@
   <script src="../js/register-sw.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="../js/supabase.js" defer></script>
+  <script src="../js/stripe.js" defer></script>
   <script src="../js/toast.js" defer></script>
   <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/dashboard-link.js" defer></script>

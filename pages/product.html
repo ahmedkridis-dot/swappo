@@ -974,6 +974,7 @@
 <script src="../js/register-sw.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="../js/supabase.js" defer></script>
+<script src="../js/stripe.js" defer></script>
 <script src="../js/swappo-items.js" defer></script>
 <script src="../js/swappo-swaps.js" defer></script>
 <script src="../js/swappo-chat.js" defer></script>
@@ -1265,8 +1266,8 @@
       '</div>';
       actionsHTML += '<button class="btn-primary" style="font-size:15px;" onclick="window.location.href=\'profile.html\'">' +
         '<i class="fas fa-cog"></i> Manage in My Swaps</button>';
-      actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" onclick="window.location.href=\'profile.html#boost-' + encodeURIComponent(item.id) + '\'">' +
-        '<i class="fas fa-rocket"></i> Boost this listing</button>';
+      actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" onclick="if(window.SwappoPayment){SwappoPayment.buyBoost(\'' + item.id + '\')}else{window.location.href=\'pricing.html\'}">' +
+        '<i class="fas fa-rocket"></i> ' + t('pay_choose_boost') + '</button>';
     } else if (item.is_giveaway) {
       // Giveaway: Claim button
       if (isGuest) {
