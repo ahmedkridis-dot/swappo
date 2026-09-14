@@ -6,11 +6,8 @@
 (function () {
   var dict = {
     pricing_hero_title: "List for free. Go Pro to save more.",
-    pricing_hero_subtitle: "Everyone can buy, sell, swap & gift. Pro members pay 0% service fee on purchases.",
-    feat_free_fee: "5% service fee on delivery",
-    feat_pro_zero_fee: "0% service fee on purchases",
+    pricing_hero_subtitle: "Everyone can swap, buy, sell & gift. Swappo takes no commission on your deals.",
     feat_pro_badge: "Verified Pro badge",
-    pro_roi_hint: "2 purchases/month and your Pro pays for itself",
     all_modes: "All modes",
     mode_buy: "Buy",
     mode_swap: "Swap",
@@ -31,7 +28,7 @@
     publish_price_label_short: "Price",
     promise_title: "The Swappo Promise",
     promise_text: "Every item you list should be something you'd happily receive yourself. Clean it, test it, photograph it honestly. Our community trusts you.",
-    footer_delivery_fee: "Service fee 5% on deliveries only. In-person trades are always free.",
+    footer_delivery_fee: "In-person trades are always free. Swappo takes no commission on your deals.",
     hero_watch_teaser: "Watch teaser",
     // Navbar
     search_placeholder: "Search items…",
@@ -584,6 +581,7 @@
     pay_coming_soon_toast: "Swappo Pro and boosts are coming soon — payments are being finalised.",
     pay_cta_soon: "Coming soon 🔒",
     pay_pro_soon_note: "Swappo Pro launches very soon — everything listed below unlocks the moment payments go live.",
+    delivery_no_commission: "No Swappo commission",
     avatar_modal_title: "Choose your avatar",
     avatar_modal_cancel: "Cancel",
     avatar_modal_confirm: "Confirm",

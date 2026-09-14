@@ -6,11 +6,8 @@
 (function () {
   var dict = {
     pricing_hero_title: "Publiez gratuitement. Passez Pro pour économiser.",
-    pricing_hero_subtitle: "Tout le monde peut acheter, vendre, échanger et donner. Les membres Pro paient 0% de frais de service.",
-    feat_free_fee: "Frais de service 5% sur la livraison",
-    feat_pro_zero_fee: "0% de frais de service sur les achats",
+    pricing_hero_subtitle: "Tout le monde peut échanger, acheter, vendre et donner. Swappo ne prend aucune commission sur vos deals.",
     feat_pro_badge: "Badge Pro vérifié",
-    pro_roi_hint: "2 achats/mois et votre Pro est rentabilisé",
     all_modes: "Tous les modes",
     mode_buy: "Acheter",
     mode_swap: "Échanger",
@@ -31,7 +28,7 @@
     publish_price_label_short: "Prix",
     promise_title: "La promesse Swappo",
     promise_text: "Chaque article listé doit être quelque chose que vous seriez heureux de recevoir. Nettoyez-le, testez-le, photographiez-le honnêtement. Notre communauté vous fait confiance.",
-    footer_delivery_fee: "Frais de service 5% sur les livraisons uniquement. Les échanges en personne sont toujours gratuits.",
+    footer_delivery_fee: "Les échanges en personne sont toujours gratuits. Swappo ne prend aucune commission sur vos deals.",
     hero_watch_teaser: "Voir le teaser",
     // Adoption Banner (Coming Soon)
     adopt_badge: "Bientôt",
@@ -594,6 +591,7 @@
     pay_coming_soon_toast: "Swappo Pro et les boosts arrivent très bientôt — les paiements sont en cours de finalisation.",
     pay_cta_soon: "Bientôt disponible 🔒",
     pay_pro_soon_note: "Swappo Pro arrive très bientôt — tout ce qui est listé ci-dessous se débloque dès l'ouverture des paiements.",
+    delivery_no_commission: "Aucune commission Swappo",
     avatar_modal_title: "Choisissez votre avatar",
     avatar_modal_cancel: "Annuler",
     avatar_modal_confirm: "Confirmer",

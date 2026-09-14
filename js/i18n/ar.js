@@ -6,11 +6,8 @@
 (function () {
   var dict = {
     pricing_hero_title: "انشر مجاناً. اشترك بـ Pro لتوفير أكثر.",
-    pricing_hero_subtitle: "الجميع يمكنهم الشراء والبيع والمقايضة والإهداء. أعضاء Pro يدفعون 0% رسوم خدمة.",
-    feat_free_fee: "رسوم خدمة 5% على التوصيل",
-    feat_pro_zero_fee: "0% رسوم خدمة على المشتريات",
+    pricing_hero_subtitle: "الجميع يمكنهم المبادلة والشراء والبيع والإهداء. Swappo لا يأخذ أي عمولة على صفقاتك.",
     feat_pro_badge: "شارة Pro موثقة",
-    pro_roi_hint: "عمليتا شراء/شهر وسيدفع Pro عن نفسه",
     all_modes: "كل الأوضاع",
     mode_buy: "شراء",
     mode_swap: "مقايضة",
@@ -31,7 +28,7 @@
     publish_price_label_short: "السعر",
     promise_title: "وعد Swappo",
     promise_text: "كل منتج تنشره يجب أن يكون شيئاً ترغب في استلامه بنفسك. نظّفه، اختبره، صوّره بصدق. مجتمعنا يثق بك.",
-    footer_delivery_fee: "رسوم خدمة 5% على التوصيل فقط. التبادل الشخصي مجاني دائماً.",
+    footer_delivery_fee: "التبادل الشخصي مجاني دائماً. Swappo لا يأخذ أي عمولة على صفقاتك.",
     hero_watch_teaser: "شاهد الفيديو",
     // Adoption Banner (Coming Soon)
     adopt_badge: "قريبًا",
@@ -594,6 +591,7 @@
     pay_coming_soon_toast: "Swappo Pro والتعزيزات قادمة قريباً — يجري الانتهاء من إعداد المدفوعات.",
     pay_cta_soon: "قريباً 🔒",
     pay_pro_soon_note: "Swappo Pro ينطلق قريباً جداً — كل ما هو مذكور أدناه يُفعَّل فور بدء المدفوعات.",
+    delivery_no_commission: "بدون عمولة من Swappo",
     avatar_modal_title: "اختر صورتك الرمزية",
     avatar_modal_cancel: "إلغاء",
     avatar_modal_confirm: "تأكيد",

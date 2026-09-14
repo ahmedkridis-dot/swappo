@@ -149,7 +149,7 @@ serve(async (req) => {
             recurring: { interval },
             product_data: {
               name: interval === 'year' ? 'Swappo Pro — yearly' : 'Swappo Pro — monthly',
-              description: '0% service fee, 3 boosts/month, 5 gift claims/month, no ads, Pro badge.',
+              description: '3 boosts/month, 5 gift claims/month, no ads, priority support, Pro badge.',
             },
           },
         }],

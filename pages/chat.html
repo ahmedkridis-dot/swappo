@@ -2048,7 +2048,6 @@
     var itemCategory = (conv && conv.item && conv.item.category) || map.category || '';
     var isLargeItem = true; // always teased in Coming Soon phase
     var isFree = currentUser && currentUser.plan === 'free';
-    var feeText = isFree ? '5% fee' : '0% fee';
 
     var div = document.createElement('div');
     div.className = 'smart-card';
@@ -3073,7 +3072,7 @@
     if (status === 'accepted' && currentUser && currentUser.plan === 'free') {
       proHTML = '<div class="dp-pro-banner">' +
         '<h4>💎 Upgrade to Pro</h4>' +
-        '<p>0% service fees · 3 free boosts · Priority support</p>' +
+        '<p>3 boosts/month · 5 gift claims · No ads · Priority support</p>' +
         '<button class="dp-pro-btn" data-pay-cta="pro" onclick="window.location.href=\'pricing.html\'">29 AED/month →</button>' +
       '</div>';
     }

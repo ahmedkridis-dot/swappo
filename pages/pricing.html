@@ -405,7 +405,6 @@
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_analytics">Analytics & insights</span></li>
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_priority">Priority in search results</span></li>
         <li><i class="fas fa-check" style="color:var(--teal,#09B1BA);"></i> <span data-i18n="feat_pro_support">Priority support</span></li>
-        <li><i class="fas fa-check" style="color:#10B981;"></i> <strong style="color:#065F46;" data-i18n="feat_pro_zero_fee">0% service fee on delivery purchases</strong></li>
         <li style="font-size:12px;color:#9CA3AF;"><i class="fas fa-clock" style="color:#D1D5DB;"></i> <span data-i18n="delivery_coming_soon_note">Swappo Delivery is coming soon — for now, all exchanges are in person.</span></li>
       </ul>
       <button onclick="if(window.SwappoPayment){SwappoPayment.subscribePro('month')}else{window.location.href='login.html'}" class="btn btn-primary pricing-cta" data-pay-cta="pro" data-i18n="cta_pro">Go Pro — 29 AED/mo</button>
@@ -580,15 +579,8 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
       }
 
-      document.querySelectorAll('.pricing-cta').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          showToast('Subscription coming soon! Using free plan for demo.');
-          setTimeout(() => {
-            window.location.href = 'login.html';
-          }, 1500);
-        });
-      });
+      // Pro CTAs are handled by js/stripe.js (SwappoPayment + FEATURES.PAYMENTS).
+      // The Free CTA is a plain link to login.html.
     });
   </script>
 

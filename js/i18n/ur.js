@@ -6,11 +6,8 @@
 (function () {
   var dict = {
     pricing_hero_title: "مفت شائع کریں۔ Pro لیں اور بچائیں۔",
-    pricing_hero_subtitle: "ہر کوئی خرید، فروخت، تبادلہ اور تحفہ دے سکتا ہے۔ Pro ممبرز 0% سروس فیس ادا کرتے ہیں۔",
-    feat_free_fee: "ڈیلیوری پر 5% سروس فیس",
-    feat_pro_zero_fee: "خریداری پر 0% سروس فیس",
+    pricing_hero_subtitle: "ہر کوئی تبادلہ، خرید، فروخت اور تحفہ دے سکتا ہے۔ Swappo آپ کے سودوں پر کوئی کمیشن نہیں لیتا۔",
     feat_pro_badge: "تصدیق شدہ Pro بیج",
-    pro_roi_hint: "ماہانہ 2 خریداری اور آپ کا Pro خود ادا ہو جائے گا",
     all_modes: "تمام طریقے",
     mode_buy: "خریدیں",
     mode_swap: "تبادلہ",
@@ -31,7 +28,7 @@
     publish_price_label_short: "قیمت",
     promise_title: "Swappo کا وعدہ",
     promise_text: "ہر آئٹم جو آپ شائع کریں وہ ایسا ہونا چاہیے جو آپ خوشی سے وصول کریں۔ صاف کریں، ٹیسٹ کریں، ایمانداری سے تصویر لگائیں۔",
-    footer_delivery_fee: "سروس فیس صرف ڈیلیوری پر 5%۔ ذاتی تبادلے ہمیشہ مفت ہیں۔",
+    footer_delivery_fee: "ذاتی تبادلے ہمیشہ مفت ہیں۔ Swappo آپ کے سودوں پر کوئی کمیشن نہیں لیتا۔",
     hero_watch_teaser: "ٹیزر دیکھیں",
     // Adoption Banner (Coming Soon)
     adopt_badge: "جلد آ رہا ہے",
@@ -593,6 +590,7 @@
     pay_coming_soon_toast: "Swappo Pro اور بوسٹس جلد آرہے ہیں — ادائیگیوں کو حتمی شکل دی جا رہی ہے۔",
     pay_cta_soon: "جلد آرہا ہے 🔒",
     pay_pro_soon_note: "Swappo Pro بہت جلد لانچ ہو رہا ہے — نیچے درج ہر چیز ادائیگیاں شروع ہوتے ہی کھل جائے گی۔",
+    delivery_no_commission: "Swappo کا کوئی کمیشن نہیں",
     avatar_modal_title: "اپنا اوتار منتخب کریں",
     avatar_modal_cancel: "منسوخ",
     avatar_modal_confirm: "تصدیق",

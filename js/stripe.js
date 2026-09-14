@@ -158,7 +158,11 @@
       el.textContent = label;
       if (el.tagName === 'BUTTON') {
         el.onclick = null;
-        el.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); _comingSoon(); });
+        // Capture phase + stopImmediatePropagation: wins over any other click
+        // listener on the same button, whatever the registration order.
+        el.addEventListener('click', function (e) {
+          e.preventDefault(); e.stopImmediatePropagation(); _comingSoon();
+        }, true);
       }
     });
     scope.querySelectorAll('[data-pay-soon-note]').forEach(function (el) { el.hidden = false; });
