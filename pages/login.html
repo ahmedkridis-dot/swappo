@@ -353,7 +353,7 @@
   <nav class="navbar">
     <div class="container">
       <div class="navbar-inner">
-        <a href="../dev-a7f3k9mz2q.html" class="site-logo">Swappo</a>
+        <a href="../index.html" class="site-logo">Swappo</a>
 
         <div class="navbar-search">
           <i class="fas fa-search"></i>
@@ -541,7 +541,7 @@
        absolute URLs (https?://…), javascript:, data:, vbscript:.
        ======================== */
     function safeRedirect(fallback) {
-      fallback = fallback || '../dev-a7f3k9mz2q.html';
+      fallback = fallback || '../index.html';
       try {
         var params = new URLSearchParams(window.location.search);
         var target = params.get('redirect');
@@ -681,7 +681,7 @@
         // Route to onboarding if profile is incomplete
         var needs = await window.SwappoAuth.needsOnboarding();
         setTimeout(function() {
-          window.location.href = needs ? 'onboarding.html' : safeRedirect('../dev-a7f3k9mz2q.html');
+          window.location.href = needs ? 'onboarding.html' : safeRedirect('../index.html');
         }, 900);
       } catch (err) {
         showToast(err.message || 'Login failed', 'error');
@@ -764,7 +764,7 @@
           const supaUser = await window.SwappoAuth.getCurrentUser();
           if (supaUser) {
             const needs = await window.SwappoAuth.needsOnboarding();
-            window.location.href = needs ? 'onboarding.html' : safeRedirect('../dev-a7f3k9mz2q.html');
+            window.location.href = needs ? 'onboarding.html' : safeRedirect('../index.html');
             return;
           }
         }

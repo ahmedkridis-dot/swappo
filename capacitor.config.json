@@ -3,7 +3,7 @@
   "appName": "Swappo",
   "webDir": "www",
   "server": {
-    "url": "https://swappo.ae/dev-a7f3k9mz2q.html",
+    "url": "https://swappo.ae/",
     "cleartext": false
   },
   "plugins": {

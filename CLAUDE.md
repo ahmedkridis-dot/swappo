@@ -12,7 +12,7 @@ Swappo (swappo.ae) est la **première marketplace UAE dédiée au swap, achat, v
 ## Statut du projet
 - **Supabase** : CONNECTÉ et opérationnel (auth, DB, storage, realtime)
 - **Vercel** : Déployé, auto-deploy depuis GitHub main
-- **Stealth mode** : `swappo.ae` = Coming Soon. Dev URL = `swappo.ae/dev-a7f3k9mz2q.html` (NE PAS référencer home.html)
+- **Site public** : `swappo.ae` = vraie homepage (`index.html`). L'ancien teaser est `coming-soon.html` (noindex). Pages privées (login, onboarding, chat, profile, publier, confirm, reset) restent `noindex`.
 - **GitHub** : `https://github.com/ahmedkridis-dot/swappo.git` branche `main`
 - **Site VIDE** : zéro items en production. Prêt à lancer. Les vrais users ajouteront les vrais items.
 
@@ -90,8 +90,8 @@ Swappo ne touche JAMAIS l'argent des deals entre users.
 ## Structure fichiers
 ```
 ehvoila/
-├── index.html                  ← Coming Soon (public)
-├── dev-a7f3k9mz2q.html        ← Homepage réelle (dev URL)
+├── index.html                  ← Homepage réelle (public)
+├── coming-soon.html            ← Ancien teaser (noindex)
 ├── CLAUDE.md                   ← CE FICHIER
 ├── manifest.json / sw.js       ← PWA
 ├── css/

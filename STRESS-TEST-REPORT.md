@@ -29,7 +29,7 @@
 - **Fix** : policy remplacée par `users_read_self USING (auth.uid() = id)`. Profils publics passent par la view `users_public` (sans email/phone).
 - Vérifié : anon reçoit **0 rows**, `users_public` rend pseudo sans PII ✅
 
-### #2 `dev-a7f3k9mz2q.html` cassé (404 sur 2 scripts archivés)
+### #2 `index.html` cassé (404 sur 2 scripts archivés)
 - Referenceait `js/mock-data.js` + `js/demo-engine.js` — tous les deux dans `_archive/`
 - Résultat : la dev-URL était entièrement cassée
 - **Fix** : remplacé par `constants.js` + `toast.js` + `a11y-helpers.js` + `i18n/en.js` + `i18n.js` + CDN Supabase SDK
@@ -111,7 +111,7 @@
 - Load event : 51 ms
 - Ressources : 30
 
-**dev-a7f3k9mz2q.html** (après fix) :
+**index.html** (après fix) :
 - DOM interactive : **25 ms**
 - Load event : 99 ms
 - Scripts : 16
@@ -150,5 +150,5 @@ Aujourd'hui avec **0 items et 2 users** le site tiendra un launch soft. Pour un 
 - ✅ RLS fermée (PII protégée)
 - ✅ Supabase stable sous charge modérée
 - ✅ Service Worker cache v76
-- ✅ dev-a7f3k9mz2q.html fonctionnel
+- ✅ index.html fonctionnel
 - ✅ onboarding.html favicon fixé

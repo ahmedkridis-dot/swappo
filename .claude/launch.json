@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "3000", "--directory", "/Users/kardous/Developer/swappo"],
       "port": 3000
+    },
+    {
+      "name": "swappo-worktree",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4173", "--bind", "127.0.0.1", "--directory", "/Users/kardous/Developer/swappo/.claude/worktrees/admiring-villani-86167b"],
+      "port": 4173
     }
   ]
 }

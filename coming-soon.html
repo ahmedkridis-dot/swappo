@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swappo — Coming Soon</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Swappo is launching soon in the UAE.">
+  <meta name="theme-color" content="#09B1BA">
+
+  <!-- Social / Open Graph (neutral, no concept reveal) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Swappo">
+  <meta property="og:title" content="Swappo — Coming Soon">
+  <meta property="og:description" content="Something new is coming to the UAE.">
+  <meta property="og:url" content="https://swappo.ae">
+
+  <link rel="icon" type="image/x-icon" href="assets/brand/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/swappo-logo-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/brand/swappo-logo-192.png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+
+  <!-- Fonts -->
+  <!-- swp-preconnects -->
+  <link rel="preconnect" href="https://cbhdjqionkvqiflmqchu.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --teal: #09B1BA;
+      --teal-dark: #067A80;
+      --teal-light: #E6F7F8;
+      --cream: #FDF9F3;
+      --ivory: #FAF5ED;
+      --ink: #0E2A2C;
+      --ink-soft: #4A6668;
+      --gold: #D4A574;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Animated gradient background */
+    .bg {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(9, 177, 186, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(212, 165, 116, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(9, 177, 186, 0.10) 0%, transparent 50%),
+        var(--cream);
+      z-index: 0;
+    }
+
+    /* Floating blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.45;
+      animation: float 18s ease-in-out infinite;
+      z-index: 0;
+    }
+    .blob-1 { width: 420px; height: 420px; background: var(--teal); top: -120px; left: -100px; animation-delay: 0s; }
+    .blob-2 { width: 380px; height: 380px; background: var(--gold); bottom: -100px; right: -80px; animation-delay: -6s; }
+    .blob-3 { width: 300px; height: 300px; background: var(--teal-dark); top: 50%; left: 60%; animation-delay: -12s; opacity: 0.25; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -30px) scale(1.08); }
+      66% { transform: translate(-30px, 40px) scale(0.95); }
+    }
+
+    /* Main container */
+    .wrap {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 24px;
+    }
+
+    /* Top brand bar */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      animation: slideDown 0.9s ease-out 0.1s forwards;
+    }
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+    .brand-text {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 600;
+      font-size: 1.3rem;
+      color: var(--teal);
+      letter-spacing: -0.02em;
+    }
+
+    /* Center content */
+    .center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--teal-dark);
+      background: rgba(9, 177, 186, 0.08);
+      border: 1px solid rgba(9, 177, 186, 0.18);
+      padding: 8px 16px;
+      border-radius: 999px;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: slideUp 0.9s ease-out 0.3s forwards;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(2.3rem, 6vw, 4.2rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: slideUp 1s ease-out 0.5s forwards;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--teal);
+      font-weight: 400;
+    }
+
+    .lead {
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 540px;
+      margin: 0 auto 40px;
+      opacity: 0;
+      animation: slideUp 1s ease-out 0.7s forwards;
+    }
+
+    /* Contact block */
+    .contact {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      opacity: 0;
+      animation: slideUp 1s ease-out 0.9s forwards;
+    }
+    .contact-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: var(--ink);
+      color: var(--cream);
+      font-size: 0.98rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 999px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(14, 42, 44, 0.15);
+    }
+    .contact-btn:hover {
+      background: var(--teal);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(9, 177, 186, 0.35);
+    }
+    .contact-btn svg { transition: transform 0.3s ease; }
+    .contact-btn:hover svg { transform: translateX(3px); }
+
+    /* Footer */
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(14, 42, 44, 0.08);
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      opacity: 0;
+      animation: fadeIn 1s ease-out 1.2s forwards;
+    }
+    .foot a {
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .foot a:hover { color: var(--teal); }
+    .foot-right { display: flex; gap: 20px; flex-wrap: wrap; }
+
+    /* Animations */
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.6; }
+    }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .wrap { padding: 24px 20px; }
+      .blob-3 { display: none; }
+      html, body { overflow-y: auto; overflow-x: hidden; }
+      .center { min-height: calc(100vh - 140px); }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .blob, .eyebrow::before { animation: none; }
+      * { animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link" data-i18n="skip_to_content">Skip to content</a>
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="wrap">
+    <header class="brand">
+      <img src="assets/brand/swappo-logo-192.png" alt="Swappo" onerror="this.style.display='none'">
+      <span class="brand-text">Swappo</span>
+    </header>
+
+    <main id="main" class="center">
+      <span class="eyebrow">Launching 2026 · Abu Dhabi</span>
+      <h1>Something new is<br>coming to <em>the UAE</em>.</h1>
+      <p class="lead">
+        We're building quietly. The full story will be revealed at launch.<br>
+        For partnerships and press, we'd love to hear from you.
+      </p>
+      <div class="contact">
+        <span class="contact-label">Get in touch</span>
+        <a class="contact-btn" href="mailto:contact@swappo.ae">
+          contact@swappo.ae
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <div>© 2026 Swappo · All rights reserved</div>
+      <div class="foot-right">
+        <span>Hannibal General Trading L.L.C-S.P.C</span>
+        <span>Abu Dhabi, UAE</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
