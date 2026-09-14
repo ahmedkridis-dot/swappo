@@ -247,10 +247,16 @@ const SwappoAuth = {
 
     extras = extras || {};
     try {
+      // Where the "Confirm your signup" link lands. Must be covered by the
+      // Auth → URL Configuration allow list (https://swappo.ae/**).
+      const verifiedLanding = (typeof location !== 'undefined')
+        ? location.origin + '/pages/login.html?verified=1'
+        : 'https://swappo.ae/pages/login.html?verified=1';
       const { data, error } = await db.auth.signUp({
         email: email,
         password: password,
         options: {
+          emailRedirectTo: verifiedLanding,
           data: {
             name: name,
             pseudo: (extras.pseudo || '').toLowerCase(),

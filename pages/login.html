@@ -690,6 +690,28 @@
     }
     window.handleLogin = handleLogin;
 
+    // Landing after the "Confirm your signup" email link (?verified=1).
+    // Supabase completes the confirmation and restores a session from the
+    // URL hash, so most users are already signed in when they arrive here.
+    document.addEventListener('DOMContentLoaded', function () {
+      if (new URLSearchParams(location.search).get('verified') !== '1') return;
+      showToast(_authT('auth_email_verified_toast', 'Email verified! Welcome to Swappo.'), 'success');
+      switchTab('login');
+      var tries = 0;
+      (function poll() {
+        if (window.SwappoAuth && SwappoAuth.isReady && SwappoAuth.isReady()) {
+          SwappoAuth.getCurrentUser().then(function (u) {
+            if (!u) return; // no session (link opened in another browser) → just log in
+            return SwappoAuth.needsOnboarding().then(function (needs) {
+              window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html'));
+            });
+          }).catch(function () {});
+        } else if (tries++ < 40) {
+          setTimeout(poll, 150);
+        }
+      })();
+    });
+
     /* ========================
        Forgot Password (Supabase)
        Uses db.auth.resetPasswordForEmail — Supabase sends a recovery link

@@ -600,6 +600,7 @@
     qr_how_cta: "سمجھ گیا",
     qr_how_link: "یہ کیسے کام کرتا ہے ⓘ",
     qr_reminder: "<strong>ملاقات پر QR کوڈ اسکین کریں</strong> تاکہ یہ سویپ تصدیق ہو — 10 سیکنڈ، اور دونوں پروفائلز کو بوسٹ ملتا ہے۔",
+    auth_email_verified_toast: "ای میل کی تصدیق ہو گئی! Swappo میں خوش آمدید۔",
     avatar_modal_title: "اپنا اوتار منتخب کریں",
     avatar_modal_cancel: "منسوخ",
     avatar_modal_confirm: "تصدیق",

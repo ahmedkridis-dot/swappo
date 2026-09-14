@@ -601,6 +601,7 @@
     qr_how_cta: "Compris",
     qr_how_link: "Comment ça marche ⓘ",
     qr_reminder: "<strong>À la rencontre, scannez le QR code</strong> pour confirmer ce swap — 10 secondes, et ça booste les deux profils.",
+    auth_email_verified_toast: "Email vérifié ! Bienvenue sur Swappo.",
     avatar_modal_title: "Choisissez votre avatar",
     avatar_modal_cancel: "Annuler",
     avatar_modal_confirm: "Confirmer",

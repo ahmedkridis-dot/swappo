@@ -601,6 +601,7 @@
     qr_how_cta: "فهمت",
     qr_how_link: "كيف يعمل ⓘ",
     qr_reminder: "<strong>عند اللقاء، امسح رمز QR</strong> لتأكيد هذه المبادلة — 10 ثوانٍ، وتعزيز للملفين معاً.",
+    auth_email_verified_toast: "تم التحقق من البريد الإلكتروني! مرحباً بك في Swappo.",
     avatar_modal_title: "اختر صورتك الرمزية",
     avatar_modal_cancel: "إلغاء",
     avatar_modal_confirm: "تأكيد",

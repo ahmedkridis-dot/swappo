@@ -575,6 +575,7 @@
     qr_how_cta: "Понятно",
     qr_how_link: "Как это работает ⓘ",
     qr_reminder: "<strong>При встрече отсканируйте QR-код</strong>, чтобы подтвердить обмен — 10 секунд, и это прокачивает оба профиля.",
+    auth_email_verified_toast: "Email подтверждён! Добро пожаловать в Swappo.",
     avatar_modal_title: "Выберите аватар",
     avatar_modal_cancel: "Отмена",
     avatar_modal_confirm: "Подтвердить",
