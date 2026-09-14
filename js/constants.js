@@ -84,7 +84,7 @@ const EMIRATES = ['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah','Fujair
 // Flip a flag → commit → push. No migration, no UI refactor needed.
 const FEATURES = {
   PHONE_VERIFICATION: false, // ← true once Twilio Phone Auth is enabled in Supabase
-  PAYMENTS: false,           // ← true once Stripe has verified the account (Pro + boosts go live)
+  PAYMENTS: true,            // Stripe account verified 2026-09-15 — Pro + boosts live
 };
 
 // ---- Expose globally (browser) ----
