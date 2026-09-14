@@ -1030,7 +1030,7 @@
     // Landing Page Upgrade
     hero_title_v2: "Quelqu'un a besoin de ce que tu as.",
     hero_title_accent: "Échange-le.",
-    trust_items: "5 000+ objets listés",
+    trust_items: "Gratuit — aucune commission sur vos deals",
     trust_categories: "12 catégories",
     trust_anonymous: "100% anonyme jusqu'à accord mutuel",
     float_phone: "Téléphone",
@@ -1045,7 +1045,6 @@
     step3_desc_v2: "Les deux acceptent ? Identités révélées. Rencontrez-vous et échangez !",
     browse_categories: "Parcourir les catégories",
     featured_categories: "Catégories populaires",
-    cat_count_items: "240+ objets",
     cat_free_items: "Objets gratuits !",
     cat_browse_all: "Tout voir",
     happening_now: "En ce moment",

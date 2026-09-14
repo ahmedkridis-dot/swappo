@@ -1004,7 +1004,7 @@
     // Landing Page Upgrade
     hero_title_v2: "Кому-то нужно то, что есть у тебя.",
     hero_title_accent: "Обменяй.",
-    trust_items: "5 000+ товаров",
+    trust_items: "Бесплатно — без комиссии со сделок",
     trust_categories: "12 категорий",
     trust_anonymous: "100% анонимно до согласия",
     float_phone: "Телефон",
@@ -1019,7 +1019,6 @@
     step3_desc_v2: "Оба согласны? Личности раскрыты. Встречайтесь и меняйтесь!",
     browse_categories: "Обзор категорий",
     featured_categories: "Популярные категории",
-    cat_count_items: "240+ товаров",
     cat_free_items: "Бесплатно!",
     cat_browse_all: "Все товары",
     happening_now: "Прямо сейчас",

@@ -1020,7 +1020,7 @@
     // Landing Page Upgrade
     hero_title_v2: "Someone needs what you have.",
     hero_title_accent: "Swap it.",
-    trust_items: "5,000+ items listed",
+    trust_items: "Free — no commission on deals",
     trust_categories: "12 categories",
     trust_anonymous: "100% anonymous until you agree",
     float_phone: "Phone",
@@ -1035,7 +1035,6 @@
     step3_desc_v2: "Both agree? Identities revealed. Meet up and swap!",
     browse_categories: "Browse Categories",
     featured_categories: "Featured Categories",
-    cat_count_items: "240+ items",
     cat_free_items: "Free items!",
     cat_browse_all: "Browse all",
     happening_now: "Happening Right Now",

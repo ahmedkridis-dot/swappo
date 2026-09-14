@@ -1030,7 +1030,7 @@
     // Landing Page Upgrade
     hero_title_v2: "شخص ما يحتاج ما لديك.",
     hero_title_accent: "بادله.",
-    trust_items: "5,000+ منتج مدرج",
+    trust_items: "مجاني — بدون عمولة على صفقاتك",
     trust_categories: "12 فئة",
     trust_anonymous: "مجهول 100% حتى الاتفاق",
     float_phone: "هاتف",
@@ -1045,7 +1045,6 @@
     step3_desc_v2: "الطرفان يوافقان؟ تُكشف الهويات. التقِ وبادل!",
     browse_categories: "تصفح الفئات",
     featured_categories: "الفئات المميزة",
-    cat_count_items: "240+ منتج",
     cat_free_items: "منتجات مجانية!",
     cat_browse_all: "عرض الكل",
     happening_now: "يحدث الآن",

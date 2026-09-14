@@ -1029,7 +1029,7 @@
     // Landing Page Upgrade
     hero_title_v2: "کسی کو آپ کی چیز کی ضرورت ہے۔",
     hero_title_accent: "تبادلہ کریں۔",
-    trust_items: "5,000+ اشیاء درج",
+    trust_items: "مفت — سودوں پر کوئی کمیشن نہیں",
     trust_categories: "12 زمرے",
     trust_anonymous: "اتفاق تک 100% گمنام",
     float_phone: "فون",
@@ -1044,7 +1044,6 @@
     step3_desc_v2: "دونوں راضی ہیں؟ شناخت ظاہر! ملیں اور تبادلہ کریں!",
     browse_categories: "زمرے براؤز کریں",
     featured_categories: "نمایاں زمرے",
-    cat_count_items: "240+ اشیاء",
     cat_free_items: "مفت اشیاء!",
     cat_browse_all: "سب دیکھیں",
     happening_now: "ابھی ہو رہا ہے",
