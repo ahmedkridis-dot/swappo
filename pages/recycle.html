@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="noindex, nofollow">
+  <!-- Recycle Hub hidden for now: direct visits go to the homepage. Remove this script (and restore footer links + index) to reactivate. -->
+  <script>location.replace('../index.html');</script>
   <title data-i18n="recycle_page_title">Recycle Hub — Swappo</title>
   <meta name="description" data-i18n-attr="content:recycle_page_description" content="Can't swap it? Recycle it. Swappo connects you with the UAE's best recycling partners — zero waste, zero hassle.">
   <link rel="canonical" href="https://swappo.ae/pages/recycle.html">
@@ -940,7 +942,6 @@
           <ul>
             <li><a href="impact.html" data-i18n="footer_about">About</a></li>
             <li><a href="impact.html" data-i18n="impact_nav">Our Impact</a></li>
-            <li><a href="recycle.html" data-i18n="recycle_nav">Recycle Hub</a></li>
             <li><a href="#" data-i18n="footer_blog" onclick="event.preventDefault();Toast.show('Blog coming soon! 📝','info')">Blog</a></li>
           </ul>
         </div>
