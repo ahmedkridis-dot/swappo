@@ -1035,6 +1035,18 @@
     return map[c] || c;
   }
 
+  function _escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  // Category-specific attributes stored in items.specs (jsonb) → detail rows.
+  function _specRows(specs) {
+    if (!specs || typeof specs !== 'object') return [];
+    var rows = [];
+    if (specs.mileage_km) rows.push({ label: t('detail_mileage'), value: _escHtml(Number(specs.mileage_km).toLocaleString('en-US')) + ' km' });
+    if (specs.fuel) rows.push({ label: t('detail_fuel'), value: _escHtml(specs.fuel) });
+    if (specs.transmission) rows.push({ label: t('detail_transmission'), value: _escHtml(specs.transmission) });
+    if (specs.body_type) rows.push({ label: t('detail_body_type'), value: _escHtml(specs.body_type) });
+    if (specs.regional_specs) rows.push({ label: t('detail_regional_specs'), value: _escHtml(specs.regional_specs) });
+    return rows;
+  }
   function capitalizeFirst(str) {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -1245,12 +1257,17 @@
       { label: t('detail_size'), value: item.size },
       { label: t('detail_color'), value: item.color },
       { label: t('detail_category'), value: capitalizeFirst(item.category) }
-    ].filter(function(d) { return d.value; });
+    ].concat(_specRows(item.specs)).filter(function(d) { return d.value; });
 
     var detailsHTML = '<div class="details-title">' + t('item_details') + '</div>';
     details.forEach(function(d) {
       detailsHTML += '<div class="detail-row"><span class="detail-label">' + d.label + '</span><span class="detail-value">' + d.value + '</span></div>';
     });
+    if (item.description && String(item.description).trim()) {
+      detailsHTML += '<div class="detail-description" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border,#EBEBEB);">' +
+        '<div class="detail-label" style="margin-bottom:6px;">' + t('detail_description') + '</div>' +
+        '<p style="margin:0;font-size:14px;line-height:1.6;color:var(--text,#171717);white-space:pre-line;word-break:break-word;">' + _escHtml(item.description) + '</p></div>';
+    }
 
     detailsHTML += '<div class="location-row"><i class="fas fa-map-marker-alt" style="color:var(--primary);"></i>';
     // Real GPS-based distance (Swappo helper from app.js) — falls back to mock value if no GPS

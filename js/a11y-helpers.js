@@ -40,6 +40,9 @@
 
     // Enter / Space fire a click
     el.addEventListener('keydown', function (e) {
+      // Only when the enhanced element itself is focused — a Space typed in a
+      // nested <input>/<textarea> must reach the field (it used to be blocked).
+      if (e.target !== el) return;
       if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
         // Use .click() so the existing onclick handler runs unchanged

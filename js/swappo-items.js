@@ -149,6 +149,8 @@
       lng: itemData.lng || null,
       city: itemData.city || '',
       emirate: itemData.emirate || '',
+      description: itemData.description ? String(itemData.description).slice(0, 2000) : null,
+      specs: (itemData.specs && typeof itemData.specs === 'object' && !Array.isArray(itemData.specs)) ? itemData.specs : {},
       status: 'available'
     };
     const { data, error } = await global.db.from(TABLE).insert(row).select('*').single();

@@ -80,6 +80,19 @@ window.formState = {
 // ========================
 // CATEGORY DATA
 // ========================
+// Vehicles: brand list depends on the vehicle type (repopulated on change).
+window.VEHICLE_BRANDS = {
+  'Car': ["Acura","Alfa Romeo","Aston Martin","Audi","Bentley","BMW","Bugatti","BYD","Cadillac","Changan","Chery","Chevrolet","Chrysler","Citroën","Cupra","Dacia","Daihatsu","Dodge","DS","Exeed","Ferrari","Fiat","Ford","Geely","Genesis","GMC","GWM / Haval","Honda","Hongqi","Hummer","Hyundai","Infiniti","Isuzu","JAC","Jaguar","Jeep","Jetour","Kia","Koenigsegg","Lada","Lamborghini","Land Rover","Lexus","Lincoln","Lotus","Lucid","Mahindra","Maserati","Maybach","Mazda","McLaren","Mercedes-Benz","MG","Mini","Mitsubishi","Nio","Nissan","Opel","Pagani","Peugeot","Polestar","Porsche","Proton","Ram","Range Rover","Renault","Rivian","Rolls-Royce","Saab","Seat","Skoda","Smart","Subaru","Suzuki","Tata","Tesla","Toyota","Volkswagen","Volvo","Xpeng","Zeekr","Other"],
+  'Motorcycle': ["Aprilia","Bajaj","Benelli","BMW Motorrad","CFMoto","Ducati","Harley-Davidson","Honda","Husqvarna","Indian","Kawasaki","KTM","Kymco","MV Agusta","Piaggio","Royal Enfield","Suzuki","SYM","Triumph","TVS","Vespa","Yamaha","Other"],
+  'Bicycle': ["Bianchi","BMC","Btwin / Decathlon","Cannondale","Canyon","Cervélo","Cube","Giant","Merida","Pinarello","Scott","Specialized","Trek","Other"],
+  'E-Scooter': ["Segway-Ninebot","Xiaomi","Kaabo","Dualtron","Inokim","Apollo","Razor","Other"],
+  'ATV / Buggy': ["Can-Am","Polaris","Yamaha","Honda","Kawasaki","CFMoto","Suzuki","Other"],
+  'Boat / Jet Ski': ["Sea-Doo","Yamaha","Kawasaki","Gulf Craft","Bayliner","Sea Ray","Boston Whaler","Beneteau","Jeanneau","Other"],
+  'Truck / Van': ["Toyota","Nissan","Mitsubishi","Isuzu","Ford","Chevrolet","GMC","Ram","Mercedes-Benz","Hyundai","Kia","JAC","Other"],
+  'Other': ['Other']
+};
+window.VEHICLE_YEARS = ["2027","2026","2025","2024","2023","2022","2021","2020","2019","2018","2017","2016","2015","2014","2013","2012","2011","2010","2009","2008","2007","2006","2005","2004","2003","2002","2001","2000","1999","1998","1997","1996","1995","1994","1993","1992","1991","1990","1989","1988","1987","1986","1985","1984","1983","1982","1981","1980","1979","1978","1977","1976","1975","1974","1973","1972","1971","1970","Before 1970"];
+
 window.categoryFields = {
   clothing: {
     gender: { label: 'Gender', type: 'select', options: ['Men', 'Women', 'Children', 'Unisex'], required: true },
@@ -102,9 +115,17 @@ window.categoryFields = {
     sizeOptions: ['Small', 'Medium', 'Large', 'Extra Large']
   },
   vehicles: {
-    types: ['Car', 'Motorcycle', 'Bicycle', 'Scooter', 'ATV', 'Boat', 'Other'],
-    brands: ['Toyota', 'Nissan', 'Honda', 'BMW', 'Mercedes', 'Hyundai', 'Kia', 'Porsche', 'Other'],
-    showSize: false
+    type: { label: 'Type', type: 'select', options: Object.keys(window.VEHICLE_BRANDS), required: true },
+    brand: { label: 'Brand', type: 'select', options: window.VEHICLE_BRANDS['Car'], required: true },
+    model: { label: 'Model', type: 'text', placeholder: 'e.g. Wrangler Sahara, Land Cruiser GXR' },
+    year: { label: 'Year', type: 'select', options: window.VEHICLE_YEARS },
+    condition: { label: 'Condition', type: 'select', options: ['New', 'Like New', 'Good', 'Fair'], required: true },
+    mileage_km: { label: 'Mileage (km)', type: 'number', placeholder: 'e.g. 85000' },
+    fuel: { label: 'Fuel', type: 'select', options: ['Petrol', 'Diesel', 'Hybrid', 'Electric', 'Other'] },
+    transmission: { label: 'Transmission', type: 'select', options: ['Automatic', 'Manual'] },
+    body_type: { label: 'Body type', type: 'select', options: ['Sedan', 'SUV', 'Hatchback', 'Coupe', 'Convertible', 'Pickup', 'Van', 'Wagon', 'Other'] },
+    regional_specs: { label: 'Regional specs', type: 'select', options: ['GCC', 'American', 'European', 'Japanese', 'Other'] },
+    color: { label: 'Color', type: 'select', options: ['Black', 'White', 'Silver', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige', 'Gold', 'Orange', 'Yellow', 'Other'] }
   },
   sports: {
     types: ['Bicycle', 'Skateboard', 'Snowboard', 'Skis', 'Roller Skates', 'Scooter', 'Gym Equipment', 'Racket', 'Other'],
@@ -177,7 +198,7 @@ window.categoryNames = {
 
 window.conditionOptions = ['New', 'Like New', 'Good', 'Fair'];
 window.colorOptions = ['Black', 'White', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige', 'Pink', 'Other'];
-window.yearOptions = ['2026', '2025', '2024', '2023', '2022', '2021', '2020'];
+window.yearOptions = ["2027","2026","2025","2024","2023","2022","2021","2020","2019","2018","2017","2016","2015","2014","2013","2012","2011","2010","2009","2008","2007","2006","2005","2004","2003","2002","2001","2000","Before 2000"];
 
 // ========================
 // STEP NAVIGATION
@@ -286,7 +307,9 @@ window.getFieldLabel = function(fieldKey, fallback) {
     condition: 'detail_condition', year: 'detail_year', size: 'detail_size',
     color: 'detail_color', gender: 'detail_gender', subcategory: 'detail_subcategory',
     age_range: 'detail_age_range', material: 'detail_material', platform: 'detail_platform',
-    zone: 'detail_zone'
+    zone: 'detail_zone', mileage_km: 'detail_mileage', fuel: 'detail_fuel',
+    transmission: 'detail_transmission', body_type: 'detail_body_type',
+    regional_specs: 'detail_regional_specs', description: 'detail_description'
   };
   var key = i18nMap[fieldKey];
   if (key && typeof t === 'function') return t(key);
@@ -315,10 +338,11 @@ window.renderDetailsFields = function() {
       var label = (field.label && field.label !== genericLabels[fieldKey]) ? field.label : getFieldLabel(fieldKey, field.label);
       if (field.type === 'select') {
         html += buildSelectNew(fieldKey, label, field.options, field.required);
-      } else if (field.type === 'text') {
+      } else if (field.type === 'text' || field.type === 'number') {
+        var extra = field.type === 'number' ? ' inputmode="numeric" min="0" step="1"' : '';
         html += '<div class="form-group">' +
           '<label class="form-label">' + label + (field.required ? ' *' : '') + '</label>' +
-          '<input type="text" class="form-input" name="' + fieldKey + '" data-field="' + fieldKey + '" placeholder="' + (field.placeholder || '') + '" onchange="updateDetails(\'' + fieldKey + '\', this.value)"' + (field.required ? ' required' : '') + '>' +
+          '<input type="' + field.type + '" class="form-input" name="' + fieldKey + '" data-field="' + fieldKey + '" placeholder="' + (field.placeholder || '') + '"' + extra + ' onchange="updateDetails(\'' + fieldKey + '\', this.value)"' + (field.required ? ' required' : '') + '>' +
           '</div>';
       }
     });
@@ -337,7 +361,27 @@ window.renderDetailsFields = function() {
     html += buildSelect('color', getFieldLabel('color', 'Color'), colorOptions);
   }
 
+  // Free-text description — every category.
+  html += '<div class="form-group" style="grid-column:1 / -1;">' +
+    '<label class="form-label" for="item-description">' + getFieldLabel('description', 'Description') + '</label>' +
+    '<textarea id="item-description" class="form-input" name="description" data-field="description" rows="4" maxlength="2000" style="resize:vertical;min-height:96px;line-height:1.5;" placeholder="' + _pubT('publish_desc_placeholder', 'Anything a buyer should know: features, defects, what you\'d swap it for…') + '" oninput="updateDetails(\'description\', this.value)">' +
+    _pubEsc(formState.details.description || '') + '</textarea></div>';
+
   container.innerHTML = html;
+
+  // Vehicles: the brand list follows the vehicle type.
+  var vehTypeSelect = document.querySelector('#detailsContainer select[data-field="type"]');
+  if (vehTypeSelect && formState.category === 'vehicles') {
+    vehTypeSelect.addEventListener('change', function() {
+      var brandSelect = document.querySelector('#detailsContainer select[data-field="brand"]');
+      if (!brandSelect) return;
+      var brands = (window.VEHICLE_BRANDS && window.VEHICLE_BRANDS[vehTypeSelect.value]) || window.VEHICLE_BRANDS['Other'];
+      brandSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('brand', 'Brand')) + '</option>' + brands.map(function(b) {
+        return '<option value="' + b + '">' + b + '</option>';
+      }).join('');
+      formState.details.brand = '';
+    });
+  }
 
   var genderSelect = document.querySelector('#detailsContainer select[data-field="gender"]');
   var zoneSelect = document.querySelector('#detailsContainer select[data-field="zone"]');
@@ -560,7 +604,7 @@ window.populateReview = function() {
   document.getElementById('reviewPhotos').innerHTML = photosHtml;
 
   var detailsHtml = '';
-  var fieldOrder = ['gender', 'zone', 'subcategory', 'age_range', 'type', 'brand', 'model', 'material', 'condition', 'year', 'size', 'color'];
+  var fieldOrder = ['gender', 'zone', 'subcategory', 'age_range', 'type', 'brand', 'model', 'material', 'condition', 'year', 'mileage_km', 'fuel', 'transmission', 'body_type', 'regional_specs', 'size', 'color', 'description'];
 
   fieldOrder.forEach(function(key) {
     var val = formState.details[key];
@@ -816,7 +860,16 @@ window.publishItem = async function(e) {
       emirate: emirateChoice,
       city: user.city || 'Dubai',
       lat: finalLat,
-      lng: finalLng
+      lng: finalLng,
+      description: (formState.details.description || '').trim().slice(0, 2000) || null,
+      specs: (function() {
+        var s = {};
+        ['mileage_km', 'fuel', 'transmission', 'body_type', 'regional_specs'].forEach(function(k) {
+          var v = formState.details[k];
+          if (v !== undefined && v !== null && String(v).trim() !== '') s[k] = (k === 'mileage_km') ? Number(v) : String(v);
+        });
+        return s;
+      })()
     };
     console.log('[publish] item payload built:', itemData);
 
