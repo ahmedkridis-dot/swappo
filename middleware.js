@@ -41,15 +41,30 @@ async function fetchItem(id) {
   return Array.isArray(rows) && rows[0] ? rows[0] : null;
 }
 
-function buildTags(item, pageUrl) {
+// Uploads made after 2026-09-15 also store a ~600 px JPEG next to each photo
+// (<uuid>_og.jpg). WhatsApp only renders preview images under ~300 KB, so we
+// prefer it and fall back to the original (or the logo) when it is missing.
+async function pickImage(item) {
+  const first = Array.isArray(item.photos) && item.photos[0] ? String(item.photos[0]) : '';
+  if (!first) return LOGO;
+  const thumb = first.replace(/\.(webp|jpe?g|png)(\?.*)?$/i, '_og.jpg');
+  if (thumb !== first) {
+    try {
+      const h = await fetch(thumb, { method: 'HEAD' });
+      if (h.ok) return thumb;
+    } catch (_) { /* fall through */ }
+  }
+  return first;
+}
+
+function buildTags(item, pageUrl, image) {
   const name = [item.brand, item.model].filter(Boolean).join(' ').trim() || 'Item';
   const price = item.is_giveaway ? 'Free gift' : (item.price ? 'AED ' + Number(item.price).toLocaleString('en-US') : 'Open to swaps');
   const where = item.emirate || item.city || 'UAE';
   const cond = CONDITION[item.condition] || null;
   const title = name + ' — ' + price + ' · Swappo';
   const desc = [price, cond, where].filter(Boolean).join(' · ') + ' — swap, buy or gift it on Swappo, the UAE\'s first barter community.';
-  const image = (Array.isArray(item.photos) && item.photos[0]) ? item.photos[0] : LOGO;
-  return { title, desc, image, pageUrl };
+  return { title, desc, image: image || LOGO, pageUrl };
 }
 
 function rewriteHead(html, t) {
@@ -81,7 +96,8 @@ export default async function middleware(req) {
     // Same static page, fetched with a non-bot UA so this middleware passes it through.
     const page = await fetch(new URL('/pages/product.html', url.origin), { headers: { 'user-agent': RENDERER_UA } });
     if (!page.ok) return;
-    const html = rewriteHead(await page.text(), buildTags(item, SITE + '/pages/product.html?id=' + encodeURIComponent(id)));
+    const image = await pickImage(item);
+    const html = rewriteHead(await page.text(), buildTags(item, SITE + '/pages/product.html?id=' + encodeURIComponent(id), image));
     return new Response(html, {
       status: 200,
       headers: {

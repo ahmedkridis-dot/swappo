@@ -109,26 +109,36 @@
     return canvas;
   }
 
-  /** Convert canvas -> WebP Blob. Falls back to JPEG if WebP unsupported. */
-  function _canvasToWebP(canvas, quality) {
-    return new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (blob) => {
-          if (blob) return resolve({ blob, mime: 'image/webp', ext: 'webp' });
-          // Fallback: JPEG
-          canvas.toBlob(
-            (jpegBlob) => {
-              if (jpegBlob) resolve({ blob: jpegBlob, mime: 'image/jpeg', ext: 'jpg' });
-              else reject(new Error('Canvas conversion failed.'));
-            },
-            'image/jpeg',
-            quality
-          );
-        },
-        'image/webp',
-        quality
-      );
-    });
+  /** Encode a canvas: WebP when the browser can really produce it, else JPEG.
+   *  Safari (and some WebViews) silently return a PNG blob for an unsupported
+   *  'image/webp' request — PNG ignores the quality knob, so files came out at
+   *  ~2 MB and hit the bucket limit. We now check blob.type and fall back. */
+  function _toBlob(canvas, type, quality) {
+    return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), type, quality));
+  }
+  async function _canvasToWebP(canvas, quality) {
+    const webp = await _toBlob(canvas, 'image/webp', quality);
+    if (webp && webp.type === 'image/webp') return { blob: webp, mime: 'image/webp', ext: 'webp' };
+    const jpeg = await _toBlob(canvas, 'image/jpeg', quality);
+    if (jpeg && jpeg.type === 'image/jpeg') return { blob: jpeg, mime: 'image/jpeg', ext: 'jpg' };
+    const any = webp || jpeg;
+    if (any) return { blob: any, mime: any.type || 'image/png', ext: 'png' };
+    throw new Error('Canvas conversion failed.');
+  }
+
+  /** Small JPEG (≤ 600 px wide) stored next to each photo as <uuid>_og.jpg —
+   *  used by middleware.js for WhatsApp / Facebook link previews, which
+   *  refuse images above ~300 KB. Best-effort: null if the browser can't. */
+  async function _ogThumb(canvas) {
+    try {
+      const scale = Math.min(1, 600 / canvas.width);
+      const tmp = document.createElement('canvas');
+      tmp.width = Math.max(1, Math.round(canvas.width * scale));
+      tmp.height = Math.max(1, Math.round(canvas.height * scale));
+      tmp.getContext('2d').drawImage(canvas, 0, 0, tmp.width, tmp.height);
+      const jpeg = await _toBlob(tmp, 'image/jpeg', 0.72);
+      return jpeg && jpeg.type === 'image/jpeg' ? jpeg : null;
+    } catch (e) { return null; }
   }
 
   /** Shrink quality iteratively until blob fits under MAX_SIZE_MB. */
@@ -172,10 +182,12 @@
     const img = await _loadImage(file);
     const canvas = _resizeToCanvas(img);
     const { blob, mime, ext } = await _shrinkToLimit(canvas);
+    const ogBlob = await _ogThumb(canvas);
     return {
       blob,
       mime,
       ext,
+      ogBlob,
       width: canvas.width,
       height: canvas.height,
       sizeKB: Math.round(blob.size / 1024),
@@ -210,6 +222,14 @@
       if (/exceed|too large|payload/i.test(m)) throw new Error('This photo is too large even after compression. Please pick another one.');
       if (/mime|not supported/i.test(m))     throw new Error('This image format is not supported. Use JPG, PNG or WebP.');
       throw new Error(m || 'Upload failed.');
+    }
+
+    if (processed.ogBlob) {
+      try {
+        await global.db.storage.from(BUCKET).upload(`${folder}/${uuid}_og.jpg`, processed.ogBlob, {
+          cacheControl: '31536000', upsert: false, contentType: 'image/jpeg'
+        });
+      } catch (e) { /* preview thumbnail is optional */ }
     }
 
     const { data } = global.db.storage.from(BUCKET).getPublicUrl(path);
