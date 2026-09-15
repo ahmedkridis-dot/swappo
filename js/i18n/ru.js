@@ -583,6 +583,7 @@
     auth_verify_resend: "Отправить письмо снова",
     auth_verify_resent: "Письмо отправлено повторно.",
     auth_verify_not_yet: "Ещё не подтверждено — сначала нажмите ссылку в письме.",
+    auth_login_unconfirmed: "Ваш email ещё не подтверждён — проверьте почту (и спам).",
     lightbox_close: "Закрыть",
     lightbox_prev: "Предыдущее фото",
     lightbox_next: "Следующее фото",

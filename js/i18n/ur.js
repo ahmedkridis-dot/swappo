@@ -608,6 +608,7 @@
     auth_verify_resend: "ای میل دوبارہ بھیجیں",
     auth_verify_resent: "ای میل دوبارہ بھیج دی گئی۔",
     auth_verify_not_yet: "ابھی تصدیق نہیں ہوئی — پہلے ای میل میں موجود لنک پر کلک کریں۔",
+    auth_login_unconfirmed: "آپ کی ای میل ابھی تصدیق شدہ نہیں — اپنا ان باکس (اور اسپیم) چیک کریں۔",
     lightbox_close: "بند کریں",
     lightbox_prev: "پچھلی تصویر",
     lightbox_next: "اگلی تصویر",

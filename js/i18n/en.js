@@ -599,6 +599,7 @@
     auth_verify_resend: "Resend email",
     auth_verify_resent: "Email sent again.",
     auth_verify_not_yet: "Not confirmed yet — click the link in the email first.",
+    auth_login_unconfirmed: "Your email is not confirmed yet — check your inbox (and spam).",
     lightbox_close: "Close",
     lightbox_prev: "Previous photo",
     lightbox_next: "Next photo",

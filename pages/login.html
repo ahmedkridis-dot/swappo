@@ -710,7 +710,11 @@
       });
 
       clearInterval(_verifyTimer);
-      _verifyTimer = setInterval(function () { if (document.visibilityState !== 'hidden') attempt(false); }, 5000);
+      var startedAt = Date.now();
+      _verifyTimer = setInterval(function () {
+        if (Date.now() - startedAt > 30 * 60 * 1000) { clearInterval(_verifyTimer); return; } // give up after 30 min
+        if (document.visibilityState !== 'hidden') attempt(false);
+      }, 8000);
       document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') attempt(false); });
     }
 
@@ -727,6 +731,15 @@
         }
         var result = await window.SwappoAuth.signIn(email, password);
         if (result.error || result.success === false) {
+          if (/not confirmed/i.test(result.error || '')) {
+            // Account exists but the email was never confirmed → explain and
+            // offer to resend, then continue by itself once the link is clicked.
+            showToast(_authT('auth_login_unconfirmed', 'Your email is not confirmed yet — check your inbox (and spam).'), 'info');
+            setLoading(btn, false);
+            switchTab('signup');
+            _showVerifyWaiting(email, password);
+            return;
+          }
           showToast(result.error || 'Invalid credentials', 'error');
           setLoading(btn, false); return;
         }

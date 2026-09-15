@@ -609,6 +609,7 @@
     auth_verify_resend: "إعادة إرسال البريد",
     auth_verify_resent: "تم إرسال البريد مجدداً.",
     auth_verify_not_yet: "لم يتم التأكيد بعد — انقر على الرابط في البريد أولاً.",
+    auth_login_unconfirmed: "لم يتم تأكيد بريدك الإلكتروني بعد — تحقق من صندوق الوارد (والرسائل غير المرغوبة).",
     lightbox_close: "إغلاق",
     lightbox_prev: "الصورة السابقة",
     lightbox_next: "الصورة التالية",

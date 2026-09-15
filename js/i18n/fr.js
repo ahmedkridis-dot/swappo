@@ -609,6 +609,7 @@
     auth_verify_resend: "Renvoyer l'email",
     auth_verify_resent: "Email renvoyé.",
     auth_verify_not_yet: "Pas encore confirmé — cliquez d'abord sur le lien dans l'email.",
+    auth_login_unconfirmed: "Votre email n'est pas encore confirmé — regardez votre boîte mail (et les spams).",
     lightbox_close: "Fermer",
     lightbox_prev: "Photo précédente",
     lightbox_next: "Photo suivante",
