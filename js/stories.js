@@ -72,9 +72,12 @@
   }
 
   async function renderBar(container) {
-    injectStyles();
     const el = (typeof container === 'string') ? document.querySelector(container) : container;
     if (!el) return;
+    // Feature flag (js/constants.js): keep the host collapsed while stories are off.
+    if (!(window.FEATURES && window.FEATURES.STORIES)) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    injectStyles();
     const stories = await fetchActive();
     const viewed = JSON.parse(localStorage.getItem('swappo_viewed_stories') || '[]');
 

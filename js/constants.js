@@ -85,6 +85,8 @@ const EMIRATES = ['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah','Fujair
 const FEATURES = {
   PHONE_VERIFICATION: false, // ← true once Twilio Phone Auth is enabled in Supabase
   PAYMENTS: true,            // Stripe account verified 2026-09-15 — Pro + boosts live
+  STORIES: false,            // Depop-style stories bar on the catalogue — off until there is content
+  FEED_TABS: false,          // Trending / Around You / Latest / For You tabs — off while the catalogue is small
 };
 
 // ---- Expose globally (browser) ----

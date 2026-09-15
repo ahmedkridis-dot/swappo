@@ -38,13 +38,17 @@
   const listeners = [];
 
   function renderTabs(container) {
-    injectStyle();
     const el = (typeof container === 'string') ? document.querySelector(container) : container;
     if (!el) return;
+    // Feature flag (js/constants.js): no tabs → the catalogue keeps the default
+    // 'latest' ordering (activeTab never changes).
+    if (!(window.FEATURES && window.FEATURES.FEED_TABS)) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    injectStyle();
     el.classList.add('swp-feed-tabs');
     el.innerHTML = TABS.map(function (t) {
       return '<button data-tab="' + t.key + '" class="' + (t.key === activeTab ? 'active' : '') + '">' +
-               t.icon + ' ' + tr(t.i18n, t.label) +
+               tr(t.i18n, t.icon + ' ' + t.label) +   // dict labels already carry the emoji
              '</button>';
     }).join('');
     Array.prototype.forEach.call(el.querySelectorAll('button'), function (btn) {
