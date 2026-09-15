@@ -1468,7 +1468,12 @@
   function _lightboxPhotos() {
     var all = (currentItem && Array.isArray(currentItem.photos)) ? currentItem.photos.filter(Boolean) : [];
     if (!all.length) { var m = document.getElementById('mainPhoto'); return m && m.src ? [m.src] : []; }
-    return document.querySelector('.thumbnail.blurred') ? all.slice(0, 1) : all;
+    // Guests see the first photos unblurred and the rest locked — mirror exactly what the strip shows.
+    if (document.querySelector('.thumbnail.blurred')) {
+      var unlocked = document.querySelectorAll('.thumbnail:not(.blurred)').length;
+      return all.slice(0, Math.max(1, unlocked));
+    }
+    return all;
   }
   function _lightboxRender() {
     var box = document.getElementById('swp-lightbox');
