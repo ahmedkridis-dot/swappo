@@ -8,7 +8,9 @@
    Public API (all async unless noted):
      SwappoChat.getConversations()          -> Promise<Conversation[]>
      SwappoChat.getMessages(convId)         -> Promise<Message[]>
-     SwappoChat.sendMessage(convId, text)   -> Promise<{success, message?, wasFiltered?, error?}>
+     SwappoChat.sendMessage(convId, text[, { allowContact }]) -> Promise<{success, message?, wasFiltered?, error?}>
+       allowContact: true once both parties accepted the deal → phone / email / WhatsApp
+       are no longer masked (they need them to meet). Default false.
      SwappoChat.markRead(convId)            -> Promise<void>
      SwappoChat.subscribe(convId, onMsg)    -> unsubscribe()   [SYNC]
      SwappoChat.subscribeAll(onMsg)         -> unsubscribe()   [SYNC]
@@ -179,13 +181,17 @@
     return data || [];
   }
 
-  async function sendMessage(convId, content) {
+  async function sendMessage(convId, content, opts) {
     if (!global.db) return { success: false, error: 'Service unavailable.' };
     const uid = await _currentUserId();
     if (!uid) return { success: false, error: 'You must be signed in.' };
     if (!content || !content.trim()) return { success: false, error: 'Message cannot be empty.' };
 
-    const filtered = filterContactInfo(content);
+    // Contact details stay masked only while a deal is not yet accepted by
+    // both sides; after acceptance the swappers must be able to exchange a
+    // WhatsApp number to arrange the handover.
+    const allowContact = !!(opts && opts.allowContact);
+    const filtered = allowContact ? content : filterContactInfo(content);
     const wasFiltered = filtered !== content;
 
     const { data, error } = await global.db.from(MSG_TABLE).insert({

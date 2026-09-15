@@ -1682,7 +1682,7 @@
   async function sendChatMessage(convId, text) {
     if (useSwappo()) {
       try {
-        const res = await window.SwappoChat.sendMessage(convId, text);
+        const res = await window.SwappoChat.sendMessage(convId, text, { allowContact: _contactAllowed(convId) });
         if (!res.success) return res;
         _msgCache[convId] = (_msgCache[convId] || []).concat(res.message);
         return res;
@@ -2040,6 +2040,13 @@
     }
     // Always-visible reminder above the thread while the swap awaits its scan.
     _renderQrReminder(area, isAcceptedDeal && map.status !== 'completed');
+    // Header hint: contact details are shareable once the deal is accepted.
+    var hintEl = document.querySelector('#chatHeader .ch-hint');
+    if (hintEl) {
+      hintEl.innerHTML = _contactAllowed(convId)
+        ? '<i class="fas fa-handshake"></i> ' + _chatT('chat_contact_allowed', 'Deal accepted — you can share your WhatsApp number to arrange the handover.')
+        : '<i class="fas fa-shield-alt"></i> ' + _chatT('chat_safety_hint', 'Contact info is filtered for safety');
+    }
 
     // Re-add typing indicator
     if (typing) area.appendChild(typing);
@@ -3022,8 +3029,8 @@
     document.getElementById('dpItems').innerHTML = itemsHTML;
 
     // Status
-    var statusColors = { pending: 'background:#FEF3C7;color:#92400E', accepted: 'background:#D1FAE5;color:#065F46', completed: 'background:#DBEAFE;color:#1E40AF' };
-    var statusLabels = { pending: '⏳ Waiting for response', accepted: '✅ Deal accepted', completed: '🎉 Exchange completed' };
+    var statusColors = { pending: 'background:#FEF3C7;color:#92400E', accepted: 'background:#D1FAE5;color:#065F46', completed: 'background:#DBEAFE;color:#1E40AF', cancelled: 'background:#FEE2E2;color:#991B1B' };
+    var statusLabels = { pending: '⏳ Waiting for response', accepted: '✅ Deal accepted', completed: '🎉 Exchange completed', cancelled: _chatT('dp_cancelled_badge', '❌ Deal cancelled') };
     document.getElementById('dpStatus').innerHTML = '<div class="dp-status"><span class="dp-status-badge" style="' + (statusColors[status] || '') + '">' + (statusLabels[status] || status) + '</span></div>';
 
     // Timeline
@@ -3055,6 +3062,7 @@
       // possible while the deal is still "pending", in the branch above.
       actionsHTML = '<div class="dp-actions">' +
         '<button class="dp-btn primary" onclick="showQRConfirmation(\'' + convId + '\')"><i class="fas fa-qrcode"></i> Confirm Exchange</button>' +
+        '<button class="dp-btn danger" onclick="cancelDeal(\'' + convId + '\')"><i class="fas fa-times"></i> ' + _chatT('dp_cancel_deal', 'Cancel deal') + '</button>' +
       '</div>';
     }
     document.getElementById('dpActions').innerHTML = actionsHTML;
@@ -3247,6 +3255,59 @@
     document.getElementById('dpEmpty').style.display = '';
     renderSidebar();
   }
+  // Either swapper can call off an accepted deal before the QR scan.
+  // Items go back on the market (SwappoSwaps.cancel), a system message is
+  // posted in the thread and the other party gets a notification.
+  function _contactAllowed(convId) {
+    var m = CONV_ITEM_MAP[convId];
+    var st = m && m.status;
+    if (st === 'accepted' || st === 'completed') return true;
+    var conv = _convCache.find(function (c) { return c.id === convId; });
+    return !!(conv && conv.identity_revealed === true);
+  }
+  window._contactAllowed = _contactAllowed;
+
+  async function cancelDeal(convId) {
+    var map = CONV_ITEM_MAP[convId];
+    if (!map || !map.swap_id) { if (window.Toast) Toast.show(_chatT('dp_cancel_no_swap', 'No active deal to cancel.'), 'info'); return; }
+    if (!confirm(_chatT('dp_cancel_confirm', 'Cancel this deal? The items go back on the market and the other person will be notified.'))) return;
+    if (!(window.SwappoSwaps && window.SwappoSwaps.cancel)) return;
+    var res = await window.SwappoSwaps.cancel(map.swap_id);
+    if (!res || !res.success) {
+      if (window.Toast) Toast.show((res && res.error) || _chatT('dp_cancel_failed', 'Could not cancel the deal.'), 'error');
+      return;
+    }
+    map.status = 'cancelled';
+    var conv = _convCache.find(function (c) { return c.id === convId; });
+    var me = currentUser || {};
+    var myName = me.pseudo || me.display_name || me.name || 'Your swap partner';
+    // System line in the thread (sender_id NULL = system message, allowed by RLS).
+    try {
+      await window.db.from('messages').insert({
+        conversation_id: convId, sender_id: null, is_system: true,
+        content: _chatT('sys_deal_cancelled', '{name} cancelled the deal. The items are back on the market.').split('{name}').join(myName)
+      });
+    } catch (e) { console.warn('[cancelDeal] system message', e && e.message); }
+    // Notify the other party (bell + email digest pick this up).
+    try {
+      var otherId = conv && conv.other_user && conv.other_user.id;
+      if (otherId) {
+        await window.db.from('notifications').insert({
+          user_id: otherId, kind: 'swap_cancelled', type: 'swap',
+          title: 'Deal cancelled',
+          message: myName + ' cancelled your deal. The items are available again.',
+          url: '/pages/chat.html?conv=' + convId,
+          payload: { swap_id: map.swap_id, conversation_id: convId, cancelled_by: me.id || null }
+        });
+      }
+    } catch (e) { console.warn('[cancelDeal] notify', e && e.message); }
+    if (window.Toast) Toast.show(_chatT('dp_cancelled_toast', 'Deal cancelled. Items are back on the market.'), 'info');
+    try { await loadMessages(convId); } catch (e) {}
+    renderDealPanel(convId);
+    renderSidebar();
+  }
+  window.cancelDeal = cancelDeal;
+
   async function sendCounter(convId) {
     var msg = dealCashAmount > 0 ? 'Counter-offer: swap + ' + dealCashAmount + ' AED cash top-up' : 'I confirmed the current swap deal.';
     await sendChatMessage(convId, msg);
