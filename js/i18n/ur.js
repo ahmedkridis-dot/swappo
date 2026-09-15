@@ -1409,7 +1409,7 @@
     publish_back: "واپس",
     publish_btn: "فہرست شائع کریں",
     publish_giveaway_option: "تحفے کے طور پر پیش کریں (مفت)",
-    publish_photo_tip: "ڈیمو موڈ: ہر خانے پر کلک کریں تاکہ ڈیمو تصویر شامل ہو۔",
+    publish_photo_tip: "تصویر منتخب کرنے کے لیے خانے پر ٹیپ کریں۔ 8 تصاویر تک — یہ خود بخود ری سائز اور بہتر ہو جاتی ہیں۔",
     publish_cat_clothing: "کپڑے اور لوازمات",
     publish_cat_books: "کتابیں اور میڈیا",
     publish_cat_kids: "بچے اور بیبی",

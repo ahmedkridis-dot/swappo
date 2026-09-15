@@ -6,14 +6,14 @@
      SwappoStorage.processFile(file, opts)    -> { blob, url, width, height, sizeKB }
      SwappoStorage.uploadItemPhotos(files)    -> [publicUrl, ...]
      SwappoStorage.uploadOne(file, folder)    -> publicUrl
-     SwappoStorage.MAX_FILES                  -> 5
-     SwappoStorage.MAX_SIZE_MB                -> 2
-     SwappoStorage.MAX_SIDE_PX                -> 1600
+     SwappoStorage.MAX_FILES                  -> 8
+     SwappoStorage.MAX_SIZE_MB                -> 1.8 (bucket limit is 5)
+     SwappoStorage.MAX_SIDE_PX                -> 1920
 
    Photo policy (per Ahmed, 2026-04-14):
      - max 5 photos per item
-     - max 2 MB each (enforced AFTER client-side resize)
-     - auto-resize to 1600 px max side, preserving aspect ratio
+     - max 1.8 MB each (enforced AFTER client-side resize; bucket allows 5 MB)
+     - auto-resize to 1920 px max side, preserving aspect ratio
      - convert to WebP (quality 0.85) before upload
    ============================================ */
 
@@ -21,7 +21,7 @@
   'use strict';
 
   const MAX_FILES   = 8;           // iPhone carousel = up to 8 photos per listing
-  const MAX_SIZE_MB = 3;            // AFTER resize/compression — bucket now
+  const MAX_SIZE_MB = 1.8;            // AFTER resize/compression — bucket now
                                     // allows 10 MB so we keep plenty of head-room
                                     // and ship higher-quality WebP
   const MAX_SIDE_PX = 1920;         // enough for retina, respects iPhone 12MP source
@@ -205,7 +205,12 @@
         contentType: processed.mime
       });
 
-    if (error) throw new Error(error.message || 'Upload failed.');
+    if (error) {
+      const m = String(error.message || '');
+      if (/exceed|too large|payload/i.test(m)) throw new Error('This photo is too large even after compression. Please pick another one.');
+      if (/mime|not supported/i.test(m))     throw new Error('This image format is not supported. Use JPG, PNG or WebP.');
+      throw new Error(m || 'Upload failed.');
+    }
 
     const { data } = global.db.storage.from(BUCKET).getPublicUrl(path);
     return data.publicUrl;

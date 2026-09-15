@@ -1543,7 +1543,7 @@
     publish_back: "Back",
     publish_btn: "Publish listing",
     publish_giveaway_option: "Offer as Giveaway (FREE)",
-    publish_photo_tip: "Demo mode: Click each slot to add a placeholder photo for your category.",
+    publish_photo_tip: "Tap a slot to pick a photo. Up to 8 photos — they are resized and optimised automatically.",
     publish_cat_clothing: "Clothing & Accessories",
     publish_cat_books: "Books & Media",
     publish_cat_kids: "Kids & Baby",

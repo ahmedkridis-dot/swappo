@@ -1410,7 +1410,7 @@
     publish_back: "Retour",
     publish_btn: "Publier l'annonce",
     publish_giveaway_option: "Offrir gratuitement (CADEAU)",
-    publish_photo_tip: "Mode démo : Cliquez sur chaque emplacement pour ajouter une photo de démonstration.",
+    publish_photo_tip: "Touchez une case pour choisir une photo. Jusqu’à 8 photos — elles sont redimensionnées et optimisées automatiquement.",
     publish_cat_clothing: "Vêtements & Accessoires",
     publish_cat_books: "Livres & Médias",
     publish_cat_kids: "Enfants & Bébé",

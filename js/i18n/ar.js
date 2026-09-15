@@ -1410,7 +1410,7 @@
     publish_back: "رجوع",
     publish_btn: "نشر الإعلان",
     publish_giveaway_option: "عرض كهدية (مجاني)",
-    publish_photo_tip: "الوضع التجريبي: انقر على كل خانة لإضافة صورة تجريبية.",
+    publish_photo_tip: "اضغط على خانة لاختيار صورة. حتى 8 صور — يتم تغيير حجمها وتحسينها تلقائياً.",
     publish_cat_clothing: "ملابس وإكسسوارات",
     publish_cat_books: "كتب ووسائط",
     publish_cat_kids: "أطفال ورضع",
