@@ -3386,14 +3386,25 @@
   // ═══ SEND MESSAGE ═══
   async function sendMsg() {
     var input = document.getElementById('chatInput');
+    var sendBtn = document.getElementById('sendBtn');
     var txt = input.value.trim();
     if (!txt || !activeConvId) return;
     input.value = '';
-    document.getElementById('sendBtn').disabled = true;
+    sendBtn.disabled = true;
 
-    var res = await sendChatMessage(activeConvId, txt);
-    if (!res.success) {
-      if (window.Toast) Toast.show(res.error || 'Could not send message.', 'error');
+    var res;
+    try {
+      res = await sendChatMessage(activeConvId, txt);
+    } catch (e) {
+      res = { success: false, error: e && e.message };
+    } finally {
+      // Never leave the composer locked: a failed send used to disable the
+      // button for good ("on n'arrive plus à écrire").
+      sendBtn.disabled = false;
+    }
+    if (!res || !res.success) {
+      input.value = txt; // give the user their text back
+      if (window.Toast) Toast.show((res && res.error) || 'Could not send message.', 'error');
       return;
     }
     if (res.wasFiltered && window.Toast) {
