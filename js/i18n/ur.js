@@ -1685,6 +1685,8 @@
     payment_confirmed: "ادائیگی کی تصدیق",
     payment_cod_fee: "کورئیر کیش لے گا (+5 AED)",
     payment_no_handling_notice: "Swappo صارفین کے درمیان رقم نہیں سنبھالتا — آپ براہ راست طے کریں۔",
+    payment_confirmed_by_qr: "🔒 ادائیگی کی تصدیق صرف حوالگی کے وقت QR کوڈ اسکین سے ہوتی ہے۔",
+    payment_settled_by_qr: "✅ ادائیگی مکمل — QR اسکین سے تصدیق شدہ",
     truck_nav_link: "🚛 ٹرک تلاش کریں",
     truck_footer_link: "ٹرک تلاش کریں",
     truck_deal_cta: "نقل و حمل میں مدد چاہیے؟",

@@ -1686,6 +1686,8 @@
     payment_confirmed: "تم تأكيد الدفع",
     payment_cod_fee: "يتم تحصيل المبلغ من السائق (+5 درهم)",
     payment_no_handling_notice: "Swappo لا تعالج المدفوعات بين المستخدمين — الاتفاق مباشر بينكم.",
+    payment_confirmed_by_qr: "🔒 يتم تأكيد الدفع فقط عبر مسح رمز QR عند التسليم.",
+    payment_settled_by_qr: "✅ تمت تسوية الدفع — مؤكَّد بمسح رمز QR",
     truck_nav_link: "🚛 اعثر على شاحنة",
     truck_footer_link: "اعثر على شاحنة",
     truck_deal_cta: "بحاجة لمساعدة في النقل؟",

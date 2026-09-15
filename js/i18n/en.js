@@ -1706,6 +1706,8 @@
     payment_confirmed: "Payment confirmed",
     payment_cod_fee: "Courier collects cash (+5 AED)",
     payment_no_handling_notice: "Swappo never processes user-to-user cash — you settle directly.",
+    payment_confirmed_by_qr: "🔒 Payment is confirmed only by the QR scan at the handover.",
+    payment_settled_by_qr: "✅ Payment settled — confirmed by QR scan",
     truck_nav_link: "🚛 Find a Truck",
     truck_footer_link: "Find a Truck",
     truck_deal_cta: "Need help moving?",

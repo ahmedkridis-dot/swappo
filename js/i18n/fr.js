@@ -1683,6 +1683,8 @@
     payment_confirmed: "Paiement confirmé",
     payment_cod_fee: "Le coursier encaisse (+5 AED)",
     payment_no_handling_notice: "Swappo ne traite jamais les paiements entre utilisateurs — vous réglez directement.",
+    payment_confirmed_by_qr: "🔒 Le paiement est confirmé uniquement par le scan du QR code lors de la remise.",
+    payment_settled_by_qr: "✅ Paiement réglé — confirmé par scan du QR code",
     truck_nav_link: "🚛 Trouver un camion",
     truck_footer_link: "Trouver un camion",
     truck_deal_cta: "Besoin d'aide pour le transport ?",

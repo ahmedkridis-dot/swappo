@@ -14,7 +14,6 @@
      SwappoSwaps.respond(swapId, accept)     -> {success, swap?, conversationId?, error?}
      SwappoSwaps.cancel(swapId)
      SwappoSwaps.rate(swapId, stars)
-     SwappoSwaps.confirmReceipt(swapId)      -> QR confirmation, marks completed when both confirm
      SwappoSwaps.getById(id)
      SwappoSwaps.getForUser(userId)
      SwappoSwaps.getSent(userId) / getReceived(userId) / getHistory(userId)
@@ -277,46 +276,8 @@
     return { success: true };
   }
 
-  // ---------- CONFIRM RECEIPT (QR flow) ----------
-  async function confirmReceipt(swapId) {
-    if (!global.db) return { success: false, error: 'Service unavailable.' };
-    const uid = await _currentUserId();
-    if (!uid) return { success: false, error: 'You must be signed in.' };
-
-    const { data: swap } = await global.db.from(TABLE).select('*').eq('id', swapId).maybeSingle();
-    if (!swap) return { success: false, error: 'Swap not found.' };
-
-    let patch;
-    if (uid === swap.proposer_id) patch = { proposer_confirmed: true };
-    else if (uid === swap.receiver_id) patch = { receiver_confirmed: true };
-    else return { success: false, error: 'Not your swap.' };
-
-    const bothConfirmed =
-      (swap.proposer_confirmed || uid === swap.proposer_id) &&
-      (swap.receiver_confirmed || uid === swap.receiver_id);
-    if (bothConfirmed) {
-      patch.status = 'completed';
-      patch.completed_at = new Date().toISOString();
-    }
-
-    const { data: updated, error } = await global.db.from(TABLE)
-      .update(patch).eq('id', swapId).select('*').single();
-    if (error) return { success: false, error: error.message };
-
-    // If completed, mark items swapped (or sold for purchases)
-    if (bothConfirmed) {
-      const ids = [updated.receiver_item_id, updated.proposer_item_id].filter(Boolean);
-      const newStatus = updated.is_purchase ? 'sold' : 'swapped';
-      await global.db.from(ITEMS_TABLE).update({ status: newStatus }).in('id', ids);
-
-      // Bump swap_count for both users
-      await Promise.all([
-        global.db.rpc('bump_swap_count', { user_id_in: updated.proposer_id }).catch(() => {}),
-        global.db.rpc('bump_swap_count', { user_id_in: updated.receiver_id }).catch(() => {})
-      ]);
-    }
-    return { success: true, swap: updated, completed: !!bothConfirmed };
-  }
+  // Swap completion lives only in the confirm_swap_qr RPC (QR scan) —
+  // direct client completion is blocked server-side (migration 031).
 
   // ---------- QUERIES ----------
   async function getById(swapId) {
@@ -379,7 +340,7 @@
   }
 
   global.SwappoSwaps = {
-    propose, respond, cancel, rate, confirmReceipt,
+    propose, respond, cancel, rate,
     getById, getForUser, getSent, getReceived, getHistory, getPendingCount,
     checkExpired
   };

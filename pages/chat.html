@@ -3159,14 +3159,12 @@
     // pay to be featured in the Deal Tracker once the platform has
     // traction). For now only user-to-user options remain.
     var state = paymentState[convId] || (paymentState[convId] = {
-      method: (map && map.payment_method) || 'cash_meetup',
-      payerConfirmed: !!(map && map.payer_confirmed_at),
-      payeeConfirmed: !!(map && map.payee_confirmed_at)
+      method: (map && map.payment_method) || 'cash_meetup'
     });
 
-    // The proposer is the one paying (cash_direction = 'proposer_pays').
-    var me = currentUser && currentUser.id;
-    var isPayer = me && map && map.proposer_id === me;
+    // No manual "I paid / I received": the payment is confirmed only by the
+    // QR scan at the handover (confirm_swap_qr), enforced server-side.
+    var settled = status === 'completed';
 
     container.innerHTML =
       '<div class="dp-payment">' +
@@ -3176,10 +3174,10 @@
           payOpt(convId, 'cod',         '🚚', _trP('payment_cod', 'Cash on Delivery (+5 AED)'), _trP('payment_cod_fee', 'Courier collects cash (+5 AED)'), state.method) +
         '</div>' +
         '<div class="dp-pay-confirm">' +
-          (isPayer ? '<button id="payIPaid" class="dp-pay-btn' + (state.payerConfirmed ? ' active' : '') + '" onclick="confirmPayment(\'' + convId + '\', \'payer\')"' + (state.payerConfirmed ? ' disabled' : '') + '>✅ ' + _trP('payment_i_paid', 'I paid') + '</button>'
-                    : '<button class="dp-pay-btn" disabled>' + (state.payerConfirmed ? '✅ ' + _trP('payment_i_paid', 'I paid') : '⏳ ' + _trP('offer_awaiting', 'Awaiting payer')) + '</button>') +
-          (!isPayer ? '<button id="payIReceived" class="dp-pay-btn' + (state.payeeConfirmed ? ' active' : '') + '" onclick="confirmPayment(\'' + convId + '\', \'payee\')"' + (state.payeeConfirmed ? ' disabled' : '') + '>✅ ' + _trP('payment_i_received', 'I received') + '</button>'
-                    : '<button class="dp-pay-btn" disabled>' + (state.payeeConfirmed ? '✅ ' + _trP('payment_i_received', 'I received') : '⏳ ' + _trP('offer_awaiting', 'Awaiting receiver')) + '</button>') +
+          '<button class="dp-pay-btn' + (settled ? ' active' : '') + '" style="grid-column:1/-1;width:100%;" disabled>' +
+            (settled ? _trP('payment_settled_by_qr', '✅ Payment settled — confirmed by QR scan')
+                     : _trP('payment_confirmed_by_qr', '🔒 Payment is confirmed only by the QR scan at the handover.')) +
+          '</button>' +
         '</div>' +
         '<div class="dp-pay-notice">' + _trP('payment_no_handling_notice', 'Swappo never processes user-to-user cash — you settle directly.') + '</div>' +
       '</div>';
@@ -3203,24 +3201,6 @@
     if (map.swap_id && window.db) {
       try { await window.db.from('swaps').update({ payment_method: method }).eq('id', map.swap_id); } catch (e) {}
     }
-    renderDealPanel(convId);
-  };
-
-  window.confirmPayment = async function (convId, side) {
-    var state = paymentState[convId] || (paymentState[convId] = {});
-    var map = CONV_ITEM_MAP[convId] || {};
-    var now = new Date().toISOString();
-    if (side === 'payer') { state.payerConfirmed = true; map.payer_confirmed_at = now; }
-    if (side === 'payee') { state.payeeConfirmed = true; map.payee_confirmed_at = now; }
-    if (map.swap_id && window.db) {
-      try {
-        var patch = {};
-        if (side === 'payer') patch.payer_confirmed_at = now;
-        if (side === 'payee') patch.payee_confirmed_at = now;
-        await window.db.from('swaps').update(patch).eq('id', map.swap_id);
-      } catch (e) { console.warn('[confirmPayment]', e.message || e); }
-    }
-    if (window.Toast) Toast.success(_trP('payment_confirmed', 'Payment confirmed'));
     renderDealPanel(convId);
   };
 
