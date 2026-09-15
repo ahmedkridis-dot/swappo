@@ -1,11 +1,13 @@
 // Vercel Edge Middleware — server-side share previews for product pages.
 //
-// WhatsApp, Facebook, Telegram, X, Slack, Google… fetch product.html WITHOUT
-// running JavaScript, so they only ever saw the generic "Product — Swappo"
-// tags. When a known crawler asks for /pages/product.html?id=<uuid>, we
-// fetch the item from Supabase (anon key, public RLS) and serve the very
-// same static page with the <title>, description, og:* and canonical tags
-// rewritten for that item. Humans keep hitting the static file untouched.
+// WhatsApp, Messenger, Instagram, Telegram, X, iMessage, LinkedIn, Google…
+// fetch product.html WITHOUT running JavaScript, so they only ever saw the
+// generic "Product — Swappo" tags. For EVERY request to
+// /pages/product.html?id=<uuid> (no user-agent sniffing — crawler lists
+// always miss one) we fetch the item from Supabase (anon key, public RLS)
+// and serve the very same static page with <title>, description, og:* and
+// canonical rewritten for that item. Same scripts, same markup for humans;
+// the edge caches each item page for a few minutes.
 //
 // No framework, no dependencies — Web APIs only (Edge runtime).
 
@@ -17,7 +19,6 @@ const SITE = 'https://swappo.ae';
 const LOGO = SITE + '/assets/brand/swappo-logo-master.png';
 const RENDERER_UA = 'swappo-og-renderer';
 
-const BOTS = /whatsapp|facebookexternalhit|facebot|twitterbot|telegrambot|slackbot|slack-imgproxy|linkedinbot|discordbot|pinterest|skypeuripreview|googlebot|bingbot|applebot|iframely|embedly|snapchat|vkshare|redditbot|quora link preview|outbrain|w3c_validator|yahoo|duckduckbot|baiduspider|yandex/i;
 
 const CONDITION = { new: 'New', like_new: 'Like new', good: 'Good', fair: 'Fair' };
 const UUID = /^[0-9a-f-]{32,36}$/i;
@@ -88,7 +89,7 @@ export default async function middleware(req) {
   const url = new URL(req.url);
   const id = (url.searchParams.get('id') || '').trim();
   const ua = req.headers.get('user-agent') || '';
-  if (!id || !UUID.test(id) || !BOTS.test(ua) || ua.includes(RENDERER_UA)) return; // humans → static file
+  if (!id || !UUID.test(id) || ua.includes(RENDERER_UA)) return; // no item id → static file
 
   try {
     const item = await fetchItem(id);
