@@ -168,6 +168,10 @@
         }
 
         .edit-profile-btn:hover { background: var(--teal-dark, #067A80); transform: translateY(-1px); }
+        /* The hidden attribute must win over inline display values
+           (e.g. the verify-phone banner's display:flex) — otherwise a
+           flag-gated block shows while its feature is off. */
+        [hidden] { display: none !important; }
 
         /* ========== STATS ROW ========== */
         .stats-row {
