@@ -100,6 +100,19 @@
     .toast.info { background: #09B1BA; }
     @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
   </style>
+  <script>
+    // Deep link carried over from login.html (?redirect=/pages/product.html?id=…).
+    // Same-origin paths only — anything else falls back to the homepage.
+    function _afterOnboardingHref() {
+      try {
+        var target = new URLSearchParams(window.location.search).get('redirect');
+        if (!target || /^(\/\/|https?:|javascript:|data:|vbscript:|file:)/i.test(target)) return '../index.html';
+        var u = new URL(target, window.location.origin);
+        if (u.origin !== window.location.origin) return '../index.html';
+        return u.pathname + u.search + u.hash;
+      } catch (e) { return '../index.html'; }
+    }
+  </script>
   <script>(function(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&/^sb-[\w-]+-auth-token$/.test(k)&&localStorage.getItem(k)){document.documentElement.classList.add("swp-auth-in");return;}}document.documentElement.classList.add("swp-auth-out");}catch(e){}})();</script>
 </head>
 <body>
@@ -345,7 +358,7 @@
           return;
         }
         toast('All set! Welcome to Swappo.', 'success');
-        setTimeout(function() { window.location.href = '../index.html'; }, 900);
+        setTimeout(function() { window.location.href = _afterOnboardingHref(); }, 900);
       } catch (err) {
         toast(err.message || 'Something went wrong.', 'error');
         btn.disabled = false;

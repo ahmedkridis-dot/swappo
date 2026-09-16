@@ -614,6 +614,16 @@
       switchTab(want);
     });
 
+    // onboarding.html keeps the deep link (e.g. a giveaway product opened
+    // from an ad) so the user lands back on it once the profile is done.
+    function onboardingHref() {
+      var raw = '';
+      try { raw = new URLSearchParams(window.location.search).get('redirect') || ''; } catch (e) {}
+      var target = raw ? safeRedirect('') : '';
+      if (!target || target === '../index.html') return 'onboarding.html';
+      return 'onboarding.html?redirect=' + encodeURIComponent(target);
+    }
+
     /* ========================
        Toast notification (shared)
        ======================== */
@@ -706,7 +716,7 @@
         // Auto-confirmed path (email verification disabled) → onboarding.
         showToast(_authT('auth_welcome','Welcome to Swappo!'), 'success');
         _markHasAccount();
-        setTimeout(function () { window.location.href = 'onboarding.html'; }, 900);
+        setTimeout(function () { window.location.href = onboardingHref(); }, 900);
       } catch (err) {
         showToast(err.message || _authT('auth_err_signup','Signup failed.'), 'error');
         setLoading(btn, false);
@@ -746,7 +756,7 @@
             var needs = true;
             try { needs = await window.SwappoAuth.needsOnboarding(); } catch (e) {}
             _markHasAccount();
-            setTimeout(function () { window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html')); }, 600);
+            setTimeout(function () { window.location.replace(needs ? onboardingHref() : safeRedirect('../index.html')); }, 600);
             return true;
           }
           if (manual) showToast(_authT('auth_verify_not_yet', 'Not confirmed yet — click the link in the email first.'), 'info');
@@ -801,7 +811,7 @@
         var needs = await window.SwappoAuth.needsOnboarding();
         setTimeout(function() {
           _markHasAccount();
-          window.location.href = needs ? 'onboarding.html' : safeRedirect('../index.html');
+          window.location.href = needs ? onboardingHref() : safeRedirect('../index.html');
         }, 900);
       } catch (err) {
         showToast(err.message || 'Login failed', 'error');
@@ -828,7 +838,7 @@
           if (!u) { if (tries++ < 40) setTimeout(poll, 250); return; }
           return SwappoAuth.needsOnboarding().then(function (needs) {
             _markHasAccount();
-            window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html'));
+            window.location.replace(needs ? onboardingHref() : safeRedirect('../index.html'));
           });
         }).catch(function () { if (tries++ < 40) setTimeout(poll, 250); });
       })();
@@ -909,7 +919,7 @@
           if (supaUser) {
             const needs = await window.SwappoAuth.needsOnboarding();
             _markHasAccount();
-            window.location.href = needs ? 'onboarding.html' : safeRedirect('../index.html');
+            window.location.href = needs ? onboardingHref() : safeRedirect('../index.html');
             return;
           }
         }
