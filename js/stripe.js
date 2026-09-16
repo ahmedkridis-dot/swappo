@@ -209,6 +209,12 @@
       if (!_paymentsEnabled()) return _comingSoon();
       var user = await _requireUser();
       if (!user) return false;
+      // No Pro subscription yet → there is nothing to manage: go straight to
+      // Checkout so the user can actually pay. (The Edge Function applies the
+      // same rule server-side, using Stripe as the source of truth.)
+      if (!(user.is_pro || user.plan === 'pro')) {
+        return _checkout({ kind: 'pro', interval: 'month' });
+      }
       return _checkout({ kind: 'portal', return_url: location.href.split('?')[0] });
     },
 

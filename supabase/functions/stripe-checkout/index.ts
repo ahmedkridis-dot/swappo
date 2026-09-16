@@ -115,18 +115,34 @@ serve(async (req) => {
   let body: any = {};
   try { body = await req.json(); } catch { /* empty body */ }
 
-  const kind = String(body.kind ?? '');
+  let kind = String(body.kind ?? '');
 
   try {
     const customerId = await getOrCreateCustomer(admin, user.id, user.email ?? null);
 
     // ── Billing portal (manage / cancel subscription) ──
+    // Without a subscription the portal has nothing to pay for (it only
+    // stores cards and shows invoices) — a user who lands there cannot
+    // subscribe. So: no live subscription on Stripe → Checkout instead.
     if (kind === 'portal') {
-      const session = await stripe.billingPortal.sessions.create({
-        customer: customerId,
-        return_url: safeUrl(body.return_url, `${SITE_URL}/pages/profile.html`),
-      });
-      return json({ url: session.url });
+      let hasSub = false;
+      try {
+        const subs = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 10 });
+        hasSub = subs.data.some((s) => ['active', 'trialing', 'past_due', 'unpaid'].includes(s.status));
+      } catch (e) {
+        console.warn('[stripe-checkout] subscriptions.list failed, using DB flag', (e as Error)?.message);
+        const { data: row } = await admin
+          .from('users').select('is_pro, stripe_subscription_id').eq('id', user.id).maybeSingle();
+        hasSub = !!(row?.is_pro && row?.stripe_subscription_id);
+      }
+      if (hasSub) {
+        const session = await stripe.billingPortal.sessions.create({
+          customer: customerId,
+          return_url: safeUrl(body.return_url, `${SITE_URL}/pages/profile.html`),
+        });
+        return json({ url: session.url });
+      }
+      kind = 'pro';
     }
 
     // ── Pro subscription ──
