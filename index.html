@@ -70,6 +70,22 @@
   <style>
     /* Homepage-specific styles */
     .feed-section + .feed-section { padding-top: 0; }
+
+    /* "How it works" lives in a popup (Ahmed, 2026-09-17): on a phone the
+       4-step section pushed the products a full screen down. */
+    .how-modal { max-width: 980px; padding: 36px 28px 28px; max-height: 90vh; overflow-y: auto; text-align: center; }
+    .how-modal .section-title { margin: 0 0 22px; }
+    .how-modal .steps-grid { margin: 0; }
+    .how-modal .step-card { text-align: center; }
+    .how-modal-cta { margin-top: 24px; }
+    @media (max-width: 640px) {
+      .how-modal { padding: 28px 18px 20px; border-radius: 18px; }
+      .how-modal .steps-grid-4 { gap: 12px; }
+      .how-modal .step-card { padding: 18px 16px; }
+    }
+    /* The overlay class sets display:flex, which beats the hidden attribute. */
+    #how-it-works[hidden] { display: none !important; }
+    body.how-modal-open { overflow: hidden; }
   </style>
   <script>(function(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&/^sb-[\w-]+-auth-token$/.test(k)&&localStorage.getItem(k)){document.documentElement.classList.add("swp-auth-in");return;}}document.documentElement.classList.add("swp-auth-out");}catch(e){}})();</script>
 </head>
@@ -164,7 +180,7 @@
         <p class="hero-subtitle-text" data-i18n="hero_subtitle">The UAE's first marketplace for swapping, buying, selling, and gifting. Trade items with your community.</p>
         <div class="hero-cta">
           <a href="pages/login.html" id="hero-start-btn" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start Swapping</a>
-          <a href="#how-it-works" class="btn-pill btn-pill-outline hero-outline-btn" data-i18n="how_it_works">How it works</a>
+          <a href="#how-it-works" class="btn-pill btn-pill-outline hero-outline-btn" role="button" aria-haspopup="dialog" aria-controls="how-it-works" onclick="return openHowItWorks(event)" data-i18n="how_it_works">How it works</a>
         </div>
         <div class="hero-trust">
           <span><span class="check">&#10003;</span> <span data-i18n="trust_items">Free — no commission on deals</span></span>
@@ -211,12 +227,13 @@
     </div>
   </section>
 
-  <!-- ========== HOW IT WORKS ========== -->
-  <section class="how-it-works reveal" id="how-it-works">
-    <div class="container">
-      <div class="section-header" style="justify-content:center;">
-        <h2 class="section-title" data-i18n="how_it_works">How it works</h2>
-      </div>
+  <!-- ========== HOW IT WORKS (popup) ==========
+       Opened by the hero "How it works" button (or #how-it-works in the URL).
+       Kept out of the page flow so the products stay one scroll away. -->
+  <div class="surprise-overlay" id="how-it-works" role="dialog" aria-modal="true" aria-labelledby="how-modal-title" hidden onclick="if(event.target===this)closeHowItWorks()">
+    <div class="surprise-modal how-modal">
+      <button type="button" class="surprise-close" onclick="closeHowItWorks()" aria-label="Close" data-i18n-aria-label="action_close">&times;</button>
+      <h2 class="section-title" id="how-modal-title" data-i18n="how_it_works">How it works</h2>
       <div class="steps-grid steps-grid-4">
         <div class="step-card card-hover">
           <div class="step-number">1</div>
@@ -243,8 +260,33 @@
           <p data-i18n="step4_desc_v5">QR code or delivery. Rate each other.</p>
         </div>
       </div>
+      <div class="how-modal-cta">
+        <a href="pages/login.html" class="btn-pill btn-pill-teal" data-i18n="hero_start_free">Start Swapping</a>
+      </div>
     </div>
-  </section>
+  </div>
+  <script>
+    function openHowItWorks(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      var m = document.getElementById('how-it-works');
+      if (!m) return true;
+      m.hidden = false;
+      document.body.classList.add('how-modal-open');
+      var x = m.querySelector('.surprise-close');
+      if (x) { try { x.focus(); } catch (err) {} }
+      return false;
+    }
+    function closeHowItWorks() {
+      var m = document.getElementById('how-it-works');
+      if (!m || m.hidden) return;
+      m.hidden = true;
+      document.body.classList.remove('how-modal-open');
+      if (location.hash === '#how-it-works') { try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {} }
+    }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeHowItWorks(); });
+    // Deep link (#how-it-works) still works — it opens the popup.
+    if (location.hash === '#how-it-works') document.addEventListener('DOMContentLoaded', function () { openHowItWorks(); });
+  </script>
 
   <!-- ========== POPULAR ITEMS ========== -->
   <section class="feed-section">
