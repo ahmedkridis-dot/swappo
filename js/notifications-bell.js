@@ -93,6 +93,8 @@
       case 'gift':
       case 'counter_offer':
         return base + 'profile.html?tab=swap-dashboard&sub=received';
+      case 'gift_declined':
+        return base + 'giveaway.html';
       case 'swap_declined':
       case 'swap':
         return base + 'profile.html?tab=swap-dashboard&sub=history';

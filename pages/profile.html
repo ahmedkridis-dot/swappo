@@ -2078,6 +2078,7 @@
             ] = await Promise.all([
               window.db.from('swaps').select('id', { count: 'exact', head: true })
                 .eq('proposer_id', user.id).eq('is_giveaway_claim', true)
+                .in('status', ['accepted', 'completed'])
                 .gte('created_at', _monthStartISO)
                 .then(function(r) { return r.count || 0; }).catch(function() { return _cachedCounts.claims || 0; }),
               window.db.from('items').select('id', { count: 'exact', head: true })

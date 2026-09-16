@@ -431,6 +431,8 @@
     gift_almost_p2_html: "That's the heart of Swappo — <strong>everyone gives, everyone gets</strong>. List one item — to swap, sell or give away — and your first claim unlocks instantly.",
     gift_maybe_later: "Maybe later",
     gift_drop_now: "Drop an item now →",
+    gift_claim_sent: "Request sent! The giver will pick who receives it.",
+    gift_already_requested: "You've already requested this gift — the giver will pick who receives it.",
     gift_claimed_month_title: "You've claimed your free gift this month",
     gift_claimed_month_p_html: "Come back next month for another free claim, or upgrade to <strong>Swappo Pro</strong> to claim up to 5 gifts per month, plus no ads, analytics, and Pro boosts included.",
     gift_upgrade_pro: "Upgrade to Pro — 29 AED/mo",

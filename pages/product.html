@@ -1662,13 +1662,16 @@
         return;
       }
 
-      // STEP 3 — Monthly quota (1 free, 5 pro)
+      // STEP 3 — Monthly quota (1 free, 5 pro). Only claims the giver
+      // accepted (or that completed) count — pending / declined requests
+      // don't burn the quota.
       var plan = String(currentUser.plan || 'free').toLowerCase();
       var limit = plan === 'pro' ? 5 : 1;
       var monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
       var { count: claimedThisMonth } = await window.db.from('swaps')
         .select('id', { count: 'exact', head: true })
         .eq('proposer_id', currentUser.id).eq('is_giveaway_claim', true)
+        .in('status', ['accepted', 'completed'])
         .gte('created_at', monthStart.toISOString());
       if ((claimedThisMonth || 0) >= limit) {
         if (plan === 'pro') {
@@ -1695,6 +1698,13 @@
 
       // STEP 4 — Insert swap giveaway_claim + notification
       if (currentItem.user_id === currentUser.id) { showToast("You can't claim your own gift"); return; }
+      // One pending request per user per gift (also enforced by a unique
+      // index, migration 034).
+      var { count: alreadyPending } = await window.db.from('swaps')
+        .select('id', { count: 'exact', head: true })
+        .eq('proposer_id', currentUser.id).eq('receiver_item_id', currentItem.id)
+        .eq('is_giveaway_claim', true).eq('status', 'pending');
+      if ((alreadyPending || 0) > 0) { showToast(t('gift_already_requested')); _markClaimBtnRequested(); return; }
       var { data: swap, error: swErr } = await window.db.from('swaps').insert({
         proposer_id: currentUser.id,
         receiver_id: currentItem.user_id,
@@ -1704,7 +1714,10 @@
         cash_amount: 0,
         status: 'pending'
       }).select('*').single();
-      if (swErr) { showToast(swErr.message || 'Could not claim'); return; }
+      if (swErr) {
+        if (swErr.code === '23505') { showToast(t('gift_already_requested')); _markClaimBtnRequested(); return; }
+        showToast(swErr.message || 'Could not claim'); return;
+      }
 
       try {
         await window.db.from('notifications').insert({
@@ -1719,18 +1732,20 @@
       } catch (nErr) { /* non-blocking */ }
 
       // STEP 5 — Success UI
-      showToast('🎁 Gift claimed! The giver will contact you soon.');
-      var btn = document.getElementById('claim-btn');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-check"></i> Claimed';
-        btn.style.opacity = '0.6';
-        btn.style.cursor = 'not-allowed';
-      }
+      showToast('🎁 ' + t('gift_claim_sent'));
+      _markClaimBtnRequested();
     } catch (err) {
       console.error('[claimGiveaway]', err);
       showToast(err.message || 'Could not claim');
     }
+  }
+  function _markClaimBtnRequested() {
+    var btn = document.getElementById('claim-btn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-check"></i> Claimed';
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
   }
 
   // ============ ITEM + CASH ============

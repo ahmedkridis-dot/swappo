@@ -441,6 +441,8 @@
     gift_almost_p2_html: "C'est le cœur de Swappo — <strong>tout le monde donne, tout le monde reçoit</strong>. Publiez un article — à échanger, vendre ou offrir — et votre premier claim s'ouvre instantanément.",
     gift_maybe_later: "Plus tard",
     gift_drop_now: "Déposer un article →",
+    gift_claim_sent: "Demande envoyée ! Le donneur choisira qui le reçoit.",
+    gift_already_requested: "Vous avez déjà demandé ce cadeau — le donneur choisira qui le reçoit.",
     gift_claimed_month_title: "Vous avez réclamé votre cadeau gratuit ce mois-ci",
     gift_claimed_month_p_html: "Revenez le mois prochain pour un autre claim gratuit, ou passez à <strong>Swappo Pro</strong> pour réclamer jusqu'à 5 cadeaux par mois, sans publicité, avec analytics et boosts Pro inclus.",
     gift_upgrade_pro: "Passer à Pro — 29 AED/mois",

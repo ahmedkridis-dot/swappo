@@ -1245,11 +1245,14 @@
                 var monthStart = new Date();
                 monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
 
+                // Only accepted / completed claims count — pending or
+                // declined requests don't burn the quota.
                 var { count: claimedThisMonth } = await window.db
                     .from('swaps')
                     .select('id', { count: 'exact', head: true })
                     .eq('proposer_id', user.id)
                     .eq('is_giveaway_claim', true)
+                    .in('status', ['accepted', 'completed'])
                     .gte('created_at', monthStart.toISOString());
                 if ((claimedThisMonth || 0) >= limit) {
                     if (plan === 'pro') showProQuotaInfoModal(limit);
@@ -1268,6 +1271,18 @@
                     Toast.show('This gift has already been claimed.', 'info'); return;
                 }
 
+                // 4b) One pending request per user per gift (unique index, migration 034)
+                var { count: alreadyPending } = await window.db.from('swaps')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('proposer_id', user.id).eq('receiver_item_id', itemId)
+                    .eq('is_giveaway_claim', true).eq('status', 'pending');
+                if ((alreadyPending || 0) > 0) {
+                    claimedItems.add(itemId);
+                    if (btnEl) { btnEl.className = 'giveaway-card-button claimed'; btnEl.innerHTML = '<i class="fas fa-check"></i> Claimed'; }
+                    Toast.show(_giftT('gift_already_requested', "You've already requested this gift — the giver will pick who receives it."), 'info');
+                    return;
+                }
+
                 // 5) Insert the giveaway claim as a swap row
                 var { data: swap, error: swapErr } = await window.db.from('swaps').insert({
                     proposer_id: user.id,
@@ -1278,7 +1293,15 @@
                     cash_amount: 0,
                     status: 'pending'
                 }).select('*').single();
-                if (swapErr) throw swapErr;
+                if (swapErr) {
+                    if (swapErr.code === '23505') {
+                        claimedItems.add(itemId);
+                        if (btnEl) { btnEl.className = 'giveaway-card-button claimed'; btnEl.innerHTML = '<i class="fas fa-check"></i> Claimed'; }
+                        Toast.show(_giftT('gift_already_requested', "You've already requested this gift — the giver will pick who receives it."), 'info');
+                        return;
+                    }
+                    throw swapErr;
+                }
 
                 // 6) Notify the giver (RLS INSERT policy in place since migration 004)
                 try {
@@ -1300,7 +1323,7 @@
                     btnEl.innerHTML = '<i class="fas fa-check"></i> Claimed';
                 }
                 await updateClaimsCounter();
-                Toast.show('🎁 Gift claimed! The giver will contact you soon.', 'success');
+                Toast.show('🎁 ' + _giftT('gift_claim_sent', 'Request sent! The giver will pick who receives it.'), 'success');
                 await updateKarmaBar(user);
                 showThankYouModal(itemId);
             } catch (err) {
@@ -1420,6 +1443,7 @@
                     .select('id', { count: 'exact', head: true })
                     .eq('proposer_id', user.id)
                     .eq('is_giveaway_claim', true)
+                    .in('status', ['accepted', 'completed'])
                     .gte('created_at', monthStart.toISOString());
 
                 var remaining = Math.max(0, limit - (used || 0));
