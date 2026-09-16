@@ -900,6 +900,21 @@ function _refreshGiftBoxSummary() {
   }
 }
 
+// Where to go after a successful publish. A caller can pass
+// ?return=<page in /pages/> (e.g. the Give-to-Unlock popup on a gift:
+// publier.html?return=product.html%3Fid%3D…) so the user lands back on the
+// gift to claim it. Relative, same-directory pages only — anything else
+// falls back to the Swap Market.
+window._afterPublishHref = function() {
+  try {
+    var target = new URLSearchParams(window.location.search).get('return') || '';
+    if (!target || /^([a-z]+:|\/|\\|\.\.)/i.test(target)) return 'catalogue.html';
+    var u = new URL(target, window.location.href);
+    if (u.origin !== window.location.origin || !/^\/pages\/[a-z0-9_-]+\.html$/i.test(u.pathname)) return 'catalogue.html';
+    return u.pathname.split('/').pop() + u.search + u.hash;
+  } catch (e) { return 'catalogue.html'; }
+};
+
 // ========================
 // PUBLISH
 // ========================
@@ -1116,7 +1131,7 @@ window.publishItem = async function(e) {
       Toast.show(_pubT('toast_pub_published', 'Item published! \uD83C\uDF89'), 'success');
     }
     setTimeout(function() {
-      window.location.href = 'catalogue.html';
+      window.location.href = _afterPublishHref();
     }, 1200);
 
   } catch (outerErr) {

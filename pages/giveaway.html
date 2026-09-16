@@ -949,7 +949,7 @@
                     <ul>
                         <li data-i18n-html="gift_rules_item1">Claims limited by your plan — <strong>Free: 1/month</strong>, <strong>Swappo Pro: 5/month</strong></li>
                         <li data-i18n="gift_rules_item2">Claiming an item locks that category for 30 days (anti-reseller protection)</li>
-                        <li data-i18n="gift_rules_item3">Give-to-Unlock: complete 1 swap OR publish 1 gift before claiming</li>
+                        <li data-i18n="gift_rules_item3">Give-to-Unlock: list 1 item (to swap, sell or give away) before claiming</li>
                         <li data-i18n="gift_rules_item4">Items must be physical goods in good condition</li>
                         <li data-i18n="gift_rules_item5">Cash or card payments are never involved — Gift Corner items are 100% free</li>
                     </ul>
@@ -1098,11 +1098,11 @@
                 return;
             }
 
-            // ── Give to Unlock: need 1+ swaps OR 1+ donations ────────────────
+            // ── Give to Unlock: at least 1 published item (swap, sell or gift) ──
+            // Same rule as claimGiveaway() on product.html.
             const userItems = await _getUserItems(user.id);
-            const hasDonations = (userItems || []).some(function(i) { return i.is_giveaway; });
-            const hasSwaps = (user.swap_count || 0) >= 1;
-            if (!hasSwaps && !hasDonations) {
+            const hasAnyItem = (userItems || []).length >= 1;
+            if (!hasAnyItem) {
                 badgeRequired.style.display = 'block';
                 giveawayContent.style.display = 'none';
                 return;
@@ -1234,7 +1234,7 @@
                     .select('id', { count: 'exact', head: true })
                     .eq('user_id', user.id);
                 if (cntErr) throw cntErr;
-                if (!hasItems || hasItems === 0) { showNeedsListingModal(); return; }
+                if (!hasItems || hasItems === 0) { showNeedsListingModal(itemId); return; }
 
                 // 3) Load plan + monthly quota (1 free, 5 pro)
                 var { data: profile } = await window.db
@@ -1326,15 +1326,17 @@
         }
 
         /** STEP 2 — User has never listed an item */
-        function showNeedsListingModal() {
+        function showNeedsListingModal(itemId) {
+            // publier.html?return=product.html?id=… → back to this gift to claim it
+            var dropHref = 'publier.html' + (itemId ? '?return=' + encodeURIComponent('product.html?id=' + itemId) : '');
             var html =
                 '<div style="font-size:52px;margin-bottom:14px;">🎁</div>' +
                 '<h3 style="font-size:22px;font-weight:800;color:var(--navy,#1A1A2E);margin:0 0 12px;letter-spacing:-0.01em;">' + _giftT('gift_almost_title', 'Almost there!') + '</h3>' +
                 '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 8px;">' + _giftT('gift_almost_p1', 'To claim a free gift, you need to share something first.') + '</p>' +
-                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">' + _giftT('gift_almost_p2_html', 'That\'s the heart of Swappo — <strong>everyone gives, everyone gets</strong>. Start by listing at least one item (to swap or to give away), and your first claim will unlock instantly.') + '</p>' +
+                '<p style="font-size:15px;line-height:1.6;color:var(--gray-text,#6B7280);margin:0 0 24px;">' + _giftT('gift_almost_p2_html', 'That\'s the heart of Swappo — <strong>everyone gives, everyone gets</strong>. List one item — to swap, sell or give away — and your first claim unlocks instantly.') + '</p>' +
                 '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
                     '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:var(--gray-bg,#F8F9FA);border:none;padding:12px 22px;border-radius:var(--radius-pill,999px);font-weight:600;cursor:pointer;color:var(--gray-text,#6B7280);font-size:14px;">' + _giftT('gift_maybe_later', 'Maybe later') + '</button>' +
-                    '<button onclick="window.location.href=\'publier.html\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 26px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">' + _giftT('gift_drop_now', 'Drop an item now →') + '</button>' +
+                    '<button onclick="window.location.href=\'' + dropHref + '\'" style="background:var(--teal,#09B1BA);color:white;border:none;padding:12px 26px;border-radius:var(--radius-pill,999px);font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">' + _giftT('gift_drop_now', 'Drop an item now →') + '</button>' +
                 '</div>';
             _buildModal(html);
         }

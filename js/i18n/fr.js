@@ -67,7 +67,7 @@
     gift_rules_title: "📋 Règles du Coin Cadeaux",
     gift_rules_item1: "Réclamations limitées par votre forfait — <strong>Gratuit : 1/mois</strong>, <strong>Swappo Pro : 5/mois</strong>",
     gift_rules_item2: "Réclamer un objet verrouille cette catégorie pendant 30 jours (protection anti-revente)",
-    gift_rules_item3: "Give-to-Unlock : complétez 1 échange OU publiez 1 cadeau avant de pouvoir réclamer",
+    gift_rules_item3: "Give-to-Unlock : publiez 1 article (à échanger, vendre ou offrir) avant de pouvoir réclamer",
     gift_rules_item4: "Les objets doivent être physiques et en bon état",
     gift_rules_item5: "Aucun paiement en espèces ou par carte — les objets du Coin Cadeaux sont 100% gratuits",
 
@@ -438,7 +438,7 @@
     gift_empty_cta: "Déposer un cadeau →",
     gift_almost_title: "Presque !",
     gift_almost_p1: "Pour réclamer un cadeau gratuit, vous devez d'abord partager quelque chose.",
-    gift_almost_p2_html: "C'est le cœur de Swappo — <strong>tout le monde donne, tout le monde reçoit</strong>. Commencez par lister au moins un article (à swapper ou à offrir), et votre premier claim s'ouvrira instantanément.",
+    gift_almost_p2_html: "C'est le cœur de Swappo — <strong>tout le monde donne, tout le monde reçoit</strong>. Publiez un article — à échanger, vendre ou offrir — et votre premier claim s'ouvre instantanément.",
     gift_maybe_later: "Plus tard",
     gift_drop_now: "Déposer un article →",
     gift_claimed_month_title: "Vous avez réclamé votre cadeau gratuit ce mois-ci",

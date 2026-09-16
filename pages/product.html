@@ -1642,18 +1642,21 @@
     if (!(window.db && window.SwappoAuth)) { showToast('Service unavailable'); return; }
 
     try {
-      // STEP 2 — User must have published at least 1 item
+      // STEP 2 — Give-to-Unlock: at least 1 published item (any mode: swap,
+      // sell or gift). Same rule as giveaway.html.
       var { count: hasItems } = await window.db.from('items')
         .select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
       if (!hasItems || hasItems === 0) {
+        // publier.html brings the user back here after publishing (?return=).
+        var dropHref = 'publier.html?return=' + encodeURIComponent('product.html?id=' + currentItem.id);
         _productBuildModal(
           '<div style="font-size:52px;margin-bottom:14px;">🎁</div>' +
-          '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">Almost there!</h3>' +
-          '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 8px;">To claim a free gift, you need to share something first.</p>' +
-          '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">That\'s the heart of Swappo — <strong style="color:#09B1BA;">everyone gives, everyone gets</strong>. Start by listing at least one item, and your first claim will unlock instantly.</p>' +
+          '<h3 style="font-size:22px;font-weight:800;color:#1A1A2E;margin:0 0 12px;">' + t('gift_almost_title') + '</h3>' +
+          '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 8px;">' + t('gift_almost_p1') + '</p>' +
+          '<p style="font-size:15px;line-height:1.6;color:#6B7280;margin:0 0 24px;">' + t('gift_almost_p2_html') + '</p>' +
           '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
-            '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:#F8F9FA;border:none;padding:12px 22px;border-radius:999px;font-weight:600;cursor:pointer;color:#6B7280;font-size:14px;">Maybe later</button>' +
-            '<button onclick="window.location.href=\'publier.html\'" style="background:#09B1BA;color:white;border:none;padding:12px 26px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">Drop an item now →</button>' +
+            '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="background:#F8F9FA;border:none;padding:12px 22px;border-radius:999px;font-weight:600;cursor:pointer;color:#6B7280;font-size:14px;">' + t('gift_maybe_later') + '</button>' +
+            '<button onclick="window.location.href=\'' + dropHref + '\'" style="background:#09B1BA;color:white;border:none;padding:12px 26px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 4px 12px rgba(9,177,186,0.3);">' + t('gift_drop_now') + '</button>' +
           '</div>'
         );
         return;

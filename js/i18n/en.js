@@ -58,7 +58,7 @@
     gift_rules_title: "📋 Gift Corner Rules",
     gift_rules_item1: "Claims limited by your plan — <strong>Free: 1/month</strong>, <strong>Swappo Pro: 5/month</strong>",
     gift_rules_item2: "Claiming an item locks that category for 30 days (anti-reseller protection)",
-    gift_rules_item3: "Give-to-Unlock: complete 1 swap OR publish 1 gift before claiming",
+    gift_rules_item3: "Give-to-Unlock: list 1 item (to swap, sell or give away) before claiming",
     gift_rules_item4: "Items must be physical goods in good condition",
     gift_rules_item5: "Cash or card payments are never involved — Gift Corner items are 100% free",
 
@@ -428,7 +428,7 @@
     gift_empty_cta: "Drop a gift →",
     gift_almost_title: "Almost there!",
     gift_almost_p1: "To claim a free gift, you need to share something first.",
-    gift_almost_p2_html: "That's the heart of Swappo — <strong>everyone gives, everyone gets</strong>. Start by listing at least one item (to swap or to give away), and your first claim will unlock instantly.",
+    gift_almost_p2_html: "That's the heart of Swappo — <strong>everyone gives, everyone gets</strong>. List one item — to swap, sell or give away — and your first claim unlocks instantly.",
     gift_maybe_later: "Maybe later",
     gift_drop_now: "Drop an item now →",
     gift_claimed_month_title: "You've claimed your free gift this month",
