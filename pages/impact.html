@@ -617,7 +617,7 @@
       <a href="login.html" class="btn btn-primary btn-lg" data-i18n="impact_cta_btn">Join Swappo</a>
       <div class="cta-count">
         <span data-i18n="impact_cta_join">Join</span>
-        <strong id="impact-user-count">500</strong>
+        <strong id="impact-user-count">0</strong>
         <span data-i18n="impact_cta_others">other swappers already making an impact</span>
       </div>
     </div>
@@ -696,20 +696,37 @@
   <script>
     // ── Animated Counters ──
     (function() {
-      // Demo impact values (in production these come from the database)
-      var totalSwaps = 247;
-      var totalGifts = 83;
+      // Live values from get_live_stats() (same public RPC as the eco
+      // ticker). Everything starts at 0 and animates to the real totals
+      // once they arrive — no demo numbers (Ahmed, 2026-09-17).
+      var targets = { co2: 0, items: 0, connections: 0, gifts: 0 };
+      var statsLoaded = false;
+      var observed = new Set();
 
-      var co2 = Math.round((totalSwaps * 2 + totalGifts) * 3.9);
-      var items = totalSwaps * 2 + totalGifts;
-      var connections = totalSwaps;
-
-      var targets = {
-        co2: co2,
-        items: items,
-        connections: connections,
-        gifts: totalGifts
-      };
+      function applyStats(st) {
+        if (!st) return;
+        targets.co2 = Number(st.co2_kg_saved) || 0;
+        targets.items = Number(st.items_swapped) || 0;
+        targets.connections = Number(st.swaps_completed) || 0;
+        targets.gifts = Number(st.gifts_total) || 0;
+        statsLoaded = true;
+        var members = document.getElementById('impact-user-count');
+        if (members) members.textContent = (Number(st.members) || 0).toLocaleString();
+        // Counters already on screen re-run with the real numbers.
+        observed.forEach(function (el) {
+          var key = el.getAttribute('data-counter');
+          if (targets[key] !== undefined) animateCounter(el, targets[key]);
+        });
+      }
+      (function loadStats(tries) {
+        if (!(window.db && window.db.rpc)) {
+          if (tries < 40) return setTimeout(function () { loadStats(tries + 1); }, 150);
+          return;
+        }
+        window.db.rpc('get_live_stats').then(function (res) {
+          if (res && !res.error) applyStats(res.data);
+        }).catch(function () {});
+      })(0);
 
       function animateCounter(el, target) {
         var duration = 1800;
@@ -729,7 +746,6 @@
 
       // Intersection Observer for counters
       var counterEls = document.querySelectorAll('[data-counter]');
-      var observed = new Set();
       var observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting && !observed.has(entry.target)) {
