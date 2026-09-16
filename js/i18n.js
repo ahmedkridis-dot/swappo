@@ -109,34 +109,42 @@ function detectBrowserLanguage() {
 // APPLY TRANSLATIONS TO DOM
 // ========================================
 
+// A key missing from the loaded dictionaries (e.g. a phone still holding
+// a cached older dictionary while the HTML is newer) must never replace the
+// element's own text with the raw key: keep the markup's fallback text.
+function _hasT(key) {
+  const code = currentLanguage;
+  return !!((translations[code] && translations[code][key]) || (translations.en && translations.en[key]));
+}
+
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (key) el.textContent = t(key);
+    if (key && _hasT(key)) el.textContent = t(key);
   });
   document.querySelectorAll('[data-i18n-html]').forEach(el => {
     const key = el.getAttribute('data-i18n-html');
-    if (key) el.innerHTML = t(key);
+    if (key && _hasT(key)) el.innerHTML = t(key);
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
-    if (key) el.placeholder = t(key);
+    if (key && _hasT(key)) el.placeholder = t(key);
   });
   document.querySelectorAll('[data-i18n-title]').forEach(el => {
     const key = el.getAttribute('data-i18n-title');
-    if (key) el.title = t(key);
+    if (key && _hasT(key)) el.title = t(key);
   });
   document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
     const key = el.getAttribute('data-i18n-aria-label');
-    if (key) el.setAttribute('aria-label', t(key));
+    if (key && _hasT(key)) el.setAttribute('aria-label', t(key));
   });
   document.querySelectorAll('[data-i18n-alt]').forEach(el => {
     const key = el.getAttribute('data-i18n-alt');
-    if (key) el.alt = t(key);
+    if (key && _hasT(key)) el.alt = t(key);
   });
   document.querySelectorAll('[data-i18n-value]').forEach(el => {
     const key = el.getAttribute('data-i18n-value');
-    if (key) el.value = t(key);
+    if (key && _hasT(key)) el.value = t(key);
   });
 }
 
