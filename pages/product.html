@@ -1036,19 +1036,62 @@
 
   function _escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   // Category-specific attributes stored in items.specs (jsonb) → detail rows.
+  // "Other" / "N/A" brands (pre free-text era) never show in a title.
+  function _cleanBrand(b) {
+    var v = String(b == null ? '' : b).trim();
+    return /^(other|n\/a)$/i.test(v) ? '' : v;
+  }
+  function _itemTitle(it) {
+    if (!it) return '';
+    return (_cleanBrand(it.brand) + ' ' + (it.model || '')).trim();
+  }
+  // Every key stored in items.specs gets a row; known keys use their i18n
+  // label, unknown ones a humanised key.
+  var SPEC_LABELS = {
+    mileage_km: 'detail_mileage', fuel: 'detail_fuel', transmission: 'detail_transmission',
+    body_type: 'detail_body_type', regional_specs: 'detail_regional_specs',
+    storage: 'detail_storage', dimensions: 'detail_dimensions', material: 'detail_material',
+    gender: 'detail_gender', age_range: 'detail_age_range', platform: 'detail_platform', zone: 'detail_zone'
+  };
   function _specRows(specs) {
     if (!specs || typeof specs !== 'object') return [];
-    var rows = [];
-    if (specs.mileage_km) rows.push({ label: t('detail_mileage'), value: _escHtml(Number(specs.mileage_km).toLocaleString('en-US')) + ' km' });
-    if (specs.fuel) rows.push({ label: t('detail_fuel'), value: _escHtml(specs.fuel) });
-    if (specs.transmission) rows.push({ label: t('detail_transmission'), value: _escHtml(specs.transmission) });
-    if (specs.body_type) rows.push({ label: t('detail_body_type'), value: _escHtml(specs.body_type) });
-    if (specs.regional_specs) rows.push({ label: t('detail_regional_specs'), value: _escHtml(specs.regional_specs) });
-    return rows;
+    return Object.keys(specs).filter(function (k) {
+      return specs[k] != null && String(specs[k]).trim() !== '';
+    }).map(function (k) {
+      var v = specs[k];
+      if (k === 'mileage_km') v = Number(v).toLocaleString('en-US') + ' km';
+      var label = SPEC_LABELS[k] ? t(SPEC_LABELS[k]) : k.replace(/_/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
+      return { label: label, value: _escHtml(v) };
+    });
   }
   function capitalizeFirst(str) {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  // Owner → publier.html?edit=<id>. The button is disabled (with the reason)
+  // when a swap is pending / accepted on the item; the DB trigger
+  // items_guard_edit_while_engaged (migration 033) enforces the same rule.
+  window.goEditListing = function () {
+    if (!currentItem) return;
+    window.location.href = 'publier.html?edit=' + encodeURIComponent(currentItem.id);
+  };
+  async function _refreshOwnerEditLock(item) {
+    var btn = document.getElementById('owner-edit-btn');
+    if (!btn || !item) return;
+    var ok = false;
+    try {
+      ok = item.status === 'available' && window.SwappoItems && window.SwappoItems.canEdit
+        ? await window.SwappoItems.canEdit(item.id)
+        : false;
+    } catch (e) { ok = false; }
+    if (ok) return;
+    btn.disabled = true;
+    btn.onclick = null;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+    btn.title = t('product_edit_locked');
+    btn.innerHTML = '<i class="fas fa-lock"></i> ' + t('product_edit_locked');
   }
 
   function showToast(message) {
@@ -1150,7 +1193,7 @@
     // Track view (session-deduped, skips the owner). Feeds the Trending
     // tab ranking in feed-tabs.js. Fire-and-forget — we don't await.
     try { window.SwappoItems.bumpViews(item.id, { ownerId: item.user_id }); } catch (e) {}
-    var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type;
+    var title = _itemTitle(item) || item.type;
     var interestedCount = Math.floor(Math.random() * 15) + 1;
 
     // ── Page title ──
@@ -1249,11 +1292,11 @@
     // ── Item details card ──
     var details = [
       { label: t('detail_type'), value: item.type },
-      { label: t('detail_brand'), value: item.brand },
+      { label: t('detail_brand'), value: _cleanBrand(item.brand) },
       { label: t('detail_model'), value: item.model },
       { label: t('detail_condition'), value: item.condition ? conditionLabel(item.condition) : null },
       { label: t('detail_year'), value: item.year },
-      { label: t('detail_size'), value: item.size },
+      { label: /^EU \d/.test(String(item.size || '')) ? t('detail_shoe_size') : t('detail_size'), value: item.size },
       { label: t('detail_color'), value: item.color },
       { label: t('detail_category'), value: capitalizeFirst(item.category) }
     ].concat(_specRows(item.specs)).filter(function(d) { return d.value; });
@@ -1302,6 +1345,8 @@
         '<div><div style="font-size:14px;font-weight:700;color:#1A1A2E;">This is your listing</div>' +
         '<div style="font-size:12px;color:#555;">Manage it from your dashboard or boost it to get more views.</div></div>' +
       '</div>';
+      actionsHTML += '<button class="btn-primary" id="owner-edit-btn" style="font-size:15px;background:#fff;color:var(--primary-dark,#078A91);border:2px solid var(--primary,#09B1BA);" onclick="goEditListing()">' +
+        '<i class="fas fa-pen"></i> ' + t('product_edit_listing') + '</button>';
       actionsHTML += '<button class="btn-primary" style="font-size:15px;" onclick="window.location.href=\'profile.html\'">' +
         '<i class="fas fa-cog"></i> Manage in My Swaps</button>';
       actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" data-pay-cta="boost" onclick="if(window.SwappoPayment){SwappoPayment.buyBoost(\'' + item.id + '\')}else{window.location.href=\'pricing.html\'}">' +
@@ -1380,6 +1425,7 @@
     }
 
     document.getElementById('action-buttons').innerHTML = actionsHTML;
+    if (isOwner) _refreshOwnerEditLock(item);
 
     // ── Seller card ──────────────────────────────────
     // Ahmed 2026-04-18: anonymity dropped from this card. Always show
@@ -1423,7 +1469,7 @@
       document.getElementById('similar-section').style.display = '';
       var simGrid = document.getElementById('similar-grid');
       simGrid.innerHTML = similar.map(function(si) {
-        var siTitle = ((si.brand || '') + ' ' + (si.model || '')).trim() || si.type;
+        var siTitle = _itemTitle(si) || si.type;
         var siPhoto = (si.photos && si.photos[0]) || '';
         return '<div class="product-card" onclick="window.location.href=\'product.html?id=' + si.id + '\'" style="cursor:pointer;">' +
           '<div class="product-card-image">' +
@@ -1782,7 +1828,7 @@
       return;
     }
     var price = currentItem.price || 0;
-    var title = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || 'this item';
+    var title = _itemTitle(currentItem) || 'this item';
     var overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.innerHTML =
@@ -1957,7 +2003,7 @@
     var recap = document.getElementById('wizRecap');
     if (!recap || !currentItem) return;
     var count = selectedSwapItemIds.length;
-    var theirTitle = ((currentItem.brand || '') + ' ' + (currentItem.model || '')).trim() || currentItem.type || 'their item';
+    var theirTitle = _itemTitle(currentItem) || currentItem.type || 'their item';
     var theirPhoto = (currentItem.photos && currentItem.photos[0]) || '';
     var minePreview = '';
     if (count >= 2) {
@@ -1965,7 +2011,7 @@
     } else if (count === 1 && window._modalItemIndex) {
       var onlyId = selectedSwapItemIds[0];
       var mine = window._modalItemIndex[onlyId] || {};
-      var mt = ((mine.brand || '') + ' ' + (mine.model || '')).trim() || mine.type || 'your item';
+      var mt = _itemTitle(mine) || mine.type || 'your item';
       var mp = (mine.photos && mine.photos[0]) || '';
       minePreview = '<div style="display:flex;align-items:center;gap:6px;">' +
         (mp ? '<img src="' + mp + '" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">' : '') +
@@ -2030,7 +2076,7 @@
 
       grid.innerHTML = myItems.map(function(mi) {
         var photo = (mi.photos && mi.photos[0]) || '';
-        var miTitle = ((mi.brand || '') + ' ' + (mi.model || '')).trim() || mi.type;
+        var miTitle = _itemTitle(mi) || mi.type;
         return '<div class="user-item" data-item="' + mi.id + '" onclick="toggleItemSelection(this)">' +
           '<div class="user-item-image">' +
             (photo ? '<img src="' + photo + '" alt="' + miTitle + '">'

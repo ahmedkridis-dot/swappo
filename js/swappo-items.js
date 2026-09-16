@@ -10,6 +10,8 @@
                           -> Promise<{items, total}>
      SwappoItems.getById(id)              -> Promise<item|null>
      SwappoItems.create(itemData)         -> Promise<{success, item?, error?}>
+     SwappoItems.update(itemId, patch)    -> Promise<{success, item?, error?, locked?}>
+     SwappoItems.canEdit(itemId)          -> Promise<boolean>
      SwappoItems.remove(itemId)           -> Promise<{success, error?}>
      SwappoItems.markStatus(itemId, status) -> Promise<{success, error?}>
      SwappoItems.getByUser(userId)        -> Promise<item[]>
@@ -45,6 +47,16 @@
     if (/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(s)) return _esc(s);
     if (/^data:image\//i.test(s)) return _esc(s);
     return '';
+  }
+  // A brand of "Other" / "N/A" (pre-2026-09 listings, before the free-text
+  // brand input) must never show up in a title.
+  function _cleanBrand(b) {
+    const v = String(b == null ? '' : b).trim();
+    return /^(other|n\/a)$/i.test(v) ? '' : v;
+  }
+  function itemTitle(item) {
+    if (!item) return '';
+    return (_cleanBrand(item.brand) + ' ' + (item.model || '')).trim() || item.type || item.category || 'Item';
   }
   function _conditionLabel(c) {
     return ({ new: 'New', like_new: 'Like New', good: 'Good', fair: 'Fair' })[c] || c || '';
@@ -158,9 +170,60 @@
 
     // Fire-and-forget toast
     if (global.Toast) {
-      global.Toast.show(`${row.brand} ${row.model}`.trim() + ' is now live on Swap Market.', 'success');
+      global.Toast.show(itemTitle(row) + ' is now live on Swap Market.', 'success');
     }
     return { success: true, item: data };
+  }
+
+  // ---------- UPDATE (owner edits a listing) ----------
+  // Only listing fields are accepted; status / boost / box columns have
+  // their own flows. RLS restricts the write to the owner, and the DB
+  // trigger items_guard_edit_while_engaged (migration 033) rejects the
+  // update while a swap is pending / accepted on the item.
+  const EDITABLE_FIELDS = ['category', 'subcategory', 'type', 'brand', 'model', 'condition',
+    'year', 'size', 'color', 'photos', 'is_giveaway', 'price', 'emirate', 'city', 'lat', 'lng',
+    'description', 'specs'];
+  async function update(itemId, patch) {
+    if (!global.db) return { success: false, error: 'Service unavailable.' };
+    if (!itemId) return { success: false, error: 'Missing item id.' };
+    const uid = await _currentUserId();
+    if (!uid) return { success: false, error: 'You must be signed in.' };
+    const row = {};
+    EDITABLE_FIELDS.forEach(k => { if (patch && patch[k] !== undefined) row[k] = patch[k]; });
+    if (row.year !== undefined) row.year = row.year ? String(row.year) : '';
+    if (row.price !== undefined) row.price = Number(row.price) || 0;
+    if (row.photos !== undefined && !Array.isArray(row.photos)) row.photos = [];
+    if (row.description !== undefined) row.description = row.description ? String(row.description).slice(0, 2000) : null;
+    if (row.specs !== undefined && (!row.specs || typeof row.specs !== 'object' || Array.isArray(row.specs))) row.specs = {};
+    if (!Object.keys(row).length) return { success: false, error: 'Nothing to update.' };
+    const { data, error } = await global.db.from(TABLE)
+      .update(row).eq('id', itemId).eq('user_id', uid).select('*').maybeSingle();
+    if (error) {
+      const locked = /item_locked_by_active_swap/i.test(error.message || '');
+      return { success: false, error: error.message, locked };
+    }
+    if (!data) return { success: false, error: 'Listing not found or not yours.' };
+    return { success: true, item: data };
+  }
+
+  // Can the current owner edit this listing right now? (no pending /
+  // accepted swap, status available). Falls back to a client-side check
+  // if the RPC is missing.
+  async function canEdit(itemId) {
+    if (!global.db || !itemId) return false;
+    try {
+      const { data, error } = await global.db.rpc('item_can_be_edited', { item_id_in: itemId });
+      if (!error && typeof data === 'boolean') return data;
+    } catch (e) { /* fall through */ }
+    try {
+      const item = await getById(itemId);
+      if (!item || item.status !== 'available') return false;
+      const { count } = await global.db.from('swaps')
+        .select('id', { count: 'exact', head: true })
+        .or('receiver_item_id.eq.' + itemId + ',proposer_item_id.eq.' + itemId)
+        .in('status', ['pending', 'accepted']);
+      return (count || 0) === 0;
+    } catch (e) { return false; }
   }
 
   // ---------- REMOVE ----------
@@ -308,7 +371,7 @@
   function renderCard(item) {
     if (!item) return '';
     const href = _esc(_productHref(item.id));
-    const title = _esc(((item.brand || '') + ' ' + (item.model || '')).trim() || item.category || 'Item');
+    const title = _esc(itemTitle(item));
     const photo = _safeUrl((item.photos && item.photos[0]) || '');
     const fav = isFavoritedSync(item.id);
     const conditionStr = item.condition ? _esc(_conditionLabel(item.condition)) : '';
@@ -371,10 +434,10 @@
   }
 
   global.SwappoItems = {
-    browse, getById, create, remove, markStatus,
+    browse, getById, create, update, canEdit, remove, markStatus,
     getByUser, hasActiveItems,
     getGiveaways, getBoosted, getSimilar,
     toggleFavorite, getFavoriteIds, getFavorites, isFavorited, isFavoritedSync,
-    bumpViews, renderCard
+    bumpViews, renderCard, itemTitle, cleanBrand: _cleanBrand
   };
 })(window);

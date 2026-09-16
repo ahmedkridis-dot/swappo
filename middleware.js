@@ -59,7 +59,9 @@ async function pickImage(item) {
 }
 
 function buildTags(item, pageUrl, image) {
-  const name = [item.brand, item.model].filter(Boolean).join(' ').trim() || 'Item';
+  // "Other" / "N/A" brands never make it into the shared title.
+  const brand = /^(other|n\/a)$/i.test(String(item.brand || '').trim()) ? '' : item.brand;
+  const name = [brand, item.model].filter(Boolean).join(' ').trim() || 'Item';
   const price = item.is_giveaway ? 'Free gift' : (item.price ? 'AED ' + Number(item.price).toLocaleString('en-US') : 'Open to swaps');
   const where = item.emirate || item.city || 'UAE';
   const cond = CONDITION[item.condition] || null;

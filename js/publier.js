@@ -63,6 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
     if (typeof updateNavbarForDemo === 'function') updateNavbarForDemo();
+    // ?edit=<itemId> → prefill the wizard with an existing listing (owner only).
+    if (typeof window.initEditMode === 'function') {
+      try { await window.initEditMode(u); } catch (e) { console.warn('[publier] edit mode failed', e); }
+    }
   })();
 });
 
@@ -93,26 +97,61 @@ window.VEHICLE_BRANDS = {
 };
 window.VEHICLE_YEARS = ["2027","2026","2025","2024","2023","2022","2021","2020","2019","2018","2017","2016","2015","2014","2013","2012","2011","2010","2009","2008","2007","2006","2005","2004","2003","2002","2001","2000","1999","1998","1997","1996","1995","1994","1993","1992","1991","1990","1989","1988","1987","1986","1985","1984","1983","1982","1981","1980","1979","1978","1977","1976","1975","1974","1973","1972","1971","1970","Before 1970"];
 
+// ── Size lists ─────────────────────────────────────────────
+// Sizes depend on what is being sold: letter sizes for adult clothing,
+// waist sizes for trousers, age sizes for kids, EU sizes for shoes.
+window.ADULT_SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'One Size'];
+window.WAIST_SIZES = ['W26', 'W27', 'W28', 'W29', 'W30', 'W31', 'W32', 'W33', 'W34', 'W36', 'W38', 'W40', 'W42', 'W44'];
+window.KIDS_SIZES = ['0-3 months', '3-6 months', '6-12 months', '12-18 months', '18-24 months', '2-3 years', '3-4 years', '4-5 years', '5-6 years', '6-7 years', '7-8 years', '8-9 years', '9-10 years', '10-11 years', '11-12 years', '12-13 years', '13-14 years', '14+ years'];
+function _euRange(a, b) { var out = []; for (var i = a; i <= b; i++) out.push('EU ' + i); return out; }
+window.SHOE_SIZES_ADULT = _euRange(35, 50);
+window.SHOE_SIZES_KIDS = _euRange(16, 40);
+window.isShoeSubcategory = function (sub) { return /shoe|sneaker|boot|sandal/i.test(String(sub || '')); };
+// Returns the size list for the current selection, or null when a size
+// makes no sense (e.g. kids' toys) → the field is hidden.
+window.sizeOptionsFor = function (category, gender, subcategory) {
+  var kids = (category === 'kids') || /child|kid/i.test(String(gender || ''));
+  if (isShoeSubcategory(subcategory)) return kids ? SHOE_SIZES_KIDS : SHOE_SIZES_ADULT;
+  if (category === 'kids') return /cloth/i.test(String(subcategory || '')) ? KIDS_SIZES : null;
+  if (kids) return KIDS_SIZES;
+  if (/pants|jeans|trousers|shorts|skirt/i.test(String(subcategory || ''))) return ADULT_SIZES.concat(WAIST_SIZES);
+  return ADULT_SIZES;
+};
+
+// Select fields where "Other" opens a free-text input so the real name is
+// stored (a listing must never display "Other" as its brand).
+window.OTHER_TEXT_FIELDS = ['brand', 'type'];
+window.isOtherValue = function (v) { return /^(other|n\/a)$/i.test(String(v || '').trim()); };
+
 window.categoryFields = {
   clothing: {
     gender: { label: 'Gender', type: 'select', options: ['Men', 'Women', 'Children', 'Unisex'], required: true },
     subcategory: { label: 'Subcategory', type: 'select', options: [], required: true },
-    type: { label: 'Type', type: 'text', placeholder: 'e.g. T-Shirt, Dress' },
+    type: { label: 'Type', type: 'text', placeholder: 'e.g. T-Shirt, Dress, Sneakers' },
     brand: { label: 'Brand', type: 'text', placeholder: 'e.g. Nike, Zara' },
-    size: { label: 'Size', type: 'select', options: ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'One Size'] },
+    size: { label: 'Size', type: 'select', options: window.ADULT_SIZES },
     condition: { label: 'Condition', type: 'select', options: ['New with tags', 'Like new', 'Good', 'Fair'], required: true },
     color: { label: 'Color', type: 'text', placeholder: 'e.g. Black, Blue' }
   },
   electronics: {
-    types: ['Smartphone', 'Laptop', 'Tablet', 'Console', 'Headphones', 'Camera', 'Smart Watch', 'Speaker', 'Other'],
-    brands: ['Apple', 'Samsung', 'Sony', 'HP', 'Dell', 'Lenovo', 'Google', 'Other'],
-    showSize: false
+    type: { label: 'Type', type: 'select', options: ['Smartphone', 'Laptop', 'Tablet', 'Desktop PC', 'Monitor', 'TV', 'Console', 'Headphones / Earbuds', 'Speaker', 'Camera', 'Drone', 'Smart Watch', 'Printer', 'Router / Networking', 'Home Appliance', 'Accessories & Cables', 'Other'], required: true },
+    brand: { label: 'Brand', type: 'select', options: ['Apple', 'Samsung', 'Huawei', 'Xiaomi', 'OnePlus', 'Oppo', 'Vivo', 'Realme', 'Honor', 'Nokia', 'Motorola', 'Google', 'Sony', 'LG', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'MSI', 'Microsoft', 'Bose', 'JBL', 'Beats', 'Sennheiser', 'Marshall', 'Canon', 'Nikon', 'GoPro', 'DJI', 'Garmin', 'Fitbit', 'Anker', 'Logitech', 'Razer', 'Philips', 'Panasonic', 'TCL', 'Hisense', 'Dyson', 'Nespresso', 'Other'], required: true },
+    model: { label: 'Model', type: 'text', placeholder: 'e.g. iPhone 15 Pro, Galaxy S24' },
+    storage: { label: 'Storage', type: 'select', options: ['32 GB', '64 GB', '128 GB', '256 GB', '512 GB', '1 TB', '2 TB', 'Other'] },
+    condition: { label: 'Condition', type: 'select', options: ['New', 'Like New', 'Good', 'Fair'], required: true },
+    year: { label: 'Year', type: 'select', options: [] },
+    color: { label: 'Color', type: 'select', options: [] }
   },
   furniture: {
-    types: ['Sofa', 'Table', 'Chair', 'Bed', 'Desk', 'Cabinet', 'Shelves', 'Lamp', 'Other'],
-    brands: ['IKEA', 'West Elm', 'Pottery Barn', 'Ashley', 'Home Centre', 'Other'],
-    showSize: true,
-    sizeOptions: ['Small', 'Medium', 'Large', 'Extra Large']
+    type: { label: 'Type', type: 'select', options: ['Sofa', 'Armchair', 'Coffee Table', 'Dining Table', 'Dining Set', 'Chair', 'Bed', 'Mattress', 'Wardrobe', 'Dresser', 'Desk', 'Office Chair', 'Cabinet', 'Shelves / Bookcase', 'TV Unit', 'Lamp / Lighting', 'Rug / Carpet', 'Curtains', 'Mirror', 'Kitchen Appliance', 'Home Decor', 'Outdoor / Garden', 'Other'], required: true },
+    brand: { label: 'Brand', type: 'select', options: ['IKEA', 'Home Centre', 'Pan Emirates', 'Danube Home', '2XL', 'Homes r Us', 'Marina Home', 'THE One', 'Pottery Barn', 'West Elm', 'Crate & Barrel', 'Ashley', 'La-Z-Boy', 'Royal Furniture', 'Other'], required: true },
+    model: { label: 'Model', type: 'text', placeholder: 'e.g. KIVIK 3-seat, MALM' },
+    material: { label: 'Material', type: 'select', options: ['Wood', 'Metal', 'Fabric', 'Leather', 'Glass', 'Plastic', 'Rattan', 'Marble', 'Other'] },
+    size: { label: 'Size', type: 'select', options: ['Small', 'Medium', 'Large', 'Extra Large'] },
+    dimensions: { label: 'Dimensions', type: 'text', placeholder: 'e.g. 200 × 90 × 80 cm' },
+    condition: { label: 'Condition', type: 'select', options: ['New', 'Like New', 'Good', 'Fair'], required: true },
+    year: { label: 'Year', type: 'select', options: [] },
+    color: { label: 'Color', type: 'select', options: [] }
   },
   vehicles: {
     type: { label: 'Type', type: 'select', options: Object.keys(window.VEHICLE_BRANDS), required: true },
@@ -128,10 +167,13 @@ window.categoryFields = {
     color: { label: 'Color', type: 'select', options: ['Black', 'White', 'Silver', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige', 'Gold', 'Orange', 'Yellow', 'Other'] }
   },
   sports: {
-    types: ['Bicycle', 'Skateboard', 'Snowboard', 'Skis', 'Roller Skates', 'Scooter', 'Gym Equipment', 'Racket', 'Other'],
-    brands: ['Decathlon', 'Trek', 'Giant', 'Specialized', 'Nike', 'Adidas', 'Other'],
-    showSize: true,
-    sizeOptions: ['S', 'M', 'L', 'XL', 'One size']
+    type: { label: 'Type', type: 'select', options: ['Bicycle', 'E-Bike', 'Scooter', 'Skateboard', 'Roller Skates', 'Gym Equipment', 'Weights & Dumbbells', 'Treadmill / Cardio Machine', 'Yoga & Pilates', 'Racket Sports', 'Football', 'Basketball', 'Golf', 'Swimming & Water Sports', 'Camping & Hiking', 'Fishing', 'Boxing & Martial Arts', 'Sportswear & Shoes', 'Other'], required: true },
+    brand: { label: 'Brand', type: 'select', options: ['Decathlon', 'Nike', 'Adidas', 'Puma', 'Under Armour', 'Reebok', 'New Balance', 'Asics', 'Trek', 'Giant', 'Specialized', 'Cannondale', 'Scott', 'Merida', 'Wilson', 'Head', 'Babolat', 'Yonex', 'Callaway', 'TaylorMade', 'Speedo', 'Technogym', 'Bowflex', 'NordicTrack', 'Xiaomi', 'Segway-Ninebot', 'Other'], required: true },
+    model: { label: 'Model', type: 'text', placeholder: 'e.g. Marlin 7, Air Zoom Pegasus' },
+    size: { label: 'Size', type: 'select', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'] },
+    condition: { label: 'Condition', type: 'select', options: ['New', 'Like New', 'Good', 'Fair'], required: true },
+    year: { label: 'Year', type: 'select', options: [] },
+    color: { label: 'Color', type: 'select', options: [] }
   },
   books: {
     type: { label: 'Type', type: 'select', options: ['Book', 'DVD/Blu-ray', 'Video Game', 'Vinyl', 'Board Game', 'Other'], required: true },
@@ -143,8 +185,9 @@ window.categoryFields = {
   },
   kids: {
     gender: { label: 'Gender', type: 'select', options: ['Girl', 'Boy', 'Unisex'], required: true },
-    subcategory: { label: 'Subcategory', type: 'select', options: ['Clothing', 'Toys & Games', 'Strollers & Car Seats', 'Baby Furniture', 'Feeding & Bottles', 'Kids Books'], required: true },
+    subcategory: { label: 'Subcategory', type: 'select', options: ['Clothing', 'Shoes', 'Toys & Games', 'Strollers & Car Seats', 'Baby Furniture', 'Feeding & Bottles', 'Kids Books', 'Other'], required: true },
     age_range: { label: 'Age Range', type: 'select', options: ['0-6 months', '6-12 months', '1-2 years', '2-4 years', '4+ years'] },
+    size: { label: 'Size', type: 'select', options: window.KIDS_SIZES },
     type: { label: 'Type', type: 'text', placeholder: 'e.g. Stroller, LEGO Set' },
     brand: { label: 'Brand', type: 'text', placeholder: 'e.g. Bugaboo, Fisher-Price' },
     condition: { label: 'Condition', type: 'select', options: ['New with tags', 'Like new', 'Good', 'Fair'], required: true },
@@ -175,9 +218,12 @@ window.categoryFields = {
     color: { label: 'Pot included?', type: 'select', options: ['Yes, with pot', 'No, plant only'] }
   },
   other: {
-    types: ['Home Decor', 'Kitchen', 'Tools', 'Garden', 'Pet Supplies', 'Collectibles', 'Other'],
-    brands: ['N/A', 'Other'],
-    showSize: false
+    type: { label: 'Type', type: 'select', options: ['Home Decor', 'Kitchen & Dining', 'Tools & DIY', 'Garden & Outdoor', 'Pet Supplies', 'Collectibles & Art', 'Musical Instruments', 'Beauty & Health', 'Office & Stationery', 'Party & Events', 'Other'], required: true },
+    brand: { label: 'Brand', type: 'text', placeholder: 'e.g. Tefal, Bosch (optional)' },
+    model: { label: 'Model', type: 'text', placeholder: 'Item name — e.g. Air fryer 5L' },
+    condition: { label: 'Condition', type: 'select', options: ['New', 'Like New', 'Good', 'Fair'], required: true },
+    year: { label: 'Year', type: 'select', options: [] },
+    color: { label: 'Color', type: 'text', placeholder: 'e.g. Black, Silver' }
   }
 };
 
@@ -199,6 +245,10 @@ window.categoryNames = {
 window.conditionOptions = ['New', 'Like New', 'Good', 'Fair'];
 window.colorOptions = ['Black', 'White', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige', 'Pink', 'Other'];
 window.yearOptions = ["2027","2026","2025","2024","2023","2022","2021","2020","2019","2018","2017","2016","2015","2014","2013","2012","2011","2010","2009","2008","2007","2006","2005","2004","2003","2002","2001","2000","Before 2000"];
+['electronics', 'furniture', 'sports', 'other'].forEach(function (k) {
+  if (categoryFields[k].year && !categoryFields[k].year.options.length) categoryFields[k].year.options = window.yearOptions;
+  if (categoryFields[k].color && categoryFields[k].color.type === 'select' && !categoryFields[k].color.options.length) categoryFields[k].color.options = window.colorOptions;
+});
 
 // ========================
 // STEP NAVIGATION
@@ -208,12 +258,41 @@ window.nextStep = function() {
     Toast.show(_pubT('toast_pub_select_category_first', 'Please select a category first.'), 'warning');
     return;
   }
+  if (formState.currentStep === 2 && !validateDetailsStep()) return;
   if (formState.currentStep < 4) {
     formState.currentStep++;
     updateStepUI();
     scrollToTop();
   }
 }
+
+// Required selects/inputs of step 2 (marked *) + the emirate must be
+// filled before moving on. Price stays optional: the product page has a
+// dedicated "Swap or make an offer" state for unpriced listings.
+window.validateDetailsStep = function () {
+  var missing = [];
+  document.querySelectorAll('#detailsContainer [data-field][required]').forEach(function (el) {
+    var group = el.closest('.form-group');
+    if (group && group.style.display === 'none') return;
+    if (!String(el.value || '').trim()) missing.push(el);
+  });
+  var emirate = document.getElementById('item-emirate');
+  if (emirate && !emirate.value) missing.push(emirate);
+  document.querySelectorAll('.swp-field-missing').forEach(function (el) {
+    el.classList.remove('swp-field-missing'); el.style.borderColor = '';
+  });
+  if (!missing.length) return true;
+  missing.forEach(function (el) {
+    el.classList.add('swp-field-missing');
+    el.style.borderColor = '#FF4B55';
+    el.addEventListener('change', function h() {
+      el.style.borderColor = ''; el.classList.remove('swp-field-missing'); el.removeEventListener('change', h);
+    });
+  });
+  Toast.show(_pubT('toast_pub_required_fields', 'Please fill in the required fields.'), 'warning');
+  try { missing[0].scrollIntoView({ behavior: 'smooth', block: 'center' }); missing[0].focus(); } catch (e) {}
+  return false;
+};
 
 window.prevStep = function() {
   if (formState.currentStep > 1) {
@@ -309,7 +388,8 @@ window.getFieldLabel = function(fieldKey, fallback) {
     age_range: 'detail_age_range', material: 'detail_material', platform: 'detail_platform',
     zone: 'detail_zone', mileage_km: 'detail_mileage', fuel: 'detail_fuel',
     transmission: 'detail_transmission', body_type: 'detail_body_type',
-    regional_specs: 'detail_regional_specs', description: 'detail_description'
+    regional_specs: 'detail_regional_specs', description: 'detail_description',
+    storage: 'detail_storage', dimensions: 'detail_dimensions'
   };
   var key = i18nMap[fieldKey];
   if (key && typeof t === 'function') return t(key);
@@ -334,35 +414,37 @@ window.renderDetailsFields = function() {
     var fieldKeys = Object.keys(cat);
     fieldKeys.forEach(function(fieldKey) {
       var field = cat[fieldKey];
-      var genericLabels = { type: 'Type', brand: 'Brand', model: 'Model', condition: 'Condition', year: 'Year', size: 'Size', color: 'Color' };
+      var genericLabels = { type: 'Type', brand: 'Brand', model: 'Model', condition: 'Condition', year: 'Year', size: 'Size', color: 'Color', storage: 'Storage', dimensions: 'Dimensions', material: 'Material' };
       var label = (field.label && field.label !== genericLabels[fieldKey]) ? field.label : getFieldLabel(fieldKey, field.label);
       if (field.type === 'select') {
         html += buildSelectNew(fieldKey, label, field.options, field.required);
       } else if (field.type === 'text' || field.type === 'number') {
         var extra = field.type === 'number' ? ' inputmode="numeric" min="0" step="1"' : '';
-        html += '<div class="form-group">' +
+        html += '<div class="form-group" data-field-group="' + fieldKey + '">' +
           '<label class="form-label">' + label + (field.required ? ' *' : '') + '</label>' +
-          '<input type="' + field.type + '" class="form-input" name="' + fieldKey + '" data-field="' + fieldKey + '" placeholder="' + (field.placeholder || '') + '"' + extra + ' onchange="updateDetails(\'' + fieldKey + '\', this.value)"' + (field.required ? ' required' : '') + '>' +
+          '<input type="' + field.type + '" class="form-input" name="' + fieldKey + '" data-field="' + fieldKey + '" placeholder="' + _pubEsc(field.placeholder || '') + '"' + extra + ' onchange="updateDetails(\'' + fieldKey + '\', this.value)"' + (field.required ? ' required' : '') + '>' +
           '</div>';
       }
     });
   } else {
-    html += buildSelect('type', getFieldLabel('type', 'Type'), cat.types);
-    html += buildSelect('brand', getFieldLabel('brand', 'Brand'), cat.brands);
-    html += '<div class="form-group">' +
+    // Legacy {types, brands} format — no category uses it any more, kept
+    // so an old config object can't blank the step.
+    html += buildSelectNew('type', getFieldLabel('type', 'Type'), cat.types, true);
+    html += buildSelectNew('brand', getFieldLabel('brand', 'Brand'), cat.brands, false);
+    html += '<div class="form-group" data-field-group="model">' +
       '<label class="form-label">' + getFieldLabel('model', 'Model') + '</label>' +
-      '<input type="text" class="form-input" name="model" placeholder="e.g. iPhone 15 Pro" onchange="updateDetails(\'model\', this.value)">' +
+      '<input type="text" class="form-input" name="model" data-field="model" placeholder="e.g. iPhone 15 Pro" onchange="updateDetails(\'model\', this.value)">' +
       '</div>';
-    html += buildSelect('condition', getFieldLabel('condition', 'Condition'), conditionOptions);
-    html += buildSelect('year', getFieldLabel('year', 'Year'), yearOptions);
+    html += buildSelectNew('condition', getFieldLabel('condition', 'Condition'), conditionOptions, true);
+    html += buildSelectNew('year', getFieldLabel('year', 'Year'), yearOptions, false);
     if (cat.showSize) {
-      html += buildSelect('size', getFieldLabel('size', 'Size'), cat.sizeOptions);
+      html += buildSelectNew('size', getFieldLabel('size', 'Size'), cat.sizeOptions, false);
     }
-    html += buildSelect('color', getFieldLabel('color', 'Color'), colorOptions);
+    html += buildSelectNew('color', getFieldLabel('color', 'Color'), colorOptions, false);
   }
 
   // Free-text description — every category.
-  html += '<div class="form-group" style="grid-column:1 / -1;">' +
+  html += '<div class="form-group" style="grid-column:1 / -1;" data-field-group="description">' +
     '<label class="form-label" for="item-description">' + getFieldLabel('description', 'Description') + '</label>' +
     '<textarea id="item-description" class="form-input" name="description" data-field="description" rows="4" maxlength="2000" style="resize:vertical;min-height:96px;line-height:1.5;" placeholder="' + _pubT('publish_desc_placeholder', 'Anything a buyer should know: features, defects, what you\'d swap it for…') + '" oninput="updateDetails(\'description\', this.value)">' +
     _pubEsc(formState.details.description || '') + '</textarea></div>';
@@ -373,13 +455,8 @@ window.renderDetailsFields = function() {
   var vehTypeSelect = document.querySelector('#detailsContainer select[data-field="type"]');
   if (vehTypeSelect && formState.category === 'vehicles') {
     vehTypeSelect.addEventListener('change', function() {
-      var brandSelect = document.querySelector('#detailsContainer select[data-field="brand"]');
-      if (!brandSelect) return;
       var brands = (window.VEHICLE_BRANDS && window.VEHICLE_BRANDS[vehTypeSelect.value]) || window.VEHICLE_BRANDS['Other'];
-      brandSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('brand', 'Brand')) + '</option>' + brands.map(function(b) {
-        return '<option value="' + b + '">' + b + '</option>';
-      }).join('');
-      formState.details.brand = '';
+      _rebuildSelect('brand', brands, getFieldLabel('brand', 'Brand'));
     });
   }
 
@@ -388,70 +465,169 @@ window.renderDetailsFields = function() {
 
   if (genderSelect && formState.category === 'clothing') {
     genderSelect.addEventListener('change', function() {
-      var subSelect = document.querySelector('#detailsContainer select[data-field="subcategory"]');
-      if (!subSelect) return;
       var genderMap = { 'Men': 'male', 'Women': 'female', 'Children': 'kids', 'Unisex': 'unisex' };
       var genderKey = genderMap[genderSelect.value] || 'male';
-      var subs = CLOTHING_SUBCATEGORIES[genderKey] || [];
-      subSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('subcategory', 'Subcategory')) + '</option>' + subs.map(function(s) {
-        return '<option value="' + s + '">' + s + '</option>';
-      }).join('');
+      _rebuildSelect('subcategory', CLOTHING_SUBCATEGORIES[genderKey] || [], getFieldLabel('subcategory', 'Subcategory'));
+      refreshSizeField();
     });
   }
 
   if (zoneSelect && formState.category === 'bags_accessories') {
     zoneSelect.addEventListener('change', function() {
-      var subSelect = document.querySelector('#detailsContainer select[data-field="subcategory"]');
-      if (!subSelect) return;
       var zoneKey = zoneSelect.value.toLowerCase();
-      var subs = BAGS_ACCESSORIES_SUBCATEGORIES[zoneKey] || [];
-      subSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('subcategory', 'Subcategory')) + '</option>' + subs.map(function(s) {
-        return '<option value="' + s + '">' + s + '</option>';
-      }).join('');
+      _rebuildSelect('subcategory', BAGS_ACCESSORIES_SUBCATEGORIES[zoneKey] || [], getFieldLabel('subcategory', 'Subcategory'));
     });
   }
 
   if (zoneSelect && formState.category === 'gaming') {
     zoneSelect.addEventListener('change', function() {
-      var subSelect = document.querySelector('#detailsContainer select[data-field="subcategory"]');
-      if (!subSelect) return;
       var zoneMap = { 'Consoles & Hardware': 'consoles_hardware', 'Games': 'games', 'Accessories': 'accessories' };
       var zoneKey = zoneMap[zoneSelect.value] || 'consoles_hardware';
-      var subs = GAMING_SUBCATEGORIES[zoneKey] || [];
-      subSelect.innerHTML = '<option value="">' + getSelectPlaceholder(getFieldLabel('subcategory', 'Subcategory')) + '</option>' + subs.map(function(s) {
-        return '<option value="' + s + '">' + s + '</option>';
-      }).join('');
+      _rebuildSelect('subcategory', GAMING_SUBCATEGORIES[zoneKey] || [], getFieldLabel('subcategory', 'Subcategory'));
     });
   }
+
+  refreshSizeField();
 }
 
+// Replace the options of a rendered select (dependent lists) and reset
+// its value + any "Other" free-text companion.
+window._rebuildSelect = function(name, options, label) {
+  var sel = document.querySelector('#detailsContainer select[data-field="' + name + '"]');
+  if (!sel) return null;
+  var lbl = label || getFieldLabel(name, name);
+  sel.innerHTML = '<option value="">' + _pubEsc(getSelectPlaceholder(lbl)) + '</option>' + (options || []).map(function(o) {
+    return '<option value="' + _pubEsc(o) + '">' + _pubEsc(o) + '</option>';
+  }).join('');
+  var other = document.querySelector('#detailsContainer input[data-other-for="' + name + '"]');
+  if (other) { other.style.display = 'none'; other.value = ''; }
+  formState.details[name] = '';
+  return sel;
+};
+
+// Clothing / kids: the size list follows the subcategory (shoes → EU
+// sizes, trousers → waist, kids → age). Hidden when a size makes no sense.
+window.refreshSizeField = function() {
+  if (formState.category !== 'clothing' && formState.category !== 'kids') return;
+  var group = document.querySelector('#detailsContainer [data-field-group="size"]');
+  if (!group) return;
+  var opts = sizeOptionsFor(formState.category, formState.details.gender, formState.details.subcategory);
+  if (!opts) { group.style.display = 'none'; formState.details.size = ''; return; }
+  group.style.display = '';
+  var shoe = isShoeSubcategory(formState.details.subcategory);
+  var label = shoe ? _pubT('detail_shoe_size', 'Shoe size (EU)') : getFieldLabel('size', 'Size');
+  var labelEl = group.querySelector('.form-label');
+  if (labelEl) labelEl.textContent = label;
+  var prev = formState.details.size;
+  var sel = group.querySelector('select');
+  var current = sel ? Array.prototype.map.call(sel.options, function(o) { return o.value; }).slice(1) : [];
+  if (current.join('|') !== opts.join('|')) {
+    _rebuildSelect('size', opts, label);
+    if (prev && opts.indexOf(prev) !== -1 && sel) { sel.value = prev; formState.details.size = prev; }
+  }
+};
+
 window.buildSelectNew = function(name, label, options, required) {
-  var optHtml = '<option value="">' + getSelectPlaceholder(label) + '</option>';
-  options.forEach(function(opt) {
-    optHtml += '<option value="' + opt + '">' + opt + '</option>';
+  var optHtml = '<option value="">' + _pubEsc(getSelectPlaceholder(label)) + '</option>';
+  (options || []).forEach(function(opt) {
+    optHtml += '<option value="' + _pubEsc(opt) + '">' + _pubEsc(opt) + '</option>';
   });
-  return '<div class="form-group">' +
+  var allowOther = OTHER_TEXT_FIELDS.indexOf(name) !== -1;
+  var html = '<div class="form-group" data-field-group="' + name + '">' +
     '<label class="form-label">' + label + (required ? ' *' : '') + '</label>' +
-    '<select class="form-select" name="' + name + '" data-field="' + name + '" onchange="updateDetails(\'' + name + '\', this.value)"' + (required ? ' required' : '') + '>' +
+    '<select class="form-select" name="' + name + '" data-field="' + name + '" onchange="onSelectChange(\'' + name + '\', this)"' + (required ? ' required' : '') + '>' +
     optHtml +
-    '</select></div>';
+    '</select>';
+  if (allowOther) {
+    html += '<input type="text" class="form-input" data-other-for="' + name + '" maxlength="60" autocomplete="off" style="display:none;margin-top:8px;" placeholder="' + _pubEsc(_pubT('publish_specify_other', 'Not in the list? Type it here')) + '" oninput="onOtherInput(\'' + name + '\', this)">';
+  }
+  return html + '</div>';
 }
 
 window.buildSelect = function(name, label, options) {
-  var optHtml = '<option value="">' + getSelectPlaceholder(label) + '</option>';
-  options.forEach(function(opt) {
-    optHtml += '<option value="' + opt + '">' + opt + '</option>';
-  });
-  return '<div class="form-group">' +
-    '<label class="form-label">' + label + '</label>' +
-    '<select class="form-select" name="' + name + '" data-field="' + name + '" onchange="updateDetails(\'' + name + '\', this.value)">' +
-    optHtml +
-    '</select></div>';
+  return buildSelectNew(name, label, options, false);
 }
+
+// Select change: store the value; for brand/type, "Other" reveals a text
+// input whose content replaces the literal "Other" in the listing.
+window.onSelectChange = function(name, sel) {
+  var val = sel.value;
+  var other = document.querySelector('#detailsContainer input[data-other-for="' + name + '"]');
+  if (other) {
+    if (isOtherValue(val)) {
+      other.style.display = 'block';
+      // Brand: nothing typed = no brand (never store the literal "Other").
+      // Type: "Other" is a legitimate answer.
+      formState.details[name] = other.value.trim() || (name === 'brand' ? '' : val);
+      try { other.focus(); } catch (e) {}
+    } else {
+      other.style.display = 'none';
+      other.value = '';
+      formState.details[name] = val;
+    }
+  } else {
+    formState.details[name] = val;
+  }
+  if (name === 'subcategory' || name === 'gender') refreshSizeField();
+};
+
+window.onOtherInput = function(name, input) {
+  var sel = document.querySelector('#detailsContainer select[data-field="' + name + '"]');
+  formState.details[name] = input.value.trim() || (name === 'brand' ? '' : (sel ? sel.value : ''));
+};
 
 window.updateDetails = function(field, value) {
   formState.details[field] = value;
 }
+
+// Map any condition label (per-category wording) to the 4 stored codes.
+window.normalizeCondition = function(label) {
+  var v = String(label || '').trim().toLowerCase();
+  if (!v) return 'good';
+  if (['new', 'like_new', 'good', 'fair'].indexOf(v) !== -1) return v;
+  if (/^like[\s_-]*new/.test(v) || v === 'thriving') return 'like_new';
+  if (/^new/.test(v)) return 'new';
+  if (/needs care|propagation|cutting|fair/.test(v)) return 'fair';
+  return 'good';
+};
+
+// Edit mode: push stored values back into the rendered fields, in
+// dependency order (gender/zone/type repopulate subcategory/brand/size).
+window.applyDetailsToForm = function(details) {
+  var order = ['gender', 'zone', 'type', 'subcategory'];
+  var keys = order.concat(Object.keys(details).filter(function(k) { return order.indexOf(k) === -1; }));
+  keys.forEach(function(k) {
+    var val = details[k];
+    if (val === undefined || val === null || String(val) === '') return;
+    val = String(val);
+    var el = document.querySelector('#detailsContainer [data-field="' + k + '"]');
+    if (!el) { formState.details[k] = val; return; }
+    if (el.tagName !== 'SELECT') {
+      el.value = val;
+      formState.details[k] = val;
+      return;
+    }
+    var optValues = Array.prototype.map.call(el.options, function(o) { return o.value; });
+    var match = optValues.indexOf(val) !== -1 ? val : null;
+    if (!match && k === 'condition') {
+      match = optValues.filter(function(o) { return o && normalizeCondition(o) === normalizeCondition(val); })[0] || null;
+    }
+    var other = document.querySelector('#detailsContainer input[data-other-for="' + k + '"]');
+    if (match) {
+      el.value = match;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      formState.details[k] = match;
+    } else if (other && optValues.indexOf('Other') !== -1) {
+      el.value = 'Other';
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      other.style.display = 'block';
+      other.value = val;
+      formState.details[k] = val;
+    } else {
+      formState.details[k] = val;
+    }
+  });
+};
 
 // ========================
 // STEP 3: PHOTOS (real file upload — Phase 2)
@@ -604,7 +780,7 @@ window.populateReview = function() {
   document.getElementById('reviewPhotos').innerHTML = photosHtml;
 
   var detailsHtml = '';
-  var fieldOrder = ['gender', 'zone', 'subcategory', 'age_range', 'type', 'brand', 'model', 'material', 'condition', 'year', 'mileage_km', 'fuel', 'transmission', 'body_type', 'regional_specs', 'size', 'color', 'description'];
+  var fieldOrder = ['gender', 'zone', 'platform', 'subcategory', 'age_range', 'type', 'brand', 'model', 'storage', 'material', 'condition', 'year', 'mileage_km', 'fuel', 'transmission', 'body_type', 'regional_specs', 'size', 'dimensions', 'color', 'description'];
 
   fieldOrder.forEach(function(key) {
     var val = formState.details[key];
@@ -777,7 +953,7 @@ window.publishItem = async function(e) {
       return;
     }
 
-    var entries = (formState.photoBlobs || []).filter(function(p) { return p && p.processed; });
+    var entries = (formState.photoBlobs || []).filter(function(p) { return p && (p.processed || p.uploadedUrl); });
     console.log('[publish] photo entries count:', entries.length);
     if (!entries.length) {
       Toast.show(_pubT('toast_pub_add_photo', 'Please add at least one photo.'), 'warning');
@@ -786,6 +962,14 @@ window.publishItem = async function(e) {
 
     var btn = document.getElementById('btnPublish');
     if (!btn) { console.error('[publish] #btnPublish not found in DOM'); return; }
+    var isEdit = !!formState.editId;
+    var restoreBtn = function() {
+      btn.innerHTML = isEdit
+        ? '<i class="fas fa-check"></i> ' + _pubT('publish_save_btn', 'Save changes')
+        : 'Publish <i class="fas fa-arrow-right"></i>';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    };
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading photos...';
     btn.disabled = true;
     btn.style.opacity = '0.7';
@@ -795,6 +979,7 @@ window.publishItem = async function(e) {
     var photoUrls = [];
     try {
       for (var i = 0; i < entries.length; i++) {
+        if (entries[i].uploadedUrl) { photoUrls.push(entries[i].uploadedUrl); continue; } // kept from the existing listing
         console.log('[publish] uploading photo', i + 1, 'of', entries.length);
         var url = await window.SwappoStorage.uploadOne(
           { _processed: entries[i].processed, type: entries[i].processed.mime },
@@ -807,16 +992,13 @@ window.publishItem = async function(e) {
     } catch (err) {
       console.error('[publish] upload failed:', err);
       Toast.show(_pubT('toast_pub_upload_failed', 'Upload failed') + ': ' + (err.message || 'unknown error'), 'error');
-      btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
-      btn.disabled = false;
-      btn.style.opacity = '1';
+      restoreBtn();
       return;
     }
 
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (isEdit ? 'Saving...' : 'Publishing...');
 
     // --- 2. Build item payload ---
-    var conditionMap = { 'New': 'new', 'Like New': 'like_new', 'Good': 'good', 'Fair': 'fair' };
     var priceEl = document.getElementById('item-price');
     var emirateEl = document.getElementById('item-emirate');
 
@@ -850,7 +1032,7 @@ window.publishItem = async function(e) {
       type: formState.details.type || formState.category,
       brand: formState.details.brand || '',
       model: formState.details.model || '',
-      condition: conditionMap[formState.details.condition] || 'good',
+      condition: normalizeCondition(formState.details.condition),
       year: formState.details.year ? String(formState.details.year) : String(new Date().getFullYear()),
       size: formState.details.size || '',
       color: formState.details.color || '',
@@ -862,11 +1044,16 @@ window.publishItem = async function(e) {
       lat: finalLat,
       lng: finalLng,
       description: (formState.details.description || '').trim().slice(0, 2000) || null,
+      // Everything that has no dedicated column (gender, storage, material,
+      // vehicle specs…) is kept in specs and rendered by the product page.
       specs: (function() {
+        var CORE = ['subcategory', 'type', 'brand', 'model', 'condition', 'year', 'size', 'color', 'description'];
         var s = {};
-        ['mileage_km', 'fuel', 'transmission', 'body_type', 'regional_specs'].forEach(function(k) {
+        Object.keys(formState.details).forEach(function(k) {
+          if (CORE.indexOf(k) !== -1) return;
           var v = formState.details[k];
-          if (v !== undefined && v !== null && String(v).trim() !== '') s[k] = (k === 'mileage_km') ? Number(v) : String(v);
+          if (v === undefined || v === null || String(v).trim() === '') return;
+          s[k] = (k === 'mileage_km') ? Number(v) : String(v).trim().slice(0, 120);
         });
         return s;
       })()
@@ -877,17 +1064,27 @@ window.publishItem = async function(e) {
     console.log('[publish] SwappoItems available?', !!window.SwappoItems);
     var result = null;
     if (window.SwappoItems) {
-      result = await window.SwappoItems.create(itemData);
-    } else if (window.SwappoItems) {
-      result = window.SwappoItems.create(itemData);
+      result = isEdit
+        ? await window.SwappoItems.update(formState.editId, itemData)
+        : await window.SwappoItems.create(itemData);
     }
-    console.log('[publish] insert result:', result);
+    console.log('[publish] ' + (isEdit ? 'update' : 'insert') + ' result:', result);
 
     if (!result || !result.success) {
-      Toast.show(_pubT('toast_pub_publish_failed', 'Publish failed') + ': ' + ((result && result.error) || 'unknown'), 'error');
-      btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
-      btn.disabled = false;
-      btn.style.opacity = '1';
+      if (result && result.locked) {
+        Toast.show(_pubT('toast_pub_locked', 'This listing is locked while a deal is in progress. Cancel or complete the deal first.'), 'warning');
+      } else {
+        Toast.show(_pubT(isEdit ? 'toast_pub_save_failed' : 'toast_pub_publish_failed', isEdit ? 'Could not save changes' : 'Publish failed') + ': ' + ((result && result.error) || 'unknown'), 'error');
+      }
+      restoreBtn();
+      return;
+    }
+
+    if (isEdit) {
+      Toast.show(_pubT('toast_pub_saved', 'Listing updated! ✅'), 'success');
+      setTimeout(function() {
+        window.location.href = 'product.html?id=' + encodeURIComponent(formState.editId);
+      }, 900);
       return;
     }
 
@@ -927,9 +1124,110 @@ window.publishItem = async function(e) {
     try { Toast.show(_pubT('toast_pub_generic_error', 'Something went wrong') + ': ' + (outerErr.message || outerErr), 'error'); } catch(e){}
     var btn = document.getElementById('btnPublish');
     if (btn) {
-      btn.innerHTML = 'Publish <i class="fas fa-arrow-right"></i>';
+      btn.innerHTML = formState.editId
+        ? '<i class="fas fa-check"></i> ' + _pubT('publish_save_btn', 'Save changes')
+        : 'Publish <i class="fas fa-arrow-right"></i>';
       btn.disabled = false;
       btn.style.opacity = '1';
     }
   }
+};
+
+// ========================
+// EDIT MODE  (publier.html?edit=<itemId>)
+// ========================
+// The owner reuses the same wizard to change price, details or photos.
+// Blocked (client + DB trigger, migration 033) while a swap is pending or
+// accepted on the item — the counterparty must see what they agreed on.
+window.initEditMode = async function(user) {
+  var params = new URLSearchParams(window.location.search);
+  var editId = params.get('edit');
+  if (!editId || !window.SwappoItems) return;
+
+  var goBack = function(href) { setTimeout(function() { window.location.href = href; }, 1400); };
+  var item = await window.SwappoItems.getById(editId);
+  if (!item) {
+    Toast.show(_pubT('toast_pub_not_found', 'Listing not found.'), 'error');
+    goBack('profile.html');
+    return;
+  }
+  if (!user || item.user_id !== user.id) {
+    Toast.show(_pubT('toast_pub_not_owner', 'You can only edit your own listings.'), 'error');
+    goBack('product.html?id=' + encodeURIComponent(editId));
+    return;
+  }
+  var editable = await window.SwappoItems.canEdit(editId);
+  if (!editable) {
+    Toast.show(_pubT('toast_pub_locked', 'This listing is locked while a deal is in progress. Cancel or complete the deal first.'), 'warning');
+    goBack('product.html?id=' + encodeURIComponent(editId));
+    return;
+  }
+
+  formState.editId = editId;
+  formState.editItem = item;
+
+  // Copy: titles + CTA
+  var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type || item.category || '';
+  var h = document.querySelector('[data-section="category"] .step-title');
+  var sub = document.querySelector('[data-section="category"] .step-subtitle');
+  if (h) h.textContent = _pubT('publish_edit_title', 'Edit your listing');
+  if (sub) sub.textContent = _pubT('publish_edit_subtitle', 'Update the details, price or photos. Changes go live immediately.');
+  var btn = document.getElementById('btnPublish');
+  if (btn) btn.innerHTML = '<i class="fas fa-check"></i> ' + _pubT('publish_save_btn', 'Save changes');
+  var form = document.getElementById('publishForm');
+  if (form && !document.getElementById('editBanner')) {
+    var banner = document.createElement('div');
+    banner.id = 'editBanner';
+    banner.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--primary-light,#E6F7F8);border:1px solid var(--primary,#09B1BA);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:14px;color:var(--text,#171717);';
+    banner.innerHTML = '<span>✏️ <strong>' + _pubT('publish_edit_title', 'Edit your listing') + '</strong>' + (title ? ' — ' + _pubEsc(title) : '') + '</span>' +
+      '<a href="product.html?id=' + _pubEsc(editId) + '" style="color:var(--primary-dark,#078A91);font-weight:600;text-decoration:none;white-space:nowrap;">' + _pubT('publish_edit_cancel', 'Cancel') + '</a>';
+    form.parentNode.insertBefore(banner, form);
+  }
+  // Gift Box bundling is a publish-time feature only.
+  var gb = document.getElementById('giftBoxWrap');
+  if (gb) gb.style.display = 'none';
+
+  // Category (no auto-advance) → fields → values
+  window.__suppressAutoAdvance = true;
+  var catBtn = document.querySelector('.category-btn[data-category="' + item.category + '"]');
+  if (catBtn) selectCategory(catBtn, item.category);
+  else { formState.category = item.category; renderDetailsFields(); }
+  window.__suppressAutoAdvance = false;
+
+  var specs = (item.specs && typeof item.specs === 'object') ? item.specs : {};
+  var details = {};
+  if (specs.gender) details.gender = specs.gender;
+  if (specs.zone) details.zone = specs.zone;
+  if (item.type && item.type !== item.category) details.type = item.type;
+  if (item.subcategory) details.subcategory = item.subcategory;
+  if (item.brand) details.brand = item.brand;
+  if (item.model) details.model = item.model;
+  Object.keys(specs).forEach(function(k) { if (k !== 'gender' && k !== 'zone' && specs[k] != null) details[k] = specs[k]; });
+  if (item.condition) details.condition = item.condition;
+  if (item.year) details.year = item.year;
+  if (item.size) details.size = item.size;
+  if (item.color) details.color = item.color;
+  applyDetailsToForm(details);
+  formState.details.description = item.description || '';
+  var desc = document.getElementById('item-description');
+  if (desc) desc.value = formState.details.description;
+
+  var priceEl = document.getElementById('item-price');
+  if (priceEl) priceEl.value = item.price > 0 ? String(Math.round(item.price)) : '';
+  var emirateEl = document.getElementById('item-emirate');
+  if (emirateEl && item.emirate) emirateEl.value = item.emirate;
+
+  var cb = document.getElementById('giveawayCheckbox');
+  if (cb && !!item.is_giveaway !== cb.checked) toggleGiveaway();
+  if (gb) gb.style.display = 'none';
+
+  var slots = document.querySelectorAll('.photo-slot').length || 5;
+  formState.photoBlobs = [];
+  (item.photos || []).slice(0, slots).forEach(function(url, i) {
+    formState.photoBlobs[i] = { preview: url, processed: null, uploadedUrl: url };
+  });
+  refreshPhotoGrid();
+
+  formState.currentStep = 2;
+  updateStepUI();
 };

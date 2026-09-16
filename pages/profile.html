@@ -406,12 +406,13 @@
 
         .product-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 8px;
             margin-top: 10px;
         }
 
         .product-action-btn {
-            flex: 1;
+            flex: 1 1 calc(50% - 4px);
             padding: 8px 10px;
             border: 1px solid var(--border);
             background: transparent;
@@ -2272,7 +2273,7 @@
             userItems.forEach(item => { buckets[_bucketFor(item.status)].push(item); });
 
             function _cardHTML(item) {
-                const title = (item.brand + ' ' + item.model).trim() || item.type;
+                const title = (window.SwappoItems && SwappoItems.itemTitle) ? SwappoItems.itemTitle(item) : ((item.brand || '') + ' ' + (item.model || '')).trim() || item.type;
                 const photo = (item.photos && item.photos[0]) || '';
                 const itemStatus = item.status || 'available';
                 const bucket = _bucketFor(itemStatus);
@@ -2298,6 +2299,7 @@
                 } else {
                     actions =
                         '<button class="product-action-btn" onclick="window.location.href=\'product.html?id=' + item.id + '\'"><i class="fas fa-eye"></i> View</button>' +
+                        '<button class="product-action-btn" style="color:#09B1BA;border-color:#09B1BA;" onclick="editItem(\'' + item.id + '\', ' + pendingCount + ')"><i class="fas fa-pen"></i> ' + ((typeof t === 'function') ? t('action_edit') : 'Edit') + '</button>' +
                         '<button class="product-action-btn" style="color:#F59E0B;border-color:#F59E0B;" onclick="showBoostPicker(\'' + item.id + '\')"><i class="fas fa-rocket"></i> Boost</button>' +
                         '<button class="product-action-btn" onclick="deleteItem(\'' + item.id + '\')"><i class="fas fa-trash"></i> Delete</button>';
                 }
@@ -3527,6 +3529,17 @@
         // Received / Offers Sent tabs which were themselves removed. The
         // real flow for accepting/declining a swap lives in the Swaps tab
         // above (acceptSwap / rejectSwap / cancelSwap → SwappoSwaps).
+
+        // Edit → publier.html?edit=<id>. A listing with a pending offer (or a
+        // reserved one) is locked: the counterparty must see what they agreed
+        // on. The DB trigger (migration 033) enforces the same rule.
+        function editItem(itemId, pendingCount) {
+            if (pendingCount > 0) {
+                Toast.show((typeof t === 'function') ? t('toast_pub_locked') : 'This listing is locked while a deal is in progress.', 'warning');
+                return;
+            }
+            window.location.href = 'publier.html?edit=' + encodeURIComponent(itemId);
+        }
 
         async function deleteItem(itemId) {
             if (!confirm('Delete this item?')) return;
