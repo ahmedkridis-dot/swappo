@@ -626,6 +626,8 @@
     detail_body_type: "باڈی کی قسم",
     detail_regional_specs: "علاقائی اسپیکس",
     detail_description: "تفصیل",
+    auth_show_password: "پاس ورڈ دکھائیں",
+    auth_hide_password: "پاس ورڈ چھپائیں",
     detail_storage: "اسٹوریج",
     detail_dimensions: "پیمائش",
     detail_shoe_size: "جوتے کا سائز (EU)",

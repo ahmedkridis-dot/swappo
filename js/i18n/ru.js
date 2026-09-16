@@ -601,6 +601,8 @@
     detail_body_type: "Тип кузова",
     detail_regional_specs: "Спецификация",
     detail_description: "Описание",
+    auth_show_password: "Показать пароль",
+    auth_hide_password: "Скрыть пароль",
     detail_storage: "Память",
     detail_dimensions: "Размеры",
     detail_shoe_size: "Размер обуви (EU)",

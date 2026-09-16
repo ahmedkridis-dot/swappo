@@ -627,6 +627,8 @@
     detail_body_type: "نوع الهيكل",
     detail_regional_specs: "المواصفات الإقليمية",
     detail_description: "الوصف",
+    auth_show_password: "إظهار كلمة المرور",
+    auth_hide_password: "إخفاء كلمة المرور",
     detail_storage: "سعة التخزين",
     detail_dimensions: "الأبعاد",
     detail_shoe_size: "مقاس الحذاء (EU)",

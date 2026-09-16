@@ -617,6 +617,8 @@
     detail_body_type: "Body type",
     detail_regional_specs: "Regional specs",
     detail_description: "Description",
+    auth_show_password: "Show password",
+    auth_hide_password: "Hide password",
     detail_storage: "Storage",
     detail_dimensions: "Dimensions",
     detail_shoe_size: "Shoe size (EU)",

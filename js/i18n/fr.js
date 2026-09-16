@@ -627,6 +627,8 @@
     detail_body_type: "Carrosserie",
     detail_regional_specs: "Spécifications",
     detail_description: "Description",
+    auth_show_password: "Afficher le mot de passe",
+    auth_hide_password: "Masquer le mot de passe",
     detail_storage: "Stockage",
     detail_dimensions: "Dimensions",
     detail_shoe_size: "Pointure (EU)",
