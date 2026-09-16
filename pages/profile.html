@@ -1777,11 +1777,11 @@
                         var tries = 0;
                         (function poll() {
                           if (window.SwappoAuth && SwappoAuth.isReady && SwappoAuth.isReady()) {
-                            SwappoAuth.getCurrentUser().then(function (u) {
-                              var pro = !!(u && (u.is_pro || u.plan === 'pro'));
+                            // The session user has no plan field: ask the server.
+                            (window.SwappoPayment && SwappoPayment.isPro ? SwappoPayment.isPro() : Promise.resolve(false)).then(function (pro) {
                               var up = document.getElementById('sidebar-upgrade-btn');
                               var mg = document.getElementById('sidebar-manage-btn');
-                              if (up) up.hidden = pro;
+                              if (up) up.hidden = !!pro;
                               if (mg) mg.hidden = !pro;
                             }).catch(function () {});
                           } else if (tries++ < 40) {

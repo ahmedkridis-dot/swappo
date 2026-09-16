@@ -233,7 +233,8 @@
       if (!_paymentsEnabled()) return _comingSoon();
       var user = await _requireUser();
       if (!user) return false;
-      if (user.is_pro || user.plan === 'pro') {
+      var cur = await _proBoostStatus();
+      if (cur && cur.is_pro) {
         _toast(_payT('pay_already_pro', 'You already have an active Pro subscription.'), 'info');
         return false;
       }
@@ -246,7 +247,9 @@
       if (!user) return false;
       if (!itemId) { _toast(_payT('pay_error', 'Payment could not be started.'), 'error'); return false; }
       // Pro plan: 3 included boosts / month, applied by use_pro_boost().
-      if (!tier && (user.is_pro || user.plan === 'pro')) {
+      // The session user carries no plan → always ask the server
+      // (pro_boosts_status reads users.is_pro / plan).
+      if (!tier) {
         var status = await _proBoostStatus();
         if (status && status.is_pro) {
           var choice = await _pickBoostTier({ pro: status });
@@ -267,7 +270,8 @@
       // No Pro subscription yet → there is nothing to manage: go straight to
       // Checkout so the user can actually pay. (The Edge Function applies the
       // same rule server-side, using Stripe as the source of truth.)
-      if (!(user.is_pro || user.plan === 'pro')) {
+      var st = await _proBoostStatus();
+      if (st && st.is_pro === false) {
         return _checkout({ kind: 'pro', interval: 'month' });
       }
       return _checkout({ kind: 'portal', return_url: location.href.split('?')[0] });
@@ -275,10 +279,8 @@
 
     isPro: async function () {
       if (!_ready()) return false;
-      try {
-        var u = await window.SwappoAuth.getCurrentUser();
-        return !!(u && (u.is_pro || u.plan === 'pro'));
-      } catch (e) { return false; }
+      var st = await _proBoostStatus();
+      return !!(st && st.is_pro);
     },
 
     // Reads ?checkout=success|cancel&kind=pro|boost after Stripe redirects back.
