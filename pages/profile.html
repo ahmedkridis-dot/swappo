@@ -1473,11 +1473,11 @@
 
                 <!-- ========== TAB: MY ITEMS ========== -->
                 <div class="tab-content active" id="my-items">
-                    <div id="pro-insights" style="display:none;margin-bottom:16px;"></div>
                     <div class="my-items-filters" id="my-items-filters" role="tablist" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
                         <button type="button" class="mi-filter active" data-mi-filter="active" role="tab" aria-selected="true"><span data-i18n="profile_filter_active">Active</span> <span class="mi-filter-count" data-mi-count="active">0</span></button>
                         <button type="button" class="mi-filter" data-mi-filter="reserved" role="tab" aria-selected="false"><span data-i18n="profile_filter_reserved">Reserved</span> <span class="mi-filter-count" data-mi-count="reserved">0</span></button>
                         <button type="button" class="mi-filter" data-mi-filter="swapped" role="tab" aria-selected="false"><span data-i18n="profile_filter_swapped">Swapped</span> <span class="mi-filter-count" data-mi-count="swapped">0</span></button>
+                        <button type="button" class="mi-filter" id="insights-btn" style="margin-inline-start:auto;" onclick="openInsights()" title="" data-i18n-title="insights_title">📊 <span data-i18n="insights_open">Analytics</span></button>
                         <button type="button" class="mi-filter" data-mi-filter="sold" role="tab" aria-selected="false"><span data-i18n="profile_filter_sold">Sold</span> <span class="mi-filter-count" data-mi-count="sold">0</span></button>
                     </div>
                     <div class="items-grid reveal" id="my-items-grid">
@@ -2295,25 +2295,6 @@
                 });
             } catch (e) { /* best-effort — badges just won't show */ }
 
-            // Pro "Analytics & insights": offers / claims received per listing
-            // (any status) — used by the per-card stats and the summary panel.
-            var offersByItem = {};
-            var offersTotal = 0;
-            if (window.__swpIsPro === undefined && window.SwappoPayment && SwappoPayment.isPro) {
-                try { window.__swpIsPro = await SwappoPayment.isPro(); } catch (e) { window.__swpIsPro = false; }
-            }
-            if (window.__swpIsPro) {
-                try {
-                    const { data: offerRows } = await window.db.from('swaps')
-                        .select('receiver_item_id, status')
-                        .eq('receiver_id', user.id);
-                    (offerRows || []).forEach(function (r) {
-                        if (!r.receiver_item_id) return;
-                        offersByItem[r.receiver_item_id] = (offersByItem[r.receiver_item_id] || 0) + 1;
-                        offersTotal++;
-                    });
-                } catch (e) { /* stats are best-effort */ }
-            }
             const itemsGrid = document.getElementById('my-items-grid');
             // Classify into buckets so the filter pills have counts + can
             // slice the view. Active = live listings, Reserved = locked
@@ -2372,7 +2353,6 @@
                         '<div class="product-title">' + title + '</div>' +
                         '<div class="product-category">' + (item.category || '') + '</div>' +
                         (item.price ? '<div class="product-price" style="font-size:15px;font-weight:700;color:var(--primary,#09B1BA);margin-bottom:6px;">' + item.price.toLocaleString() + ' AED</div>' : '') +
-                        (window.__swpIsPro ? '<div class="mi-stats" style="font-size:11px;color:var(--text-muted,#6B7280);margin:-2px 0 6px;display:flex;gap:10px;"><span title="' + ((typeof t === 'function') ? t('insights_views') : 'Views') + '">👁 ' + (item.views_count || 0) + '</span><span title="' + ((typeof t === 'function') ? t('insights_favorites') : 'Favorites') + '">❤️ ' + (item.favorites_count || 0) + '</span><span title="' + ((typeof t === 'function') ? t('insights_offers') : 'Offers') + '">📩 ' + (offersByItem[item.id] || 0) + '</span></div>' : '') +
                     '<div class="product-actions">' + actions + '</div>' +
                         '<div class="my-auto-decline-host" data-item-id="' + item.id + '"></div>' +
                     '</div>' +
@@ -2418,37 +2398,6 @@
                 });
             }
             _renderBucket('active');
-
-            // ── Analytics & insights (Swappo Pro) ──────────────────────
-            (function renderInsights() {
-                var host = document.getElementById('pro-insights');
-                if (!host) return;
-                var T = function (k, f) { return (typeof t === 'function') ? t(k) : f; };
-                if (!window.__swpIsPro) {
-                    host.style.display = 'block';
-                    host.innerHTML = '<a href="pricing.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px dashed var(--border,#EBEBEB);border-radius:12px;font-size:13px;color:var(--text-muted,#6B7280);text-decoration:none;">🔒 <span>' + T('insights_locked', 'Analytics & insights are a Swappo Pro feature.') + '</span></a>';
-                    return;
-                }
-                var live = userItems.filter(function (i) { return i.status === 'available' || i.status === 'reserved'; });
-                var views = userItems.reduce(function (n, i) { return n + (i.views_count || 0); }, 0);
-                var favs  = userItems.reduce(function (n, i) { return n + (i.favorites_count || 0); }, 0);
-                var top = userItems.slice().sort(function (a, b) { return (b.views_count || 0) - (a.views_count || 0); })[0];
-                var topTitle = top ? ((window.SwappoItems && SwappoItems.itemTitle) ? SwappoItems.itemTitle(top) : (top.model || top.type || '')) : '—';
-                var stat = function (icon, label, value) {
-                    return '<div style="flex:1;min-width:120px;background:#fff;border:1px solid var(--border,#EBEBEB);border-radius:12px;padding:12px 14px;">' +
-                        '<div style="font-size:11px;color:var(--text-muted,#6B7280);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">' + icon + ' ' + label + '</div>' +
-                        '<div style="font-size:20px;font-weight:800;color:var(--text,#171717);margin-top:4px;word-break:break-word;">' + value + '</div></div>';
-                };
-                host.style.display = 'block';
-                host.innerHTML =
-                    '<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#BE185D;margin-bottom:8px;">🛡️ ' + T('insights_title', 'Analytics & insights') + '</div>' +
-                    '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-                        stat('👁', T('insights_views', 'Views'), views.toLocaleString()) +
-                        stat('❤️', T('insights_favorites', 'Favorites'), favs.toLocaleString()) +
-                        stat('📩', T('insights_offers', 'Offers & claims received'), offersTotal.toLocaleString()) +
-                        stat('🏆', T('insights_top', 'Top listing'), top ? (String(topTitle).replace(/</g, '&lt;') + ' <span style="font-size:12px;color:var(--text-muted,#6B7280);font-weight:600;">· ' + (top.views_count || 0) + ' 👁</span>') : '—') +
-                    '</div>';
-            })();
 
             // P4B — Auto-decline control per item. Pro users get a live toggle;
             // Free users see a greyed-out "Pro feature" pill.
@@ -3608,6 +3557,85 @@
         // Received / Offers Sent tabs which were themselves removed. The
         // real flow for accepting/declining a swap lives in the Swaps tab
         // above (acceptSwap / rejectSwap / cancelSwap → SwappoSwaps).
+
+        // ── Analytics & insights (Swappo Pro) — one button, one modal ──
+        // Always reads live from the database when opened, so the numbers
+        // match what the product pages show right now (views_count is
+        // bumped once per visitor session, owner excluded; favorites_count
+        // by the favourites trigger; offers = swaps received per listing).
+        async function openInsights() {
+            var T = function (k, f) { return (typeof t === 'function') ? t(k) : f; };
+            var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
+            overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
+            var box = document.createElement('div');
+            box.style.cssText = 'background:#fff;border-radius:20px;padding:24px;max-width:640px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.25);';
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
+            var closeBtn = '<button type="button" onclick="this.closest(\'div[style*=fixed]\').remove()" style="position:absolute;top:0;right:0;width:32px;height:32px;border-radius:50%;border:none;background:#F3F4F6;color:#6B7280;font-size:16px;cursor:pointer;">×</button>';
+            var head = '<div style="position:relative;padding-right:40px;margin-bottom:14px;"><div style="font-size:17px;font-weight:800;color:#1A1A2E;">📊 ' + T('insights_title', 'Analytics & insights') + '</div>' + closeBtn + '</div>';
+
+            var pro = window.__swpIsPro;
+            if (pro === undefined && window.SwappoPayment && SwappoPayment.isPro) {
+                try { pro = await SwappoPayment.isPro(); } catch (e) { pro = false; }
+                window.__swpIsPro = pro;
+            }
+            if (!pro) {
+                box.innerHTML = head +
+                    '<div style="text-align:center;padding:12px 0 4px;"><div style="font-size:40px;margin-bottom:8px;">🔒</div>' +
+                    '<p style="font-size:14px;color:#6B7280;margin:0 0 18px;">' + T('insights_locked', 'Analytics & insights are a Swappo Pro feature.') + '</p>' +
+                    '<a href="pricing.html" class="btn-pill btn-pill-teal" style="font-size:14px;padding:10px 24px;" data-pay-cta="pro">' + T('cta_pro', 'Go Pro') + '</a></div>';
+                return;
+            }
+
+            box.innerHTML = head + '<div style="text-align:center;padding:24px;color:#9CA3AF;"><i class="fas fa-spinner fa-spin"></i></div>';
+            var uid = null;
+            try { var fu = window.SwappoAuth && SwappoAuth.getFastUser ? SwappoAuth.getFastUser() : null; uid = fu && fu.id; } catch (e) {}
+            if (!uid) { try { var cu = await SwappoAuth.getCurrentUser(); uid = cu && cu.id; } catch (e) {} }
+            var items = [], offers = {};
+            try {
+                var res = await window.db.from('items')
+                    .select('id,brand,model,type,category,status,views_count,favorites_count,created_at')
+                    .eq('user_id', uid);
+                items = res.data || [];
+                var sw = await window.db.from('swaps').select('receiver_item_id').eq('receiver_id', uid);
+                (sw.data || []).forEach(function (r) { if (r.receiver_item_id) offers[r.receiver_item_id] = (offers[r.receiver_item_id] || 0) + 1; });
+            } catch (e) { console.warn('[insights]', e); }
+
+            var title = function (i) { return (window.SwappoItems && SwappoItems.itemTitle) ? SwappoItems.itemTitle(i) : ((i.brand || '') + ' ' + (i.model || '')).trim() || i.type || ''; };
+            items.sort(function (a, b) { return (b.views_count || 0) - (a.views_count || 0); });
+            var views = items.reduce(function (n, i) { return n + (i.views_count || 0); }, 0);
+            var favs  = items.reduce(function (n, i) { return n + (i.favorites_count || 0); }, 0);
+            var offersTotal = Object.keys(offers).reduce(function (n, k) { return n + offers[k]; }, 0);
+            var top = items[0];
+            var tile = function (icon, label, value) {
+                return '<div style="flex:1;min-width:120px;background:var(--bg-light,#F7F7F7);border-radius:12px;padding:12px 14px;">' +
+                    '<div style="font-size:11px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">' + icon + ' ' + label + '</div>' +
+                    '<div style="font-size:20px;font-weight:800;color:#171717;margin-top:4px;word-break:break-word;">' + value + '</div></div>';
+            };
+            var rows = items.map(function (i) {
+                return '<tr><td style="padding:8px 6px;border-top:1px solid #F3F4F6;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="product.html?id=' + esc(i.id) + '" style="color:#171717;text-decoration:none;font-weight:600;">' + esc(title(i)) + '</a></td>' +
+                    '<td style="padding:8px 6px;border-top:1px solid #F3F4F6;color:#6B7280;font-size:12px;">' + esc(i.status || '') + '</td>' +
+                    '<td style="padding:8px 6px;border-top:1px solid #F3F4F6;text-align:right;">' + (i.views_count || 0) + '</td>' +
+                    '<td style="padding:8px 6px;border-top:1px solid #F3F4F6;text-align:right;">' + (i.favorites_count || 0) + '</td>' +
+                    '<td style="padding:8px 6px;border-top:1px solid #F3F4F6;text-align:right;">' + (offers[i.id] || 0) + '</td></tr>';
+            }).join('');
+            box.innerHTML = head +
+                '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">' +
+                    tile('👁', T('insights_views', 'Views'), views.toLocaleString()) +
+                    tile('❤️', T('insights_favorites', 'Favorites'), favs.toLocaleString()) +
+                    tile('📩', T('insights_offers', 'Offers & claims received'), offersTotal.toLocaleString()) +
+                    tile('🏆', T('insights_top', 'Top listing'), top ? esc(title(top)) + ' <span style="font-size:12px;color:#6B7280;font-weight:600;">· ' + (top.views_count || 0) + ' 👁</span>' : '—') +
+                '</div>' +
+                (items.length
+                    ? '<div style="overflow:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="color:#6B7280;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;">' +
+                        '<th style="text-align:left;padding:6px;">' + T('insights_listing', 'Listing') + '</th><th style="text-align:left;padding:6px;">' + T('insights_status', 'Status') + '</th>' +
+                        '<th style="text-align:right;padding:6px;">👁</th><th style="text-align:right;padding:6px;">❤️</th><th style="text-align:right;padding:6px;">📩</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+                    : '<p style="color:#6B7280;font-size:14px;">' + T('insights_no_items', 'No listings yet.') + '</p>') +
+                '<p style="font-size:12px;color:#9CA3AF;margin:14px 0 0;line-height:1.5;">' + T('insights_hint', 'Views are counted once per visitor session (guests included); your own visits are not counted.') + '</p>';
+        }
+        window.openInsights = openInsights;
 
         // Edit → publier.html?edit=<id>. A listing with a pending offer (or a
         // reserved one) is locked: the counterparty must see what they agreed
