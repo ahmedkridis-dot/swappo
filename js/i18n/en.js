@@ -1670,7 +1670,7 @@
     seller_disclaimer: "Identity revealed after both parties accept the swap.",
     boosted: "Boosted",
     boosted_until: "Boosted until {date}",
-    badge_swappo_pro: "Swappo Pro",
+    badge_swappo_pro: "Pro",
     insights_title: "Analytics & insights",
     insights_listing: "Listing",
     insights_status: "Status",

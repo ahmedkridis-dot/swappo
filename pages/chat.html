@@ -1485,6 +1485,7 @@
 
   <!-- Scripts -->
   <script src="../js/constants.js" defer></script>
+  <script src="../js/avatars.js" defer></script>
   <script src="../js/i18n/en.js" defer></script>
   <script src="../js/i18n.js" defer></script>
   <script src="../js/register-sw.js" defer></script>
@@ -1756,9 +1757,11 @@
       var safeTime = escapeHTML(time);
       var safeUnread = escapeHTML(String(c.unread_count || 0));
 
-      var avatarInner = safeAvatarUrl
-        ? '<img src="' + safeAvatarUrl + '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
-        : escapeHTML(initial(displayName));
+      var avatarInner = (window.SwappoAvatar && (SwappoAvatar.isPreset(o.avatar) || safeAvatarUrl))
+        ? SwappoAvatar.html(o.avatar, displayName)
+        : (safeAvatarUrl
+          ? '<img src="' + safeAvatarUrl + '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+          : escapeHTML(initial(displayName)));
 
       return '<div class="sb-card' + (c.id === activeConvId ? ' active' : '') + '" onclick="openConv(\'' + safeConvId + '\')">' +
         '<div class="sb-avatar" style="background:' + safeAvatarColor + '">' + avatarInner +
@@ -1798,8 +1801,10 @@
     document.getElementById('chatHeader').style.display = '';
     var chAvatar = document.getElementById('chAvatar');
     var chAvatarUrl = safeImgUrl(o.avatar);
-    chAvatar.style.background = chAvatarUrl ? 'transparent' : (o.avatar_color || '#09B1BA');
-    if (chAvatarUrl) {
+    chAvatar.style.background = (chAvatarUrl || (window.SwappoAvatar && SwappoAvatar.isPreset(o.avatar))) ? 'transparent' : (o.avatar_color || '#09B1BA');
+    if (window.SwappoAvatar && (SwappoAvatar.isPreset(o.avatar) || chAvatarUrl)) {
+      chAvatar.innerHTML = SwappoAvatar.html(o.avatar, displayName);
+    } else if (chAvatarUrl) {
       chAvatar.innerHTML = '<img src="' + chAvatarUrl + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
     } else {
       chAvatar.textContent = initial(displayName);
@@ -1881,7 +1886,11 @@
       var avName = isMine
         ? (currentUser && (currentUser.pseudo || currentUser.display_name || currentUser.name))
         : (o.pseudo || o.display_name || o.name);
-      if (avUrl) {
+      var avRaw = isMine ? (currentUser && currentUser.avatar) : o.avatar;
+      if (window.SwappoAvatar && SwappoAvatar.isPreset(avRaw)) {
+        av.style.background = 'transparent';
+        av.innerHTML = SwappoAvatar.html(avRaw, avName);
+      } else if (avUrl) {
         av.style.background = 'transparent';
         var imgEl = document.createElement('img');
         imgEl.src = avUrl;

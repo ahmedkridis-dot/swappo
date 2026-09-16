@@ -1537,7 +1537,7 @@
     seller_disclaimer: "L'identité est révélée après acceptation mutuelle de l'échange.",
     boosted: "Boosté",
     boosted_until: "Boosté jusqu'au {date}",
-    badge_swappo_pro: "Swappo Pro",
+    badge_swappo_pro: "Pro",
     insights_title: "Statistiques & analyses",
     insights_listing: "Annonce",
     insights_status: "Statut",

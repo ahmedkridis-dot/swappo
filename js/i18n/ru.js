@@ -1514,7 +1514,7 @@
     seller_disclaimer: "Личность раскрывается после того, как обе стороны примут обмен.",
     boosted: "Продвинуто",
     boosted_until: "Продвигается до {date}",
-    badge_swappo_pro: "Swappo Pro",
+    badge_swappo_pro: "Pro",
     insights_title: "Аналитика и статистика",
     insights_listing: "Объявление",
     insights_status: "Статус",

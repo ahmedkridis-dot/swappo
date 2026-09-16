@@ -1539,7 +1539,7 @@
     seller_disclaimer: "دونوں فریقوں کی قبولیت کے بعد شناخت ظاہر ہوتی ہے۔",
     boosted: "بوسٹ شدہ",
     boosted_until: "{date} تک بوسٹ شدہ",
-    badge_swappo_pro: "Swappo Pro",
+    badge_swappo_pro: "Pro",
     insights_title: "تجزیات اور بصیرت",
     insights_listing: "اشتہار",
     insights_status: "حیثیت",

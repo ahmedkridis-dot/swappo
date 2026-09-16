@@ -1540,7 +1540,7 @@
     seller_disclaimer: "يتم الكشف عن الهوية بعد قبول الطرفين للمبادلة.",
     boosted: "مروّج",
     boosted_until: "معزَّز حتى {date}",
-    badge_swappo_pro: "Swappo Pro",
+    badge_swappo_pro: "Pro",
     insights_title: "التحليلات والإحصاءات",
     insights_listing: "الإعلان",
     insights_status: "الحالة",

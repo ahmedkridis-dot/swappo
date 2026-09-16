@@ -244,6 +244,33 @@ function getAvatarsByGender() {
 
 // Expose to global scope
 window.SWAPPO_AVATARS = SWAPPO_AVATARS;
+
+// ── Shared renderer ─────────────────────────────────────────
+// users.avatar holds either a preset key ('happy', 'ninja'…) or an uploaded
+// image URL. Every place that draws an avatar (navbar chip, chat, identity
+// card, profiles) goes through this so a preset never degrades to a letter.
+(function () {
+  function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function isPreset(v) { return !!(v && SWAPPO_AVATARS[v]); }
+  function isUrl(v) { return /^(https?:\/\/|\/|\.\.?\/|data:image\/)/i.test(String(v || '')); }
+  function letter(pseudo) { return String(pseudo || '?').trim().charAt(0).toUpperCase() || '?'; }
+  function html(value, pseudo) {
+    if (isPreset(value)) return '<span class="swp-av-preset" style="display:block;width:100%;height:100%;border-radius:50%;overflow:hidden;line-height:0;">' + SWAPPO_AVATARS[value].svg + '</span>';
+    if (isUrl(value)) return '<img src="' + esc(value) + '" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">';
+    return esc(letter(pseudo));
+  }
+  function renderInto(el, value, pseudo) {
+    if (!el) return false;
+    if (isPreset(value) || isUrl(value)) {
+      el.innerHTML = html(value, pseudo);
+      el.style.background = 'transparent';
+      return true;
+    }
+    el.textContent = letter(pseudo);
+    return false;
+  }
+  window.SwappoAvatar = { isPreset: isPreset, isUrl: isUrl, html: html, renderInto: renderInto, letter: letter };
+})();
 window.AVATAR_PAIRS = AVATAR_PAIRS;
 window.getAllAvatars = getAllAvatars;
 window.getAvatarPairs = getAvatarPairs;

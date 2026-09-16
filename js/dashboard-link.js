@@ -51,10 +51,35 @@
     return ch ? ch.toUpperCase() : '?';
   }
 
-  function setAvatar(link, url, pseudo) {
+  // js/avatars.js is only on a few pages; pull it in when the value is a
+  // preset key so the chip can draw the SVG instead of a letter.
+  function ensureAvatarLib() {
+    if (window.SwappoAvatar) return Promise.resolve(true);
+    return new Promise(function (resolve) {
+      const base = location.pathname.indexOf('/pages/') !== -1 ? '../js/' : 'js/';
+      const sc = document.createElement('script');
+      sc.src = base + 'avatars.js';
+      sc.onload = function () { resolve(!!window.SwappoAvatar); };
+      sc.onerror = function () { resolve(false); };
+      document.head.appendChild(sc);
+    });
+  }
+  function looksLikePresetKey(v) { return !!v && /^[a-z0-9_]+$/i.test(String(v)); }
+
+  async function setAvatar(link, url, pseudo) {
     const current = link.querySelector('.swp-dash-avatar');
     if (!current) return;
-    if (url) {
+    if (looksLikePresetKey(url) && await ensureAvatarLib()) {
+      const span = document.createElement('span');
+      span.className = 'swp-dash-avatar';
+      span.setAttribute('aria-hidden', 'true');
+      span.style.background = 'transparent';
+      span.style.overflow = 'hidden';
+      span.innerHTML = window.SwappoAvatar.html(url, pseudo);
+      link.querySelector('.swp-dash-avatar').replaceWith(span);
+      return;
+    }
+    if (url && !looksLikePresetKey(url)) {
       const img = new Image();
       img.className = 'swp-dash-avatar';
       img.alt = pseudo || '';
@@ -107,20 +132,25 @@
       pseudoEl.textContent = pseudo;
       pseudoEl.classList.remove('swp-skel', 'swp-skel-text');
     }
-    setAvatar(link, avatarUrl, pseudo);
-    // Swappo Pro members: shield next to the pseudo (their badge, everywhere).
+    await setAvatar(link, avatarUrl, pseudo);
+    // Badge bubble on the avatar: Swappo Pro shield first, else the earned
+    // tier emoji (nothing for a newcomer).
     try {
       const isPro = !!(profileData && (profileData.is_pro || profileData.plan === 'pro'));
-      const old = link.querySelector('.swp-dash-pro');
+      const tiers = (window.BADGE_TIERS || []).reduce(function (m, b) { m[b.tier] = b.emoji; return m; }, {});
+      const tier = profileData && profileData.badge;
+      const emoji = isPro ? '🛡️' : ((tier && tier !== 'newcomer' && tiers[tier]) || '');
+      const old = link.querySelector('.swp-dash-tier');
       if (old) old.remove();
-      if (isPro && pseudoEl) {
-        const shield = document.createElement('span');
-        shield.className = 'swp-dash-pro';
-        shield.title = (typeof t === 'function') ? t('badge_swappo_pro') : 'Swappo Pro';
-        shield.setAttribute('aria-label', shield.title);
-        shield.textContent = '🛡️';
-        shield.style.cssText = 'font-size:12px;margin-inline-start:4px;';
-        pseudoEl.appendChild(shield);
+      if (emoji) {
+        link.style.position = 'relative';
+        const bubble = document.createElement('span');
+        bubble.className = 'swp-dash-tier';
+        bubble.title = isPro ? ((typeof t === 'function') ? t('badge_swappo_pro') : 'Swappo Pro') : String(tier);
+        bubble.setAttribute('aria-label', bubble.title);
+        bubble.textContent = emoji;
+        bubble.style.cssText = 'position:absolute;left:21px;top:19px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);font-size:10px;line-height:16px;text-align:center;pointer-events:none;';
+        link.appendChild(bubble);
       }
     } catch (e) { /* cosmetic */ }
   }

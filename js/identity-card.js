@@ -116,7 +116,10 @@
     const av = el.querySelector('.swp-av');
     if (isRevealed && profile && profile.avatar) {
       av.innerHTML = '';
-      if (/^https?:\/\//.test(profile.avatar)) {
+      if (window.SwappoAvatar && (SwappoAvatar.isPreset(profile.avatar) || SwappoAvatar.isUrl(profile.avatar))) {
+        av.innerHTML = SwappoAvatar.html(profile.avatar, profile.pseudo || profile.display_name);
+        av.style.background = 'transparent';
+      } else if (/^https?:\/\//.test(profile.avatar)) {
         av.innerHTML = '<img src="' + profile.avatar + '" alt="">';
       } else {
         av.textContent = profile.avatar.slice(0, 2).toUpperCase();
