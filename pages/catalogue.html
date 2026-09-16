@@ -1266,12 +1266,14 @@
         // {r} is the retina token — the @2x tile variant ships on
         // high-density screens (Mac / iPhone) so the map looks crisp.
         catalogueMapInstance = L.map('catalogueMap', { zoomControl: true }).setView([25.2, 55.27], 10);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          // CARTO basemaps started watermarking tiles with "API KEY REQUIRED"
-          // (2026-09-17). OpenStreetMap's standard tiles need no key.
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
-          maxZoom: 19
-        }).addTo(catalogueMapInstance);
+        // Monochrome light-gray basemap: areas and district names, no road
+        // clutter (Ahmed prefers the CARTO "light" look, which now needs an
+        // API key). Esri's Light Gray Canvas is free and key-less: a base
+        // layer + a labels ("Reference") layer drawn above it.
+        var esriGray = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_{layer}/MapServer/tile/{z}/{y}/{x}';
+        var esriAttribution = 'Tiles &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a> &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors';
+        L.tileLayer(esriGray, { layer: 'Base', maxZoom: 16, attribution: esriAttribution }).addTo(catalogueMapInstance);
+        L.tileLayer(esriGray, { layer: 'Reference', maxZoom: 16 }).addTo(catalogueMapInstance);
       } else {
         catalogueMapInstance.invalidateSize();
       }
