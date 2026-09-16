@@ -249,6 +249,23 @@
       font-size: 12px;
     }
     .photo-slot.filled .remove-photo { display: flex; }
+    /* Reorder: drag & drop (mouse + touch) and a ★ "make main" button */
+    .photo-slot.filled { touch-action: none; }
+    .photo-slot.dragging { opacity: 0.45; }
+    .photo-slot.drop-target { outline: 3px solid var(--primary); outline-offset: -3px; }
+    .photo-slot .photo-main-badge {
+      position: absolute; left: 6px; bottom: 6px; z-index: 3;
+      background: var(--primary); color: #fff; font-size: 11px; font-weight: 800;
+      padding: 3px 8px; border-radius: 999px; pointer-events: none;
+    }
+    .photo-slot .make-main {
+      position: absolute; right: 6px; bottom: 6px; z-index: 3;
+      width: 26px; height: 26px; border-radius: 50%; border: 0;
+      background: rgba(255,255,255,0.92); color: #F59E0B; font-size: 14px;
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .photo-slot.filled:not(:first-child) .make-main { display: flex; }
     .photo-slot .slot-progress {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -825,6 +842,9 @@
               </div>
             </div>
 
+            <div class="photo-tips" style="margin-bottom:4px;">
+              <span data-i18n="publish_photo_drag_hint">Drag a photo to reorder — the first one is the cover. Tap ★ to make it the main photo.</span>
+            </div>
             <div class="photo-tips">
               <span data-i18n="publish_photo_tip">Tap a slot to pick a photo. Up to 8 photos — they are resized and optimised automatically.</span>
             </div>

@@ -637,11 +637,9 @@ formState.photoBlobs = formState.photoBlobs || [];
 var _pendingSlotIndex = null;
 
 window.openPhotoPicker = function(index) {
-  // If slot already has a photo, clicking removes it
-  if (formState.photoBlobs[index]) {
-    removePhoto(index);
-    return;
-  }
+  // A filled slot is removed with its × button (and reordered by drag /
+  // ★) — a plain tap on the photo must not delete it.
+  if (formState.photoBlobs[index]) return;
   _pendingSlotIndex = index;
   var input = document.getElementById('photoFileInput');
   if (input) { input.value = ''; input.click(); }
@@ -654,6 +652,95 @@ window.removePhoto = function(index) {
   formState.photoBlobs[index] = null;
   refreshPhotoGrid();
 };
+
+// ── Order ────────────────────────────────────────────────
+// Slot 0 is the cover (first photo in items.photos). Photos are kept
+// contiguous: removing one shifts the rest left.
+window.compactPhotos = function() {
+  formState.photoBlobs = (formState.photoBlobs || []).filter(Boolean);
+};
+window.movePhoto = function(from, to) {
+  compactPhotos();
+  var arr = formState.photoBlobs;
+  if (from === to || from < 0 || from >= arr.length) return;
+  var entry = arr.splice(from, 1)[0];
+  if (to > arr.length) to = arr.length;
+  arr.splice(to, 0, entry);
+  refreshPhotoGrid();
+};
+window.setMainPhoto = function(index) { movePhoto(index, 0); };
+
+// Drag & drop between slots — mouse (HTML5 DnD) and touch (pointer events).
+var _dragFrom = null;
+function _slotIndexAt(x, y) {
+  var el = document.elementFromPoint(x, y);
+  var slot = el && el.closest ? el.closest('.photo-slot') : null;
+  return slot ? parseInt(slot.getAttribute('data-index'), 10) : -1;
+}
+function _clearDropTargets() {
+  document.querySelectorAll('.photo-slot.drop-target').forEach(function(s) { s.classList.remove('drop-target'); });
+}
+window.wirePhotoDrag = function(slot, idx) {
+  slot.setAttribute('draggable', 'true');
+  slot.addEventListener('dragstart', function(e) {
+    _dragFrom = idx; slot.classList.add('dragging');
+    try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(idx)); } catch (err) {}
+  });
+  slot.addEventListener('dragend', function() { _dragFrom = null; slot.classList.remove('dragging'); _clearDropTargets(); });
+  // Touch: hold-and-drag with pointer events (HTML5 DnD doesn't fire on iOS)
+  var pressTimer = null, dragging = false;
+  slot.addEventListener('pointerdown', function(e) {
+    if (e.pointerType === 'mouse') return;
+    pressTimer = setTimeout(function() { dragging = true; _dragFrom = idx; slot.classList.add('dragging'); }, 180);
+  });
+  slot.addEventListener('pointermove', function(e) {
+    if (!dragging) { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } return; }
+    e.preventDefault();
+    _clearDropTargets();
+    var over = _slotIndexAt(e.clientX, e.clientY);
+    if (over >= 0 && over !== idx) {
+      var t = document.querySelector('.photo-slot[data-index="' + over + '"]');
+      if (t) t.classList.add('drop-target');
+    }
+  });
+  var endTouch = function(e) {
+    if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+    if (!dragging) return;
+    dragging = false;
+    var over = _slotIndexAt(e.clientX, e.clientY);
+    slot.classList.remove('dragging'); _clearDropTargets();
+    var from = _dragFrom; _dragFrom = null;
+    if (over >= 0 && from != null && over !== from) {
+      var n = (formState.photoBlobs || []).filter(Boolean).length;
+      movePhoto(from, Math.min(over, Math.max(n - 1, 0)));
+    }
+  };
+  slot.addEventListener('pointerup', endTouch);
+  slot.addEventListener('pointercancel', endTouch);
+};
+// Drop targets: every slot accepts a drop (also empty ones → append at the end)
+document.addEventListener('DOMContentLoaded', function() {
+  var grid = document.getElementById('photoGrid');
+  if (!grid) return;
+  grid.addEventListener('dragover', function(e) {
+    if (_dragFrom == null) return;
+    e.preventDefault();
+    _clearDropTargets();
+    var slot = e.target.closest && e.target.closest('.photo-slot');
+    if (slot) slot.classList.add('drop-target');
+  });
+  grid.addEventListener('drop', function(e) {
+    if (_dragFrom == null) return;
+    e.preventDefault();
+    var slot = e.target.closest && e.target.closest('.photo-slot');
+    var to = slot ? parseInt(slot.getAttribute('data-index'), 10) : -1;
+    var from = _dragFrom; _dragFrom = null; _clearDropTargets();
+    if (to >= 0 && to !== from) {
+      var n = (formState.photoBlobs || []).filter(Boolean).length;
+      movePhoto(from, Math.min(to, Math.max(n - 1, 0)));
+    }
+  });
+});
 
 window.handlePhotoFiles = async function(e) {
   var files = Array.from(e.target.files || []);
@@ -721,6 +808,7 @@ window.handlePhotoFiles = async function(e) {
 };
 
 window.refreshPhotoGrid = function() {
+  compactPhotos();
   var slots = document.querySelectorAll('.photo-slot');
   slots.forEach(function(slot, idx) {
     // Wipe non-progress children
@@ -746,8 +834,26 @@ window.refreshPhotoGrid = function() {
         removePhoto(idx);
       };
       slot.insertBefore(btn, slot.firstChild);
+
+      if (idx === 0) {
+        var badge = document.createElement('span');
+        badge.className = 'photo-main-badge';
+        badge.textContent = '★ ' + _pubT('publish_photo_main', 'Main photo');
+        slot.appendChild(badge);
+      } else {
+        var mk = document.createElement('button');
+        mk.type = 'button';
+        mk.className = 'make-main';
+        mk.title = _pubT('publish_photo_make_main', 'Make main photo');
+        mk.setAttribute('aria-label', mk.title);
+        mk.textContent = '★';
+        mk.onclick = function(ev) { ev.stopPropagation(); setMainPhoto(idx); };
+        slot.appendChild(mk);
+      }
+      if (!slot.__dragWired) { wirePhotoDrag(slot, idx); slot.__dragWired = true; }
     } else {
       slot.classList.remove('filled');
+      slot.removeAttribute('draggable');
       var ph = document.createElement('div');
       ph.className = 'photo-placeholder';
       ph.textContent = '+';
