@@ -301,7 +301,7 @@ function openMobileMenu(prefix, pagesPrefix) {
       <button class="mobile-menu-close" aria-label="Close menu">&times;</button>
       <div class="mobile-menu-logo">
         <a href="${prefix}index.html">
-          <img src="assets/brand/swappo-logo-teal.png" alt="Swappo" width="32" height="32" style="vertical-align:middle;margin-right:6px;"> Swappo
+          <img src="${prefix}assets/brand/swappo-logo-teal.png" alt="Swappo" width="32" height="32" style="vertical-align:middle;margin-right:6px;"> Swappo
         </a>
       </div>
       <ul class="mobile-menu-nav">
@@ -313,11 +313,26 @@ function openMobileMenu(prefix, pagesPrefix) {
         <li><a href="${pagesPrefix}profile.html"><i class="fas fa-user"></i> My Swaps</a></li>
         <li><a href="${pagesPrefix}pricing.html"><i class="fas fa-tag"></i> Pricing</a></li>
       </ul>
+      <div class="mobile-menu-langs" role="group" aria-label="Language"></div>
       <div class="mobile-menu-footer">
-        <a href="${pagesPrefix}login.html" class="btn btn-primary" style="width:100%;text-align:center;">Join the Swap</a>
+        <a href="${pagesPrefix}login.html" class="btn btn-primary" data-mm-join style="width:100%;text-align:center;">Join the Swap</a>
       </div>
     `;
     document.body.appendChild(drawer);
+
+    // Language pills (the navbar switcher is hidden on phones)
+    try {
+      const langs = [['en','🇬🇧 EN'],['fr','🇫🇷 FR'],['ar','🇦🇪 AR'],['ur','🇵🇰 UR'],['ru','🇷🇺 RU']];
+      const host = drawer.querySelector('.mobile-menu-langs');
+      const current = (typeof getCurrentLang === 'function') ? getCurrentLang() : (document.documentElement.lang || 'en');
+      host.innerHTML = langs.map(([code, label]) => '<button type="button" data-lang="' + code + '" class="' + (code === current ? 'active' : '') + '">' + label + '</button>').join('');
+      host.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-lang]');
+        if (!b) return;
+        if (typeof setLanguage === 'function') setLanguage(b.getAttribute('data-lang'));
+        host.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+      });
+    } catch (e) { /* language pills are optional */ }
 
     // Close button
     drawer.querySelector('.mobile-menu-close').addEventListener('click', () => {

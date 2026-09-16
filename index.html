@@ -860,14 +860,19 @@
       btn.onclick = function() { showSurprise(); };
       document.body.appendChild(btn);
 
-      window.showSurprise = function() {
-        var items = DemoItems.browse({ sortBy: 'popular' }).items;
-        if (!items.length) return;
-        var item = items[Math.floor(Math.random() * Math.min(20, items.length))];
-        var title = ((item.brand || '') + ' ' + (item.model || '')).trim() || 'Mystery Item';
-        var photo = (item.photos && item.photos[0]) || '';
-        var cat = item.category || '';
-        var cond = item.condition || '';
+      // Random live listing (the old version read a demo store that no
+      // longer exists, so the button did nothing).
+      var _esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
+      window.showSurprise = async function() {
+        if (!(window.SwappoItems && window.db)) return;
+        var res = await window.SwappoItems.browse({ sortBy: 'popular', limit: 20 });
+        var items = (res && res.items) || [];
+        if (!items.length) { if (window.Toast) Toast.show('No listings yet — be the first to drop one!', 'info'); return; }
+        var item = items[Math.floor(Math.random() * items.length)];
+        var title = _esc(SwappoItems.itemTitle ? SwappoItems.itemTitle(item) : (item.model || 'Item'));
+        var photo = /^https?:\/\//.test(String((item.photos && item.photos[0]) || '')) ? _esc(item.photos[0]) : '';
+        var cat = _esc(item.category || '');
+        var cond = _esc(item.condition || '');
 
         var overlay = document.createElement('div');
         overlay.className = 'surprise-overlay';
@@ -880,7 +885,7 @@
             '<p style="font-size:12px;color:#6B7280;font-style:italic;margin:0 0 20px;">Popular in your area</p>' +
             '<div style="display:flex;gap:10px;justify-content:center;">' +
               '<button onclick="this.closest(\'.surprise-overlay\').remove();showSurprise();" class="btn-pill btn-pill-outline" style="font-size:13px;padding:10px 20px;"><i class="fas fa-dice"></i> Another</button>' +
-              '<a href="pages/product.html?id=' + item.id + '" class="btn-pill btn-pill-teal" style="font-size:13px;padding:10px 20px;">View item →</a>' +
+              '<a href="pages/product.html?id=' + _esc(item.id) + '" class="btn-pill btn-pill-teal" style="font-size:13px;padding:10px 20px;">View item →</a>' +
             '</div>' +
           '</div>';
         document.body.appendChild(overlay);
@@ -888,12 +893,14 @@
       };
     })();
 
-    function convertToGift(itemId, btn) {
-      if (window.DemoItems && DemoItems.update) {
-        DemoItems.update(itemId, { is_giveaway: true });
+    async function convertToGift(itemId, btn) {
+      // Turn a listing into a gift (Supabase; the old demo store is gone).
+      if (window.SwappoItems && SwappoItems.update) {
+        var r = await SwappoItems.update(itemId, { is_giveaway: true, price: 0 });
+        if (r && !r.success) { if (window.Toast) Toast.show(r.error || 'Could not update the listing.', 'error'); return; }
       }
-      DemoNotifications.showToast('Item moved to Gift Corner! 🎁', 'success');
-      btn.closest('div[style*="fixed"]').remove();
+      if (window.Toast) Toast.show('Item moved to Gift Corner! 🎁', 'success');
+      var box = btn && btn.closest('div[style*="fixed"]'); if (box) box.remove();
     }
   </script>
 </body>

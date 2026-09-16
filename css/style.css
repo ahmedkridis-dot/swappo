@@ -1269,7 +1269,9 @@ a.site-logo:hover { color: #078A91 !important; }
   width: 300px;
   height: 100vh;
   background: white;
-  z-index: 200;
+  /* Above the sticky navbar (1050), eco ticker and category bar (999):
+     the drawer used to slide underneath them on phones. */
+  z-index: 1200;
   box-shadow: -4px 0 24px rgba(0,0,0,0.1);
   transform: translateX(100%);
   transition: transform var(--dur-slow) ease;
@@ -1283,7 +1285,7 @@ a.site-logo:hover { color: #078A91 !important; }
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  z-index: 199;
+  z-index: 1190;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--dur-slow) ease;
@@ -1566,3 +1568,34 @@ html.swp-auth-out #swp-dash-link { display: none !important; }
    viewport as the only scroller (position: sticky still works); `hidden`
    is the fallback for browsers without overflow: clip. */
 html { overflow-x: hidden; overflow-x: clip; }
+
+
+/* ── Phone header (≤640px) ─────────────────────────────────
+   Logged-in: logo · bell · chat · avatar · + · ☰ on ONE row. The language
+   switcher lives in the ☰ drawer, "Drop an Item" is a round + button.
+   Before: the row wrapped and spilled over the eco ticker. */
+@media (max-width: 640px) {
+  .navbar .navbar-inner { flex-wrap: nowrap; gap: 6px; }
+  .navbar .navbar-actions { gap: 6px; flex-wrap: nowrap; flex-shrink: 0; }
+  .navbar #swappo-language-selector, .navbar .swappo-language-select, .navbar .lang-dropdown { display: none !important; }
+  .navbar .navbar-actions a[data-i18n="drop_item"] {
+    width: 36px; height: 36px; padding: 0; border-radius: 50%;
+    font-size: 0; line-height: 36px; display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .navbar .navbar-actions a[data-i18n="drop_item"]::before {
+    content: '+'; font-size: 24px; font-weight: 700; line-height: 1; color: #fff;
+  }
+  .navbar .navbar-actions a[data-i18n="join_swap"] { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
+  .navbar .site-logo { flex-shrink: 0; }
+  .navbar .navbar-toggle { flex-shrink: 0; }
+}
+
+/* Language switcher inside the ☰ drawer (phones) */
+.mobile-menu-langs { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 6px; }
+.mobile-menu-langs button {
+  border: 1px solid var(--border, #EBEBEB); background: #fff; border-radius: 999px;
+  padding: 7px 12px; font: 600 13px Inter, sans-serif; color: var(--text, #171717); cursor: pointer;
+}
+.mobile-menu-langs button.active { border-color: var(--primary, #09B1BA); color: var(--primary, #09B1BA); background: var(--primary-light, #E6F7F8); }
+html.swp-auth-in .mobile-menu-footer a[data-mm-join] { display: none; }
