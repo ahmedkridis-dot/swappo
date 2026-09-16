@@ -90,7 +90,10 @@
   }
 
   // ── Boost tier picker (small inline modal, matches other Swappo modals) ──
-  function _pickBoostTier() {
+  // opts.pro = result of pro_boosts_status() → the included boost is offered
+  // first (or a "used up" note when the monthly 3 are gone).
+  function _pickBoostTier(opts) {
+    opts = opts || {};
     return new Promise(function (resolve) {
       var tiers = window.BOOST_PRICES || {
         '24h': { price: 5,  duration: 1 },
@@ -103,9 +106,24 @@
         '7d':  _payT('pay_boost_7d',  '7-day boost + featured')
       };
 
+      var proRows = '';
+      if (opts.pro && opts.pro.is_pro) {
+        var pro = opts.pro;
+        if ((pro.remaining || 0) > 0) {
+          proRows =
+            '<button type="button" data-tier="pro" style="display:block;width:100%;padding:16px;margin-bottom:8px;border:0;border-radius:14px;background:linear-gradient(135deg,#09B1BA,#0891B2);color:#fff;cursor:pointer;font-family:inherit;text-align:left;box-shadow:0 6px 16px rgba(9,177,186,0.3);">' +
+              '<span style="display:block;font-size:15px;font-weight:800;">💎 ' + _payT('pay_pro_boost_btn', 'Use my Pro boost — 3 days, included') + '</span>' +
+              '<span style="display:block;font-size:12px;opacity:0.9;margin-top:4px;">' + _payT('pay_pro_boost_left', '{n} of {limit} Pro boosts left this month').replace('{n}', pro.remaining).replace('{limit}', pro.limit) + '</span>' +
+            '</button>' +
+            '<div style="font-size:12px;color:var(--text-muted,#999);text-align:center;margin:6px 0 10px;">' + _payT('pay_pro_boost_or_buy', 'Or buy a longer boost:') + '</div>';
+        } else {
+          proRows = '<div style="font-size:13px;color:var(--text-secondary,#555);background:var(--primary-light,#E6F7F8);border-radius:12px;padding:10px 12px;margin:0 0 12px;text-align:center;">💎 ' +
+            _payT('pay_pro_boost_exhausted', 'Your {limit} Pro boosts are used up this month — they reset on the 1st. You can still buy one:').replace('{limit}', pro.limit) + '</div>';
+        }
+      }
       var overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
-      var rows = Object.keys(tiers).map(function (key) {
+      var rows = proRows + Object.keys(tiers).map(function (key) {
         var tcfg = tiers[key];
         return '<button type="button" data-tier="' + key + '" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border,#EBEBEB);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;">' +
           '<span style="font-size:14px;font-weight:600;color:var(--text,#171717);">' + labels[key] + '</span>' +
@@ -181,6 +199,33 @@
     mo.observe(document.body, { childList: true, subtree: true });
   }
 
+  // ── Pro included boosts (server-side: migration 035) ──────
+  async function _proBoostStatus() {
+    if (!window.db) return null;
+    try {
+      var r = await window.db.rpc('pro_boosts_status');
+      return (r && !r.error && r.data) ? r.data : null;
+    } catch (e) { return null; }
+  }
+  async function _useProBoost(itemId) {
+    var r;
+    try { r = await window.db.rpc('use_pro_boost', { p_item_id: itemId }); }
+    catch (e) { r = { error: e }; }
+    if (r && r.error) {
+      var msg = String(r.error.message || '');
+      if (/pro_boosts_exhausted/.test(msg)) _toast(_payT('pay_pro_boost_exhausted', 'Your Pro boosts are used up this month.').replace('{limit}', 3), 'warning');
+      else if (/item_not_available/.test(msg)) _toast(_payT('pay_boost_item_unavailable', "This listing can't be boosted right now (it must be available)."), 'warning');
+      else if (/pro_required/.test(msg)) _toast(_payT('pay_signin_required', 'Please sign in first.'), 'warning');
+      else _toast(_payT('pay_error', 'Payment could not be started.') + ' ' + msg, 'error');
+      return false;
+    }
+    var d = r.data || {};
+    _toast(_payT('pay_pro_boost_done', 'Boost activated with your Pro plan! 🚀 {n} left this month.').replace('{n}', d.remaining != null ? d.remaining : ''), 'success');
+    try { document.dispatchEvent(new CustomEvent('swappo:boosted', { detail: d })); } catch (e) {}
+    setTimeout(function () { location.reload(); }, 1400);
+    return true;
+  }
+
   // ── Public API ────────────────────────────────────────────
   var SwappoPayment = {
 
@@ -200,6 +245,16 @@
       var user = await _requireUser();
       if (!user) return false;
       if (!itemId) { _toast(_payT('pay_error', 'Payment could not be started.'), 'error'); return false; }
+      // Pro plan: 3 included boosts / month, applied by use_pro_boost().
+      if (!tier && (user.is_pro || user.plan === 'pro')) {
+        var status = await _proBoostStatus();
+        if (status && status.is_pro) {
+          var choice = await _pickBoostTier({ pro: status });
+          if (!choice) return false;
+          if (choice === 'pro') return _useProBoost(itemId);
+          tier = choice;
+        }
+      }
       if (!tier) tier = await _pickBoostTier();
       if (!tier) return false;
       return _checkout({ kind: 'boost', item_id: itemId, tier: tier });

@@ -2121,6 +2121,16 @@
               boosts_limit: _tierForPlan.boosts,
               next_renewal: _nextRenewal
             };
+            // Pro: "Boosts x/3 used" = included boosts consumed this month (migration 035).
+            if (_planKey !== 'free' && window.db && window.db.rpc) {
+              try {
+                var _pbs = await window.db.rpc('pro_boosts_status');
+                if (_pbs && !_pbs.error && _pbs.data && _pbs.data.is_pro) {
+                  planInfo.boosts_used = _pbs.data.used;
+                  planInfo.boosts_limit = _pbs.data.limit;
+                }
+              } catch (e) { /* keep the fallback numbers */ }
+            }
             const tierInfo = planInfo.tier;
             // Preserve legacy `favorites` name as a list of ids.
             const favorites = favoriteItems.map(function(it) { return it.id; });
@@ -3506,24 +3516,12 @@
         });
 
         function showBoostPicker(itemId) {
-            // Payments gated by FEATURES.PAYMENTS — explain instead of opening the picker.
+            // One picker for every entry point (product page + My Items):
+            // js/stripe.js shows the included Pro boost first when the
+            // member still has some this month, then the paid tiers.
             if (window.SwappoPayment && !SwappoPayment.enabled()) { SwappoPayment.comingSoon(); return; }
-            var o = document.createElement('div');
-            o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
-            o.innerHTML =
-              '<div style="background:#fff;border-radius:20px;padding:32px;max-width:380px;width:100%;text-align:center;">' +
-                '<div style="font-size:36px;margin-bottom:10px;">🚀</div>' +
-                '<h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 6px;">Boost your item</h3>' +
-                '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">Get more visibility in search results</p>' +
-                '<div style="display:flex;flex-direction:column;gap:10px;">' +
-                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();window.SwappoPayment&&SwappoPayment.buyBoost(\'' + itemId + '\',\'24h\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition: transform .2s, opacity .2s, background-color .2s, border-color .2s, color .2s, box-shadow .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>24h Boost</strong></span><span style="font-weight:700;color:#09B1BA;">5 AED</span></button>' +
-                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();window.SwappoPayment&&SwappoPayment.buyBoost(\'' + itemId + '\',\'3d\')" style="padding:14px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;transition: transform .2s, opacity .2s, background-color .2s, border-color .2s, color .2s, box-shadow .2s;" onmouseover="this.style.borderColor=\'#09B1BA\'" onmouseout="this.style.borderColor=\'\'"><span><strong>3-day Boost</strong></span><span style="font-weight:700;color:#09B1BA;">10 AED</span></button>' +
-                  '<button onclick="this.closest(\'div[style*=fixed]\').remove();window.SwappoPayment&&SwappoPayment.buyBoost(\'' + itemId + '\',\'7d\')" style="padding:14px;border:2px solid #09B1BA;border-radius:12px;background:#F0FBFC;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;"><span><strong>7-day Featured</strong> <span style="font-size:11px;color:#6B7280;">⭐ Best value</span></span><span style="font-weight:700;color:#09B1BA;">25 AED</span></button>' +
-                '</div>' +
-                '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="margin-top:12px;border:none;background:none;color:#6B7280;font-size:13px;cursor:pointer;">Cancel</button>' +
-              '</div>';
-            document.body.appendChild(o);
-            o.addEventListener('click', function(e) { if (e.target === o) o.remove(); });
+            if (!window.SwappoPayment) { Toast.show('Payments are loading — please try again.', 'warning'); return; }
+            SwappoPayment.buyBoost(itemId);
         }
 
         // Legacy acceptOffer / declineOffer / counterOffer removed 2026-04-16.
