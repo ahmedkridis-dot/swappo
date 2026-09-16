@@ -184,7 +184,7 @@
         const tiers = { newcomer: '🌱 Newcomer', swapper: '⭐ Swapper', active: '🔥 Active', pro: '💎 Pro', elite: '🏆 Elite', legend: '👑 Legend' };
         const chips = [];
         if (tiers[profile.badge]) chips.push(tiers[profile.badge]);
-        if (profile.is_pro) chips.push('💎 Swappo Pro');
+        if (profile.is_pro || profile.plan === 'pro') chips.push('🛡️ ' + ((typeof t === 'function') ? t('badge_swappo_pro') : 'Swappo Pro'));
         // ✓ Verified — trust badge only; the phone number itself is never exposed.
         if (profile.is_verified === true) chips.push('✓ ' + ((typeof t === 'function') ? t('badge_verified') : 'Verified'));
         badgesRow.innerHTML = chips.length

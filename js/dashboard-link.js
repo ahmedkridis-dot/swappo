@@ -88,6 +88,7 @@
     if (!link || !user) return;
     let pseudo = user.email ? user.email.split('@')[0] : 'You';
     let avatarUrl = '';
+    let profileData = null;
     // Use the shared SwappoAuth profile cache — other modules booting in
     // parallel (bell, messages icon, chat init) hit the same endpoint,
     // so coalesce to a single round-trip.
@@ -95,6 +96,7 @@
       const data = (window.SwappoAuth && window.SwappoAuth.getUserProfile)
         ? await window.SwappoAuth.getUserProfile(user.id)
         : null;
+      profileData = data;
       if (data) {
         pseudo = data.pseudo || data.display_name || pseudo;
         avatarUrl = data.avatar || '';
@@ -106,6 +108,21 @@
       pseudoEl.classList.remove('swp-skel', 'swp-skel-text');
     }
     setAvatar(link, avatarUrl, pseudo);
+    // Swappo Pro members: shield next to the pseudo (their badge, everywhere).
+    try {
+      const isPro = !!(profileData && (profileData.is_pro || profileData.plan === 'pro'));
+      const old = link.querySelector('.swp-dash-pro');
+      if (old) old.remove();
+      if (isPro && pseudoEl) {
+        const shield = document.createElement('span');
+        shield.className = 'swp-dash-pro';
+        shield.title = (typeof t === 'function') ? t('badge_swappo_pro') : 'Swappo Pro';
+        shield.setAttribute('aria-label', shield.title);
+        shield.textContent = '🛡️';
+        shield.style.cssText = 'font-size:12px;margin-inline-start:4px;';
+        pseudoEl.appendChild(shield);
+      }
+    } catch (e) { /* cosmetic */ }
   }
 
   async function refreshBadge(user) {

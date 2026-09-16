@@ -789,8 +789,8 @@
           items.sort(function(a, b) {
             var aBoost = a.is_boosted ? 2 : 0;
             var bBoost = b.is_boosted ? 2 : 0;
-            var aPro = (a.user_id === 'user-demo' || a.is_pro_user) ? 1 : 0;
-            var bPro = (b.user_id === 'user-demo' || b.is_pro_user) ? 1 : 0;
+            var aPro = a.owner_is_pro ? 1 : 0;
+            var bPro = b.owner_is_pro ? 1 : 0;
             var priority = (bBoost + bPro) - (aBoost + aPro);
             return priority !== 0 ? priority : 0; // keep original sub-order
           });

@@ -104,9 +104,10 @@
     // Sorting
     switch (opts.sortBy) {
       case 'popular':
-        // Boosted first here too — "Popular right now" on the homepage
-        // uses this sort and a boost must show at the top of every feed.
+        // Boosted first, then Swappo Pro members ("priority in search
+        // results"), then the most favourited.
         q = q.order('is_boosted', { ascending: false })
+             .order('owner_is_pro', { ascending: false })
              .order('favorites_count', { ascending: false });
         break;
       case 'oldest':
@@ -114,8 +115,9 @@
         break;
       case 'newest':
       default:
-        // Boosted first, then newest
+        // Boosted first, then Swappo Pro members, then newest
         q = q.order('is_boosted', { ascending: false })
+             .order('owner_is_pro', { ascending: false })
              .order('created_at', { ascending: false });
         break;
     }
@@ -432,6 +434,7 @@
         (locSafe ? '<div class="product-location" style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:#6B7280;margin-top:4px;font-weight:500;"><i class="fas fa-map-marker-alt" style="color:#09B1BA;font-size:0.7rem;"></i> ' + locSafe + '</div>' : '') +
         '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">' + modesHTML +
           // ✓ Verified owner — only when the feed attaches owner_is_verified (users_public.is_verified).
+          (item.owner_is_pro === true ? '<span class="swp-chip-pro" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:700;background:#FCE7F3;color:#BE185D;">🛡️ ' + _esc((typeof t === 'function') ? t('badge_swappo_pro') : 'Swappo Pro') + '</span>' : '') +
           (item.owner_is_verified === true ? '<span class="swp-chip-verified" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:700;background:var(--primary-light,#E6F7F8);color:var(--primary-dark,#078A91);">✓ ' + _esc((typeof t === 'function') ? t('badge_verified') : 'Verified') + '</span>' : '') +
           (item.shipping_enabled ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E0F2FE;color:#075985;">\u{1F69A} Delivery</span>' : '') +
           (['furniture', 'vehicles', 'sports'].includes(item.category) ? '<span style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#FDF2F8;color:#9D174D;">\u{1F69B} Truck</span>' : '') +

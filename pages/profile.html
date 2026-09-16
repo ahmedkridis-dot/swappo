@@ -1385,6 +1385,7 @@
             <div id="tier-progress"></div>
             <div class="progress-fill" id="progress-fill"></div>
             <div id="tier-badges-row"></div>
+            <div id="pro-badge-row" hidden style="margin-top:10px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#FCE7F3;color:#BE185D;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;">🛡️ <span data-i18n="badge_swappo_pro">Swappo Pro</span></span></div>
             <!-- P4B — Airbnb-style badge decay countdown / warning -->
             <div id="badge-decay-host"></div>
         </div>
@@ -1416,7 +1417,7 @@
                 <div class="stat-label" style="text-align:left;" data-i18n="dash_your_rating">Your rating</div>
             </a>
             <!-- Exchanges this month (plan card — colored bg) -->
-            <a href="pricing.html" class="stat-card" style="text-align:left;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-color:#C7D2FE;text-decoration:none;color:inherit;cursor:pointer;">
+            <a href="pricing.html" id="stat-plan-card" class="stat-card" style="text-align:left;background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-color:#C7D2FE;text-decoration:none;color:inherit;cursor:pointer;">
                 <div style="margin-bottom:12px;">
                     <span id="stat-plan-badge" style="background:#6366F1;color:white;font-size:12px;font-weight:600;padding:4px 12px;border-radius:var(--radius-pill,999px);" data-i18n="profile_free_badge">Free</span>
                 </div>
@@ -1468,6 +1469,7 @@
 
                 <!-- ========== TAB: MY ITEMS ========== -->
                 <div class="tab-content active" id="my-items">
+                    <div id="pro-insights" style="display:none;margin-bottom:16px;"></div>
                     <div class="my-items-filters" id="my-items-filters" role="tablist" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
                         <button type="button" class="mi-filter active" data-mi-filter="active" role="tab" aria-selected="true"><span data-i18n="profile_filter_active">Active</span> <span class="mi-filter-count" data-mi-count="active">0</span></button>
                         <button type="button" class="mi-filter" data-mi-filter="reserved" role="tab" aria-selected="false"><span data-i18n="profile_filter_reserved">Reserved</span> <span class="mi-filter-count" data-mi-count="reserved">0</span></button>
@@ -1771,20 +1773,40 @@
                             onclick="if(window.SwappoPayment){SwappoPayment.manageSubscription()}">
                         <i class="fas fa-credit-card"></i> <span data-i18n="pay_manage_subscription">Manage subscription</span>
                     </button>
+                    <a class="sub-upgrade-btn" id="sidebar-support-btn" hidden href="https://wa.me/971543125559?text=Swappo%20Pro%20support" target="_blank" rel="noopener" style="background:#25D366;margin-top:8px;" title="" data-i18n-title="support_priority_hint">
+                        <i class="fab fa-whatsapp"></i> <span data-i18n="support_priority">Priority support</span>
+                    </a>
                     <script>
                       // Pro members manage billing in the Stripe portal; Free members see Upgrade.
                       document.addEventListener('DOMContentLoaded', function () {
                         var tries = 0;
                         (function poll() {
-                          if (window.SwappoAuth && SwappoAuth.isReady && SwappoAuth.isReady()) {
+                          var ready = window.SwappoAuth && SwappoAuth.isReady && SwappoAuth.isReady() && window.SwappoPayment && SwappoPayment.isPro;
+                          if (ready) {
                             // The session user has no plan field: ask the server.
-                            (window.SwappoPayment && SwappoPayment.isPro ? SwappoPayment.isPro() : Promise.resolve(false)).then(function (pro) {
+                            SwappoPayment.isPro().then(function (pro) {
+                              window.__swpIsPro = !!pro;
                               var up = document.getElementById('sidebar-upgrade-btn');
                               var mg = document.getElementById('sidebar-manage-btn');
+                              var sp = document.getElementById('sidebar-support-btn');
                               if (up) up.hidden = !!pro;
                               if (mg) mg.hidden = !pro;
+                              if (sp) sp.hidden = !pro;
+                              var row = document.getElementById('pro-badge-row');
+                              if (row) row.hidden = !pro;
+                              // Plan stat card: a member is already Pro → it opens the
+                              // billing portal instead of the pricing page.
+                              var card = document.getElementById('stat-plan-card');
+                              var badge = document.getElementById('stat-plan-badge');
+                              if (pro && card) {
+                                card.href = '#';
+                                card.title = (typeof t === 'function') ? t('pro_active_manage') : 'Swappo Pro active · manage subscription';
+                                card.onclick = function (e) { e.preventDefault(); if (window.SwappoPayment) SwappoPayment.manageSubscription(); };
+                                if (badge) badge.textContent = '🛡️ ' + ((typeof t === 'function') ? t('badge_swappo_pro') : 'Swappo Pro');
+                              }
+                              try { document.dispatchEvent(new CustomEvent('swappo:pro-status', { detail: { pro: !!pro } })); } catch (e2) {}
                             }).catch(function () {});
-                          } else if (tries++ < 40) {
+                          } else if (tries++ < 60) {
                             setTimeout(poll, 100);
                           }
                         })();
@@ -2269,6 +2291,25 @@
                 });
             } catch (e) { /* best-effort — badges just won't show */ }
 
+            // Pro "Analytics & insights": offers / claims received per listing
+            // (any status) — used by the per-card stats and the summary panel.
+            var offersByItem = {};
+            var offersTotal = 0;
+            if (window.__swpIsPro === undefined && window.SwappoPayment && SwappoPayment.isPro) {
+                try { window.__swpIsPro = await SwappoPayment.isPro(); } catch (e) { window.__swpIsPro = false; }
+            }
+            if (window.__swpIsPro) {
+                try {
+                    const { data: offerRows } = await window.db.from('swaps')
+                        .select('receiver_item_id, status')
+                        .eq('receiver_id', user.id);
+                    (offerRows || []).forEach(function (r) {
+                        if (!r.receiver_item_id) return;
+                        offersByItem[r.receiver_item_id] = (offersByItem[r.receiver_item_id] || 0) + 1;
+                        offersTotal++;
+                    });
+                } catch (e) { /* stats are best-effort */ }
+            }
             const itemsGrid = document.getElementById('my-items-grid');
             // Classify into buckets so the filter pills have counts + can
             // slice the view. Active = live listings, Reserved = locked
@@ -2327,6 +2368,7 @@
                         '<div class="product-title">' + title + '</div>' +
                         '<div class="product-category">' + (item.category || '') + '</div>' +
                         (item.price ? '<div class="product-price" style="font-size:15px;font-weight:700;color:var(--primary,#09B1BA);margin-bottom:6px;">' + item.price.toLocaleString() + ' AED</div>' : '') +
+                        (window.__swpIsPro ? '<div class="mi-stats" style="font-size:11px;color:var(--text-muted,#6B7280);margin:-2px 0 6px;display:flex;gap:10px;"><span title="' + ((typeof t === 'function') ? t('insights_views') : 'Views') + '">👁 ' + (item.views_count || 0) + '</span><span title="' + ((typeof t === 'function') ? t('insights_favorites') : 'Favorites') + '">❤️ ' + (item.favorites_count || 0) + '</span><span title="' + ((typeof t === 'function') ? t('insights_offers') : 'Offers') + '">📩 ' + (offersByItem[item.id] || 0) + '</span></div>' : '') +
                     '<div class="product-actions">' + actions + '</div>' +
                         '<div class="my-auto-decline-host" data-item-id="' + item.id + '"></div>' +
                     '</div>' +
@@ -2372,6 +2414,37 @@
                 });
             }
             _renderBucket('active');
+
+            // ── Analytics & insights (Swappo Pro) ──────────────────────
+            (function renderInsights() {
+                var host = document.getElementById('pro-insights');
+                if (!host) return;
+                var T = function (k, f) { return (typeof t === 'function') ? t(k) : f; };
+                if (!window.__swpIsPro) {
+                    host.style.display = 'block';
+                    host.innerHTML = '<a href="pricing.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px dashed var(--border,#EBEBEB);border-radius:12px;font-size:13px;color:var(--text-muted,#6B7280);text-decoration:none;">🔒 <span>' + T('insights_locked', 'Analytics & insights are a Swappo Pro feature.') + '</span></a>';
+                    return;
+                }
+                var live = userItems.filter(function (i) { return i.status === 'available' || i.status === 'reserved'; });
+                var views = userItems.reduce(function (n, i) { return n + (i.views_count || 0); }, 0);
+                var favs  = userItems.reduce(function (n, i) { return n + (i.favorites_count || 0); }, 0);
+                var top = userItems.slice().sort(function (a, b) { return (b.views_count || 0) - (a.views_count || 0); })[0];
+                var topTitle = top ? ((window.SwappoItems && SwappoItems.itemTitle) ? SwappoItems.itemTitle(top) : (top.model || top.type || '')) : '—';
+                var stat = function (icon, label, value) {
+                    return '<div style="flex:1;min-width:120px;background:#fff;border:1px solid var(--border,#EBEBEB);border-radius:12px;padding:12px 14px;">' +
+                        '<div style="font-size:11px;color:var(--text-muted,#6B7280);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">' + icon + ' ' + label + '</div>' +
+                        '<div style="font-size:20px;font-weight:800;color:var(--text,#171717);margin-top:4px;word-break:break-word;">' + value + '</div></div>';
+                };
+                host.style.display = 'block';
+                host.innerHTML =
+                    '<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#BE185D;margin-bottom:8px;">🛡️ ' + T('insights_title', 'Analytics & insights') + '</div>' +
+                    '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+                        stat('👁', T('insights_views', 'Views'), views.toLocaleString()) +
+                        stat('❤️', T('insights_favorites', 'Favorites'), favs.toLocaleString()) +
+                        stat('📩', T('insights_offers', 'Offers & claims received'), offersTotal.toLocaleString()) +
+                        stat('🏆', T('insights_top', 'Top listing'), top ? (String(topTitle).replace(/</g, '&lt;') + ' <span style="font-size:12px;color:var(--text-muted,#6B7280);font-weight:600;">· ' + (top.views_count || 0) + ' 👁</span>') : '—') +
+                    '</div>';
+            })();
 
             // P4B — Auto-decline control per item. Pro users get a live toggle;
             // Free users see a greyed-out "Pro feature" pill.

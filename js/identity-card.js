@@ -162,12 +162,14 @@
       verified.textContent = '✓ ' + tr('badge_verified', 'Verified');
       line2.appendChild(verified);
     }
-    if (isRevealed && profile && profile.is_pro) {
+    // Swappo Pro badge — like the tier badge and rating, it is part of the
+    // anonymous card too (identity stays hidden, trust signals don't).
+    if (profile && (profile.is_pro || profile.plan === 'pro')) {
       const pro = document.createElement('span');
       pro.className = 'swp-chip';
       pro.style.background = '#FCE7F3';
       pro.style.color = '#BE185D';
-      pro.textContent = '💎 Pro';
+      pro.textContent = '🛡️ ' + tr('badge_swappo_pro', 'Swappo Pro');
       line2.appendChild(pro);
     }
     const swaps = document.createElement('span');
