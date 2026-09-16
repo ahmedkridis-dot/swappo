@@ -1538,6 +1538,7 @@
     seller_member_since: "ممبر از",
     seller_disclaimer: "دونوں فریقوں کی قبولیت کے بعد شناخت ظاہر ہوتی ہے۔",
     boosted: "بوسٹ شدہ",
+    boosted_until: "{date} تک بوسٹ شدہ",
     free_giveaway: "مفت تحفہ",
 
     plan_pro: 'Swappo Pro',

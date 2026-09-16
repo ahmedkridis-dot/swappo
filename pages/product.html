@@ -1349,8 +1349,13 @@
         '<i class="fas fa-pen"></i> ' + t('product_edit_listing') + '</button>';
       actionsHTML += '<button class="btn-primary" style="font-size:15px;" onclick="window.location.href=\'profile.html\'">' +
         '<i class="fas fa-cog"></i> Manage in My Swaps</button>';
-      actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" data-pay-cta="boost" onclick="if(window.SwappoPayment){SwappoPayment.buyBoost(\'' + item.id + '\')}else{window.location.href=\'pricing.html\'}">' +
-        '<i class="fas fa-rocket"></i> ' + t('pay_choose_boost') + '</button>';
+      if (window.SwappoPayment && SwappoPayment.boostActiveUntil && SwappoPayment.boostActiveUntil(item)) {
+        actionsHTML += '<div style="background:#FFFBEB;border:1px solid #FCD34D;color:#B45309;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:700;text-align:center;">' +
+          '<i class="fas fa-rocket"></i> ' + _escHtml(SwappoPayment.boostedUntilLabel(item)) + '</div>';
+      } else {
+        actionsHTML += '<button class="btn-primary" style="background:#F59E0B;font-size:14px;" data-pay-cta="boost" onclick="if(window.SwappoPayment){SwappoPayment.buyBoost(\'' + item.id + '\')}else{window.location.href=\'pricing.html\'}">' +
+          '<i class="fas fa-rocket"></i> ' + t('pay_choose_boost') + '</button>';
+      }
     } else if (item.is_giveaway) {
       // Giveaway: Claim button
       if (isGuest) {

@@ -1513,6 +1513,7 @@
     seller_member_since: "Участник с",
     seller_disclaimer: "Личность раскрывается после того, как обе стороны примут обмен.",
     boosted: "Продвинуто",
+    boosted_until: "Продвигается до {date}",
     free_giveaway: "Бесплатная раздача",
 
     plan_pro: 'Swappo Pro',

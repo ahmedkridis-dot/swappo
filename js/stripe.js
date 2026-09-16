@@ -123,7 +123,12 @@
       }
       var overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
-      var rows = proRows + Object.keys(tiers).map(function (key) {
+      // A member who still has an included 3-day boost is only offered the
+      // paid tiers that are LONGER than it (7 days); once the monthly Pro
+      // boosts are used up, every tier comes back.
+      var proLeft = !!(opts.pro && opts.pro.is_pro && (opts.pro.remaining || 0) > 0);
+      var tierKeys = Object.keys(tiers).filter(function (key) { return !proLeft || (tiers[key].duration || 0) > 3; });
+      var rows = proRows + tierKeys.map(function (key) {
         var tcfg = tiers[key];
         return '<button type="button" data-tier="' + key + '" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border,#EBEBEB);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;">' +
           '<span style="font-size:14px;font-weight:600;color:var(--text,#171717);">' + labels[key] + '</span>' +
@@ -197,6 +202,21 @@
       }
     });
     mo.observe(document.body, { childList: true, subtree: true });
+  }
+
+  // ── Active boost helpers (shared by the profile + product pages) ──
+  function boostActiveUntil(item) {
+    if (!item || !item.is_boosted || !item.boost_expires_at) return null;
+    var d = new Date(item.boost_expires_at);
+    return (d.getTime() > Date.now()) ? d : null;
+  }
+  function boostedUntilLabel(item) {
+    var d = boostActiveUntil(item);
+    if (!d) return '';
+    var when;
+    try { when = d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { when = d.toISOString().slice(0, 16).replace('T', ' '); }
+    return _payT('boosted_until', 'Boosted until {date}').replace('{date}', when);
   }
 
   // ── Pro included boosts (server-side: migration 035) ──────
@@ -276,6 +296,9 @@
       }
       return _checkout({ kind: 'portal', return_url: location.href.split('?')[0] });
     },
+
+    boostActiveUntil: boostActiveUntil,
+    boostedUntilLabel: boostedUntilLabel,
 
     isPro: async function () {
       if (!_ready()) return false;

@@ -2312,7 +2312,9 @@
                     actions =
                         '<button class="product-action-btn" onclick="window.location.href=\'product.html?id=' + item.id + '\'"><i class="fas fa-eye"></i> View</button>' +
                         '<button class="product-action-btn" style="color:#09B1BA;border-color:#09B1BA;" onclick="editItem(\'' + item.id + '\', ' + pendingCount + ')"><i class="fas fa-pen"></i> ' + ((typeof t === 'function') ? t('action_edit') : 'Edit') + '</button>' +
-                        '<button class="product-action-btn" style="color:#F59E0B;border-color:#F59E0B;" onclick="showBoostPicker(\'' + item.id + '\')"><i class="fas fa-rocket"></i> Boost</button>' +
+                        ((window.SwappoPayment && SwappoPayment.boostActiveUntil && SwappoPayment.boostActiveUntil(item))
+                            ? '<span class="product-action-btn" style="color:#B45309;border-color:#FCD34D;background:#FFFBEB;cursor:default;" title="' + SwappoPayment.boostedUntilLabel(item).replace(/"/g, '&quot;') + '"><i class="fas fa-rocket"></i> ' + SwappoPayment.boostedUntilLabel(item) + '</span>'
+                            : '<button class="product-action-btn" style="color:#F59E0B;border-color:#F59E0B;" onclick="showBoostPicker(\'' + item.id + '\')"><i class="fas fa-rocket"></i> Boost</button>') +
                         '<button class="product-action-btn" onclick="deleteItem(\'' + item.id + '\')"><i class="fas fa-trash"></i> Delete</button>';
                 }
                 return '<div class="product-card' + terminalCls + '" data-my-item-id="' + item.id + '" data-mi-bucket="' + bucket + '" data-status="' + itemStatus + '"' + cardOnclick + '>' +

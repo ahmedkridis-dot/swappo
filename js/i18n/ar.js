@@ -1539,6 +1539,7 @@
     seller_member_since: "عضو منذ",
     seller_disclaimer: "يتم الكشف عن الهوية بعد قبول الطرفين للمبادلة.",
     boosted: "مروّج",
+    boosted_until: "معزَّز حتى {date}",
     free_giveaway: "هدية مجانية",
 
     plan_pro: 'Swappo Pro',

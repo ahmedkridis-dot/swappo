@@ -1536,6 +1536,7 @@
     seller_member_since: "Membre depuis",
     seller_disclaimer: "L'identité est révélée après acceptation mutuelle de l'échange.",
     boosted: "Boosté",
+    boosted_until: "Boosté jusqu'au {date}",
     free_giveaway: "Don gratuit",
 
     plan_pro: 'Swappo Pro',

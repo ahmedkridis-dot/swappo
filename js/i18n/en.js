@@ -1669,6 +1669,7 @@
     seller_member_since: "Member since",
     seller_disclaimer: "Identity revealed after both parties accept the swap.",
     boosted: "Boosted",
+    boosted_until: "Boosted until {date}",
     free_giveaway: "Free Giveaway",
 
     radius_5km: '5 km',
