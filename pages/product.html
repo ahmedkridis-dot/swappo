@@ -1614,8 +1614,13 @@
       return;
     }
     var res = await window.SwappoItems.toggleFavorite(currentItem.id);
+    if (res && res.error) { showToast(res.error); return; }
     nowFav = !!res.favorited;
+    // Heart pill next to the price follows the same state.
+    var pill = document.getElementById('price-fav');
+    if (pill) pill.innerHTML = nowFav ? '<i class="fas fa-heart" style="color:#EF4444;"></i>' : '<i class="far fa-heart"></i>';
     var btn = document.getElementById('saveBtn');
+    if (!btn) return;
     if (nowFav) {
       btn.innerHTML = '<i class="fas fa-heart"></i> Saved';
       btn.style.background = 'var(--secondary)';

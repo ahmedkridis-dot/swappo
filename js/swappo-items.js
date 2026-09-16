@@ -338,6 +338,31 @@
     }
   }
 
+  // ---------- CARD HEART CLICK ----------
+  // The red state lives on the .is-liked class (css/style.css), not on the
+  // icon alone — toggling only far/fas left the heart grey. Errors (e.g.
+  // not signed in) are surfaced with a toast instead of failing silently.
+  function onFavClick(btn) {
+    if (!btn) return;
+    const id = btn.getAttribute('data-fav-id');
+    const icon = btn.querySelector('i');
+    const wasLiked = btn.classList.contains('is-liked');
+    // Optimistic flip, reverted if the server disagrees.
+    btn.classList.toggle('is-liked', !wasLiked);
+    btn.setAttribute('aria-pressed', !wasLiked ? 'true' : 'false');
+    if (icon) icon.className = !wasLiked ? 'fas fa-heart' : 'far fa-heart';
+    toggleFavorite(id).then(r => {
+      const liked = !!(r && r.favorited);
+      btn.classList.toggle('is-liked', liked);
+      btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+      if (icon) icon.className = liked ? 'fas fa-heart' : 'far fa-heart';
+      if (r && r.error && global.Toast) global.Toast.show(r.error, 'warning');
+    }).catch(() => {
+      btn.classList.toggle('is-liked', wasLiked);
+      if (icon) icon.className = wasLiked ? 'fas fa-heart' : 'far fa-heart';
+    });
+  }
+
   // ---------- VIEWS COUNTER ----------
   // Any new page that displays a single product detail MUST call this on
   // mount (see pages/product.html for the reference pattern). The counter
@@ -423,7 +448,7 @@
       '<div class="product-img" style="position:relative;">' +
         distBadge + boostBadge + (boostBadge && item.box_id ? boxBadge.replace('top:8px;left:8px;', 'top:36px;left:8px;') : boxBadge) +
         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '<div style="width:100%;height:100%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:28px;">\u{1F4E6}</div>') +
-        '<button class="product-fav" type="button" style="top:8px; bottom:auto;" data-fav-id="' + itemIdAttr + '" onclick="event.stopPropagation(); SwappoItems.toggleFavorite(this.dataset.favId).then(r => { this.querySelector(\'i\').className = r.favorited ? \'fas fa-heart\' : \'far fa-heart\'; });">' +
+        '<button class="product-fav' + (fav ? ' is-liked' : '') + '" type="button" style="top:8px; bottom:auto;" data-fav-id="' + itemIdAttr + '" aria-pressed="' + (fav ? 'true' : 'false') + '" onclick="event.stopPropagation(); SwappoItems.onFavClick(this)">' +
           '<i class="' + (fav ? 'fas fa-heart' : 'far fa-heart') + '"></i>' +
         '</button>' +
       '</div>' +
@@ -447,7 +472,7 @@
     browse, getById, create, update, canEdit, remove, markStatus,
     getByUser, hasActiveItems,
     getGiveaways, getBoosted, getSimilar,
-    toggleFavorite, getFavoriteIds, getFavorites, isFavorited, isFavoritedSync,
+    toggleFavorite, onFavClick, getFavoriteIds, getFavorites, isFavorited, isFavoritedSync,
     bumpViews, renderCard, itemTitle, cleanBrand: _cleanBrand
   };
 })(window);
