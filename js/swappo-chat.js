@@ -248,11 +248,20 @@
     if (!global.db) return 0;
     const uid = await _currentUserId();
     if (!uid) return 0;
-    const { count, error } = await global.db.from('swaps')
-      .select('id', { count: 'exact', head: true })
+    // An "active chat" is a conversation whose deal is still open
+    // (swap accepted). Counting accepted swaps alone over-counted: an
+    // accepted swap that never opened a chat, or whose deal was closed
+    // another way, kept the badge at 1 forever.
+    const { data: open, error } = await global.db.from('swaps')
+      .select('id')
       .or(`proposer_id.eq.${uid},receiver_id.eq.${uid}`)
       .eq('status', 'accepted');
-    if (error) return 0;
+    if (error || !open || !open.length) return 0;
+    const ids = open.map(r => r.id);
+    const { count, error: cErr } = await global.db.from(CONV_TABLE)
+      .select('id', { count: 'exact', head: true })
+      .in('swap_id', ids);
+    if (cErr) return 0;
     return count || 0;
   }
 

@@ -1726,7 +1726,9 @@
       // embeds it via the Supabase select). No legacy-items fallback.
       var item = c.item || null;
       var photo = item && item.photos ? item.photos[0] : '';
-      var status = map.status || 'accepted';
+      // Real deal state from the joined swap row — a closed deal must not
+      // wear the green "active" dot (CONV_ITEM_MAP is legacy demo data).
+      var status = (c.swap && c.swap.status) || map.status || 'accepted';
       // Prefer the real swap row that SwappoChat.getConversations joins in —
       // the legacy CONV_ITEM_MAP is static demo data and only covers a
       // handful of hardcoded IDs.
