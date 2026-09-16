@@ -219,8 +219,29 @@
     .signup-modal h2 { font-size: 1.3rem; font-weight: 700; color: #1A1A2E; margin: 0 0 24px; }
 
     /* Auth card header */
-    .auth-header { text-align: center; margin-bottom: 28px; }
+    .auth-header { text-align: center; margin-bottom: 24px; }
     .auth-header .logo-icon { font-size: 36px; color: var(--teal, #09B1BA); margin-bottom: 12px; }
+
+    /* Brand row + Log in / Create account switcher — sits at the very top
+       of the card so it is visible without scrolling on a phone
+       (Ahmed, 2026-09-16). */
+    .auth-brand {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-bottom: 16px; font-size: 1.15rem; font-weight: 800; color: #1A1A2E;
+    }
+    .auth-brand img { width: 36px; height: 36px; display: block; }
+    .auth-seg {
+      display: flex; background: #F1F5F6; border-radius: var(--radius-pill, 999px);
+      padding: 4px; margin-bottom: 20px;
+    }
+    .auth-seg button {
+      flex: 1; border: 0; background: transparent; border-radius: var(--radius-pill, 999px);
+      padding: 11px 0; font-family: inherit; font-size: 0.9rem; font-weight: 600; color: #6B7280;
+      cursor: pointer; transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .auth-seg button:hover { color: #1A1A2E; }
+    .auth-seg button.active { background: #fff; color: var(--teal, #09B1BA); box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
+    .auth-seg button:focus-visible { outline: 2px solid var(--teal, #09B1BA); outline-offset: 2px; }
     .auth-header h2 { font-size: 1.5rem; font-weight: 700; color: #1A1A2E; margin: 0 0 6px; }
     .auth-header p { font-size: 0.9rem; color: #6B7280; margin: 0; }
 
@@ -387,12 +408,20 @@
   <div class="auth-page">
     <div class="auth-card">
 
+      <div class="auth-brand">
+        <img src="../assets/brand/swappo-logo-teal.png" alt="" width="36" height="36">
+        <span>Swappo</span>
+      </div>
+      <div class="auth-seg" role="tablist">
+        <button type="button" role="tab" data-tab="login" aria-selected="false" onclick="switchTab('login')" data-i18n="auth_login_btn">Log in</button>
+        <button type="button" role="tab" data-tab="signup" aria-selected="true" class="active" onclick="switchTab('signup')" data-i18n="auth_create_account">Create account</button>
+      </div>
+
       <!-- ========== VIEW: SIGNUP (email + password, launch config) ========== -->
       <!-- Phone-first signup was kept in Git history (commit 2ed16c8) and can
            be restored once Twilio SMS is wired to Supabase Auth. -->
       <div id="signup" class="auth-tab-content active">
         <div class="auth-header">
-          <div class="logo-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><img src="../assets/brand/swappo-logo-teal.png" alt="Swappo" width="56" height="56"></div>
           <h2 data-i18n="auth_join_swappo">Join Swappo</h2>
           <p data-i18n="auth_subtitle">Swap, buy, sell, gift — across the UAE.</p>
         </div>
@@ -429,8 +458,8 @@
       <!-- ========== VIEW: LOGIN (email + password) ========== -->
       <div id="login" class="auth-tab-content">
         <div class="auth-header">
-          <div class="logo-icon" style="display:flex;justify-content:center;margin-bottom:12px;"><img src="../assets/brand/swappo-logo-teal.png" alt="Swappo" width="56" height="56"></div>
           <h2 data-i18n="auth_welcome_back">Welcome back</h2>
+          <p data-i18n="auth_subtitle">Swap, buy, sell, gift — across the UAE.</p>
         </div>
 
         <form class="auth-form" id="login-email-form" onsubmit="handleLogin(event)" style="margin-bottom:12px;">
@@ -560,7 +589,29 @@
       document.querySelectorAll('.auth-tab-content').forEach(function(tab) { tab.classList.remove('active'); });
       var target = document.getElementById(tabName);
       if (target) target.classList.add('active');
+      document.querySelectorAll('.auth-seg button').forEach(function (b) {
+        var on = b.getAttribute('data-tab') === tabName;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
     }
+
+    // Which view opens first: ?tab=login|signup wins; otherwise "Log in"
+    // when this device has already signed in to Swappo (per-device
+    // convenience flag, set on every successful login / signup), else
+    // "Create account" for a brand-new visitor.
+    var HAS_ACCOUNT_KEY = 'swappo_has_account';
+    function _markHasAccount() { try { localStorage.setItem(HAS_ACCOUNT_KEY, '1'); } catch (e) {} }
+    document.addEventListener('DOMContentLoaded', function () {
+      var params = new URLSearchParams(location.search);
+      var want = params.get('tab');
+      if (want !== 'login' && want !== 'signup') {
+        var known = false;
+        try { known = localStorage.getItem(HAS_ACCOUNT_KEY) === '1'; } catch (e) {}
+        want = known ? 'login' : 'signup';
+      }
+      switchTab(want);
+    });
 
     /* ========================
        Toast notification (shared)
@@ -653,6 +704,7 @@
         }
         // Auto-confirmed path (email verification disabled) → onboarding.
         showToast(_authT('auth_welcome','Welcome to Swappo!'), 'success');
+        _markHasAccount();
         setTimeout(function () { window.location.href = 'onboarding.html'; }, 900);
       } catch (err) {
         showToast(err.message || _authT('auth_err_signup','Signup failed.'), 'error');
@@ -692,6 +744,7 @@
             showToast(_authT('auth_email_verified_toast', 'Email verified! Welcome to Swappo.'), 'success');
             var needs = true;
             try { needs = await window.SwappoAuth.needsOnboarding(); } catch (e) {}
+            _markHasAccount();
             setTimeout(function () { window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html')); }, 600);
             return true;
           }
@@ -746,6 +799,7 @@
         // Route to onboarding if profile is incomplete
         var needs = await window.SwappoAuth.needsOnboarding();
         setTimeout(function() {
+          _markHasAccount();
           window.location.href = needs ? 'onboarding.html' : safeRedirect('../index.html');
         }, 900);
       } catch (err) {
@@ -772,6 +826,7 @@
         SwappoAuth.getCurrentUser().then(function (u) {
           if (!u) { if (tries++ < 40) setTimeout(poll, 250); return; }
           return SwappoAuth.needsOnboarding().then(function (needs) {
+            _markHasAccount();
             window.location.replace(needs ? 'onboarding.html' : safeRedirect('../index.html'));
           });
         }).catch(function () { if (tries++ < 40) setTimeout(poll, 250); });
@@ -852,6 +907,7 @@
           const supaUser = await window.SwappoAuth.getCurrentUser();
           if (supaUser) {
             const needs = await window.SwappoAuth.needsOnboarding();
+            _markHasAccount();
             window.location.href = needs ? 'onboarding.html' : safeRedirect('../index.html');
             return;
           }
