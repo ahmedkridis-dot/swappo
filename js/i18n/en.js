@@ -1627,6 +1627,7 @@
     all_conditions: "All Conditions",
     newest_first: "Newest first",
     clear: "Clear",
+    catalogue_filters_btn: "Filters",
     catalogue_search_placeholder: "Search items…",
 
     // Product page

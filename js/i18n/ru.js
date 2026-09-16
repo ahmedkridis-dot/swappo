@@ -1468,6 +1468,7 @@
     all_conditions: "Все состояния",
     newest_first: "Сначала новые",
     clear: "Сбросить",
+    catalogue_filters_btn: "Фильтры",
     catalogue_search_placeholder: "Поиск товаров…",
 
     // Product page

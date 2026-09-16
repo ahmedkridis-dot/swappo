@@ -1494,6 +1494,7 @@
     all_conditions: "Tous les états",
     newest_first: "Plus récent",
     clear: "Effacer",
+    catalogue_filters_btn: "Filtres",
     catalogue_search_placeholder: "Rechercher des articles…",
 
     // Product page

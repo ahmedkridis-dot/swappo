@@ -133,6 +133,43 @@
       color: var(--teal, #09B1BA);
     }
 
+    /* Filters folded behind one button on phones (Ahmed, 2026-09-17):
+       the six controls pushed the items a full screen down. Desktop keeps
+       the inline bar (the panel is display:contents there). */
+    .filters-toggle {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid var(--gray-border, #E5E7EB);
+      border-radius: var(--radius-pill, 999px);
+      background: white;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .filters-toggle[aria-expanded="true"], .filters-toggle.has-active {
+      border-color: var(--teal, #09B1BA);
+      color: var(--teal, #09B1BA);
+    }
+    .filters-toggle .filters-count {
+      min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+      background: var(--teal, #09B1BA); color: #fff; font-size: 11px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .filters-toggle .filters-count[hidden] { display: none; }
+    .filters-panel, .filters-panel[hidden] { display: contents; }
+    @media (max-width: 900px) {
+      .filters-toggle { display: inline-flex; }
+      .filters-panel { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; padding-top: 4px; }
+      .filters-panel[hidden] { display: none; }
+      .filters-panel select { flex: 1 1 100%; }
+      .filters-panel .clear-filters { margin-inline: auto; }
+    }
+
     /* Item count */
     .result-count {
       font-size: 0.9rem;
@@ -358,6 +395,12 @@
         <input type="text" id="catalogue-search" placeholder="Search items…" data-i18n-placeholder="catalogue_search_placeholder" autocomplete="off">
       </div>
 
+      <button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="filters-panel">
+        <i class="fas fa-sliders-h" aria-hidden="true"></i> <span data-i18n="catalogue_filters_btn">Filters</span>
+        <span class="filters-count" id="filters-count" hidden></span>
+      </button>
+
+      <div class="filters-panel" id="filters-panel" hidden>
       <select id="filter-category">
         <option value="" data-i18n="all_categories">All Categories</option>
         <option value="clothing" data-i18n="publish_cat_clothing">Clothing & Accessories</option>
@@ -413,6 +456,7 @@
       </select>
 
       <button class="clear-filters" id="clear-filters-btn"><i class="fas fa-times"></i> <span data-i18n="clear">Clear</span></button>
+      </div><!-- /filters-panel -->
     </div>
 
     <!-- Dynamic Subcategory Filters (shown for clothing, kids, bags_accessories) -->
@@ -593,6 +637,34 @@
       const PAGE_SIZE = 20;
       let visibleCount = PAGE_SIZE;
 
+      // ── Filters toggle (phones) + active-filter badge ──
+      const filtersToggle = document.getElementById('filters-toggle');
+      const filtersPanel = document.getElementById('filters-panel');
+      function updateFiltersBadge() {
+        var n = 0;
+        ['filter-category', 'filter-condition', 'filter-mode', 'filter-emirate'].forEach(function (id) {
+          var el = document.getElementById(id); if (el && el.value) n++;
+        });
+        ['filter-price-min', 'filter-price-max'].forEach(function (id) {
+          var el = document.getElementById(id); if (el && parseInt(el.value, 10) > 0) n++;
+        });
+        var sortEl = document.getElementById('filter-sort');
+        if (sortEl && sortEl.value && sortEl.value !== 'newest') n++;
+        var badge = document.getElementById('filters-count');
+        if (badge) { badge.textContent = String(n); badge.hidden = n === 0; }
+        if (filtersToggle) filtersToggle.classList.toggle('has-active', n > 0);
+      }
+      if (filtersToggle && filtersPanel) {
+        filtersToggle.addEventListener('click', function () {
+          var open = filtersPanel.hidden;
+          filtersPanel.hidden = !open;
+          filtersToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        filtersPanel.addEventListener('change', updateFiltersBadge);
+        filtersPanel.addEventListener('input', updateFiltersBadge);
+      }
+      window.updateFiltersBadge = updateFiltersBadge;
+
       // Pre-select category dropdown if URL param present
       const catSelect = document.getElementById('filter-category');
       const condSelect = document.getElementById('filter-condition');
@@ -759,6 +831,7 @@
           visibleCount = PAGE_SIZE;
           renderCatalogue();
           updateSubcategoryBar();
+          updateFiltersBadge();
         });
       }
 
@@ -1097,6 +1170,7 @@
       // Initial render
       renderCatalogue();
       updateSubcategoryBar();
+      updateFiltersBadge();
     });
 
     // ── Surprise Me button ──

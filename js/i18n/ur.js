@@ -1493,6 +1493,7 @@
     all_conditions: "تمام حالات",
     newest_first: "نئے پہلے",
     clear: "صاف",
+    catalogue_filters_btn: "فلٹرز",
     catalogue_search_placeholder: "چیزیں تلاش کریں…",
 
     // Product page

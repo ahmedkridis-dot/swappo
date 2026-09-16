@@ -1494,6 +1494,7 @@
     all_conditions: "جميع الحالات",
     newest_first: "الأحدث أولاً",
     clear: "مسح",
+    catalogue_filters_btn: "الفلاتر",
     catalogue_search_placeholder: "ابحث عن الأشياء…",
 
     // Product page
