@@ -1033,6 +1033,7 @@
 
     <!-- Demo Scripts -->
     <script src="../js/constants.js" defer></script>
+    <script src="../js/share-sheet.js" defer></script>
     <script src="../js/banned-guard.js" defer></script>
     <script src="../js/animations.js" defer></script>
     <script src="../js/cookie-consent.js" defer></script>
@@ -1159,6 +1160,7 @@
                 return;
             }
 
+            window._lastGiftItems = items; // for the share sheet text (title / gift flag)
             grid.innerHTML = items.map(function(item) {
                 return buildGiveawayCard(item);
             }).join('');
@@ -1196,11 +1198,14 @@
                     '<button class="giveaway-favorite' + (fav ? ' liked' : '') + '" type="button" onclick="event.stopPropagation(); toggleFav(this, \'' + item.id + '\')">' +
                         '<i class="' + (fav ? 'fas fa-heart' : 'far fa-heart') + '"></i>' +
                     '</button>' +
+                    '<button class="giveaway-favorite giveaway-share" type="button" style="right:52px;" aria-label="' + ((typeof t === 'function') ? t('share') : 'Share') + '" onclick="event.stopPropagation(); if(window.SwappoItems){SwappoItems._byId[\'' + item.id + '\']=SwappoItems._byId[\'' + item.id + '\']||_giftItemById(\'' + item.id + '\');SwappoItems.share(\'' + item.id + '\')}">' +
+                        '<i class="fas fa-share-alt"></i>' +
+                    '</button>' +
                 '</div>' +
                 '<div class="giveaway-card-content">' +
                     '<h3 class="giveaway-card-title" style="cursor:pointer" onclick="window.location.href=\'product.html?id=' + item.id + '\'">' + title + '</h3>' +
                     '<div class="giveaway-card-details">' + detailStr + '</div>' +
-                    '<div class="giveaway-card-offer"><i class="fas fa-gift"></i> Free \u2014 Claim with subscription</div>' +
+                    '<div class="giveaway-card-offer"><i class="fas fa-gift"></i> ' + ((typeof t === 'function') ? t('gift_card_free') : 'Free') + '</div>' +
                     '<div class="giveaway-card-donor">' +
                         '<span class="donor-badge">\u2B50</span> Donated by Swapper' +
                     '</div>' +
@@ -1223,6 +1228,12 @@
          *    4. Cannot have already claimed N gifts this calendar month
          *       (N = 1 for free, 5 for pro).
          */
+        // Share sheet needs title / gift flag: look the card's item up in the last rendered list.
+        window._giftItemById = function (id) {
+            var list = (window._lastGiftItems || []);
+            for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+            return { id: id, is_giveaway: true };
+        };
         async function handleClaim(itemId, btnEl) {
             if (window.__swpBanned) { Toast.show((typeof t === 'function') ? t('banned_banner') : 'This account has been closed.', 'error'); return; }
             // STEP 1 — Must be signed in (use the Supabase session, not Demo*auth)

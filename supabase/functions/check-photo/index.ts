@@ -155,7 +155,11 @@ serve(async (req) => {
   let result = UNAVAILABLE;
   if (ANTHROPIC_API_KEY) {
     const v = await askModel(imageBase64, mime, category, itemType);
-    if (v) result = v;
+    if (v) {
+      // Never block on a hesitant "reject": low confidence → review queue instead.
+      if (v.verdict === 'reject' && v.confidence < 0.5) v.verdict = 'unsure';
+      result = v;
+    }
   } else {
     console.warn('[check-photo] ANTHROPIC_API_KEY not set — returning unsure');
   }

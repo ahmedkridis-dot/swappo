@@ -1847,6 +1847,7 @@
     <script src="../js/swappo-storage.js" defer></script>
     <script src="../js/photo-safety.js" defer></script>
     <script src="../js/swappo-items.js" defer></script>
+    <script src="../js/share-sheet.js" defer></script>
     <script src="../js/swappo-swaps.js" defer></script>
     <script src="../js/swappo-chat.js" defer></script>
     <script src="../js/toast.js" defer></script>
@@ -2347,6 +2348,7 @@
                     '<div class="product-image">' +
                         (photo ? '<img src="' + photo + '" alt="' + title + '" loading="lazy">' : '') +
                         '<span class="product-status ' + statusClass + '">' + statusLabel + '</span>' +
+                        ((bucket === 'active') ? '<button class="product-fav product-share" type="button" style="top:8px;bottom:auto;right:8px;" aria-label="' + ((typeof t === 'function') ? t('share') : 'Share') + '" onclick="event.stopPropagation(); SwappoItems._byId[\'' + item.id + '\'] = SwappoItems._byId[\'' + item.id + '\'] || userItems.find(function (i) { return i.id === \'' + item.id + '\'; }); SwappoItems.share(\'' + item.id + '\')"><i class="fas fa-share-alt"></i></button>' : '') +
                         pendingBadge +
                     '</div>' +
                     '<div class="product-info">' +

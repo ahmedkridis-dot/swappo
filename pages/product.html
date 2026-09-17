@@ -997,6 +997,7 @@
 <script src="../js/supabase.js" defer></script>
 <script src="../js/stripe.js" defer></script>
 <script src="../js/swappo-items.js" defer></script>
+<script src="../js/share-sheet.js" defer></script>
 <script src="../js/banned-guard.js" defer></script>
 <script src="../js/swappo-swaps.js" defer></script>
 <script src="../js/swappo-chat.js" defer></script>
@@ -1186,6 +1187,7 @@
     }
 
     currentItem = item;
+    if (window.SwappoItems && SwappoItems._byId) SwappoItems._byId[item.id] = item;
     currentUser = await _resolveCurrentUser();
     var isGuest = !currentUser;
     var owner = await _resolveOwner(item.user_id);
@@ -2380,6 +2382,8 @@
 
   // Native Web Share or clipboard fallback
   window.shareItem = async function () {
+    // Same share sheet as everywhere else (short link with the photo preview).
+    if (currentItem && window.SwappoItems && SwappoItems.share) { SwappoItems.share(currentItem.id); return; }
     var url = window.location.href;
     var title = document.getElementById('product-title')?.textContent || 'Swappo item';
     if (navigator.share) {

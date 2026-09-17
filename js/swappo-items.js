@@ -34,6 +34,19 @@
 
   // In-memory favorites cache (filled after first fetch) to keep renderCard sync
   let _favCache = null;
+  // Items rendered on this page, by id — the share sheet reads title /
+  // price / gift flag from here without a refetch.
+  const _byId = {};
+  // js/share-sheet.js is loaded on demand the first time a card's share
+  // icon is tapped on a page that doesn't ship it.
+  function share(itemId) {
+    if (global.SwappoShare) return global.SwappoShare.open(itemId, _byId[itemId]);
+    const base = global.location.pathname.indexOf('/pages/') !== -1 ? '../js/' : 'js/';
+    const sc = document.createElement('script');
+    sc.src = base + 'share-sheet.js';
+    sc.onload = function () { if (global.SwappoShare) global.SwappoShare.open(itemId, _byId[itemId]); };
+    document.head.appendChild(sc);
+  }
 
   function _esc(s) {
     if (s == null) return '';
@@ -426,6 +439,7 @@
   // ---------- RENDER CARD ----------
   function renderCard(item) {
     if (!item) return '';
+    if (item.id) _byId[item.id] = item;
     const href = _esc(_productHref(item.id));
     const title = _esc(itemTitle(item));
     const photo = _safeUrl((item.photos && item.photos[0]) || '');
@@ -477,6 +491,10 @@
         '<button class="product-fav' + (fav ? ' is-liked' : '') + '" type="button" style="top:8px; bottom:auto;" data-fav-id="' + itemIdAttr + '" aria-pressed="' + (fav ? 'true' : 'false') + '" onclick="event.stopPropagation(); SwappoItems.onFavClick(this)">' +
           '<i class="' + (fav ? 'fas fa-heart' : 'far fa-heart') + '"></i>' +
         '</button>' +
+        // Share — same look as the heart, right next to it (ignored by the card click like .product-fav).
+        '<button class="product-fav product-share" type="button" style="top:8px;bottom:auto;right:44px;" data-share-id="' + itemIdAttr + '" aria-label="' + _esc((typeof t === 'function') ? t('share') : 'Share') + '" onclick="event.stopPropagation(); SwappoItems.share(this.dataset.shareId)">' +
+          '<i class="fas fa-share-alt"></i>' +
+        '</button>' +
       '</div>' +
       '<div class="product-info">' +
         '<div class="product-brand">' + title + '</div>' +
@@ -499,6 +517,6 @@
     getByUser, hasActiveItems,
     getGiveaways, getBoosted, getSimilar,
     toggleFavorite, onFavClick, getFavoriteIds, getFavorites, isFavorited, isFavoritedSync,
-    bumpViews, renderCard, itemTitle, cleanBrand: _cleanBrand, claimerSummary
+    bumpViews, renderCard, itemTitle, cleanBrand: _cleanBrand, claimerSummary, share, _byId
   };
 })(window);
