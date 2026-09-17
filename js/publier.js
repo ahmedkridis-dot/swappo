@@ -259,6 +259,10 @@ window.nextStep = function() {
     return;
   }
   if (formState.currentStep === 2 && !validateDetailsStep()) return;
+  if (formState.currentStep === 3 && !photoGateOk()) {
+    Toast.show(_pubT('photo_need_ok_cover', 'Your first photo must be a clear photo of the item before you can continue.'), 'warning');
+    return;
+  }
   if (formState.currentStep < 4) {
     formState.currentStep++;
     updateStepUI();
@@ -751,6 +755,12 @@ window.handlePhotoFiles = async function(e) {
     return;
   }
 
+  if (_photoLockUntil && Date.now() < _photoLockUntil) {
+    var mins = Math.max(1, Math.ceil((_photoLockUntil - Date.now()) / 60000));
+    _photoCheckMessage(_pubT('photo_rejects_locked', 'Only real photos of the item are accepted. Listings with fake photos close the account.') + ' ' + _pubT('photo_locked_wait', 'Photo uploads are paused for {minutes} min.').replace('{minutes}', mins));
+    return;
+  }
+
   // Start at the pending slot (or first empty), and fill forward
   var start = _pendingSlotIndex != null ? _pendingSlotIndex : 0;
   var maxSlots = SwappoStorage.MAX_FILES || 5;
@@ -776,7 +786,7 @@ window.handlePhotoFiles = async function(e) {
       var safeInput = files[i];
       if (window.PhotoSafety) {
         try {
-          var safety = await PhotoSafety.processImage(files[i], { blurFaces: true, redactText: true });
+          var safety = await PhotoSafety.processImage(files[i], { blurFaces: true, redactText: false });
           if (safety.rejected) {
             Toast.show('🚫 ' + safety.rejectReason, 'error');
             if (slotEl) slotEl.classList.remove('uploading');
@@ -789,10 +799,22 @@ window.handlePhotoFiles = async function(e) {
         }
       }
       var processed = await SwappoStorage.processFile(safeInput);
+      // AI check (Edge Function check-photo): real item, right category, no
+      // contact details. Blocking on "reject", never on an outage.
+      if (slotEl) { slotEl.classList.add('checking'); slotEl.setAttribute('data-checking', _pubT('photo_checking', 'Checking…')); }
+      var check = await checkPhotoWithAI(processed);
+      if (slotEl) { slotEl.classList.remove('checking'); }
+      if (check.verdict === 'reject') {
+        try { URL.revokeObjectURL(processed.preview); } catch (e2) {}
+        _photoRejected(check.reason, slotEl);
+        continue;
+      }
+      _photoCheckMessage('');
       formState.photoBlobs[slotIdx] = {
         preview: processed.preview,
         processed: processed,
-        uploadedUrl: null
+        uploadedUrl: null,
+        verdict: check.verdict
       };
     } catch (err) {
       Toast.show(_pubT('toast_pub_could_not_read', 'Could not read this photo.') + ' (' + (files[i].name || 'image') + ')', 'error');
@@ -863,6 +885,91 @@ window.refreshPhotoGrid = function() {
 
   // Keep formState.photos mirrored for legacy reviewPhotos rendering
   formState.photos = formState.photoBlobs.map(function(e) { return e ? e.preview : null; });
+  // "?" marker on photos the check could not classify
+  slots.forEach(function(slot, idx) {
+    var e = formState.photoBlobs[idx];
+    slot.classList.toggle('unsure', !!(e && e.verdict === 'unsure'));
+  });
+  updatePhotoGate();
+};
+
+// ── AI photo check ───────────────────────────────────────
+// Verdict per photo: 'ok' | 'unsure' | 'reject'. Photos that were already
+// online (edit mode) count as 'ok'. The cover (slot 0) must be 'ok' to
+// leave the photo step; 'unsure' photos are allowed but flag the listing
+// for review (needs_review).
+var _photoRejectCount = 0;
+var _photoLockUntil = 0;
+function _blobToBase64(blob) {
+  return new Promise(function(resolve, reject) {
+    var r = new FileReader();
+    r.onload = function() { resolve(String(r.result || '').replace(/^data:[^,]+,/, '')); };
+    r.onerror = function() { reject(r.error || new Error('read failed')); };
+    r.readAsDataURL(blob);
+  });
+}
+window.checkPhotoWithAI = async function(processed) {
+  if (!(window.db && window.db.functions)) return { verdict: 'unsure', reason: 'check_unavailable' };
+  try {
+    // The small JPEG thumbnail (≤600px) is enough for the verdict and keeps the call cheap.
+    var blob = processed.ogBlob || processed.blob;
+    var mime = processed.ogBlob ? 'image/jpeg' : (processed.mime || 'image/jpeg');
+    var b64 = await _blobToBase64(blob);
+    var res = await window.db.functions.invoke('check-photo', {
+      body: { image_base64: b64, mime: mime, category: formState.category || 'other', item_type: formState.details.type || '' }
+    });
+    if (res && res.error) {
+      var status = res.error.context && res.error.context.status;
+      if (status === 429) return { verdict: 'reject', reason: 'rate_limited' };
+      return { verdict: 'unsure', reason: 'check_unavailable' };
+    }
+    var d = res && res.data;
+    if (!d || !d.verdict) return { verdict: 'unsure', reason: 'check_unavailable' };
+    return { verdict: d.verdict, reason: d.reason || '', confidence: d.confidence };
+  } catch (e) {
+    console.warn('[check-photo] unavailable', e && e.message);
+    return { verdict: 'unsure', reason: 'check_unavailable' };
+  }
+};
+function _photoCheckMessage(msg) {
+  var host = document.getElementById('photoCheckMsg');
+  if (!host) return;
+  host.hidden = !msg;
+  host.textContent = msg || '';
+}
+function _photoRejected(reason, slotEl) {
+  if (reason === 'rate_limited') { _photoCheckMessage(_pubT('photo_too_many_checks', 'Too many attempts, try again later.')); return; }
+  var catKey = 'publish_cat_' + (formState.category === 'bags_accessories' ? 'bags' : formState.category);
+  var catLabel = (typeof t === 'function') ? t(catKey) : (categoryNames[formState.category] || formState.category || '');
+  var known = ['no_item', 'screenshot_or_stock', 'wrong_category', 'person', 'prohibited', 'contact_info', 'unclear'];
+  var key = 'photo_rejected_' + (known.indexOf(reason) !== -1 ? reason : 'unclear');
+  var msg = _pubT(key, 'This photo was not accepted.').replace('{category}', catLabel);
+  _photoRejectCount++;
+  if (_photoRejectCount >= 3) {
+    _photoLockUntil = Date.now() + 10 * 60 * 1000;
+    msg = _pubT('photo_rejects_locked', 'Only real photos of the item are accepted. Listings with fake photos close the account.') + ' ' + _pubT('photo_locked_wait', 'Photo uploads are paused for {minutes} min.').replace('{minutes}', 10);
+  }
+  _photoCheckMessage(msg);
+  if (slotEl) {
+    slotEl.classList.add('rejected');
+    setTimeout(function() { slotEl.classList.remove('rejected'); }, 4000);
+  }
+  if (window.Toast) Toast.show(msg, 'error');
+}
+window.photoGateOk = function() {
+  var entries = (formState.photoBlobs || []).filter(Boolean);
+  if (!entries.length) return false;
+  var cover = entries[0];
+  var v = cover.verdict || (cover.uploadedUrl ? 'ok' : 'unsure');
+  return v === 'ok';
+};
+window.updatePhotoGate = function() {
+  var btn = document.getElementById('btnNextStep3');
+  if (!btn) return;
+  var ok = photoGateOk();
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? '' : '0.5';
+  btn.style.cursor = ok ? '' : 'not-allowed';
 };
 
 // ========================
@@ -1169,6 +1276,8 @@ window.publishItem = async function(e) {
       lat: finalLat,
       lng: finalLng,
       description: (formState.details.description || '').trim().slice(0, 2000) || null,
+      // A photo the AI check could not classify → the listing goes to Ahmed's review queue.
+      needs_review: entries.some(function(e) { return e.verdict === 'unsure'; }),
       // Everything that has no dedicated column (gender, storage, material,
       // vehicle specs…) is kept in specs and rendered by the product page.
       specs: (function() {
@@ -1349,7 +1458,7 @@ window.initEditMode = async function(user) {
   var slots = document.querySelectorAll('.photo-slot').length || 5;
   formState.photoBlobs = [];
   (item.photos || []).slice(0, slots).forEach(function(url, i) {
-    formState.photoBlobs[i] = { preview: url, processed: null, uploadedUrl: url };
+    formState.photoBlobs[i] = { preview: url, processed: null, uploadedUrl: url, verdict: 'ok' };
   });
   refreshPhotoGrid();
 

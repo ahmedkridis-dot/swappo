@@ -67,3 +67,20 @@ Bloque la connexion (`auth.users.banned_until`), ferme toutes ses sessions, reti
 - Ne jamais toucher `auth.users` à la main : passer par les fonctions `admin_*`.
 - Ne jamais agir sur un email qui ne correspond pas exactement à un compte.
 - Jamais d'avertissement ni de deuxième chance pour une fausse annonce.
+
+## File de revue (contrôle IA des photos)
+
+Chaque photo ajoutée à une annonce passe par la fonction `check-photo`
+(Claude Haiku 4.5, vision). `reject` → la photo est refusée sur place ;
+`unsure` → la photo passe mais l'annonce est marquée `needs_review`.
+Ahmed dit « montre-moi la file de review » ; Claude Code lance :
+
+```sql
+select * from public.admin_review_queue order by since desc;
+```
+- `kind = 'item'` : annonces en ligne à regarder (`needs_review`). Après vérification :
+  `update public.items set needs_review = false where id = '<id>';` — ou `status = 'suspended'` si c'est une fausse annonce (ban automatique).
+- `kind = 'user'` : membres avec 5 refus de photo ou plus sur 24 h.
+
+Coût / volume : `select count(*), sum(case when verdict='reject' then 1 else 0 end) as rejects from public.photo_checks where created_at > now() - interval '24 hours';`
+(≈ 0,002 $ par photo vérifiée).

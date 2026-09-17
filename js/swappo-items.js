@@ -168,6 +168,7 @@
       emirate: itemData.emirate || '',
       description: itemData.description ? String(itemData.description).slice(0, 2000) : null,
       specs: (itemData.specs && typeof itemData.specs === 'object' && !Array.isArray(itemData.specs)) ? itemData.specs : {},
+      needs_review: !!itemData.needs_review,
       status: 'available'
     };
     const { data, error } = await global.db.from(TABLE).insert(row).select('*').single();
@@ -187,7 +188,7 @@
   // update while a swap is pending / accepted on the item.
   const EDITABLE_FIELDS = ['category', 'subcategory', 'type', 'brand', 'model', 'condition',
     'year', 'size', 'color', 'photos', 'is_giveaway', 'price', 'emirate', 'city', 'lat', 'lng',
-    'description', 'specs'];
+    'description', 'specs', 'needs_review'];
   async function update(itemId, patch) {
     if (!global.db) return { success: false, error: 'Service unavailable.' };
     if (!itemId) return { success: false, error: 'Missing item id.' };

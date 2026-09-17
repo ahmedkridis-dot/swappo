@@ -249,6 +249,14 @@
       font-size: 12px;
     }
     .photo-slot.filled .remove-photo { display: flex; }
+    /* AI photo check states */
+    .photo-slot.checking::after {
+      content: attr(data-checking); position: absolute; inset: 0; z-index: 4;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.75); color: var(--primary); font-size: 12px; font-weight: 700;
+    }
+    .photo-slot.rejected { border: 2px solid #FF4B55 !important; background: #FEF2F2 !important; }
+    .photo-slot.unsure::before { content: '?'; position: absolute; top: 6px; right: 6px; z-index: 3; width: 20px; height: 20px; border-radius: 50%; background: #F59E0B; color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
     /* Reorder: drag & drop (mouse + touch) and a ★ "make main" button */
     .photo-slot.filled { touch-action: none; }
     .photo-slot.dragging { opacity: 0.45; }
@@ -846,6 +854,7 @@
               </div>
             </div>
 
+            <div id="photoCheckMsg" hidden role="alert" style="margin-top:12px;padding:12px 14px;border:1px solid #FCA5A5;background:#FEF2F2;color:#991B1B;border-radius:10px;font-size:13px;line-height:1.5;"></div>
             <div class="photo-tips" style="margin-bottom:4px;">
               <span data-i18n="publish_photo_drag_hint">Drag a photo to reorder — the first one is the cover. Tap ★ to make it the main photo.</span>
             </div>
@@ -857,7 +866,7 @@
               <button type="button" class="btn-back" onclick="prevStep()">
                 <i class="fas fa-arrow-left"></i> <span data-i18n="publish_back">Back</span>
               </button>
-              <button type="button" class="btn-next" onclick="nextStep()">
+              <button type="button" class="btn-next" id="btnNextStep3" disabled onclick="nextStep()">
                 <span data-i18n="publish_next">Next</span> <i class="fas fa-arrow-right"></i>
               </button>
             </div>
