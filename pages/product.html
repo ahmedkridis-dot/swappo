@@ -997,6 +997,7 @@
 <script src="../js/supabase.js" defer></script>
 <script src="../js/stripe.js" defer></script>
 <script src="../js/swappo-items.js" defer></script>
+<script src="../js/banned-guard.js" defer></script>
 <script src="../js/swappo-swaps.js" defer></script>
 <script src="../js/swappo-chat.js" defer></script>
 <script src="../js/toast.js" defer></script>
@@ -1647,7 +1648,13 @@
     document.body.appendChild(overlay);
   }
 
+  function _bannedStop() {
+    if (!window.__swpBanned) return false;
+    showToast(t('banned_banner'));
+    return true;
+  }
   async function claimGiveaway() {
+    if (_bannedStop()) return;
     if (!currentItem) return;
     if (!currentUser) { window.location.href = 'login.html'; return; }
     if (!(window.db && window.SwappoAuth)) { showToast('Service unavailable'); return; }
@@ -1731,14 +1738,16 @@
       }
 
       try {
+        // The giver sees who is asking (badge, seniority, latest listing) — never a name.
+        var cs = (window.SwappoItems && SwappoItems.claimerSummary) ? await SwappoItems.claimerSummary(currentUser.id) : { line: '', badge: '', joined: null, item: null };
         await window.db.from('notifications').insert({
           user_id: currentItem.user_id,
           kind: 'gift_claimed',
           type: 'gift',
           title: 'Someone claimed your gift',
-          message: 'Accept it to open the chat and arrange the hand-off.',
+          message: (cs.line ? cs.line + ' — ' : '') + 'Accept it to open the chat and arrange the hand-off.',
           url: '/pages/profile.html?tab=swap-dashboard&sub=received',
-          payload: { swap_id: swap.id, item_id: currentItem.id, claimer_id: currentUser.id }
+          payload: { swap_id: swap.id, item_id: currentItem.id, claimer_id: currentUser.id, claimer_badge: cs.badge, claimer_joined: cs.joined, claimer_item: cs.item }
         });
       } catch (nErr) { /* non-blocking */ }
 
@@ -1807,6 +1816,7 @@
 
   // ============ BUY (v5) — sends a purchase offer (no chat yet) ============
   async function startBuy() {
+    if (_bannedStop()) return;
     if (!currentItem) return;
     if (!currentUser) {
       try { currentUser = await _resolveCurrentUser(); } catch (e) {}
@@ -1843,6 +1853,7 @@
 
   // ============ OFFER MODAL (v5) — cash + optional item ============
   async function openOfferModal() {
+    if (_bannedStop()) return;
     if (!currentItem) return;
     if (!currentUser) {
       try { currentUser = await _resolveCurrentUser(); } catch (e) {}
@@ -1912,6 +1923,7 @@
 
   // ============ SWAP MODAL ============
   async function openSwapModal() {
+    if (_bannedStop()) return;
     // Re-check current user at click time (not just at page load) — the
     // Supabase session may have restored AFTER the initial DOMContentLoaded
     // race. If we still don't have a user after the retry, THEN redirect.

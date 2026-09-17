@@ -1486,6 +1486,7 @@
   <!-- Scripts -->
   <script src="../js/constants.js" defer></script>
   <script src="../js/avatars.js" defer></script>
+  <script src="../js/banned-guard.js" defer></script>
   <script src="../js/i18n/en.js" defer></script>
   <script src="../js/i18n.js" defer></script>
   <script src="../js/register-sw.js" defer></script>
@@ -3212,6 +3213,7 @@
 
   // ═══ SEND MESSAGE ═══
   async function sendMsg() {
+    if (window.__swpBanned) { Toast.show(_chatT('banned_banner', 'This account has been closed. Contact contact@swappo.ae.'), 'error'); return; }
     var input = document.getElementById('chatInput');
     var sendBtn = document.getElementById('sendBtn');
     var txt = input.value.trim();

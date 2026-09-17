@@ -363,6 +363,31 @@
     });
   }
 
+  // ---------- CLAIMER SUMMARY (gift claims) ----------
+  // What a giver may see about a claimer while identities are hidden:
+  // tier badge, join date and the claimer's latest listing. No name, no
+  // avatar. Used for the "Someone claimed your gift" notification and the
+  // received-claims list.
+  async function claimerSummary(userId) {
+    const out = { badge: '', joined: null, item: null, line: '' };
+    if (!global.db || !userId) return out;
+    try {
+      const { data: u } = await global.db.from('users_public').select('badge, created_at').eq('id', userId).maybeSingle();
+      if (u) { out.badge = u.badge || ''; out.joined = u.created_at || null; }
+      const { data: its } = await global.db.from(TABLE).select('id, brand, model, type, category, photos')
+        .eq('user_id', userId).in('status', ['available', 'reserved', 'swapped', 'sold'])
+        .order('created_at', { ascending: false }).limit(1);
+      if (its && its[0]) out.item = { id: its[0].id, title: itemTitle(its[0]), photo: (its[0].photos && its[0].photos[0]) || '' };
+    } catch (e) { /* best-effort */ }
+    const tiers = (global.BADGE_TIERS || []).reduce((m, b) => { m[b.tier] = b.emoji + ' ' + b.label; return m; }, {});
+    const badgeLabel = tiers[out.badge] || (out.badge ? out.badge : '');
+    const joined = out.joined ? new Date(out.joined).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : '';
+    const tr = (k, f) => (typeof global.t === 'function') ? global.t(k) : f;
+    out.line = [badgeLabel, joined ? tr('claim_member_since', 'member since') + ' ' + joined : '', out.item ? tr('claim_latest_listing', 'Latest listing') + ': ' + out.item.title : '']
+      .filter(Boolean).join(' · ');
+    return out;
+  }
+
   // ---------- VIEWS COUNTER ----------
   // Any new page that displays a single product detail MUST call this on
   // mount (see pages/product.html for the reference pattern). The counter
@@ -473,6 +498,6 @@
     getByUser, hasActiveItems,
     getGiveaways, getBoosted, getSimilar,
     toggleFavorite, onFavClick, getFavoriteIds, getFavorites, isFavorited, isFavoritedSync,
-    bumpViews, renderCard, itemTitle, cleanBrand: _cleanBrand
+    bumpViews, renderCard, itemTitle, cleanBrand: _cleanBrand, claimerSummary
   };
 })(window);

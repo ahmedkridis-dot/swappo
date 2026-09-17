@@ -59,7 +59,9 @@ type Ctx = {
 // ── email templates ───────────────────────────────────────
 function template(ctx: Ctx): { subject: string; html: string } {
   const cta =
-    ctx.kind === 'swap_accepted' || ctx.kind === 'new_message'
+    ctx.kind === 'banned'
+      ? { label: 'Contact us', url: 'mailto:contact@swappo.ae' }
+      : ctx.kind === 'swap_accepted' || ctx.kind === 'new_message'
       ? { label: 'Open chat', url: ctx.url }
       : ctx.kind === 'swap_declined'
       ? { label: 'Browse items', url: `${SITE_URL}/pages/catalogue.html` }
@@ -68,7 +70,9 @@ function template(ctx: Ctx): { subject: string; html: string } {
   const boxSuffix = ctx.box_count && ctx.box_count >= 2
     ? ` (Swap Box of ${ctx.box_count} items)` : '';
   const headline =
-    ctx.kind === 'swap_proposed' || ctx.kind === 'offer_received'
+    ctx.kind === 'banned'
+      ? 'Your Swappo account has been closed'
+      : ctx.kind === 'swap_proposed' || ctx.kind === 'offer_received'
       ? `${ctx.actor_name} wants to swap for your ${esc(ctx.item_title)}${boxSuffix ? ' ' + esc(boxSuffix) : ''}`
       : ctx.kind === 'swap_accepted'
       ? `${ctx.actor_name} accepted your offer!`
@@ -81,7 +85,9 @@ function template(ctx: Ctx): { subject: string; html: string } {
       : `Swappo update`;
 
   const preheader =
-    ctx.kind === 'swap_accepted'
+    ctx.kind === 'banned'
+      ? 'One fake listing closes the account. Details inside.'
+      : ctx.kind === 'swap_accepted'
       ? 'Identities revealed — open the chat to agree on a meetup.'
       : ctx.kind === 'swap_declined'
       ? 'No worries — plenty more items waiting to be swapped.'
@@ -92,7 +98,9 @@ function template(ctx: Ctx): { subject: string; html: string } {
       : 'A fresh offer is waiting for you on Swappo.';
 
   const subject =
-    ctx.kind === 'swap_proposed' || ctx.kind === 'offer_received'
+    ctx.kind === 'banned'
+      ? 'Your Swappo account has been closed'
+      : ctx.kind === 'swap_proposed' || ctx.kind === 'offer_received'
       ? `New swap offer on your ${ctx.item_title}`
       : ctx.kind === 'swap_accepted'
       ? `Deal accepted — ${ctx.item_title}`
@@ -115,6 +123,10 @@ function template(ctx: Ctx): { subject: string; html: string } {
 
   // For "new_message" emails we quote a short preview of what the other
   // party wrote so the recipient knows whether it's worth re-opening.
+  const bannedLine =
+    ctx.kind === 'banned' && ctx.preview
+      ? `<p style="margin:0 0 16px;color:#1A1A2E;font-size:15px;line-height:1.6;">${esc(ctx.preview)}</p>`
+      : '';
   const previewLine =
     ctx.kind === 'new_message' && ctx.preview
       ? `<blockquote style="margin:12px 16px 20px;padding:12px 16px;border-left:3px solid #09B1BA;background:#F8FAFA;border-radius:6px;color:#1A1A2E;font-size:14px;line-height:1.5;text-align:left;font-style:normal;">${esc(ctx.preview)}</blockquote>`
@@ -145,7 +157,7 @@ function template(ctx: Ctx): { subject: string; html: string } {
               <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;letter-spacing:-0.02em;color:#1A1A2E;line-height:1.3;">${esc(headline)}</h1>
               <p style="margin:0 0 20px;color:#4A4A5A;font-size:15px;line-height:1.5;">Hey ${esc(ctx.recipient_name || 'there')},<br/>${esc(preheader)}</p>
               ${amountLine}
-              ${previewLine}
+              ${bannedLine}${previewLine}
             </td>
           </tr>
           <tr>
@@ -259,7 +271,9 @@ serve(async (req: Request) => {
     item_title: itemTitle,
     item_photo: itemPhoto,
     amount_aed: typeof payload.cash_amount === 'number' ? (payload.cash_amount as number) : null,
-    preview: typeof payload.preview === 'string' ? (payload.preview as string) : null,
+    preview: notif.kind === 'banned'
+      ? (notif.message as string)
+      : (typeof payload.preview === 'string' ? (payload.preview as string) : null),
     url,
     kind: notif.kind,
     box_count: typeof payload.proposer_box_count === 'number' ? (payload.proposer_box_count as number) : null,

@@ -1068,6 +1068,10 @@ window.publishItem = async function(e) {
       return;
     }
 
+    if (window.__swpBanned) {
+      Toast.show(_pubT('banned_banner', 'This account has been closed. Contact contact@swappo.ae.'), 'error');
+      return;
+    }
     if (!formState.category) {
       console.warn('[publish] no category selected');
       Toast.show(_pubT('toast_pub_select_category', 'Please select a category.'), 'warning');

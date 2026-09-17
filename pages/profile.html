@@ -2483,7 +2483,7 @@
                         itemIds.size ? window.db.from('items').select('id,brand,model,category,type,photos,price,condition,is_giveaway,status,box_id').in('id', Array.from(itemIds)) : Promise.resolve({data:[]}),
                         // public-safe view: pseudo + avatar + badge (no PII).
                         // The raw `users` table is RLS-blocked for non-self reads.
-                        userIds.size ? window.db.from('users_public').select('id,pseudo,display_name,avatar,plan,badge,swap_count,rating_avg,rating_count').in('id', Array.from(userIds)) : Promise.resolve({data:[]}),
+                        userIds.size ? window.db.from('users_public').select('id,pseudo,display_name,avatar,plan,badge,swap_count,rating_avg,rating_count,created_at').in('id', Array.from(userIds)) : Promise.resolve({data:[]}),
                         boxIds.size ? window.db.from('boxes').select('id,owner_id,kind,title,status').in('id', Array.from(boxIds)) : Promise.resolve({data:[]}),
                         boxIds.size ? window.db.from('box_items').select('box_id,item_id').in('box_id', Array.from(boxIds)) : Promise.resolve({data:[]})
                     ]);
@@ -2661,6 +2661,37 @@
                 '</div>';
             }
 
+            // One query per render for all claimers' latest listings.
+            var _claimerHydrateTimer = null;
+            function hydrateClaimerCards() {
+                if (_claimerHydrateTimer) return;
+                _claimerHydrateTimer = setTimeout(async function () {
+                    _claimerHydrateTimer = null;
+                    var hosts = Array.prototype.slice.call(document.querySelectorAll('.claimer-info[data-claimer-uid]:not([data-hydrated])'));
+                    if (!hosts.length || !window.db) return;
+                    var uids = Array.from(new Set(hosts.map(function (h) { return h.getAttribute('data-claimer-uid'); }).filter(Boolean)));
+                    var latest = {};
+                    try {
+                        var { data } = await window.db.from('items').select('id,user_id,brand,model,type,photos,created_at')
+                            .in('user_id', uids).in('status', ['available', 'reserved', 'swapped', 'sold'])
+                            .order('created_at', { ascending: false });
+                        (data || []).forEach(function (it) { if (!latest[it.user_id]) latest[it.user_id] = it; });
+                    } catch (e) { /* best-effort */ }
+                    var _T = function (k, f) { return (typeof t === 'function') ? t(k) : f; };
+                    hosts.forEach(function (h) {
+                        h.setAttribute('data-hydrated', '1');
+                        var it = latest[h.getAttribute('data-claimer-uid')];
+                        var slot = h.querySelector('.claimer-latest');
+                        if (!slot || !it) return;
+                        var title = (window.SwappoItems && SwappoItems.itemTitle) ? SwappoItems.itemTitle(it) : ((it.brand || '') + ' ' + (it.model || '')).trim();
+                        var photo = (it.photos && it.photos[0] && /^https?:\/\//.test(it.photos[0])) ? it.photos[0] : '';
+                        slot.innerHTML = '<a href="product.html?id=' + encodeURIComponent(it.id) + '" style="display:inline-flex;align-items:center;gap:6px;color:var(--primary-dark,#078A91);text-decoration:none;font-weight:600;">' +
+                            (photo ? '<img src="' + photo.replace(/"/g, '') + '" alt="" style="width:28px;height:28px;border-radius:6px;object-fit:cover;">' : '') +
+                            '<span>' + _T('claim_latest_listing', 'Latest listing') + ': ' + String(title).replace(/</g, '&lt;') + '</span></a>';
+                    });
+                }, 0);
+            }
+
             function renderSwapCard(swap, perspective) {
                 var isProposer = swap.proposer_id === user.id;
                 var otherUserId = isProposer ? swap.receiver_id : swap.proposer_id;
@@ -2715,6 +2746,18 @@
                     intent = { cls: 'swap', label: '⇄ Swap', accept: 'Accept swap' };
                 }
                 var intentBadgeHTML = '<span class="swap-intent-badge swap-intent-' + intent.cls + '">' + intent.label + '</span>';
+                // Gift claim received: who is asking — badge, seniority, latest
+                // listing (hydrated below). Never the name or avatar.
+                if (swap.is_giveaway_claim && !isProposer) {
+                    var _cu = otherUser || {};
+                    var _tiers = (window.BADGE_TIERS || []).reduce(function (m, b) { m[b.tier] = b.emoji + ' ' + b.label; return m; }, {});
+                    var _joined = _cu.created_at ? new Date(_cu.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : '';
+                    var _T = function (k, f) { return (typeof t === 'function') ? t(k) : f; };
+                    intentBadgeHTML += '<div class="claimer-info" data-claimer-uid="' + String(otherUserId || '').replace(/"/g, '') + '" style="margin-top:8px;font-size:12px;color:var(--text-secondary,#555);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+                        '<span>' + _T('claim_from', 'Claim from') + ' <strong>' + (_tiers[_cu.badge] || '🌱 Newcomer') + '</strong>' + (_joined ? ' · ' + _T('claim_member_since', 'member since') + ' ' + _joined : '') + '</span>' +
+                        '<span class="claimer-latest" style="display:inline-flex;align-items:center;gap:6px;"></span></div>';
+                    setTimeout(hydrateClaimerCards, 0);
+                }
 
                 // The "rating" stored on the swap row is split by side:
                 // proposer_rating (what the proposer gave) and

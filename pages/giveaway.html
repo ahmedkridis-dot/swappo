@@ -1033,6 +1033,7 @@
 
     <!-- Demo Scripts -->
     <script src="../js/constants.js" defer></script>
+    <script src="../js/banned-guard.js" defer></script>
     <script src="../js/animations.js" defer></script>
     <script src="../js/cookie-consent.js" defer></script>
     <script src="../js/i18n/en.js" defer></script>
@@ -1223,6 +1224,7 @@
          *       (N = 1 for free, 5 for pro).
          */
         async function handleClaim(itemId, btnEl) {
+            if (window.__swpBanned) { Toast.show((typeof t === 'function') ? t('banned_banner') : 'This account has been closed.', 'error'); return; }
             // STEP 1 — Must be signed in (use the Supabase session, not Demo*auth)
             var user = await _getUser();
             if (!user) { window.location.href = 'login.html'; return; }
@@ -1305,14 +1307,15 @@
 
                 // 6) Notify the giver (RLS INSERT policy in place since migration 004)
                 try {
+                    var cs = (window.SwappoItems && SwappoItems.claimerSummary) ? await SwappoItems.claimerSummary(user.id) : { line: '', badge: '', joined: null, item: null };
                     await window.db.from('notifications').insert({
                         user_id: item.user_id,
                         kind: 'gift_claimed',
                         type: 'gift',
                         title: 'Someone claimed your gift',
-                        message: 'Accept it to open the chat and arrange the hand-off.',
+                        message: (cs.line ? cs.line + ' — ' : '') + 'Accept it to open the chat and arrange the hand-off.',
                         url: '/pages/profile.html?tab=swap-dashboard&sub=received',
-                        payload: { swap_id: swap.id, item_id: itemId, claimer_id: user.id }
+                        payload: { swap_id: swap.id, item_id: itemId, claimer_id: user.id, claimer_badge: cs.badge, claimer_joined: cs.joined, claimer_item: cs.item }
                     });
                 } catch (nErr) { console.warn('[giveaway] notify giver failed:', nErr.message || nErr); }
 
