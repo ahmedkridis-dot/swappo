@@ -200,3 +200,6 @@ Logo | Search | Chat icon | Profile icon | "Join the Swap" | "Drop an Item"
 8. **Find a Truck dans le header** → seulement footer, Deal Tracker, catalogue sidebar
 9. **Clés i18n manquantes** → chaque string en 5 langues, zéro `snake_case` affiché
 10. **Reveal d'identité avant acceptance** → pseudo + badge seulement
+
+## Modération (commande d'Ahmed)
+Quand Ahmed écrit « bannis / suspends l'utilisateur x@y.com », suivre **`docs/MODERATION.md`** à la lettre : identifier le compte par email exact, montrer ses annonces, attendre le « ok », passer la fausse annonce en `suspended` (le trigger `on_item_suspended` ferme le compte et envoie la notification + l'email). **Règle Swappo : une fausse annonce = compte fermé, sans avertissement.** Jamais de `delete`. Rapport en 3 lignes.
