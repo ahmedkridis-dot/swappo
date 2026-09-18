@@ -349,8 +349,12 @@ serve(async (req: Request) => {
   if (claimErr) console.error('[send-swap-email] claim failed', claimErr.message);
   if (!claimErr && claimed !== true) return json({ skipped: 'already_emailed', kind: notif.kind }, 200);
 
-  // Send via Resend
-  const resp = await fetch('https://api.resend.com/emails', {
+  // Send via Resend. Resend allows ~2 requests/second: when one action fans
+  // out (accepting a gift auto-declines a dozen other claims in the same
+  // second) some calls get a 429. Retry those with a growing, jittered
+  // pause instead of losing the email. A daily/monthly quota error is not
+  // retried — the row is released so a later catch-up can send it.
+  const sendOnce = () => fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,
@@ -364,6 +368,15 @@ serve(async (req: Request) => {
       tags: [{ name: 'kind', value: notif.kind }],
     }),
   });
+  let resp = await sendOnce();
+  for (let attempt = 1; attempt <= 5 && resp.status === 429; attempt++) {
+    const peek = await resp.clone().text();
+    if (/quota/i.test(peek)) break;                       // daily / monthly cap: retrying is useless
+    const retryAfter = Number(resp.headers.get('retry-after')) || 0;
+    const waitMs = Math.max(retryAfter * 1000, 600 * attempt) + Math.floor(Math.random() * 500);
+    await new Promise((r) => setTimeout(r, waitMs));
+    resp = await sendOnce();
+  }
 
   const resendBody = await resp.text();
   if (!resp.ok) {
