@@ -1855,6 +1855,7 @@
   <script src="../js/password-toggle.js" defer></script>
   <script src="../js/dashboard-link.js" defer></script>
     <script src="../js/notifications-bell.js" defer></script>
+    <script src="../js/gift-moments.js" defer></script>
     <script src="../js/messages-icon.js" defer></script>
   <script src="../js/identity-card.js" defer></script>
   <script src="../js/offer-threading.js" defer></script>
@@ -2783,6 +2784,13 @@
                         + '\u2605'.repeat(filled)
                         + '<span style="color:#DDD;">' + '\u2605'.repeat(5 - filled) + '</span>'
                         + '</div>';
+                }
+
+                // Gift received: the "Gift received" panel can be re-opened from
+                // History to share it (js/gift-moments.js), for those who closed
+                // it too fast.
+                if (perspective === 'history' && swap.status === 'completed' && swap.is_giveaway_claim && isProposer) {
+                    actionsHTML += '<div class="swap-actions" style="margin-top:8px;"><button type="button" onclick="event.stopPropagation(); if (window.SwappoGiftMoments) SwappoGiftMoments.reopen(\'' + swap.id + '\')" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid var(--border,#EBEBEB);background:#fff;color:var(--primary,#09B1BA);font:600 12px Inter,sans-serif;cursor:pointer;"><i class="fas fa-share-alt"></i> ' + ((typeof t === 'function' && t('share') !== 'share') ? t('share') : 'Share') + '</button></div>';
                 }
 
                 // Per Ahmed 2026-04-18: the counter-party card must be clickable

@@ -1504,6 +1504,7 @@
   <script src="../js/a11y-helpers.js" defer></script>
   <script src="../js/dashboard-link.js" defer></script>
   <script src="../js/notifications-bell.js" defer></script>
+  <script src="../js/gift-moments.js" defer></script>
   <script src="../js/messages-icon.js" defer></script>
   <script src="../js/identity-card.js" defer></script>
   <script src="../js/offer-threading.js" defer></script>
@@ -2397,6 +2398,18 @@
     } catch (e) { console.warn('[badge] check failed', e && e.message); }
   }
 
+  // Runs `next` once the gift panel (if this swap owes one to the member)
+  // is closed. Never blocks the rating: any failure falls straight through.
+  function _afterGiftMoment(swapId, next) {
+    var fired = false;
+    var go = function () { if (!fired) { fired = true; next(); } };
+    try {
+      if (swapId && window.SwappoGiftMoments && SwappoGiftMoments.beforeRating) {
+        SwappoGiftMoments.beforeRating(swapId).then(go, go);
+      } else go();
+    } catch (e) { go(); }
+  }
+
   // Open / close the rating overlay. Both parties see this modal after
   // a successful confirm (shower via realtime, scanner via URL param).
   function openRatingModal(convId, swapId) {
@@ -2652,7 +2665,9 @@
     // if the system-message insert or loadMessages() fail we never
     // leave the user without a way to rate. (Ahmed reported a swap
     // where the rating never appeared after QR success.)
-    setTimeout(function () { openRatingModal(convId, swapId); }, 400);
+    // A gift shows its "Gift received" / "Gift given" panel first
+    // (js/gift-moments.js); the rating opens when it is closed.
+    setTimeout(function () { _afterGiftMoment(swapId, function () { openRatingModal(convId, swapId); }); }, 400);
 
     // After the swap-count bump fires the badge_earned notification in
     // the DB, poll briefly to catch it and play the celebration.
@@ -3374,7 +3389,7 @@
     var rateParam = params.get('rate');
     if (rateParam) {
       var convForRate = targetConv || (_convCache[0] && _convCache[0].id) || null;
-      setTimeout(function () { openRatingModal(convForRate, rateParam); }, 500);
+      setTimeout(function () { _afterGiftMoment(rateParam, function () { openRatingModal(convForRate, rateParam); }); }, 500);
     }
 
     // Check for an unread badge_earned notification on any page load.

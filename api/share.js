@@ -4,6 +4,7 @@
 // share links point here: a tiny HTML page whose Open Graph tags carry
 // the item's title, price and photo, then an instant redirect to the
 // product page for humans. Not found / not live → the Swap Market.
+// A gift already given keeps its preview and sends humans to the Gift Corner.
 //
 // Route: vercel.json rewrites /i/:id → /api/share?id=:id
 // Reads Supabase REST with the public (publishable) key — the same one
@@ -49,14 +50,21 @@ module.exports = async (req, res) => {
 
   let item = null;
   try { item = await fetchItem(id); } catch (e) { item = null; }
-  if (!item || item.status !== 'available') { res.statusCode = 302; res.setHeader('Location', market); return res.end(); }
+  // A gift already handed over keeps its preview: the
+  // recipient and the giver share this link from the "Gift received" /
+  // "Gift given" panels (js/gift-moments.js). Humans land on the Gift Corner.
+  const given = !!(item && item.is_giveaway && item.status === 'swapped');
+  if (!item || (item.status !== 'available' && !given)) { res.statusCode = 302; res.setHeader('Location', market); return res.end(); }
 
   const title = ((cleanBrand(item.brand) + ' ' + (item.model || '')).trim() || item.type || item.category || 'Item');
   const price = Number(item.price) || 0;
-  const ogTitle = item.is_giveaway ? title + ' — Free on Swappo' : (price > 0 ? title + ' — ' + price.toLocaleString('en-US') + ' AED' : title + ' — on Swappo');
-  const ogDesc = 'Swap, buy, sell & gift across the UAE. Sign up to see more.';
+  const ogTitle = given ? title + ' — given for free on Swappo'
+    : (item.is_giveaway ? title + ' — Free on Swappo' : (price > 0 ? title + ' — ' + price.toLocaleString('en-US') + ' AED' : title + ' — on Swappo'));
+  const ogDesc = given
+    ? 'Someone gave this away instead of throwing it away. List one thing you don\'t use, claim what you need.'
+    : 'Swap, buy, sell & gift across the UAE. Sign up to see more.';
   const image = await pickImage(item.photos);
-  const target = '/pages/product.html?id=' + encodeURIComponent(id);
+  const target = given ? '/pages/giveaway.html' : '/pages/product.html?id=' + encodeURIComponent(id);
   const canonical = SITE + '/i/' + encodeURIComponent(id);
 
   const html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +

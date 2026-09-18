@@ -7,6 +7,8 @@
    OG preview with the item photo). No tracking, no nudges.
 
    API:  SwappoShare.open(itemId, item?)   SwappoShare.icon(itemId)
+         SwappoShare.open(itemId, { text, item? })  → same sheet with a custom
+           message (js/gift-moments.js); the text carries the short link.
    ============================================ */
 (function () {
   'use strict';
@@ -67,9 +69,13 @@
   async function open(itemId, itemOpt) {
     if (!itemId) return;
     ensureStyle();
+    // Second argument: the item row, or options { text, item }.
+    var opts = (itemOpt && !itemOpt.id && (itemOpt.text || itemOpt.item)) ? itemOpt : null;
+    if (opts) itemOpt = opts.item || null;
     var item = await resolveItem(itemId, itemOpt);
     var url = SHORT_BASE + encodeURIComponent(itemId);
-    var text = shareText(item, url);
+    var text = (opts && opts.text) ? String(opts.text) : shareText(item, url);
+    if (text.indexOf(url) === -1) text = text + ' ' + url;
     var textNoUrl = text.replace(' ' + url, '').replace(url, '').trim();
     var title = titleOf(item);
     var canNative = !!(navigator.share);

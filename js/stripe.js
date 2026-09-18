@@ -121,12 +121,25 @@
             _payT('pay_pro_boost_exhausted', 'Your {limit} Pro boosts are used up this month — they reset on the 1st. You can still buy one:').replace('{limit}', pro.limit) + '</div>';
         }
       }
+      // Give & Earn (migration 046): every 3 gifts handed over earn one free
+      // 3-day boost — offered first, to Pro and Free members alike.
+      var giftLeft = !!(opts.gift && (opts.gift.available || 0) > 0);
+      if (giftLeft) {
+        proRows =
+          '<button type="button" data-tier="gift" style="display:block;width:100%;padding:16px;margin-bottom:8px;border:0;border-radius:14px;background:linear-gradient(135deg,#FF8C00,#FF6B00);color:#fff;cursor:pointer;font-family:inherit;text-align:left;box-shadow:0 6px 16px rgba(255,140,0,0.3);">' +
+            '<span style="display:block;font-size:15px;font-weight:800;">🎁 ' + _payT('pay_gift_boost_btn', 'Use my free boost — 3 days, earned by giving') + '</span>' +
+            '<span style="display:block;font-size:12px;opacity:0.9;margin-top:4px;">' + _payT('pay_gift_boost_left', '{n} free boost(s) from your gifts').replace('{n}', opts.gift.available) + '</span>' +
+          '</button>' + proRows;
+        if (!(opts.pro && opts.pro.is_pro && (opts.pro.remaining || 0) > 0)) {
+          proRows += '<div style="font-size:12px;color:var(--text-muted,#999);text-align:center;margin:6px 0 10px;">' + _payT('pay_pro_boost_or_buy', 'Or buy a longer boost:') + '</div>';
+        }
+      }
       var overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
       // A member who still has an included 3-day boost is only offered the
       // paid tiers that are LONGER than it (7 days); once the monthly Pro
       // boosts are used up, every tier comes back.
-      var proLeft = !!(opts.pro && opts.pro.is_pro && (opts.pro.remaining || 0) > 0);
+      var proLeft = giftLeft || !!(opts.pro && opts.pro.is_pro && (opts.pro.remaining || 0) > 0);
       var tierKeys = Object.keys(tiers).filter(function (key) { return !proLeft || (tiers[key].duration || 0) > 3; });
       var rows = proRows + tierKeys.map(function (key) {
         var tcfg = tiers[key];
@@ -246,6 +259,31 @@
     return true;
   }
 
+  // ── Give & Earn boosts (server-side: migration 046) ───────
+  async function _giftBoostStatus() {
+    if (!window.db) return null;
+    try {
+      var r = await window.db.rpc('give_earn_status');
+      return (r && !r.error && r.data) ? r.data : null;
+    } catch (e) { return null; }
+  }
+  async function _useGiftBoost(itemId) {
+    var r;
+    try { r = await window.db.rpc('use_gift_boost', { p_item_id: itemId }); }
+    catch (e) { r = { error: e }; }
+    if (r && r.error) {
+      var msg = String(r.error.message || '');
+      if (/gift_boosts_exhausted/.test(msg)) _toast(_payT('pay_gift_boost_none', 'No free boost left — give 3 items away to earn one.'), 'warning');
+      else if (/item_not_available/.test(msg)) _toast(_payT('pay_boost_item_unavailable', "This listing can't be boosted right now (it must be available)."), 'warning');
+      else _toast(_payT('pay_error', 'Payment could not be started.') + ' ' + msg, 'error');
+      return false;
+    }
+    _toast(_payT('pay_gift_boost_done', 'Boost activated — thank you for giving! 🚀'), 'success');
+    try { document.dispatchEvent(new CustomEvent('swappo:boosted', { detail: r.data || {} })); } catch (e) {}
+    setTimeout(function () { location.reload(); }, 1400);
+    return true;
+  }
+
   // ── Public API ────────────────────────────────────────────
   var SwappoPayment = {
 
@@ -270,10 +308,13 @@
       // The session user carries no plan → always ask the server
       // (pro_boosts_status reads users.is_pro / plan).
       if (!tier) {
-        var status = await _proBoostStatus();
-        if (status && status.is_pro) {
-          var choice = await _pickBoostTier({ pro: status });
+        var both = await Promise.all([_proBoostStatus(), _giftBoostStatus()]);
+        var status = both[0], gift = both[1];
+        var giftLeft = !!(gift && (gift.available || 0) > 0);
+        if ((status && status.is_pro) || giftLeft) {
+          var choice = await _pickBoostTier({ pro: status, gift: gift });
           if (!choice) return false;
+          if (choice === 'gift') return _useGiftBoost(itemId);
           if (choice === 'pro') return _useProBoost(itemId);
           tier = choice;
         }
