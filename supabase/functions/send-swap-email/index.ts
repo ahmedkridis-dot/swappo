@@ -3,7 +3,7 @@
 //  Swappo transactional emails via Resend.
 //
 //  Invoked by a Postgres trigger on notifications INSERT
-//  (see migration 013_email_trigger.sql). Never called from the
+//  (see migrations 013 → 047: every kind is emailed, once). Never called from the
 //  browser — the trigger uses the service role which is safe.
 //
 //  Env vars (set via `supabase secrets set …`):
@@ -54,63 +54,113 @@ type Ctx = {
   url: string;              // deep link into swappo.ae
   kind: string;
   box_count: number | null; // size of the Swap Box if the proposer offered a box
+  title: string;            // notification title / message: used by the generic template
+  message: string;
 };
 
 // ── email templates ───────────────────────────────────────
-function template(ctx: Ctx): { subject: string; html: string } {
-  const cta =
-    ctx.kind === 'banned'
-      ? { label: 'Contact us', url: 'mailto:contact@swappo.ae' }
-      : ctx.kind === 'swap_accepted' || ctx.kind === 'new_message'
-      ? { label: 'Open chat', url: ctx.url }
-      : ctx.kind === 'swap_declined'
-      ? { label: 'Browse items', url: `${SITE_URL}/pages/catalogue.html` }
-      : { label: 'View offer', url: ctx.url };
+// One spec per kind; the layout below is shared and never changes.
+// Any kind without a spec (present or future) falls back to the GENERIC
+// one — subject = notification title, body = notification message — so no
+// notification can stay silent (migration 047).
+// Vocabulary rule: a gift is never a game. Words allowed: received, given,
+// claim accepted, the giver chose you.
+type Spec = { subject: string; headline: string; body: string; cta: { label: string; url: string } };
 
+function specFor(ctx: Ctx): Spec {
+  const mySwaps = `${SITE_URL}/pages/profile.html?tab=swap-dashboard`;
   const boxSuffix = ctx.box_count && ctx.box_count >= 2
     ? ` (Swap Box of ${ctx.box_count} items)` : '';
-  const headline =
-    ctx.kind === 'banned'
-      ? 'Your Swappo account has been closed'
-      : ctx.kind === 'swap_proposed' || ctx.kind === 'offer_received'
-      ? `${ctx.actor_name} wants to swap for your ${esc(ctx.item_title)}${boxSuffix ? ' ' + esc(boxSuffix) : ''}`
-      : ctx.kind === 'swap_accepted'
-      ? `${ctx.actor_name} accepted your offer!`
-      : ctx.kind === 'swap_declined'
-      ? `Your offer was declined`
-      : ctx.kind === 'counter_offer'
-      ? `${ctx.actor_name} sent you a counter-offer`
-      : ctx.kind === 'new_message'
-      ? `${ctx.actor_name} sent you a message`
-      : `Swappo update`;
+  switch (ctx.kind) {
+    case 'banned':
+      return {
+        subject: 'Your Swappo account has been closed',
+        headline: 'Your Swappo account has been closed',
+        body: 'One fake listing closes the account. Details inside.',
+        cta: { label: 'Contact us', url: 'mailto:contact@swappo.ae' },
+      };
+    case 'swap_proposed':
+    case 'offer_received':
+      return {
+        subject: `New swap offer on your ${ctx.item_title}`,
+        headline: `${ctx.actor_name} wants to swap for your ${ctx.item_title}${boxSuffix}`,
+        body: 'A fresh offer is waiting for you on Swappo.',
+        cta: { label: 'View offer', url: ctx.url },
+      };
+    case 'gift_claimed':
+      return {
+        subject: `Someone claimed your gift: ${ctx.item_title}`,
+        headline: `A member is asking for your ${ctx.item_title}`,
+        body: "Open My Swaps to see who's asking and accept or decline. You choose who receives your gift.",
+        cta: { label: 'See the claim', url: ctx.url },
+      };
+    case 'swap_accepted':
+      return {
+        subject: `Deal accepted — ${ctx.item_title}`,
+        headline: `${ctx.actor_name} accepted your offer!`,
+        body: 'Identities revealed — open the chat to agree on a meetup.',
+        cta: { label: 'Open chat', url: ctx.url },
+      };
+    case 'swap_declined':
+      return {
+        subject: `Your offer on ${ctx.item_title} was declined`,
+        headline: 'Your offer was declined',
+        body: 'No worries — plenty more items waiting to be swapped.',
+        cta: { label: 'Browse items', url: `${SITE_URL}/pages/catalogue.html` },
+      };
+    case 'counter_offer':
+      return {
+        subject: `Counter-offer on ${ctx.item_title}`,
+        headline: `${ctx.actor_name} sent you a counter-offer`,
+        body: 'Take a look and accept, decline, or counter back.',
+        cta: { label: 'View offer', url: ctx.url },
+      };
+    case 'new_message':
+      return {
+        subject: `New message about ${ctx.item_title}`,
+        headline: `${ctx.actor_name} sent you a message`,
+        body: 'The chat went quiet for a while — here is what you missed.',
+        cta: { label: 'Open chat', url: ctx.url },
+      };
+    case 'swap_cancelled':
+      return {
+        subject: 'An offer was withdrawn',
+        headline: ctx.title || 'Deal cancelled',
+        body: ctx.message || 'The other member cancelled the deal. The items are available again.',
+        cta: { label: 'Open My Swaps', url: mySwaps },
+      };
+    case 'boost':
+    case 'boost_expiring':
+      return {
+        subject: 'Your boost ends soon',
+        headline: ctx.title || 'Your boost ends soon',
+        body: ctx.message || 'Boost again to keep your listing at the top of the Swap Market.',
+        cta: { label: 'Boost again', url: `${SITE_URL}/pages/profile.html` },
+      };
+    case 'pro':
+    case 'pro_expiring':
+      return {
+        subject: ctx.title || 'Your Swappo Pro is active',
+        headline: ctx.title || 'Your Swappo Pro is active',
+        body: ctx.message || 'Your Pro benefits are live: included boosts, more gift claims, no ads.',
+        cta: { label: 'My Swaps', url: mySwaps },
+      };
+    default:
+      return {
+        subject: ctx.title || 'Swappo update',
+        headline: ctx.title || 'Swappo update',
+        body: ctx.message || 'Something new is waiting for you on Swappo.',
+        cta: { label: 'Open Swappo', url: ctx.url },
+      };
+  }
+}
 
-  const preheader =
-    ctx.kind === 'banned'
-      ? 'One fake listing closes the account. Details inside.'
-      : ctx.kind === 'swap_accepted'
-      ? 'Identities revealed — open the chat to agree on a meetup.'
-      : ctx.kind === 'swap_declined'
-      ? 'No worries — plenty more items waiting to be swapped.'
-      : ctx.kind === 'counter_offer'
-      ? 'Take a look and accept, decline, or counter back.'
-      : ctx.kind === 'new_message'
-      ? 'The chat went quiet for a while — here is what you missed.'
-      : 'A fresh offer is waiting for you on Swappo.';
-
-  const subject =
-    ctx.kind === 'banned'
-      ? 'Your Swappo account has been closed'
-      : ctx.kind === 'swap_proposed' || ctx.kind === 'offer_received'
-      ? `New swap offer on your ${ctx.item_title}`
-      : ctx.kind === 'swap_accepted'
-      ? `Deal accepted — ${ctx.item_title}`
-      : ctx.kind === 'swap_declined'
-      ? `Your offer on ${ctx.item_title} was declined`
-      : ctx.kind === 'counter_offer'
-      ? `Counter-offer on ${ctx.item_title}`
-      : ctx.kind === 'new_message'
-      ? `New message about ${ctx.item_title}`
-      : `Swappo — ${ctx.item_title}`;
+function template(ctx: Ctx): { subject: string; html: string } {
+  const spec = specFor(ctx);
+  const cta = spec.cta;
+  const headline = spec.headline;
+  const preheader = spec.body;
+  const subject = spec.subject;
 
   const photoHTML = ctx.item_photo
     ? `<img src="${esc(ctx.item_photo)}" alt="" width="120" height="120" style="display:block;border-radius:12px;object-fit:cover;width:120px;height:120px;margin:0 auto 16px;" />`
@@ -209,13 +259,16 @@ serve(async (req: Request) => {
   // Load the notification
   const { data: notif, error: notifErr } = await supabase
     .from('notifications')
-    .select('id, user_id, kind, title, message, url, payload')
+    .select('id, user_id, kind, title, message, url, payload, emailed_at')
     .eq('id', notificationId)
     .maybeSingle();
 
   if (notifErr || !notif) {
     return json({ error: 'notification_not_found', detail: notifErr?.message }, 404);
   }
+
+  // Never email the same notification twice (migration 047).
+  if (notif.emailed_at) return json({ skipped: 'already_emailed', kind: notif.kind }, 200);
 
   // Opt-out check
   const { data: wantEmail } = await supabase.rpc('should_email_user', {
@@ -277,7 +330,17 @@ serve(async (req: Request) => {
     url,
     kind: notif.kind,
     box_count: typeof payload.proposer_box_count === 'number' ? (payload.proposer_box_count as number) : null,
+    title: (notif.title ?? '') as string,
+    message: (notif.message ?? '') as string,
   });
+
+  // Claim the row before sending: two concurrent calls (trigger + a manual
+  // catch-up) can never both send. Released if the provider refuses.
+  const { data: claimed, error: claimErr } = await supabase.rpc('claim_notification_email', {
+    p_notification_id: notificationId,
+  });
+  if (claimErr) console.error('[send-swap-email] claim failed', claimErr.message);
+  if (!claimErr && claimed !== true) return json({ skipped: 'already_emailed', kind: notif.kind }, 200);
 
   // Send via Resend
   const resp = await fetch('https://api.resend.com/emails', {
@@ -298,14 +361,18 @@ serve(async (req: Request) => {
   const resendBody = await resp.text();
   if (!resp.ok) {
     console.error('[send-swap-email] resend error', resp.status, resendBody);
+    await supabase.rpc('release_notification_email', { p_notification_id: notificationId });
     return json({ error: 'resend_failed', status: resp.status, detail: resendBody }, 502);
   }
 
-  // Best-effort: tag the notification as emailed so we don't double-send
-  await supabase
-    .from('notifications')
-    .update({ emailed_at: new Date().toISOString() })
-    .eq('id', notificationId);
+  // Already stamped by claim_notification_email(); keep the direct write as
+  // a fallback in case the claim RPC was unavailable.
+  if (claimErr) {
+    await supabase
+      .from('notifications')
+      .update({ emailed_at: new Date().toISOString() })
+      .eq('id', notificationId);
+  }
 
   return json({ ok: true, kind: notif.kind, resend: JSON.parse(resendBody) });
 });
