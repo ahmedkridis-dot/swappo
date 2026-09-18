@@ -1456,12 +1456,19 @@
                      MOCK_OFFERS fixtures and was duplicating the Swaps tab's
                      Sent/Received/History view. Single source of truth now:
                      public.swaps via SwappoSwaps (Supabase). -->
+                <!-- Requests waiting for MY answer (offers + gift claims): one tap
+                     to Swaps › Received. Filled by renderSwapDashboard(). -->
+                <button type="button" id="requests-banner" onclick="openReceivedRequests()" style="display:none;width:100%;align-items:center;gap:12px;text-align:start;background:#FFF1F2;border:1px solid #FECDD3;border-radius:14px;padding:12px 14px;margin:0 0 14px;cursor:pointer;font-family:inherit;">
+                    <span style="flex:0 0 auto;min-width:34px;height:34px;border-radius:17px;background:#FF4B55;color:#fff;font-weight:800;font-size:15px;display:inline-flex;align-items:center;justify-content:center;padding:0 8px;" id="requests-banner-count">0</span>
+                    <span style="flex:1 1 auto;min-width:0;font-size:14px;font-weight:600;color:#171717;line-height:1.35;" id="requests-banner-text"></span>
+                    <span style="flex:0 0 auto;background:#09B1BA;color:#fff;font-size:13px;font-weight:700;border-radius:999px;padding:8px 14px;white-space:nowrap;" data-i18n="dash_requests_review">Review</span>
+                </button>
                 <div class="tabs-nav">
                     <button class="tab-btn active" data-tab="my-items">
                         <i class="fas fa-box"></i> <span data-i18n="my_items">My Items</span>
                     </button>
                     <button class="tab-btn" data-tab="swap-dashboard">
-                        <i class="fas fa-exchange-alt"></i> <span data-i18n="profile_tab_swaps">Swaps</span>
+                        <i class="fas fa-exchange-alt"></i> <span data-i18n="profile_tab_swaps">Swaps</span> <span class="swap-tab-count" id="swap-badge"></span>
                     </button>
                     <button class="tab-btn" data-tab="saved-items">
                         <i class="fas fa-heart"></i> <span data-i18n="saved">Saved</span>
@@ -1493,11 +1500,13 @@
                 <div class="tab-content" id="swap-dashboard">
                     <!-- Sub-tabs -->
                     <div class="swap-tabs">
-                        <button class="swap-tab active" data-swap-tab="sent" onclick="switchSwapTab('sent', this)">
-                            <i class="fas fa-paper-plane"></i> <span data-i18n="profile_swap_sent">Sent</span> <span class="swap-tab-count" id="sent-count"></span>
-                        </button>
-                        <button class="swap-tab" data-swap-tab="received" onclick="switchSwapTab('received', this)">
+                        <!-- Received first and open by default: it is the list that
+                             needs an answer (offers + gift claims). -->
+                        <button class="swap-tab active" data-swap-tab="received" onclick="switchSwapTab('received', this)">
                             <i class="fas fa-inbox"></i> <span data-i18n="profile_swap_received">Received</span> <span class="swap-tab-count" id="received-count"></span>
+                        </button>
+                        <button class="swap-tab" data-swap-tab="sent" onclick="switchSwapTab('sent', this)">
+                            <i class="fas fa-paper-plane"></i> <span data-i18n="profile_swap_sent">Sent</span> <span class="swap-tab-count" id="sent-count"></span>
                         </button>
                         <button class="swap-tab" data-swap-tab="history" onclick="switchSwapTab('history', this)">
                             <i class="fas fa-history"></i> <span data-i18n="profile_swap_history">History</span>
@@ -1505,12 +1514,12 @@
                     </div>
 
                     <!-- Sent requests -->
-                    <div class="swap-tab-content active" id="swap-sent">
+                    <div class="swap-tab-content" id="swap-sent">
                         <div class="swap-list" id="swap-sent-list"></div>
                     </div>
 
                     <!-- Received requests -->
-                    <div class="swap-tab-content" id="swap-received">
+                    <div class="swap-tab-content active" id="swap-received">
                         <div class="swap-list" id="swap-received-list"></div>
                     </div>
 
@@ -2322,7 +2331,7 @@
                 const terminalCls = (bucket === 'swapped' || bucket === 'sold' || bucket === 'removed') ? ' is-terminal' : '';
                 const pendingCount = pendingByItem[item.id] || 0;
                 const pendingBadge = pendingCount > 0
-                    ? '<span class="pending-offer-badge" onclick="event.stopPropagation(); document.querySelector(\'[data-tab=swap-dashboard]\').click(); setTimeout(function(){var b=document.querySelector(\'[data-swap-tab=received]\');if(b)b.click();},50);">🔔 ' + pendingCount + ' pending offer' + (pendingCount > 1 ? 's' : '') + '</span>'
+                    ? '<span class="pending-offer-badge" onclick="event.stopPropagation(); openReceivedRequests();">🔔 ' + pendingCount + ' pending offer' + (pendingCount > 1 ? 's' : '') + '</span>'
                     : '';
                 // Reserved card → clicking the whole card opens the chat for
                 // the active swap, and the action row replaces Boost/Delete
@@ -2868,6 +2877,18 @@
                 else Toast.show((result && result.error) || 'Error', 'error');
             }
 
+            // Banner / badges → Swaps › Received, scrolled into view.
+            window.openReceivedRequests = function () {
+                var tabBtn = document.querySelector('[data-tab="swap-dashboard"]');
+                if (tabBtn) tabBtn.click();
+                setTimeout(function () {
+                    var sub = document.querySelector('[data-swap-tab="received"]');
+                    if (sub) sub.click();
+                    var nav = document.querySelector('.tabs-nav');
+                    if (nav && nav.scrollIntoView) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 60);
+            };
+
             // Expose to inline onclick handlers
             window.cancelSwap = cancelSwap;
             window.acceptSwap = acceptSwap;
@@ -2892,10 +2913,22 @@
                 if (sentCountEl) sentCountEl.textContent = sentPending > 0 ? sentPending : '';
                 var receivedCountEl = document.getElementById('received-count');
                 if (receivedCountEl) receivedCountEl.textContent = receivedPending > 0 ? receivedPending : '';
+                // Swaps tab badge + banner = requests waiting for MY answer
+                // (received offers and gift claims). Sent ones need nothing from me.
                 var badge = document.getElementById('swap-badge');
-                if (badge) {
-                    if (totalPending > 0) { badge.textContent = totalPending; badge.style.display = 'inline-flex'; }
-                    else { badge.style.display = 'none'; }
+                if (badge) badge.textContent = receivedPending > 0 ? receivedPending : '';
+                var banner = document.getElementById('requests-banner');
+                if (banner) {
+                    if (receivedPending > 0) {
+                        var _bt = function (k, f) { var v = (typeof t === 'function') ? t(k) : k; return (v && v !== k) ? v : f; };
+                        document.getElementById('requests-banner-count').textContent = receivedPending;
+                        document.getElementById('requests-banner-text').textContent = receivedPending === 1
+                            ? _bt('dash_requests_waiting_one', '1 request is waiting for your answer')
+                            : _bt('dash_requests_waiting_many', '{n} requests are waiting for your answer').replace('{n}', receivedPending);
+                        banner.style.display = 'flex';
+                    } else {
+                        banner.style.display = 'none';
+                    }
                 }
 
                 // Render sent

@@ -645,6 +645,10 @@
     share_copy: "لنک کاپی کریں",
     share_copied: "لنک کاپی ہو گیا",
     share_more: "مزید",
+    // Dashboard: requests waiting for the member's answer (pages/profile.html)
+    dash_requests_waiting_one: "1 درخواست آپ کے جواب کی منتظر ہے",
+    dash_requests_waiting_many: "{n} درخواستیں آپ کے جواب کی منتظر ہیں",
+    dash_requests_review: "دیکھیں",
     // Gift moments (js/gift-moments.js) — vocabulary rule: received / given / claim accepted only.
     gm_item_fallback: "یہ چیز",
     gm_accepted_title: "آپ کی درخواست قبول ہو گئی",

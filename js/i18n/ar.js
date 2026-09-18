@@ -646,6 +646,10 @@
     share_copy: "نسخ الرابط",
     share_copied: "تم نسخ الرابط",
     share_more: "المزيد",
+    // Dashboard: requests waiting for the member's answer (pages/profile.html)
+    dash_requests_waiting_one: "طلب واحد ينتظر ردّك",
+    dash_requests_waiting_many: "{n} طلبات تنتظر ردّك",
+    dash_requests_review: "عرض",
     // Gift moments (js/gift-moments.js) — vocabulary rule: received / given / claim accepted only.
     gm_item_fallback: "هذا الغرض",
     gm_accepted_title: "تم قبول طلبك",

@@ -620,6 +620,10 @@
     share_copy: "Скопировать ссылку",
     share_copied: "Ссылка скопирована",
     share_more: "Ещё",
+    // Dashboard: requests waiting for the member's answer (pages/profile.html)
+    dash_requests_waiting_one: "1 заявка ждёт вашего ответа",
+    dash_requests_waiting_many: "Заявок, ожидающих ответа: {n}",
+    dash_requests_review: "Открыть",
     // Gift moments (js/gift-moments.js) — vocabulary rule: received / given / claim accepted only.
     gm_item_fallback: "эту вещь",
     gm_accepted_title: "Ваша заявка принята",

@@ -646,6 +646,10 @@
     share_copy: "Copier le lien",
     share_copied: "Lien copié",
     share_more: "Plus",
+    // Dashboard: requests waiting for the member's answer (pages/profile.html)
+    dash_requests_waiting_one: "1 demande attend votre réponse",
+    dash_requests_waiting_many: "{n} demandes attendent votre réponse",
+    dash_requests_review: "Voir",
     // Gift moments (js/gift-moments.js) — vocabulary rule: received / given / claim accepted only.
     gm_item_fallback: "cet objet",
     gm_accepted_title: "Votre demande a été acceptée",
