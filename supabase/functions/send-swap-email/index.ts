@@ -56,6 +56,7 @@ type Ctx = {
   box_count: number | null; // size of the Swap Box if the proposer offered a box
   title: string;            // notification title / message: used by the generic template
   message: string;
+  can_reoffer: boolean;     // declined offer whose item can receive a new offer
 };
 
 // ── email templates ───────────────────────────────────────
@@ -105,8 +106,13 @@ function specFor(ctx: Ctx): Spec {
       return {
         subject: `Your offer on ${ctx.item_title} was declined`,
         headline: 'Your offer was declined',
-        body: 'No worries — plenty more items waiting to be swapped.',
-        cta: { label: 'Browse items', url: `${SITE_URL}/pages/catalogue.html` },
+        // Migration 048: the link re-opens the offer form on the item.
+        body: ctx.can_reoffer
+          ? (ctx.message || 'Your offer was declined. You can change it and send a new one.')
+          : 'No worries — plenty more items waiting to be swapped.',
+        cta: ctx.can_reoffer
+          ? { label: 'Change my offer', url: ctx.url }
+          : { label: 'Browse items', url: `${SITE_URL}/pages/catalogue.html` },
       };
     case 'counter_offer':
       return {
@@ -332,6 +338,7 @@ serve(async (req: Request) => {
     box_count: typeof payload.proposer_box_count === 'number' ? (payload.proposer_box_count as number) : null,
     title: (notif.title ?? '') as string,
     message: (notif.message ?? '') as string,
+    can_reoffer: payload.can_reoffer === true,
   });
 
   // Claim the row before sending: two concurrent calls (trigger + a manual

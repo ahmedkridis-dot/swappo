@@ -646,6 +646,15 @@
     share_copy: "نسخ الرابط",
     share_copied: "تم نسخ الرابط",
     share_more: "المزيد",
+    // Re-offer after a declined offer (pages/product.html, pages/profile.html)
+    reoffer_declined_cash: "تم رفض عرضك بقيمة {amount} درهم.",
+    reoffer_declined_swap: "تم رفض عرض المقايضة الخاص بك.",
+    reoffer_hint: "عدّله وأرسل عرضاً جديداً — سيراه المالك فوراً.",
+    reoffer_new_price: "اعرض سعراً جديداً",
+    reoffer_new_swap: "اقترح مقايضة بدلاً من ذلك",
+    reoffer_modal_prev: "عرضك السابق: {amount} درهم — مرفوض. جرّب عرضاً أفضل.",
+    reoffer_unavailable: "تم رفض عرضك، وهذا الغرض لم يعد متاحاً.",
+    reoffer_change_btn: "تعديل عرضي",
     // Dashboard: requests waiting for the member's answer (pages/profile.html)
     dash_requests_waiting_one: "طلب واحد ينتظر ردّك",
     dash_requests_waiting_many: "{n} طلبات تنتظر ردّك",

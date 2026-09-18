@@ -496,8 +496,12 @@
     @media (max-width: 900px) {
       /* Drop the side thumbnails column — hero goes full width, the
          horizontal thumbnail-strip below shows everything. */
-      .pg { grid-template-columns: 1fr; }
+      .pg { grid-template-columns: minmax(0, 1fr); }
       .pg-side { display: none; }
+      /* min-height 300 + aspect-ratio 4/3 forced the photo to 400px wide on a
+         375px phone: the whole page scrolled sideways and every popup was
+         cut on the right. */
+      .pg-hero { min-height: 0; width: 100%; }
     }
     @media (max-width: 768px) {
       .product-container { padding: 16px; }
@@ -1436,6 +1440,7 @@
 
     document.getElementById('action-buttons').innerHTML = actionsHTML;
     if (isOwner) _refreshOwnerEditLock(item);
+    if (!isOwner && !isGuest) _initReoffer(item);
 
     // ── Seller card ──────────────────────────────────
     // Ahmed 2026-04-18: anonymity dropped from this card. Always show
@@ -1817,6 +1822,52 @@
   window.selectCashAmount = selectCashAmount;
   window.updateCashFromSlider = updateCashFromSlider;
 
+  // ============ RE-OFFER after a decline ============
+  // A declined offer notifies its author (migration 048) with a link
+  // product.html?id=…&reoffer=<swap id>. We show what was declined and let
+  // the member change the offer and send a new one — linked to the old one
+  // through swaps.parent_offer_id (SwappoSwaps.propose reads __swpReoffer).
+  var _reofferPrev = null;
+  function _rT(key, fallback) { var v = (typeof t === 'function') ? t(key) : key; return (v && v !== key) ? v : fallback; }
+  async function _initReoffer(item) {
+    try {
+      var sid = new URLSearchParams(location.search).get('reoffer');
+      if (!sid || !window.db || !currentUser || !item) return;
+      if (document.getElementById('reoffer-banner')) return;
+      var r = await window.db.from('swaps')
+        .select('id,status,proposer_id,receiver_item_id,cash_amount,is_purchase,is_giveaway_claim,proposer_item_id,proposer_box_id')
+        .eq('id', sid).maybeSingle();
+      var prev = r && r.data;
+      if (!prev || prev.proposer_id !== currentUser.id || prev.receiver_item_id !== item.id) return;
+      if (prev.status !== 'declined' || prev.is_giveaway_claim) return;
+      var host = document.getElementById('action-buttons');
+      if (!host) return;
+      var box = document.createElement('div');
+      box.id = 'reoffer-banner';
+      box.style.cssText = 'background:#FFF7ED;border:1px solid #FED7AA;border-radius:14px;padding:14px 16px;margin:0 0 14px;';
+      if (item.status !== 'available') {
+        box.innerHTML = '<div style="font-size:14px;font-weight:600;color:#9A3412;">' + _rT('reoffer_unavailable', 'Your offer was declined, and this item is no longer available.') + '</div>';
+        host.insertBefore(box, host.firstChild);
+        return;
+      }
+      _reofferPrev = prev;
+      window.__swpReoffer = { id: prev.id, itemId: item.id };
+      var cashOnly = (Number(prev.cash_amount) || 0) > 0 && !prev.proposer_item_id && !prev.proposer_box_id;
+      var what = cashOnly
+        ? _rT('reoffer_declined_cash', 'Your offer of {amount} AED was declined.').replace('{amount}', Number(prev.cash_amount).toLocaleString())
+        : _rT('reoffer_declined_swap', 'Your swap offer was declined.');
+      box.innerHTML =
+        '<div style="font-size:14px;font-weight:700;color:#9A3412;margin-bottom:4px;">' + what + '</div>' +
+        '<div style="font-size:13px;color:#7C2D12;margin-bottom:12px;">' + _rT('reoffer_hint', 'Change it and send a new one — the owner sees it right away.') + '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button type="button" onclick="openOfferModal()" style="flex:1 1 140px;min-height:44px;padding:10px 14px;border:0;border-radius:12px;background:#09B1BA;color:#fff;font:700 14px Inter,sans-serif;cursor:pointer;"><i class="fas fa-hand-holding-usd"></i> ' + _rT('reoffer_new_price', 'Offer a new price') + '</button>' +
+          '<button type="button" onclick="openSwapModal()" style="flex:1 1 140px;min-height:44px;padding:10px 14px;border:1px solid #09B1BA;border-radius:12px;background:#fff;color:#078A91;font:700 14px Inter,sans-serif;cursor:pointer;"><i class="fas fa-exchange-alt"></i> ' + _rT('reoffer_new_swap', 'Propose a swap instead') + '</button>' +
+        '</div>';
+      host.insertBefore(box, host.firstChild);
+      try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    } catch (e) { console.warn('[reoffer]', e && e.message); }
+  }
+
   // ============ BUY (v5) — sends a purchase offer (no chat yet) ============
   async function startBuy() {
     if (_bannedStop()) return;
@@ -1872,14 +1923,19 @@
     }
     var price = currentItem.price || 0;
     var title = _itemTitle(currentItem) || 'this item';
+    var prevAmount = (_reofferPrev && Number(_reofferPrev.cash_amount) > 0) ? Number(_reofferPrev.cash_amount) : 0;
+    var prevLine = prevAmount
+      ? '<p style="font-size:13px;color:#9A3412;background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:8px 12px;margin:0 0 14px;">' + _rT('reoffer_modal_prev', 'Your previous offer: {amount} AED — declined. Try a better one.').replace('{amount}', prevAmount.toLocaleString()) + '</p>'
+      : '';
     var overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.innerHTML =
-      '<div style="background:#fff;border-radius:20px;padding:32px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.25);">' +
+      '<div style="background:#fff;border-radius:20px;padding:clamp(20px,6vw,32px);max-width:440px;width:100%;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,0.25);">' +
         '<h3 style="font-size:20px;font-weight:700;color:#1A1A2E;margin:0 0 4px;">Make an offer</h3>' +
         '<p style="font-size:13px;color:#6B7280;margin:0 0 20px;">for "' + title + '" (listed at ' + price.toLocaleString() + ' AED)</p>' +
+        prevLine +
         '<label style="font-size:13px;font-weight:600;color:#1A1A2E;display:block;margin-bottom:6px;">Your cash offer (AED)</label>' +
-        '<input type="number" id="offer-amount" min="1" value="' + price + '" style="width:100%;padding:12px 16px;border:1px solid #E5E7EB;border-radius:12px;font-size:18px;font-weight:700;font-family:inherit;outline:none;margin-bottom:16px;" onfocus="this.style.borderColor=\'#09B1BA\'" onblur="this.style.borderColor=\'#E5E7EB\'" autocomplete="off">' +
+        '<input type="number" id="offer-amount" min="1" value="' + (prevAmount || price) + '" style="width:100%;box-sizing:border-box;padding:12px 16px;border:1px solid #E5E7EB;border-radius:12px;font-size:18px;font-weight:700;font-family:inherit;outline:none;margin-bottom:16px;" onfocus="this.style.borderColor=\'#09B1BA\'" onblur="this.style.borderColor=\'#E5E7EB\'" autocomplete="off">' +
         '<p style="font-size:12px;color:#9CA3AF;margin:0 0 20px;">You can also propose a swap from your items via "Propose a Swap".</p>' +
         '<div style="display:flex;gap:10px;">' +
           '<button onclick="this.closest(\'div[style*=fixed]\').remove();" style="flex:1;padding:12px;border:1px solid #E5E7EB;border-radius:12px;background:#fff;font-weight:600;cursor:pointer;color:#6B7280;">Cancel</button>' +
@@ -2295,11 +2351,13 @@
       // nothing to show on the right.
       if (pg) {
         if (html) {
+          // Leave the columns to the stylesheet: an inline '2fr 1fr' beat
+          // the phone media query and squeezed / overflowed the photo.
           side.style.display = '';
-          pg.style.gridTemplateColumns = '2fr 1fr';
+          pg.style.gridTemplateColumns = '';
         } else {
           side.style.display = 'none';
-          pg.style.gridTemplateColumns = '1fr';
+          pg.style.gridTemplateColumns = 'minmax(0, 1fr)';
         }
       }
     }

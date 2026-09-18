@@ -77,6 +77,11 @@
       cashAmount = 0, cashDirection = 'none',
       isPurchase = false, isGiveawayClaim = false
     } = args || {};
+    // New offer after a decline (product.html?reoffer=…): keep the thread.
+    var parentOfferId = (args && args.parentOfferId) || null;
+    if (!parentOfferId && global.__swpReoffer && global.__swpReoffer.itemId === theirItemId) {
+      parentOfferId = global.__swpReoffer.id;
+    }
 
     if (!theirItemId && !theirBoxId) return { success: false, error: 'Target item required.' };
 
@@ -132,6 +137,7 @@
       status: 'pending',
       confirmation_code: _code6()
     };
+    if (parentOfferId && !isGiveawayClaim) row.parent_offer_id = parentOfferId;
     const { data, error } = await global.db.from(TABLE).insert(row).select('*').single();
     if (error) return { success: false, error: error.message };
 

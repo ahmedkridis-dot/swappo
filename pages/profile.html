@@ -2795,6 +2795,13 @@
                         + '</div>';
                 }
 
+                // Declined offer (mine): change it and send a new one — product
+                // page re-opens the offer form (?reoffer=, migration 048).
+                if (perspective === 'history' && swap.status === 'declined' && isProposer && !swap.is_giveaway_claim && swap.receiver_item_id) {
+                    var _rl = (typeof t === 'function' && t('reoffer_change_btn') !== 'reoffer_change_btn') ? t('reoffer_change_btn') : 'Change my offer';
+                    actionsHTML += '<div class="swap-actions" style="margin-top:8px;"><a href="product.html?id=' + encodeURIComponent(swap.receiver_item_id) + '&reoffer=' + encodeURIComponent(swap.id) + '" onclick="event.stopPropagation();" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;border:0;background:var(--primary,#09B1BA);color:#fff;font:700 13px Inter,sans-serif;text-decoration:none;"><i class="fas fa-pen"></i> ' + _rl + '</a></div>';
+                }
+
                 // Gift received: the "Gift received" panel can be re-opened from
                 // History to share it (js/gift-moments.js), for those who closed
                 // it too fast.

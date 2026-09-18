@@ -645,6 +645,15 @@
     share_copy: "لنک کاپی کریں",
     share_copied: "لنک کاپی ہو گیا",
     share_more: "مزید",
+    // Re-offer after a declined offer (pages/product.html, pages/profile.html)
+    reoffer_declined_cash: "آپ کی {amount} درہم کی پیشکش مسترد کر دی گئی۔",
+    reoffer_declined_swap: "آپ کی سویپ پیشکش مسترد کر دی گئی۔",
+    reoffer_hint: "اسے بدلیں اور نئی پیشکش بھیجیں — مالک اسے فوراً دیکھے گا۔",
+    reoffer_new_price: "نئی قیمت پیش کریں",
+    reoffer_new_swap: "اس کے بجائے سویپ تجویز کریں",
+    reoffer_modal_prev: "آپ کی پچھلی پیشکش: {amount} درہم — مسترد۔ بہتر پیشکش آزمائیں۔",
+    reoffer_unavailable: "آپ کی پیشکش مسترد ہو گئی اور یہ چیز اب دستیاب نہیں۔",
+    reoffer_change_btn: "اپنی پیشکش بدلیں",
     // Dashboard: requests waiting for the member's answer (pages/profile.html)
     dash_requests_waiting_one: "1 درخواست آپ کے جواب کی منتظر ہے",
     dash_requests_waiting_many: "{n} درخواستیں آپ کے جواب کی منتظر ہیں",

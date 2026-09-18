@@ -646,6 +646,15 @@
     share_copy: "Copier le lien",
     share_copied: "Lien copié",
     share_more: "Plus",
+    // Re-offer after a declined offer (pages/product.html, pages/profile.html)
+    reoffer_declined_cash: "Votre offre de {amount} AED a été refusée.",
+    reoffer_declined_swap: "Votre proposition d'échange a été refusée.",
+    reoffer_hint: "Modifiez-la et renvoyez-en une nouvelle — le propriétaire la voit tout de suite.",
+    reoffer_new_price: "Proposer un nouveau prix",
+    reoffer_new_swap: "Proposer plutôt un échange",
+    reoffer_modal_prev: "Votre offre précédente : {amount} AED — refusée. Essayez une meilleure offre.",
+    reoffer_unavailable: "Votre offre a été refusée et cet objet n'est plus disponible.",
+    reoffer_change_btn: "Modifier mon offre",
     // Dashboard: requests waiting for the member's answer (pages/profile.html)
     dash_requests_waiting_one: "1 demande attend votre réponse",
     dash_requests_waiting_many: "{n} demandes attendent votre réponse",

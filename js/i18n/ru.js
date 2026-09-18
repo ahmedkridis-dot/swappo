@@ -620,6 +620,15 @@
     share_copy: "Скопировать ссылку",
     share_copied: "Ссылка скопирована",
     share_more: "Ещё",
+    // Re-offer after a declined offer (pages/product.html, pages/profile.html)
+    reoffer_declined_cash: "Ваше предложение на {amount} AED отклонено.",
+    reoffer_declined_swap: "Ваше предложение обмена отклонено.",
+    reoffer_hint: "Измените его и отправьте новое — владелец увидит его сразу.",
+    reoffer_new_price: "Предложить новую цену",
+    reoffer_new_swap: "Предложить обмен",
+    reoffer_modal_prev: "Ваше прошлое предложение: {amount} AED — отклонено. Попробуйте предложить лучше.",
+    reoffer_unavailable: "Ваше предложение отклонено, и эта вещь больше недоступна.",
+    reoffer_change_btn: "Изменить предложение",
     // Dashboard: requests waiting for the member's answer (pages/profile.html)
     dash_requests_waiting_one: "1 заявка ждёт вашего ответа",
     dash_requests_waiting_many: "Заявок, ожидающих ответа: {n}",

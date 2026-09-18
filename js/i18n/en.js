@@ -636,6 +636,15 @@
     share_copy: "Copy link",
     share_copied: "Link copied",
     share_more: "More",
+    // Re-offer after a declined offer (pages/product.html, pages/profile.html)
+    reoffer_declined_cash: "Your offer of {amount} AED was declined.",
+    reoffer_declined_swap: "Your swap offer was declined.",
+    reoffer_hint: "Change it and send a new one — the owner sees it right away.",
+    reoffer_new_price: "Offer a new price",
+    reoffer_new_swap: "Propose a swap instead",
+    reoffer_modal_prev: "Your previous offer: {amount} AED — declined. Try a better one.",
+    reoffer_unavailable: "Your offer was declined, and this item is no longer available.",
+    reoffer_change_btn: "Change my offer",
     // Dashboard: requests waiting for the member's answer (pages/profile.html)
     dash_requests_waiting_one: "1 request is waiting for your answer",
     dash_requests_waiting_many: "{n} requests are waiting for your answer",
