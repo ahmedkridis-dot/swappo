@@ -263,7 +263,9 @@ const SwappoAuth = {
             // string would be stored as-is by the DB trigger and skip onboarding.
             pseudo: extras.pseudo ? String(extras.pseudo).toLowerCase() : undefined,
             avatar: extras.avatar || '',
-            phone: extras.phone || ''
+            phone: extras.phone || '',
+            // First touch of the visit (js/source-tag.js) → users.signup_source.
+            signup_src: (typeof window !== 'undefined' && window.SwappoSource) ? window.SwappoSource.get() : undefined
           }
         }
       });

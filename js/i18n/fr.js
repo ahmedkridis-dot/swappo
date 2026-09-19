@@ -646,6 +646,12 @@
     share_copy: "Copier le lien",
     share_copied: "Lien copié",
     share_more: "Plus",
+    // Onboarding last screen: list one item to unlock the first gift claim
+    ob_unlock_step: "Une dernière chose",
+    ob_unlock_title: "Débloquez votre première demande de cadeau",
+    ob_unlock_text: "Publiez un objet — à échanger, vendre ou donner — et votre première demande se débloque aussitôt. Une minute suffit, depuis votre téléphone.",
+    ob_unlock_cta: "Publier un objet",
+    ob_unlock_later: "Plus tard — aller sur Swappo",
     // Re-offer after a declined offer (pages/product.html, pages/profile.html)
     reoffer_declined_cash: "Votre offre de {amount} AED a été refusée.",
     reoffer_declined_swap: "Votre proposition d'échange a été refusée.",

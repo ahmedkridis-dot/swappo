@@ -135,6 +135,13 @@ function specFor(ctx: Ctx): Spec {
         body: ctx.message || 'The other member cancelled the deal. The items are available again.',
         cta: { label: 'Open My Swaps', url: mySwaps },
       };
+    case 'publish_nudge':       // day-after reminder, migration 049
+      return {
+        subject: 'Your first gift claim is one listing away',
+        headline: 'One listing unlocks your first gift claim',
+        body: 'List one item — to swap, sell or give away — and your first claim unlocks instantly. It takes about a minute, straight from your phone.',
+        cta: { label: 'Drop an Item', url: `${SITE_URL}/pages/publier.html` },
+      };
     case 'boost':
     case 'boost_expiring':
       return {

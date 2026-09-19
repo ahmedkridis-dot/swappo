@@ -620,6 +620,12 @@
     share_copy: "Скопировать ссылку",
     share_copied: "Ссылка скопирована",
     share_more: "Ещё",
+    // Onboarding last screen: list one item to unlock the first gift claim
+    ob_unlock_step: "Последний шаг",
+    ob_unlock_title: "Откройте свою первую заявку на подарок",
+    ob_unlock_text: "Выставьте одну вещь — на обмен, продажу или в подарок — и первая заявка откроется сразу. Это займёт около минуты, прямо с телефона.",
+    ob_unlock_cta: "Выставить вещь",
+    ob_unlock_later: "Позже — перейти в Swappo",
     // Re-offer after a declined offer (pages/product.html, pages/profile.html)
     reoffer_declined_cash: "Ваше предложение на {amount} AED отклонено.",
     reoffer_declined_swap: "Ваше предложение обмена отклонено.",

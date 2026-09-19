@@ -636,6 +636,12 @@
     share_copy: "Copy link",
     share_copied: "Link copied",
     share_more: "More",
+    // Onboarding last screen: list one item to unlock the first gift claim
+    ob_unlock_step: "One last thing",
+    ob_unlock_title: "Unlock your first gift claim",
+    ob_unlock_text: "List one item — to swap, sell or give away — and your first claim unlocks instantly. It takes about a minute, straight from your phone.",
+    ob_unlock_cta: "Drop an Item",
+    ob_unlock_later: "Maybe later — take me to Swappo",
     // Re-offer after a declined offer (pages/product.html, pages/profile.html)
     reoffer_declined_cash: "Your offer of {amount} AED was declined.",
     reoffer_declined_swap: "Your swap offer was declined.",

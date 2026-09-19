@@ -645,6 +645,12 @@
     share_copy: "لنک کاپی کریں",
     share_copied: "لنک کاپی ہو گیا",
     share_more: "مزید",
+    // Onboarding last screen: list one item to unlock the first gift claim
+    ob_unlock_step: "ایک آخری بات",
+    ob_unlock_title: "اپنی پہلی تحفہ درخواست کھولیں",
+    ob_unlock_text: "ایک چیز لسٹ کریں — سویپ، فروخت یا دینے کے لیے — اور آپ کی پہلی درخواست فوراً کھل جائے گی۔ فون سے تقریباً ایک منٹ لگتا ہے۔",
+    ob_unlock_cta: "چیز لسٹ کریں",
+    ob_unlock_later: "بعد میں — مجھے Swappo پر لے چلیں",
     // Re-offer after a declined offer (pages/product.html, pages/profile.html)
     reoffer_declined_cash: "آپ کی {amount} درہم کی پیشکش مسترد کر دی گئی۔",
     reoffer_declined_swap: "آپ کی سویپ پیشکش مسترد کر دی گئی۔",

@@ -160,6 +160,8 @@
   <!-- Supabase + Swappo scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="../js/supabase.js" defer></script>
+  <script src="../js/i18n/en.js" defer></script>
+  <script src="../js/i18n.js" defer></script>
   <script src="../js/avatars.js" defer></script>
   <script src="../js/swappo-storage.js" defer></script>
   <script src="../js/register-sw.js" defer></script>
@@ -358,13 +360,49 @@
           return;
         }
         toast('All set! Welcome to Swappo.', 'success');
-        setTimeout(function() { window.location.href = _afterOnboardingHref(); }, 900);
+        setTimeout(function() { showUnlockStep(u.id); }, 700);
       } catch (err) {
         toast(err.message || 'Something went wrong.', 'error');
         btn.disabled = false;
         label.textContent = 'Enter Swappo';
       }
     });
+
+    /* ---- Last screen: list one item → the first gift claim unlocks ----
+       Traffic analysis (Sept 2026): 5 new members out of 6 never list an
+       item, so they cannot claim a gift and do not come back. We say it
+       right here, once, with a one-tap way to do it — and a way to skip. */
+    function _obT(key, fallback) { var v = (typeof t === 'function') ? t(key) : key; return (v && v !== key) ? v : fallback; }
+    function _publishHref() {
+      // publier.html?return= only accepts a page of /pages/ (no leading slash).
+      var after = _afterOnboardingHref();
+      var m = /^\/pages\/([a-z0-9_-]+\.html)([?#].*)?$/i.exec(after);
+      return 'publier.html' + (m ? '?return=' + encodeURIComponent(m[1] + (m[2] || '')) : '');
+    }
+    async function showUnlockStep(userId) {
+      var after = _afterOnboardingHref();
+      try {
+        // Already has a listing (rare: came back to onboarding) → nothing to unlock.
+        if (window.db && userId) {
+          var r = await window.db.from('items').select('id', { count: 'exact', head: true }).eq('user_id', userId);
+          if (r && r.count > 0) { window.location.href = after; return; }
+        }
+      } catch (e) {}
+      var card = document.querySelector('.card');
+      if (!card) { window.location.href = after; return; }
+      card.innerHTML =
+        '<div class="header">' +
+          '<div style="font-size:54px;line-height:1;margin-bottom:10px;" aria-hidden="true">🎁</div>' +
+          '<div class="step-counter">' + _obT('ob_unlock_step', 'One last thing') + '</div>' +
+          '<h1>' + _obT('ob_unlock_title', 'Unlock your first gift claim') + '</h1>' +
+          '<p>' + _obT('ob_unlock_text', 'List one item — to swap, sell or give away — and your first claim unlocks instantly. It takes about a minute, straight from your phone.') + '</p>' +
+        '</div>' +
+        '<a class="btn btn-primary" id="ob-unlock-go" href="' + _publishHref() + '" style="text-decoration:none;">' +
+          '<span>' + _obT('ob_unlock_cta', 'Drop an Item') + '</span> <i class="fas fa-arrow-right"></i></a>' +
+        '<a id="ob-unlock-later" href="' + after.replace(/"/g, '&quot;') + '" style="display:block;text-align:center;margin-top:16px;font-size:14px;font-weight:600;color:#6B7280;text-decoration:none;padding:10px;">' +
+          _obT('ob_unlock_later', 'Maybe later — take me to Swappo') + '</a>';
+      try { window.scrollTo(0, 0); } catch (e) {}
+    }
 
     /* ---- Init ---- */
     (async function init() {

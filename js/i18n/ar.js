@@ -646,6 +646,12 @@
     share_copy: "نسخ الرابط",
     share_copied: "تم نسخ الرابط",
     share_more: "المزيد",
+    // Onboarding last screen: list one item to unlock the first gift claim
+    ob_unlock_step: "خطوة أخيرة",
+    ob_unlock_title: "افتح أول طلب هدية لك",
+    ob_unlock_text: "اعرض غرضاً واحداً — للمقايضة أو البيع أو الإهداء — ويُفتح أول طلب لك فوراً. يستغرق الأمر دقيقة تقريباً من هاتفك.",
+    ob_unlock_cta: "اعرض غرضاً",
+    ob_unlock_later: "لاحقاً — خذني إلى Swappo",
     // Re-offer after a declined offer (pages/product.html, pages/profile.html)
     reoffer_declined_cash: "تم رفض عرضك بقيمة {amount} درهم.",
     reoffer_declined_swap: "تم رفض عرض المقايضة الخاص بك.",
