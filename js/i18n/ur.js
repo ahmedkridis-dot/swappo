@@ -645,6 +645,7 @@
     share_copy: "لنک کاپی کریں",
     share_copied: "لنک کاپی ہو گیا",
     share_more: "مزید",
+    price_drop_badge: "قیمت کم ہوئی",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "ایک آخری بات",
     ob_unlock_title: "اپنی پہلی تحفہ درخواست کھولیں",

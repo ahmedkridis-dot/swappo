@@ -460,7 +460,13 @@
       modesHTML = '<span class="mode-badge mode-gift" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#ECFDF5;color:#065F46;">Gift</span>';
     } else {
       const price = Number(item.price) || 0;
-      priceHTML = '<div class="product-price" style="font-weight:800;font-size:15px;color:#1A1A2E;">'
+      // Price drop (migration 052): old price struck through next to the new one.
+      const was = Number(item.previous_price) || 0;
+      const dropHTML = (was > price && price > 0)
+        ? '<span style="font-size:12px;font-weight:600;color:#9CA3AF;text-decoration:line-through;margin-inline-end:6px;">' + _esc(was.toLocaleString()) + '</span>'
+        : '';
+      priceHTML = '<div class="product-price" style="font-weight:800;font-size:15px;color:' + (dropHTML ? '#DC2626' : '#1A1A2E') + ';">'
+        + dropHTML
         + _esc(price.toLocaleString())
         + ' <span style="font-size:11px;font-weight:600;color:#6B7280;">AED</span></div>';
       modesHTML = '<span class="mode-badge mode-swap" style="font-size:0.68rem;padding:2px 8px;border-radius:999px;font-weight:600;background:#E6F7F8;color:#078A91;">Swap</span>'

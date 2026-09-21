@@ -636,6 +636,7 @@
     share_copy: "Copy link",
     share_copied: "Link copied",
     share_more: "More",
+    price_drop_badge: "Price drop",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "One last thing",
     ob_unlock_title: "Unlock your first gift claim",

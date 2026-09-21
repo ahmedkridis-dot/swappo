@@ -620,6 +620,7 @@
     share_copy: "Скопировать ссылку",
     share_copied: "Ссылка скопирована",
     share_more: "Ещё",
+    price_drop_badge: "Цена снижена",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "Последний шаг",
     ob_unlock_title: "Откройте свою первую заявку на подарок",

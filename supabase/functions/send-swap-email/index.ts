@@ -57,6 +57,8 @@ type Ctx = {
   title: string;            // notification title / message: used by the generic template
   message: string;
   can_reoffer: boolean;     // declined offer whose item can receive a new offer
+  old_price: number | null; // price_drop
+  new_price: number | null;
 };
 
 // ── email templates ───────────────────────────────────────
@@ -135,6 +137,16 @@ function specFor(ctx: Ctx): Spec {
         body: ctx.message || 'The other member cancelled the deal. The items are available again.',
         cta: { label: 'Open My Swaps', url: mySwaps },
       };
+    case 'price_drop': {        // migration 052: saved the item or made an offer on it
+      const now = ctx.new_price ? `${ctx.new_price.toLocaleString('en-US')} AED` : 'a lower price';
+      const was = ctx.old_price ? ` It was ${ctx.old_price.toLocaleString('en-US')} AED.` : '';
+      return {
+        subject: `Price drop: ${ctx.item_title} is now ${now}`,
+        headline: `${ctx.item_title} just dropped to ${now}`,
+        body: `${was} You saved this item or made an offer on it — take another look before someone else does.`.trim(),
+        cta: { label: 'View item', url: ctx.url },
+      };
+    }
     case 'publish_nudge':       // day-after reminder, migration 049
       return {
         subject: 'Your first gift claim is one listing away',
@@ -346,6 +358,8 @@ serve(async (req: Request) => {
     title: (notif.title ?? '') as string,
     message: (notif.message ?? '') as string,
     can_reoffer: payload.can_reoffer === true,
+    old_price: Number(payload.old_price) > 0 ? Number(payload.old_price) : null,
+    new_price: Number(payload.new_price) > 0 ? Number(payload.new_price) : null,
   });
 
   // Claim the row before sending: two concurrent calls (trigger + a manual

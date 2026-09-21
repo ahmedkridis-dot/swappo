@@ -2292,7 +2292,17 @@
       if (item.is_giveaway) {
         priceEl.innerHTML = '<span style="color:#10B981;">FREE</span>';
       } else if (priceVal > 0) {
-        priceEl.innerHTML = '<span class="price-ccy">AED</span>' + priceVal.toLocaleString();
+        // Price drop (migration 052): old price struck through + how much lower.
+        var wasVal = Number(item.previous_price) || 0;
+        if (wasVal > priceVal) {
+          var pct = Math.round((1 - priceVal / wasVal) * 100);
+          var dropLabel = (typeof t === 'function' && t('price_drop_badge') !== 'price_drop_badge') ? t('price_drop_badge') : 'Price drop';
+          priceEl.innerHTML = '<span class="price-ccy">AED</span><span style="color:#DC2626;">' + priceVal.toLocaleString() + '</span>' +
+            ' <span style="font-size:0.5em;font-weight:600;color:#9CA3AF;text-decoration:line-through;margin-inline-start:6px;">' + wasVal.toLocaleString() + '</span>' +
+            (pct >= 1 ? ' <span style="display:inline-block;vertical-align:middle;font-size:12px;font-weight:700;color:#B91C1C;background:#FEE2E2;border-radius:999px;padding:3px 9px;margin-inline-start:6px;letter-spacing:0;">↓ ' + dropLabel + ' −' + pct + '%</span>' : '');
+        } else {
+          priceEl.innerHTML = '<span class="price-ccy">AED</span>' + priceVal.toLocaleString();
+        }
       } else {
         // No listed price — don't show "AED 0". Prompt the user to swap
         // or make an offer instead (mirrors swap-info / price-display).

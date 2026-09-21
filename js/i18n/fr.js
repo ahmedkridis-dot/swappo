@@ -646,6 +646,7 @@
     share_copy: "Copier le lien",
     share_copied: "Lien copié",
     share_more: "Plus",
+    price_drop_badge: "Prix en baisse",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "Une dernière chose",
     ob_unlock_title: "Débloquez votre première demande de cadeau",

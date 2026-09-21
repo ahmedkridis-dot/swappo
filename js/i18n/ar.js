@@ -646,6 +646,7 @@
     share_copy: "نسخ الرابط",
     share_copied: "تم نسخ الرابط",
     share_more: "المزيد",
+    price_drop_badge: "انخفاض السعر",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "خطوة أخيرة",
     ob_unlock_title: "افتح أول طلب هدية لك",

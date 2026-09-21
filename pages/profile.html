@@ -2363,7 +2363,7 @@
                     '<div class="product-info">' +
                         '<div class="product-title">' + title + '</div>' +
                         '<div class="product-category">' + (item.category || '') + '</div>' +
-                        (item.price ? '<div class="product-price" style="font-size:15px;font-weight:700;color:var(--primary,#09B1BA);margin-bottom:6px;">' + item.price.toLocaleString() + ' AED</div>' : '') +
+                        (item.price ? '<div class="product-price" style="font-size:15px;font-weight:700;color:var(--primary,#09B1BA);margin-bottom:6px;">' + ((Number(item.previous_price) || 0) > Number(item.price) ? '<span style="font-size:12px;font-weight:600;color:#9CA3AF;text-decoration:line-through;margin-inline-end:6px;">' + Number(item.previous_price).toLocaleString() + '</span>' : '') + item.price.toLocaleString() + ' AED</div>' : '') +
                     '<div class="product-actions">' + actions + '</div>' +
                         '<div class="my-auto-decline-host" data-item-id="' + item.id + '"></div>' +
                     '</div>' +
