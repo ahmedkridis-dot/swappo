@@ -4,9 +4,14 @@
  * Cache-first for assets, Network-first for HTML and API calls
  */
 
-const CACHE_NAME = 'swappo-v145';
-const ASSET_CACHE = 'swappo-assets-v136';
-const API_CACHE = 'swappo-api-v136';
+// ONE version for the three caches. Scripts, styles and images live in
+// ASSET_CACHE (cache-first): if only CACHE_NAME moves, returning visitors keep
+// the previous JS forever — that happened from v137 to v145 (2026-09-21).
+// Bump VERSION on every JS / CSS / dictionary change.
+const VERSION = 'v146';
+const CACHE_NAME = 'swappo-' + VERSION;
+const ASSET_CACHE = 'swappo-assets-' + VERSION;
+const API_CACHE = 'swappo-api-' + VERSION;
 
 // Files to pre-cache during install
 // NOTE: During Coming Soon phase, we only precache the landing page and its assets.

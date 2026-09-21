@@ -201,5 +201,8 @@ Logo | Search | Chat icon | Profile icon | "Join the Swap" | "Drop an Item"
 9. **Clés i18n manquantes** → chaque string en 5 langues, zéro `snake_case` affiché
 10. **Reveal d'identité avant acceptance** → pseudo + badge seulement
 
+## Cache PWA (à chaque changement JS / CSS / dictionnaire)
+`sw.js` sert scripts, styles et images en cache-first. Après toute modification de `js/`, `css/` ou `js/i18n/`, incrémenter **`const VERSION`** dans `sw.js` (une seule constante pour les trois caches). Ne jamais renommer un seul cache : de v137 à v145 seul `CACHE_NAME` bougeait et les visiteurs déjà venus gardaient les anciens scripts.
+
 ## Modération (commande d'Ahmed)
 Quand Ahmed écrit « bannis / suspends l'utilisateur x@y.com », suivre **`docs/MODERATION.md`** à la lettre : identifier le compte par email exact, montrer ses annonces, attendre le « ok », passer la fausse annonce en `suspended` (le trigger `on_item_suspended` ferme le compte et envoie la notification + l'email). **Règle Swappo : une fausse annonce = compte fermé, sans avertissement.** Jamais de `delete`. Rapport en 3 lignes.
