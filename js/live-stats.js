@@ -30,13 +30,18 @@
   // Counter order in the eco-ticker markup:
   //   0 → CO2 kg saved       (suffix " kg")
   //   1 → items swapped
-  //   2 → gifts today
-  //   3 → items sold today   (homepage only, optional)
-  var KEY_BY_INDEX = ['co2_kg_saved', 'items_swapped', 'gifts_today', 'sold_today'];
+  //   2 → gifts given        (all time)
+  //   3 → items sold         (all time — homepage only, optional)
+  // Counters never reset: "today" / "last hour" read 0 most of the day on
+  // a young marketplace (Ahmed, 2026-09-21). The markup also names each
+  // counter with data-live-key; this order is the fallback.
+  var KEY_BY_INDEX = ['co2_kg_saved', 'items_swapped', 'gifts_total', 'sold_total'];
 
   function formatLiveLabel(n) {
     if (!n || n < 0) n = 0;
-    return '+' + n + ' in the last hour';
+    var label = (typeof window.t === 'function') ? window.t('eco_members') : 'members';
+    if (!label || label === 'eco_members') label = 'members';
+    return Number(n).toLocaleString() + ' ' + label;
   }
 
   function writeCounter(el, rawValue) {
@@ -62,7 +67,7 @@
         writeCounter(el, stats[key]);
       });
       var liveEl = document.getElementById('ecoTickerLive');
-      if (liveEl) liveEl.textContent = formatLiveLabel(stats.items_last_hour);
+      if (liveEl) liveEl.textContent = formatLiveLabel(stats.members);
     }
 
     // Any other counter on the page (e.g. Swappo Effect) that opts in via

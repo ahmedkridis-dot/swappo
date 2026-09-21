@@ -1284,6 +1284,9 @@
     eco_co2_saved: "CO2 saved",
     eco_items_swapped: "items swapped",
     eco_gifts_today: "gifts today",
+    eco_gifts_given: "gifts given",
+    eco_items_sold: "items sold",
+    eco_members: "members",
     eco_last_hour: "in the last hour",
 
     // Landing page refonte
