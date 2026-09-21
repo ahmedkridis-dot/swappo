@@ -8,7 +8,7 @@
 // ASSET_CACHE (cache-first): if only CACHE_NAME moves, returning visitors keep
 // the previous JS forever — that happened from v137 to v145 (2026-09-21).
 // Bump VERSION on every JS / CSS / dictionary change.
-const VERSION = 'v146';
+const VERSION = 'v147';
 const CACHE_NAME = 'swappo-' + VERSION;
 const ASSET_CACHE = 'swappo-assets-' + VERSION;
 const API_CACHE = 'swappo-api-' + VERSION;

@@ -214,51 +214,23 @@
   }
 
   // ---------- CANCEL ----------
+  // One server call (cancel_swap_deal, migration 054): swap cancelled, items
+  // back on the market, boxes released, chat line + notification. The rule
+  // (who may cancel an accepted deal, and when) lives in the database.
   async function cancel(swapId) {
     if (!global.db) return { success: false, error: 'Service unavailable.' };
     const uid = await _currentUserId();
     if (!uid) return { success: false, error: 'You must be signed in.' };
-
-    const { data: swap } = await global.db.from(TABLE).select('*').eq('id', swapId).maybeSingle();
-    if (!swap) return { success: false, error: 'Swap not found.' };
-    if (swap.proposer_id !== uid && swap.receiver_id !== uid) {
-      return { success: false, error: 'Not your swap.' };
+    const { data, error } = await global.db.rpc('cancel_swap_deal', { p_swap_id: swapId });
+    if (error) {
+      const msg = String(error.message || '');
+      if (/cancel_not_available/.test(msg))  return { success: false, error: "This deal can't be cancelled right now." };
+      if (/swap_not_cancellable/.test(msg))  return { success: false, error: 'This deal is already closed.' };
+      if (/not_your_swap/.test(msg))         return { success: false, error: 'Not your swap.' };
+      if (/swap_not_found/.test(msg))        return { success: false, error: 'Swap not found.' };
+      return { success: false, error: msg || 'Could not cancel.' };
     }
-    if (!['pending', 'accepted'].includes(swap.status)) {
-      return { success: false, error: 'Only pending or accepted swaps can be cancelled.' };
-    }
-
-    const { error } = await global.db.from(TABLE)
-      .update({ status: 'cancelled' }).eq('id', swapId);
-    if (error) return { success: false, error: error.message };
-
-    // Release single items if they were reserved
-    const ids = [swap.receiver_item_id, swap.proposer_item_id].filter(Boolean);
-    if (ids.length) {
-      await global.db.from(ITEMS_TABLE).update({ status: 'available' }).in('id', ids);
-    }
-
-    // Swap Box side: the proposer's box was created just for this swap —
-    // cancel it + free its items. We fire-and-forget via the cancel_box
-    // RPC so we don't block on permission edge cases.
-    if (swap.proposer_box_id) {
-      try { await global.db.rpc('cancel_box', { p_box_id: swap.proposer_box_id }); } catch (_) {}
-    }
-    // Gift Box side: the receiver's box stays listed; just make sure the
-    // items are available again and the box status reverts to listed.
-    if (swap.receiver_box_id) {
-      try {
-        const { data: boxItems } = await global.db.from('box_items')
-          .select('item_id').eq('box_id', swap.receiver_box_id);
-        const boxItemIds = (boxItems || []).map(r => r.item_id);
-        if (boxItemIds.length) {
-          await global.db.from(ITEMS_TABLE).update({ status: 'available' }).in('id', boxItemIds);
-        }
-        await global.db.from('boxes').update({ status: 'listed' }).eq('id', swap.receiver_box_id);
-      } catch (_) {}
-    }
-
-    return { success: true };
+    return { success: true, conversationId: data && data.conversation_id };
   }
 
   // ---------- RATE ----------

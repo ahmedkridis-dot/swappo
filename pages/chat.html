@@ -2783,7 +2783,9 @@
   async function renderDealPanel(convId) {
     var map = CONV_ITEM_MAP[convId] || {};
     var conv = _convCache.find(function(c) { return c.id === convId; }) || {};
-    var status = map.status || (conv.identity_revealed ? 'accepted' : 'pending');
+    // Source of truth: the joined swap row; the map only overrides it after a
+    // local action (accept / cancel / complete) until the next refresh.
+    var status = map.status || (conv.swap && conv.swap.status) || (conv.identity_revealed ? 'accepted' : 'pending');
 
     // If we have a swap_id on the conv, look up the swap once so we can
     // render boxes on either side + know the intent. Fetch is cached.
@@ -2971,9 +2973,10 @@
       // of the offer both parties said yes to). Editing the cash here was
       // confusing — removed per Ahmed 2026-04-18. Counter-offers remain
       // possible while the deal is still "pending", in the branch above.
+      var mayCancel = await _canCancelDeal(convId);
       actionsHTML = '<div class="dp-actions">' +
         '<button class="dp-btn primary" onclick="showQRConfirmation(\'' + convId + '\')"><i class="fas fa-qrcode"></i> Confirm Exchange</button>' +
-        '<button class="dp-btn danger" onclick="cancelDeal(\'' + convId + '\')"><i class="fas fa-times"></i> ' + _chatT('dp_cancel_deal', 'Cancel deal') + '</button>' +
+        (mayCancel ? '<button class="dp-btn danger" onclick="cancelDeal(\'' + convId + '\')"><i class="fas fa-times"></i> ' + _chatT('dp_cancel_deal', 'Cancel deal') + '</button>' : '') +
       '</div>';
     }
     document.getElementById('dpActions').innerHTML = actionsHTML;
@@ -3174,43 +3177,45 @@
   window._contactAllowed = _contactAllowed;
 
   async function cancelDeal(convId) {
-    var map = CONV_ITEM_MAP[convId];
-    if (!map || !map.swap_id) { if (window.Toast) Toast.show(_chatT('dp_cancel_no_swap', 'No active deal to cancel.'), 'info'); return; }
+    // The swap id lives on the conversation row — the in-memory map only
+    // knows it for legacy entries (Ahmed, 2026-09-21: "No active deal to
+    // cancel" on a real accepted gift).
+    var swapId = await _resolveSwapId(convId);
+    if (!swapId) { if (window.Toast) Toast.show(_chatT('dp_cancel_no_swap', 'No active deal to cancel.'), 'info'); return; }
     if (!confirm(_chatT('dp_cancel_confirm', 'Cancel this deal? The items go back on the market and the other person will be notified.'))) return;
     if (!(window.SwappoSwaps && window.SwappoSwaps.cancel)) return;
-    var res = await window.SwappoSwaps.cancel(map.swap_id);
+    // cancel_swap_deal (migration 054) does it all server-side: status, items
+    // back on the market, system line in the thread, notification + email.
+    var res = await window.SwappoSwaps.cancel(swapId);
     if (!res || !res.success) {
       if (window.Toast) Toast.show((res && res.error) || _chatT('dp_cancel_failed', 'Could not cancel the deal.'), 'error');
       return;
     }
-    map.status = 'cancelled';
+    CONV_ITEM_MAP[convId] = Object.assign(CONV_ITEM_MAP[convId] || {}, { swap_id: swapId, status: 'cancelled' });
     var conv = _convCache.find(function (c) { return c.id === convId; });
-    var me = currentUser || {};
-    var myName = me.pseudo || me.display_name || me.name || 'Your swap partner';
-    // System line in the thread (sender_id NULL = system message, allowed by RLS).
-    try {
-      await window.db.from('messages').insert({
-        conversation_id: convId, sender_id: null, is_system: true,
-        content: _chatT('sys_deal_cancelled', '{name} cancelled the deal. The items are back on the market.').split('{name}').join(myName)
-      });
-    } catch (e) { console.warn('[cancelDeal] system message', e && e.message); }
-    // Notify the other party (bell + email digest pick this up).
-    try {
-      var otherId = conv && conv.other_user && conv.other_user.id;
-      if (otherId) {
-        await window.db.from('notifications').insert({
-          user_id: otherId, kind: 'swap_cancelled', type: 'swap',
-          title: 'Deal cancelled',
-          message: myName + ' cancelled your deal. The items are available again.',
-          url: '/pages/chat.html?conv=' + convId,
-          payload: { swap_id: map.swap_id, conversation_id: convId, cancelled_by: me.id || null }
-        });
-      }
-    } catch (e) { console.warn('[cancelDeal] notify', e && e.message); }
+    if (conv && conv.swap) conv.swap.status = 'cancelled';
+    delete _canCancelCache[convId];
     if (window.Toast) Toast.show(_chatT('dp_cancelled_toast', 'Deal cancelled. Items are back on the market.'), 'info');
     try { await loadMessages(convId); } catch (e) {}
     renderDealPanel(convId);
     renderSidebar();
+  }
+  // Whether THIS member may cancel the accepted deal right now — decided by
+  // the server (can_cancel_deal). The button simply is or isn't there.
+  var _canCancelCache = {};
+  async function _canCancelDeal(convId) {
+    var hit = _canCancelCache[convId];
+    if (hit && (Date.now() - hit.t) < 60000) return hit.v;
+    var allowed = false;
+    try {
+      var swapId = await _resolveSwapId(convId);
+      if (swapId && window.db) {
+        var r = await window.db.rpc('can_cancel_deal', { p_swap_id: swapId });
+        allowed = !!(r && !r.error && r.data === true);
+      }
+    } catch (e) {}
+    _canCancelCache[convId] = { t: Date.now(), v: allowed };
+    return allowed;
   }
   window.cancelDeal = cancelDeal;
 
