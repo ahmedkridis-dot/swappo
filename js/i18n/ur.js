@@ -1692,7 +1692,6 @@
     eco_gifts_today: 'آج تحائف',
     eco_gifts_given: "تحفے دیے گئے",
     eco_items_sold: "چیزیں فروخت ہوئیں",
-    eco_members: "ممبرز",
     eco_last_hour: 'پچھلے گھنٹے میں',
     hero_browse: 'اشیاء دیکھیں →',
     gift_teaser_title: 'سخی لوگوں کی طرف سے مفت اشیاء',

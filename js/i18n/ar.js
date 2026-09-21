@@ -1693,7 +1693,6 @@
     eco_gifts_today: 'هدايا اليوم',
     eco_gifts_given: "هدايا مُقدَّمة",
     eco_items_sold: "أغراض مباعة",
-    eco_members: "عضو",
     eco_last_hour: 'في الساعة الأخيرة',
     hero_browse: 'تصفّح العناصر ←',
     gift_teaser_title: 'عناصر مجانية من أشخاص كرماء',

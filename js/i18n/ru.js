@@ -1667,7 +1667,6 @@
     eco_gifts_today: 'подарков сегодня',
     eco_gifts_given: "подарков отдано",
     eco_items_sold: "вещей продано",
-    eco_members: "участников",
     eco_last_hour: 'за последний час',
     hero_browse: 'Смотреть товары →',
     gift_teaser_title: 'Бесплатные вещи от щедрых людей',

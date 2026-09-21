@@ -37,13 +37,6 @@
   // counter with data-live-key; this order is the fallback.
   var KEY_BY_INDEX = ['co2_kg_saved', 'items_swapped', 'gifts_total', 'sold_total'];
 
-  function formatLiveLabel(n) {
-    if (!n || n < 0) n = 0;
-    var label = (typeof window.t === 'function') ? window.t('eco_members') : 'members';
-    if (!label || label === 'eco_members') label = 'members';
-    return Number(n).toLocaleString() + ' ' + label;
-  }
-
   function writeCounter(el, rawValue) {
     var divisor = parseFloat(el.getAttribute('data-live-divisor') || '1');
     var value = Number(rawValue);
@@ -84,8 +77,6 @@
         writeCounter(el, stats[key]);
       });
       hideZeroCounters(ticker);
-      var liveEl = document.getElementById('ecoTickerLive');
-      if (liveEl) liveEl.textContent = formatLiveLabel(stats.members);
     }
 
     // Any other counter on the page (e.g. Swappo Effect) that opts in via

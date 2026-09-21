@@ -1690,7 +1690,6 @@
     eco_gifts_today: 'cadeaux aujourd\'hui',
     eco_gifts_given: "cadeaux donnés",
     eco_items_sold: "objets vendus",
-    eco_members: "membres",
     eco_last_hour: 'au cours de la dernière heure',
     hero_browse: 'Parcourir les articles →',
     gift_teaser_title: 'Des objets gratuits de gens généreux',
