@@ -56,6 +56,23 @@
     el.textContent = prefix + Math.floor(scaled).toLocaleString() + suffix;
   }
 
+  // A counter still at 0 (no sale confirmed yet, …) stays out of the banner
+  // and shows up by itself with the first one. Separators follow.
+  function hideZeroCounters(ticker) {
+    var items = ticker.querySelectorAll('.eco-ticker-item');
+    items.forEach(function (item) {
+      var num = item.querySelector('.eco-ticker-number');
+      var zero = !!num && !(Number(num.getAttribute('data-target')) > 0);
+      item.style.display = zero ? 'none' : '';
+    });
+    ticker.querySelectorAll('.eco-ticker-separator').forEach(function (sep) {
+      var prev = sep.previousElementSibling, next = sep.nextElementSibling, before = false, after = false;
+      while (prev) { if (prev.classList.contains('eco-ticker-item') && prev.style.display !== 'none') { before = true; break; } prev = prev.previousElementSibling; }
+      while (next) { if (next.classList.contains('eco-ticker-separator')) break; if (next.classList.contains('eco-ticker-item') && next.style.display !== 'none') { after = true; break; } next = next.nextElementSibling; }
+      sep.style.display = (before && after) ? '' : 'none';
+    });
+  }
+
   function applyStats(stats) {
     if (!stats) return;
 
@@ -66,6 +83,7 @@
         if (!key) return;
         writeCounter(el, stats[key]);
       });
+      hideZeroCounters(ticker);
       var liveEl = document.getElementById('ecoTickerLive');
       if (liveEl) liveEl.textContent = formatLiveLabel(stats.members);
     }
