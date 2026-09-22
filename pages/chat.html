@@ -1403,7 +1403,8 @@
       </div>
 
       <div class="ch-input" id="inputBar" style="display:none;">
-        <div class="ch-input-row">
+        <div id="chClosed" style="display:none;padding:12px 16px;border-radius:12px;background:#F3F4F6;color:#4B5563;font-size:13px;font-weight:600;text-align:center;" data-i18n="chat_closed_notice">🔒 This deal is finished — the chat is closed.</div>
+        <div class="ch-input-row" id="chInputRow">
           <input type="text" class="ch-text" id="chatInput" placeholder="Type a message…" data-i18n-placeholder="chat_input_placeholder" autocomplete="off">
           <button class="ch-send" id="sendBtn" disabled aria-label="Send" data-i18n-aria-label="action_send"><i class="fas fa-paper-plane"></i></button>
         </div>
@@ -1634,6 +1635,7 @@
       if (convId === activeConvId) {
         renderMessagesFrom(_msgCache[convId]);
       }
+      if (msg.is_system) _refreshDealStatus(convId);
     });
   }
 
@@ -1747,6 +1749,7 @@
       else if (dealType === 'purchase') dealTypeHTML = '<span class="sb-deal-type buy"><i class="fas fa-shopping-bag"></i> Buy</span>';
       else if (dealType === 'gift') dealTypeHTML = '<span class="sb-deal-type gift"><i class="fas fa-gift"></i> Gift</span>';
       if (cash > 0) dealTypeHTML += '<span class="sb-deal-amount">' + cash.toLocaleString() + ' AED</span>';
+      if (CLOSED_DEAL[status]) dealTypeHTML += '<span style="font-size:10px;font-weight:600;color:#6B7280;margin-left:6px;"><i class="fas fa-lock"></i> ' + escapeHTML(_chatT('chat_closed_short', 'Chat closed')) + '</span>';
 
       // SAFE: escape all user-controlled strings before HTML concatenation (C-1 stored-XSS fix)
       var displayName = o.pseudo || o.display_name || o.name || 'User';
@@ -1790,8 +1793,7 @@
     var conv = convs.find(function(c) { return c.id === convId; });
     if (!conv) return;
     var o = conv.other_user || {};
-    var map = CONV_ITEM_MAP[convId] || {};
-    var status = map.status || 'accepted';
+    var status = _dealStatus(convId);
 
     // Update sidebar active state
     document.querySelectorAll('.sb-card').forEach(function(c) { c.classList.remove('active'); });
@@ -1826,6 +1828,7 @@
     document.getElementById('chatEmpty').style.display = 'none';
     document.getElementById('msgArea').style.display = '';
     document.getElementById('inputBar').style.display = status === 'pending' ? 'none' : '';
+    _applyChatClosed(convId);
 
     // Load messages
     await loadMessages(convId);
@@ -1926,17 +1929,17 @@
     // that the same options remain in the Deal Tracker panel — the
     // inline card was re-inserted on every re-open which cluttered
     // the thread (Ahmed 2026-04-21).
-    var isAcceptedDeal = (conv && conv.identity_revealed === true) || map.status === 'accepted';
+    var isAcceptedDeal = _dealStatus(convId) === 'accepted';
     if (isAcceptedDeal && !deliveryChoice[convId] && !exchangeCardShown[convId]) {
       area.appendChild(createExchangeMethodCard(convId));
       _markExchangeCardShown(convId);
     }
     // First accepted deal ever for this user → explain the QR handshake once.
-    if (isAcceptedDeal && map.status !== 'completed' && !_howItWorksSeen()) {
+    if (isAcceptedDeal && !_howItWorksSeen()) {
       setTimeout(function () { showHowItWorks(); }, 600);
     }
     // Always-visible reminder above the thread while the swap awaits its scan.
-    _renderQrReminder(area, isAcceptedDeal && map.status !== 'completed');
+    _renderQrReminder(area, isAcceptedDeal);
     // Header hint: contact details are shareable once the deal is accepted.
     var hintEl = document.querySelector('#chatHeader .ch-hint');
     if (hintEl) {
@@ -2658,7 +2661,8 @@
     if (qrTimerInterval) clearInterval(qrTimerInterval);
     _teardownQrRealtime();
     _closeQrModal();
-    if (CONV_ITEM_MAP[convId]) CONV_ITEM_MAP[convId].status = 'completed';
+    _setDealStatus(convId, 'completed');
+    _applyChatClosed(convId);
     Toast.show('🎉 Exchange confirmed!', 'success');
 
     // Open the rating modal RIGHT AWAY — no await before it, so even
@@ -2680,20 +2684,9 @@
       if (currentUser && currentUser.id) _checkPendingBadgePromotion(currentUser.id);
     }, 3000);
 
-    // Best-effort: drop a system message so both sides see a trace
-    // in the chat. Failures here must not block the rating UX.
-    try {
-      if (window.db) {
-        window.db.from('messages').insert({
-          conversation_id: convId,
-          sender_id: null,
-          content: '🎉 Exchange completed successfully! Both parties confirmed via QR.',
-          is_system: true
-        }).then(function () {
-          loadMessages(convId).catch(function () {});
-        }, function () {});
-      }
-    } catch (e) { console.warn('[qr] system msg insert failed:', e); }
+    // The closing line ("Deal completed — this chat is now closed") is
+    // written by the server when the swap flips to completed (migration 055).
+    if (convId === activeConvId) loadMessages(convId).catch(function () {});
 
     try { renderDealPanel(convId); } catch (_) {}
     try { renderSidebar(); } catch (_) {}
@@ -2944,7 +2937,8 @@
     // Status
     var statusColors = { pending: 'background:#FEF3C7;color:#92400E', accepted: 'background:#D1FAE5;color:#065F46', completed: 'background:#DBEAFE;color:#1E40AF', cancelled: 'background:#FEE2E2;color:#991B1B' };
     var statusLabels = { pending: '⏳ Waiting for response', accepted: '✅ Deal accepted', completed: '🎉 Exchange completed', cancelled: _chatT('dp_cancelled_badge', '❌ Deal cancelled') };
-    document.getElementById('dpStatus').innerHTML = '<div class="dp-status"><span class="dp-status-badge" style="' + (statusColors[status] || '') + '">' + (statusLabels[status] || status) + '</span></div>';
+    document.getElementById('dpStatus').innerHTML = '<div class="dp-status"><span class="dp-status-badge" style="' + (statusColors[status] || '') + '">' + (statusLabels[status] || status) + '</span></div>' +
+      (CLOSED_DEAL[status] ? '<div style="text-align:center;margin-top:8px;font-size:12px;font-weight:600;color:#6B7280;">' + escapeHTML(_chatT('dp_chat_closed', '🔒 Chat closed')) + '</div>' : '');
 
     // Timeline
     var steps = ['Proposed', 'Accepted', 'Meeting', 'Done'];
@@ -3176,6 +3170,56 @@
   }
   window._contactAllowed = _contactAllowed;
 
+  // Deal state of a conversation: a local action (accept / cancel / complete)
+  // wins until the next refresh, then the joined swap row.
+  function _dealStatus(convId) {
+    var m = CONV_ITEM_MAP[convId] || {};
+    var conv = _convCache.find(function (c) { return c.id === convId; }) || {};
+    return m.status || (conv.swap && conv.swap.status) || (conv.identity_revealed ? 'accepted' : 'pending');
+  }
+  // A finished deal closes its chat — the server refuses new messages too
+  // (msg_insert_sender, migration 055).
+  var CLOSED_DEAL = { completed: 1, cancelled: 1, declined: 1, expired: 1 };
+  function _dealClosed(convId) { return !!CLOSED_DEAL[_dealStatus(convId)]; }
+  function _setDealStatus(convId, status) {
+    CONV_ITEM_MAP[convId] = Object.assign(CONV_ITEM_MAP[convId] || {}, { status: status });
+    var conv = _convCache.find(function (c) { return c.id === convId; });
+    if (conv && conv.swap) conv.swap.status = status;
+  }
+  function _applyChatClosed(convId) {
+    if (convId !== activeConvId) return;
+    var closed = _dealClosed(convId);
+    var row = document.getElementById('chInputRow');
+    var note = document.getElementById('chClosed');
+    var hint = document.querySelector('#inputBar .ch-hint');
+    if (row) row.style.display = closed ? 'none' : '';
+    if (hint) hint.style.display = closed ? 'none' : '';
+    if (note) {
+      note.textContent = _chatT('chat_closed_notice', '🔒 This deal is finished — the chat is closed.');
+      note.style.display = closed ? '' : 'none';
+    }
+    if (closed) {
+      var input = document.getElementById('chatInput');
+      if (input) { input.value = ''; input.blur(); }
+      document.getElementById('inputBar').style.display = '';
+    }
+  }
+  // The other member finished or cancelled the deal: a system line arrives
+  // in the thread — re-read the swap status and close the composer.
+  async function _refreshDealStatus(convId) {
+    var conv = _convCache.find(function (c) { return c.id === convId; });
+    if (!conv || !conv.swap_id || !window.db) return;
+    try {
+      var r = await window.db.from('swaps').select('status').eq('id', conv.swap_id).maybeSingle();
+      if (!r || !r.data || r.data.status === _dealStatus(convId)) return;
+      _setDealStatus(convId, r.data.status);
+      delete _canCancelCache[convId];
+      _applyChatClosed(convId);
+      if (convId === activeConvId) renderDealPanel(convId);
+      renderSidebar();
+    } catch (e) {}
+  }
+
   async function cancelDeal(convId) {
     // The swap id lives on the conversation row — the in-memory map only
     // knows it for legacy entries (Ahmed, 2026-09-21: "No active deal to
@@ -3191,10 +3235,10 @@
       if (window.Toast) Toast.show((res && res.error) || _chatT('dp_cancel_failed', 'Could not cancel the deal.'), 'error');
       return;
     }
-    CONV_ITEM_MAP[convId] = Object.assign(CONV_ITEM_MAP[convId] || {}, { swap_id: swapId, status: 'cancelled' });
-    var conv = _convCache.find(function (c) { return c.id === convId; });
-    if (conv && conv.swap) conv.swap.status = 'cancelled';
+    CONV_ITEM_MAP[convId] = Object.assign(CONV_ITEM_MAP[convId] || {}, { swap_id: swapId });
+    _setDealStatus(convId, 'cancelled');
     delete _canCancelCache[convId];
+    _applyChatClosed(convId);
     if (window.Toast) Toast.show(_chatT('dp_cancelled_toast', 'Deal cancelled. Items are back on the market.'), 'info');
     try { await loadMessages(convId); } catch (e) {}
     renderDealPanel(convId);
@@ -3238,6 +3282,7 @@
     var sendBtn = document.getElementById('sendBtn');
     var txt = input.value.trim();
     if (!txt || !activeConvId) return;
+    if (_dealClosed(activeConvId)) { _applyChatClosed(activeConvId); return; }
     input.value = '';
     sendBtn.disabled = true;
 
@@ -3250,6 +3295,14 @@
       // Never leave the composer locked: a failed send used to disable the
       // button for good ("on n'arrive plus à écrire").
       sendBtn.disabled = false;
+    }
+    if (res && !res.success && /row-level security/i.test(res.error || '')) {
+      // Refused by the server: the deal was just finished on the other side.
+      await _refreshDealStatus(activeConvId);
+      if (_dealClosed(activeConvId)) {
+        if (window.Toast) Toast.show(_chatT('chat_closed_toast', 'Deal finished — the chat is closed.'), 'info');
+        return;
+      }
     }
     if (!res || !res.success) {
       input.value = txt; // give the user their text back
