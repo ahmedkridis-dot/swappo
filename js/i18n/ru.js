@@ -624,6 +624,14 @@
     share_copy: "Скопировать ссылку",
     share_copied: "Ссылка скопирована",
     share_more: "Ещё",
+    // App shell (js/app-shell.js): bottom tab bar + offline screen, inside the mobile app only
+    tab_home: "Главная",
+    tab_market: "Маркет",
+    tab_drop: "Добавить",
+    tab_gifts: "Подарки",
+    app_offline_title: "Нет соединения",
+    app_offline_text: "Проверьте подключение к интернету и попробуйте снова.",
+    app_retry: "Повторить",
     price_drop_badge: "Цена снижена",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "Последний шаг",

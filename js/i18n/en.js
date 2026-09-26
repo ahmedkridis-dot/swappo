@@ -640,6 +640,14 @@
     share_copy: "Copy link",
     share_copied: "Link copied",
     share_more: "More",
+    // App shell (js/app-shell.js): bottom tab bar + offline screen, inside the mobile app only
+    tab_home: "Home",
+    tab_market: "Market",
+    tab_drop: "Drop",
+    tab_gifts: "Gifts",
+    app_offline_title: "No connection",
+    app_offline_text: "Check your internet connection and try again.",
+    app_retry: "Retry",
     price_drop_badge: "Price drop",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "One last thing",

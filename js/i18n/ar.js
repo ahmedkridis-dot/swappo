@@ -650,6 +650,14 @@
     share_copy: "نسخ الرابط",
     share_copied: "تم نسخ الرابط",
     share_more: "المزيد",
+    // App shell (js/app-shell.js): bottom tab bar + offline screen, inside the mobile app only
+    tab_home: "الرئيسية",
+    tab_market: "السوق",
+    tab_drop: "أضف",
+    tab_gifts: "الهدايا",
+    app_offline_title: "لا يوجد اتصال",
+    app_offline_text: "تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
+    app_retry: "إعادة المحاولة",
     price_drop_badge: "انخفاض السعر",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "خطوة أخيرة",

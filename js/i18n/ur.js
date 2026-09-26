@@ -649,6 +649,14 @@
     share_copy: "لنک کاپی کریں",
     share_copied: "لنک کاپی ہو گیا",
     share_more: "مزید",
+    // App shell (js/app-shell.js): bottom tab bar + offline screen, inside the mobile app only
+    tab_home: "ہوم",
+    tab_market: "مارکیٹ",
+    tab_drop: "شامل کریں",
+    tab_gifts: "تحفے",
+    app_offline_title: "کنکشن نہیں",
+    app_offline_text: "اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔",
+    app_retry: "دوبارہ کوشش کریں",
     price_drop_badge: "قیمت کم ہوئی",
     // Onboarding last screen: list one item to unlock the first gift claim
     ob_unlock_step: "ایک آخری بات",
