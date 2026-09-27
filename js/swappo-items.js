@@ -246,10 +246,20 @@
   }
 
   // ---------- REMOVE ----------
+  // Soft delete (migration 056): the listing leaves every list, its history
+  // (offers, claims, chat, impact) stays. A hard delete failed for any item
+  // that ever had an offer.
   async function remove(itemId) {
     if (!global.db) return { success: false, error: 'Service unavailable.' };
-    const { error } = await global.db.from(TABLE).delete().eq('id', itemId);
-    if (error) return { success: false, error: error.message };
+    const { error } = await global.db.rpc('remove_item', { p_item_id: itemId });
+    if (error) {
+      const msg = String(error.message || '');
+      if (/item_locked_by_active_swap/.test(msg)) return { success: false, error: 'This listing has a pending or accepted offer — respond to it first.', locked: true };
+      if (/item_locked_in_box/.test(msg))        return { success: false, error: 'This item is part of a box — remove it from the box first.', locked: true };
+      if (/not_your_item/.test(msg))             return { success: false, error: 'Not your item.' };
+      if (/item_not_found/.test(msg))            return { success: false, error: 'Item not found.' };
+      return { success: false, error: msg };
+    }
     return { success: true };
   }
 
@@ -264,7 +274,7 @@
   async function getByUser(userId) {
     if (!global.db || !userId) return [];
     const { data } = await global.db.from(TABLE)
-      .select('*').eq('user_id', userId)
+      .select('*').eq('user_id', userId).neq('status', 'removed')
       .order('created_at', { ascending: false });
     return data || [];
   }

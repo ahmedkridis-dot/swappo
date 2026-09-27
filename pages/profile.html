@@ -3755,8 +3755,8 @@
                     // is referenced by a pending or accepted swap — anti-fraud
                     // protection so donors can't make a gift disappear once
                     // someone has claimed it.
-                    if (/pending or accepted swap/i.test(msg)) {
-                        msg = 'This item is locked — someone has a pending swap or gift claim on it. Cancel/decline the swap first to delete.';
+                    if (res.locked || /pending or accepted swap|item_locked/i.test(msg)) {
+                        msg = 'This item is locked — someone has a pending swap or gift claim on it. Respond to it first to delete.';
                     }
                     Toast.show(msg, 'error');
                     return;
@@ -3766,7 +3766,7 @@
                 Toast.show('Could not delete.', 'error');
                 return;
             }
-            Toast.show('Item deleted.', 'success');
+            Toast.show('Listing removed.', 'success');
             location.reload();
         }
 
